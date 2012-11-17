@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 
 // Use a different DB for tests
-mongoose.connect('mongodb://localhost/karibou-test');
+var app = require("../app/index");
 
 var customer = require("../models/users");
 
