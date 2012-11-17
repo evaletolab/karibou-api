@@ -44,14 +44,14 @@ logs in (any request to `/auth/twitter`).
 `DELETE /users/:username`
 
 ### Stores API
-`:store_name` is a repository name it has on GitHub.
+`:store_name` is a store name.
 
 #### List user stores
 `GET /users/:username/stores/`
 
 **Example:** http://api.karibou.io/v1/users/evaleto/stores/
 
-#### Sync stores 
+#### Sync stores with ???
 `POST /users/:username/stores/`
 
 #### Get repo data
@@ -60,62 +60,65 @@ logs in (any request to `/auth/twitter`).
 **Example:** http://api.karibou.io/v1/users/evaleto/stores/[???]
 
 ### Topics API
-`:topic_number` is a number, local to current .
+`:topic_name` is a string.
 
-#### List repo topics
-`GET /users/:username/repos/:store_name/topics/`
+#### List topics by store, username, all
+`GET /users/:username/stores/:store_name/topics/`
+`GET /users/:username/topics/`
+`GET /topics/`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/bicycle/topics/
+**Example:** http://api.karibou.io/v1/users/evaleto/topics/
 
 #### Create new topic
-`POST /users/:username/repos/:store_name/topics/`
+`POST /users/:username/topics/`
 
 Input:
 
 * **title**: *Required* **string**
 
-#### Get topic data
-`GET /users/:username/repos/:store_name/topics/:topic_number`
+#### Get topic products
+`GET /users/:username/stores/:store_name/topics/:topic_name`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/bicycle/topics/motor
 
 #### Modify topic
-`PUT /users/:username/repos/:store_name/topics/:topic_number`
+`PUT /users/:username/stores/:store_name/topics/:topic_name`
 
 Input:
 
 * **title**: *Required* **string*&
 
 #### Delete topic
-`DELETE /users/:username/repos/:store_name/topics/:topic_number`
+`DELETE /users/:username/stores/:store_name/topics/:topic_name`
 
-### Posts API
-### List topic posts
-`GET /users/:username/repos/:store_name/topics/:topic_number/posts/`
+### products API
+### List topic products
+`GET /users/:username/stores/:store_name/topics/:topic_name/products/`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1/posts/
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/ostio/topics/1/products/
 
-#### Create new post
-`POST /users/:username/repos/:store_name/topics/:topic_number/posts/`
-
-Input:
-
-* **text**: *Required* **string*
-
-#### Get post data
-`GET /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
-
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1/posts/8
-
-#### Modify post
-`PUT /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
+#### Create new product
+`POST /users/:username/stores/:store_name/topics/:topic_name/products/`
 
 Input:
 
 * **text**: *Required* **string*
 
-#### Delete post
-`DELETE /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
+#### Get product data
+`GET /users/:username/stores/:store_name/topics/:topic_name/products/:id`
+
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/ostio/topics/1/products/8
+
+#### Modify product
+`PUT /users/:username/stores/:store_name/topics/:topic_name/products/:id`
+
+Input:
+
+* **text**: *Required* **string*
+
+#### Delete product
+`DELETE /users/:username/stores/:store_name/topics/:topic_name/products/:id`
 
 ## License
 The MIT License (MIT)
