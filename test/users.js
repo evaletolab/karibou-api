@@ -1,9 +1,8 @@
-var mongoose = require("mongoose");
-
 // Use a different DB for tests
 var app = require("../app/index");
 
-var customer = require("../models/users");
+var mongoose = require("mongoose");
+var customer = mongoose.model('Customers');
 
 // why not using
 // https://github.com/1602/jugglingdb
