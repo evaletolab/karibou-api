@@ -1,11 +1,6 @@
   
 module.exports = function(app) {
 
-  var mongoose = require('mongoose');
-  var mongooseAuth = require('mongoose-auth');
-  var everyauth = require('everyauth')
-    , Promise = everyauth.Promise;
-
   var home = require('./home');
   var api = require('./index');
   var products = require('./products');
