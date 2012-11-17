@@ -2,7 +2,12 @@
 Your open-source commerce. Backend part.
 
 ## Getting started
-This is a backend part of [karibou.io](http://karibou.io/) application.
+This is a backend part of the futur [karibou.*] application.
+
+    $ git clone https://github.com/evaletolab/karibou-api.git
+    $ cd karibou-api
+    $ npm install
+    $ node app
 
 
 ## Deploying
@@ -38,79 +43,79 @@ logs in (any request to `/auth/twitter`).
 #### Delete user
 `DELETE /users/:username`
 
-### Repos API
-`:repo_name` is a repository name it has on GitHub.
+### Stores API
+`:store_name` is a repository name it has on GitHub.
 
-#### List user repos
-`GET /users/:username/repos/`
+#### List user stores
+`GET /users/:username/stores/`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/
 
-#### Sync repos with GitHub
-`POST /users/:username/repos/`
+#### Sync stores 
+`POST /users/:username/stores/`
 
 #### Get repo data
-`GET /users/:username/repos/:repo_name`
+`GET /users/:username/stores/:store_name`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio
+**Example:** http://api.karibou.io/v1/users/evaleto/stores/[???]
 
 ### Topics API
-`:topic_number` is a number, local to current repository.
+`:topic_number` is a number, local to current .
 
 #### List repo topics
-`GET /users/:username/repos/:repo_name/topics/`
+`GET /users/:username/repos/:store_name/topics/`
 
 **Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/
 
 #### Create new topic
-`POST /users/:username/repos/:repo_name/topics/`
+`POST /users/:username/repos/:store_name/topics/`
 
 Input:
 
 * **title**: *Required* **string**
 
 #### Get topic data
-`GET /users/:username/repos/:repo_name/topics/:topic_number`
+`GET /users/:username/repos/:store_name/topics/:topic_number`
 
 **Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1
 
 #### Modify topic
-`PUT /users/:username/repos/:repo_name/topics/:topic_number`
+`PUT /users/:username/repos/:store_name/topics/:topic_number`
 
 Input:
 
 * **title**: *Required* **string*&
 
 #### Delete topic
-`DELETE /users/:username/repos/:repo_name/topics/:topic_number`
+`DELETE /users/:username/repos/:store_name/topics/:topic_number`
 
 ### Posts API
 ### List topic posts
-`GET /users/:username/repos/:repo_name/topics/:topic_number/posts/`
+`GET /users/:username/repos/:store_name/topics/:topic_number/posts/`
 
 **Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1/posts/
 
 #### Create new post
-`POST /users/:username/repos/:repo_name/topics/:topic_number/posts/`
+`POST /users/:username/repos/:store_name/topics/:topic_number/posts/`
 
 Input:
 
 * **text**: *Required* **string*
 
 #### Get post data
-`GET /users/:username/repos/:repo_name/topics/:topic_number/posts/:id`
+`GET /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
 
 **Example:** http://api.karibou.io/v1/users/evaleto/repos/ostio/topics/1/posts/8
 
 #### Modify post
-`PUT /users/:username/repos/:repo_name/topics/:topic_number/posts/:id`
+`PUT /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
 
 Input:
 
 * **text**: *Required* **string*
 
 #### Delete post
-`DELETE /users/:username/repos/:repo_name/topics/:topic_number/posts/:id`
+`DELETE /users/:username/repos/:store_name/topics/:topic_number/posts/:id`
 
 ## License
 The MIT License (MIT)
