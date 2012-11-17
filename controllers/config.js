@@ -2,7 +2,7 @@
 module.exports = function(app) {
 
   var home = require('./home');
-  var api = require('./index');
+  var api = require('./api');
   var products = require('./products');
 
 
