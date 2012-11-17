@@ -9,10 +9,12 @@ This is a backend part of the futur [karibou.*] application.
     $ npm install
     
 Testing
+
     $ npm -g install mocha
     $ mocha
 
 Running    
+
     $ node app
 
 
