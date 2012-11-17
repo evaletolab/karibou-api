@@ -1,8 +1,14 @@
 var mongoose = require("mongoose");
+
+// Use a different DB for tests
+mongoose.connect('mongodb://localhost/karibou-test');
+
 var customer = require("../models/users");
 
-//tell Mongoose to use a different DB - created on the fly
-mongoose.connect('mongodb://localhost/karibou-test');
+// why not using
+// https://github.com/1602/jugglingdb
+
+
 
 describe("Customers", function(){
   var currentCustomer = null;
@@ -16,7 +22,6 @@ describe("Customers", function(){
   });
 
   afterEach(function(done){
-  // FIXME how to remove data?
     customer.remove({}, function(o) {
       done();
     });
@@ -45,6 +50,11 @@ describe("Customers", function(){
       doc.email.should.equal("test@test.com");
       done();
     });
+  });
+
+  it("stats customer", function(done){
+  	console.log();
+  	done();
   });
 
 /* TODO

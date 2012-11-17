@@ -1,3 +1,5 @@
+// from
+// http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
 
 var ProductModel = require('../models/products.js');
 
@@ -23,6 +25,7 @@ exports.create=function (req, res) {
       return console.log(err);
     }
   });
+  res.contentType('application/json'); 
   return res.send(product);
 };
 

@@ -5,15 +5,16 @@
   "private": true,
   "dependencies": {
     "express": "3.x",
-    "connect-redis": "~1.4.4",
-    "mongoose": "3.4.0",
-    "express-mongoose": "0.1.0",
-    "debug": "~0.7.0",
-    "jade": "~0.27.6",
-    "mongodb": "~1.1.10",
-    "mocha": "1.7.0",
-    "should": "1.2.1",
-    "redis": "~0.8.1"
+    "redis": "*",
+    "connect-redis": "*",
+    "mongoose": "3.x",
+    "everyauth": "0.3.x",
+    "mongoose-auth": "0.0.x",
+    "debug": "0.x",
+    "jade": "0.x",
+    "mongodb": "1.x",
+    "mocha": "1.x",
+    "should": "1.2.1"
   }
 }
 

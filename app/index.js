@@ -10,15 +10,20 @@ var path = require('path');
 var config = require('./config');
 var pkgname = require('../package').name;
 var debug = require('debug')('app');
-var mongoose = require('mongoose');
 
 
 var app = module.exports = express();
 
 
-app.Redis = require('redis');
+//export config
+global.config=config;
 
+
+//
+// configure redis layer with zrevrangebyscore
+// -> http://expressjs.com/guide.html#users-online
 if (config.redis){
+	app.Redis = require('redis');
 	app.redisCreateClient = function() {
 		if (config.redis.socket) {
 		  config.redis.port = config.redis.socket;
@@ -33,22 +38,26 @@ if (config.redis){
 }
 
 
+
 for (var name in config.express) {
   app.set(name, config.express[name]);
 }
 
-// connect to Mongo when the app initializes
-mongoose.connect('mongodb://localhost/karibou-test');
 
 
 // config
+// TODO check error handling options http://expressjs.com/guide.html#error-handling
 app.configure(function () {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(path.join(application_root, "public")));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(express.cookieParser());
+  app.use(express.session({ secret: config.session.secret}));
 });
 
 
+
+require('../models/config')(app);
 require('../controllers/config')(app);
