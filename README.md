@@ -7,6 +7,12 @@ This is a backend part of the futur [karibou.*] application.
     $ git clone https://github.com/evaletolab/karibou-api.git
     $ cd karibou-api
     $ npm install
+    
+Testing
+    $ npm -g install mocha
+    $ mocha
+
+Running    
     $ node app
 
 
