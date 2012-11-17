@@ -1,26 +1,37 @@
+
+
   
 module.exports = function(app) {
 
-  var home = require('./home');
-  var api = require('./api');
-  var products = require('./products');
+  var api 			= require('./api');
+  var auth 			= require('./auth');
+  var home 			= require('./home');
+  var products 	= require('./products');
 
 
+	
+	
   //
-  // auth logout
-  app.get('/logout', function (req, res) {
-      req.logout();
-      res.redirect('/');
-  });
-
+  // auth 
+  app.get('/logout', auth.logout);
+ 	app.get('/login', auth.login);
+  app.post('/login', auth.login_post);
+  app.get('/register', auth.register);
+  app.post('/register', auth.register_post);
+  
+	//
+	// home
   app.get('/', home.index);
+  
+  //
+  // api
   app.get('/v1', api.index);
   app.get('/v1/products',products.list);
   app.get('/v1/products/:id',products.get);
-  app.delete('/v1/products',products.mass_remove);
-  app.delete('/v1/products/:id', products.remove);
-  app.post('/v1/products',products.create);
-  app.put('/v1/products',products.mass_update);
-  app.put('/v1/products/:id',products.update);
+  app.delete('/v1/products',auth.ensureAuthenticated, products.mass_remove);
+  app.delete('/v1/products/:id',auth.ensureAuthenticated, products.remove);
+  app.post('/v1/products', auth.ensureAuthenticated, products.create);
+  app.put('/v1/products', auth.ensureAuthenticated, products.mass_update);
+  app.put('/v1/products/:id', auth.ensureAuthenticated, products.update);
   
 };

@@ -1,23 +1,29 @@
-h2 Register
-- if ('undefined' !== typeof errors && errors.length)
-  ul#errors
-    - each error in errors
-      li.error= error
-form(action='/register', method='POST')
-  #login
-    label(for=everyauth.password.loginFormFieldName) Login
-    input(type='text', name=everyauth.password.loginFormFieldName, value=userParams[everyauth.password.loginFormFieldName])
-  #password
-    label(for=everyauth.password.passwordFormFieldName) Password
-    input(type='password', name=everyauth.password.passwordFormFieldName)
-  #phone
-    label(for='phone') Phone
-    input(type='text', name='phone')
-  #first-name
-    label(for='name.first') First Name
-    input(type='text', name='name.first')
-  #last-name
-    label(for='name.last') Last Name
-    input(type='text', name='name.last')
-  #submit
-    input(type='submit') Register
+title Register a New User
+
+div
+  div#header
+    h2 CrowdNotes
+    p Register as a User
+
+  div
+    form(action='/register', method='POST')
+      #login.center
+        label(for='email') Email: 
+        input(type='text', name='email', placeholder='email@email.com')
+      #password.center
+        label(for='password') Password: 
+        input(type='password', name='password', placeholder='password')
+      #password.center
+        label(for='confirm') Confirm: 
+        input(type='password', name='confirm', placeholder='confirm')
+      #first-name.center
+        label(for='name.first') First Name: 
+        input(type='text', name='name.first', placeholder='First Name')
+      #last-name.center
+        label(for='name.last') Last Name: 
+        input(type='text', name='name.last', placeholder='Last Name')
+      #submit.button
+        input(type='submit') Register
+
+div.button 
+  a(href='/account') HOME

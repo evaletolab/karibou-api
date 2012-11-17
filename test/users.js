@@ -2,32 +2,32 @@
 var app = require("../app/index");
 
 var mongoose = require("mongoose");
-var customer = mongoose.model('Customers');
+var User = mongoose.model('Users');
 
 // why not using
 // https://github.com/1602/jugglingdb
 
 
 
-describe("Customers", function(){
-  var currentCustomer = null;
+describe("Users", function(){
+  var currentUser = null;
 
   beforeEach(function(done){
     //add some test data    
-    customer.register("test@test.com", "password", "password", function(doc){
-      currentCustomer = doc;
+    User.register("test@test.com", "password", "password", function(doc){
+      currentUser = doc;
       done();
     });
   });
 
   afterEach(function(done){
-    customer.remove({}, function(o) {
+    User.remove({}, function(o) {
       done();
     });
   });
 
-  it("registers a new customer", function(done){
-    customer.register("test2@test.com", "password", "password", function(doc){
+  it("registers a new User", function(done){
+    User.register("test2@test.com", "password", "password", function(doc){
       doc.email.should.equal("test2@test.com");
       doc.crypted_password.should.not.equal("password");
       done();
@@ -38,27 +38,27 @@ describe("Customers", function(){
   });
 
   it("retrieves by email", function(done){
-    customer.findByEmail(currentCustomer.email, function(doc){
+    User.findByEmail(currentUser.email, function(doc){
       doc.email.should.equal("test@test.com");
       done();
     });
   });
 
   it("retrieves by token", function(done){
-    customer.findByToken(currentCustomer.auth_token, function(doc){
+    User.findByToken(currentUser.auth_token, function(doc){
       doc.email.should.equal("test@test.com");
       done();
     });
   });
 
-  it("stats customer", function(done){
+  it("stats User", function(done){
   	done();
   });
 
 /* TODO
-  it("authenticates and returns customer with valid login", function(done){
-    customer.authenticate(currentCustomer.email, "password", function(customer){
-      customer.email.should.equal("test@test.com");
+  it("authenticates and returns User with valid login", function(done){
+    User.authenticate(currentUser.email, "password", function(User){
+      User.email.should.equal("test@test.com");
       done();
     }, function(){
       throw("oops");
@@ -67,7 +67,7 @@ describe("Customers", function(){
   });
 
   it("authenticates and returns fail with invalid login", function(done){
-    customer.authenticate(currentCustomer.email, "liar", function(customer){
+    User.authenticate(currentUser.email, "liar", function(User){
       throw("This shouldn't happen");
     }, function(){
       done();

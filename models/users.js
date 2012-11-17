@@ -2,72 +2,58 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , mongooseAuth = require('mongoose-auth');
+	, passport = require('passport')
+	, bcrypt = require('bcrypt');
+
 
  var UserSchema = new Schema({
     id    : Number,
     email : {type : String, index: { unique: true, required : true } },
     first : String,
     last  : String,
-    crypted_password :String,
     auth_token : String,
     created:Date,
-    
+		salt: { type: String, required: true },
+		hash: { type: String, required: true },   
     invoices : [{type: Schema.ObjectId, ref : 'Invoice'}]
 });
 
 
-UserSchema.plugin(mongooseAuth, {
-    everymodule: {
-      everyauth: {
-          User: function () {
-            return User;
-          }
-      }
-    }
-  , twitter: {
-      everyauth: {
-          myHostname: 'http://localhost:3000'
-        , consumerKey: config.auth.twit.consumerKey
-        , consumerSecret: config.auth.twit.consumerSecret
-        , redirectPath: '/'
-      }
-    }
-  , password: {
-        loginWith: 'email'
-      , extraParams: {
-            phone: String
-          , name: {
-                first: String
-              , last: String
-            }
-        }
-      , everyauth: {
-            getLoginPath: '/login'
-          , postLoginPath: '/login'
-          , loginView: 'login.jade'
-          , getRegisterPath: '/register'
-          , postRegisterPath: '/register'
-          , registerView: 'register.jade'
-          , loginSuccessRedirect: '/'
-          , registerSuccessRedirect: '/'
-        }
-    }
-  , github: {
-      everyauth: {
-          myHostname: 'http://localhost:3000'
-        , appId: config.auth.github.appId
-        , appSecret: config.auth.github.appSecret
-        , redirectPath: '/'
-      }
-    }
-});
-// Adds login: String
   
+UserSchema.virtual('password').get(function () {
+  return this._password;
+});
 
+UserSchema.virtual('password').set(function (password) {
+  this._password = password;
+  var salt = this.salt = bcrypt.genSaltSync(10);
+  this.hash = bcrypt.hashSync(password, salt);
+});
+
+UserSchema.method('verifyPassword', function(password, callback) {
+  bcrypt.compare(password, this.hash, callback);
+});
+
+
+UserSchema.static('authenticate', function(email, password, callback) {
+  this.findOne({ email: email }, function(err, user) {
+      // on error
+      if (err) { return callback(err); }
+      
+      // on user is Null
+      if (!user) { return callback(null, false); }
+      
+      // verify passwd
+      user.verifyPassword(password, function(err, passwordCorrect) {
+        if (err) { return callback(err); }
+        if (!passwordCorrect) { return callback(null, false); }
+        return callback(null, user);
+      });
+    });
+});
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-	var Users=this.model('Customers');
+	var Users=this.model('Users');
   Users.findOne({email:email}, function(e, doc){
     if(e){
       fail(e)
@@ -78,7 +64,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 }
 
 UserSchema.statics.findByToken = function(token, success, fail){
-	var Users=this.model('Customers');
+	var Users=this.model('Users');
   Users.findOne({auth_token:token}, function(e, doc){
     if(e){
       fail(e)
@@ -89,10 +75,11 @@ UserSchema.statics.findByToken = function(token, success, fail){
 }
 
 UserSchema.statics.login = function(email, password, callback){
+  console.log("login",email, password);
 };
 
 UserSchema.statics.register = function(email, password, confirm, callback){
-	var Users=this.model('Customers');
+	var Users=this.model('Users');
 	
 	// hash password
 	var pwd=require('crypto').createHash('md5').update(password).digest("hex");
@@ -101,7 +88,7 @@ UserSchema.statics.register = function(email, password, confirm, callback){
 	var user=new Users({
 			email:email,
 			auth_token:email,
-			crypted_password:pwd, 
+			password:password,
 			created:new Date()
 	});
 	
@@ -109,11 +96,11 @@ UserSchema.statics.register = function(email, password, confirm, callback){
 	
 	//save it
 	user.save(function(err){
+		callback(err, user);
 	});
-	callback(user);
 };
 
-module.exports = mongoose.model('Customers', UserSchema);
+module.exports = mongoose.model('Users', UserSchema);
 
 
 

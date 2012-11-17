@@ -50,14 +50,12 @@ for (var name in config.express) {
 app.configure(function () {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
   app.use(express.static(path.join(application_root, "public")));
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   app.use(express.cookieParser());
-  app.use(express.session({ secret: config.session.secret}));
 });
 
 
 
-require('../models/config')(app);
+require('../models/config')(app, express);
 require('../controllers/config')(app);

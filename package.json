@@ -7,12 +7,13 @@
     "express": "3.x",
     "redis": "*",
     "connect-redis": "*",
+    "mongodb": "1.x",
     "mongoose": "3.x",
-    "everyauth": "0.3.x",
-    "mongoose-auth": "0.0.x",
+    "connect-mongodb": "1.x",
+    "passport-local": "0.x",
+    "bcrypt": "0.x",
     "debug": "0.x",
     "jade": "0.x",
-    "mongodb": "1.x",
     "mocha": "1.x",
     "should": "1.2.1"
   }

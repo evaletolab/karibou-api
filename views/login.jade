@@ -1,13 +1,17 @@
-- if ('undefined' !== typeof errors && errors.length)
-  ul#errors
-    - each error in errors
-      li.error= error
-form(action='/login', method='POST')
-  #login
-    label(for=everyauth.password.loginFormFieldName) Login
-    input(type='text', name=everyauth.password.loginFormFieldName, value=email)
-  #password
-    label(for=everyauth.password.passwordFormFieldName) Password
-    input(type='password', name=everyauth.password.passwordFormFieldName)
-  #submit
-    input(type='submit') Login
+title Login to karibou
+
+div
+  div#header
+    h2 karibou
+    p Log In
+
+  div
+    form(action='/login', method='POST')
+      #login.center
+        label(for='email') Email:
+        input(type='text', name='email', placeholder='email@email.com')
+      #password.center
+        label(for='password') Password:
+        input(type='password', name='password', placeholder='password')
+      #submit.button
+        input(type='submit', value='Log Me In!') Login
