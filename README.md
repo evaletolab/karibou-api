@@ -6,6 +6,7 @@ This is a backend part of the futur [karibou.*] application.
 
     $ git clone https://github.com/evaletolab/karibou-api.git
     $ cd karibou-api
+    $ npm install git://github.com/bnoguchi/everyauth.git#express3
     $ npm install
     
 Testing

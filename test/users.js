@@ -52,7 +52,6 @@ describe("Customers", function(){
   });
 
   it("stats customer", function(done){
-  	console.log();
   	done();
   });
 
