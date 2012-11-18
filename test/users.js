@@ -12,6 +12,7 @@ var Users = mongoose.model('Users');
 
 describe("Users", function(){
   var currentUsers = null;
+  var assert = require("assert");
 
   beforeEach(function(done){
     //add some test data    
@@ -44,19 +45,23 @@ describe("Users", function(){
     });
   });
 
-  it("retrieves by token", function(done){
+  it.skip("retrieves by token (eg. twitter)", function(done){
     Users.findByToken(currentUsers.auth_token, function(doc){
       doc.email.should.equal("test@test.com");
       done();
     });
   });
 
-  it("stats User", function(done){
+  it.skip("forget password", function(done){
+    
   	done();
   });
 
-/* TODO
-  it("authenticates and returns User with valid login", function(done){
+  it.skip("confirm mail for registration", function(done){
+  	done();
+  });
+
+  it.skip("authenticates and returns User with valid login", function(done){
     Users.authenticate(currentUsers.email, "password", function(User){
       User.email.should.equal("test@test.com");
       done();
@@ -66,14 +71,30 @@ describe("Users", function(){
     });
   });
 
-  it("authenticates and returns fail with invalid login", function(done){
+  it.skip("authenticates and returns fail with invalid login", function(done){
     Users.authenticate(currentUser.email, "liar", function(User){
       throw("This shouldn't happen");
     }, function(){
       done();
     });
   });
+
+  it.skip("ask to become a seller", function(done){
+  });
   
-*/
+  describe("Seller", function(){
+    it.skip("create shop", function(done){
+    });
+
+    it.skip("create a products", function(done){
+    });
+
+    it.skip("import images", function(done){
+    });
+
+  });
+  
+  
+  
 });
 

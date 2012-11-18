@@ -86,7 +86,7 @@ Product.path('description').validate(function (v) {
 
 //
 //
-module.exports = mongoose.model('Product', Product);
+module.exports = mongoose.model('Products', Product);
 
 
 /* Product Document 
