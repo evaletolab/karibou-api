@@ -3,7 +3,7 @@
  * Auth
  */
 
-require('../models/config');
+require('../app/config');
 var db = require('mongoose');
 var passport = require('passport');
 

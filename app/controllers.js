@@ -2,7 +2,7 @@
 
   
 module.exports = function(app) {
-  var path='../controllers';
+  var path='../controllers/';
   var api 			= require(path+'api');
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
