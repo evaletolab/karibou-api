@@ -81,6 +81,12 @@ describe("Users", function(){
 
   it.skip("ask to become a seller", function(done){
   });
+
+  it.skip("seller status is accepted", function(done){
+  });
+
+  it.skip("seller status is denied", function(done){
+  });
   
   describe("Seller", function(){
     it.skip("create shop", function(done){
