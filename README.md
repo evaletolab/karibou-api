@@ -10,7 +10,7 @@ This is a backend part of the futur [karibou.*] application.
     
 Testing
 
-    $ npm -g install mocha
+    $ sudo npm -g install mocha
     $ mocha
 
 Running    
