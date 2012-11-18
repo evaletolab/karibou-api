@@ -57,5 +57,5 @@ app.configure(function () {
 
 
 
-require('../models/config')(app, express);
-require('../controllers/config')(app);
+require('./models')(app, express);
+require('./controllers')(app);
