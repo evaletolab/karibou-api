@@ -1,0 +1,31 @@
+
+db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
+
+[
+  {"_id": ObjectID("4bd87bd8277d094c458d2a43"),
+   "title": "A Love Supreme [Original Recording Reissued]",
+   "author" : "John Coltrane",
+   "author_id": ObjectID("4bd87bd8277d094c458d2fa5"),
+
+   "details": {
+     "number_of_discs": 1,
+     "label": "Impulse Records",
+     "issue_date": "December 9, 1964",
+     "average_customer_review": 4.95,
+     "asin": "B0000A118M"
+   },
+
+   "pricing": {
+    "list": 1198,
+    "retail": 1099,
+    "savings": 99,
+    "pct_savings": 8
+   },
+
+   "categories": [
+     ObjectID("4bd87bd8277d094c458d2a43"),
+     ObjectID("4bd87bd8277d094c458d2b44"),
+     ObjectID("4bd87bd8277d094c458d29a1")
+   ]
+  }
+]

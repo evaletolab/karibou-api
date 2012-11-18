@@ -1,0 +1,27 @@
+{'_id': objectid('4b980a6dea2c3f4579da141e'),
+ 'user_id': objectid('4b980a6dea2c3f4579a4f54'),
+ 'state': 'cart',
+
+ 'line_items': [
+    {'sku': 'jc-432',
+     'name': 'John Coltrane: A Love Supreme',
+     'retail_price': 1099
+    },
+
+    {'sku': 'ly-211',
+     'name': 'Larry Young: Unity',
+     'retail_price': 1199
+    },
+  ],
+
+ 'shipping_address': {
+   'street': '3333 Greene Ave.',
+   'city': 'Brooklyn',
+   'state': 'NY',
+   'zip': '11216'
+  },
+
+  'subtotal': 2199
+}
+
+

@@ -1,3 +1,12 @@
+//
+// refs:
+// - http://kylebanker.com/blog/2010/04/30/mongodb-and-ecommerce/
+// - http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
+
+//
+// have a look on docs/products-*.json for examples
+//
+
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
@@ -87,58 +96,5 @@ Product.path('description').validate(function (v) {
 //
 //
 module.exports = mongoose.model('Products', Product);
-
-
-/* Product Document 
-[
-{  
-  "title": "My Awesome T-shirt",  
-  "description": "All about the details. Of course it's black.",  
-  "images": [  
-    {  
-      "kind": "thumbnail",  
-      "url": "images/products/1234/main.jpg"  
-    }  
-  ],  
-  "categories": [  
-      { "name": "Clothes" },  
-      { "name": "Shirts" }  
-  ],  
-  "style": "1234",  
-  "variants": [  
-    {  
-      "color": "Black",  
-      "images": [  
-        {  
-          "kind": "thumbnail",  
-          "url": "images/products/1234/thumbnail.jpg"  
-        },  
-        {  
-          "kind": "catalog",  
-          "url": "images/products/1234/black.jpg"  
-        }  
-      ],  
-      "sizes": [  
-        {  
-          "size": "S",  
-          "available": 10,  
-          "sku": "CAT-1234-Blk-S",  
-          "price": 99.99  
-        },  
-        {  
-          "size": "M",  
-          "available": 7,  
-          "sku": "CAT-1234-Blk-M",  
-          "price": 109.99  
-        }  
-      ]  
-    }  
-  ],  
-  "catalogs": [  
-      { "name": "Apparel" }  
-  ]  
-}
-]
-*/
 
 
