@@ -55,18 +55,28 @@ logs in (any request to `/auth/twitter`).
 ### Stores API
 `:store_name` is a store name.
 
-#### List user stores
-`GET /users/:username/stores/`
-
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/
+#### List available stores
+`GET /stores/`
 
 #### Sync stores with ???
 `POST /users/:username/stores/`
 
-#### Get repo data
-`GET /users/:username/stores/:store_name`
+#### Get store data
+`GET /stores/:store_name`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/[???]
+**Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies
+
+### Products API
+`:product_name` is a product.
+
+#### List available products
+`GET /products/`
+
+#### Get product data
+`GET /products/:produc_name`
+
+#### List products by store
+`GET /stores/:store_name/products/`
 
 ### Topics API
 `:topic_name` is a string.
@@ -86,10 +96,15 @@ Input:
 
 * **title**: *Required* **string**
 
-#### Get topic products
-`GET /users/:username/stores/:store_name/topics/:topic_name`
+#### Get products by topics
+`GET /topics/:topic_name`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/bicycle/topics/motor
+**Example:** http://api.karibou.io/v1/topics/motor
+
+#### Get products by store and topics
+`GET /stores/:store_name/topics/:topic_name`
+
+**Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies/topics/motor
 
 #### Modify topic
 `PUT /users/:username/stores/:store_name/topics/:topic_name`
