@@ -42,7 +42,7 @@ Just add `?access_token=x` to your URLs. Access token can be get when user
 logs in (any request to `/auth/twitter`).
 
 ### Users API
-`:username` is a user name user has on GitHub.
+`:username` is a user name user has on twitter.
 
 #### Get user data
 `GET /users/:username`
