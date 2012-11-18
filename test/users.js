@@ -28,6 +28,7 @@ describe("Users", function(){
     });
   });
 
+  
   it("registers a new User", function(done){
     Users.register("test2@test.com", "password", "password", function(err, doc){
       doc.email.should.equal("test2@test.com");
@@ -77,6 +78,9 @@ describe("Users", function(){
     }, function(){
       done();
     });
+  });
+
+  it.skip("registers a new User only via twitter", function(done){
   });
 
   it.skip("ask to become a seller", function(done){

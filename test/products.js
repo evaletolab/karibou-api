@@ -31,6 +31,9 @@ describe("Products:", function(){
   
     it.skip("Contact customers directly via email or newsletters", function(done){
     });
+
+    it.skip("Contact customers directly via twitter", function(done){
+    });
     
     it.skip("Easily backup and restore", function(done){
     });
