@@ -78,6 +78,18 @@ describe("Products:", function(){
   });
   
   describe("Products", function(){
+    it.skip("Product is identified by a unique number (SKU Stock-keeping)", function(done){
+    });
+
+    it.skip("Product can be enabled or disabled", function(done){
+    });
+
+    it.skip("Product could have a related products", function(done){
+    });
+
+    it.skip("Product could have variations", function(done){
+    });
+
     it.skip("Control if out of stock products can still be shown and are available for purchase", function(done){
     });
 
