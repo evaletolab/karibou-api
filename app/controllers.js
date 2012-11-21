@@ -7,6 +7,7 @@ module.exports = function(app) {
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
   var products 	= require(path+'products');
+  var users 	= require(path+'users');
 
 
 	
@@ -27,6 +28,7 @@ module.exports = function(app) {
   //
   // api
   app.get('/v1', api.index);
+  app.get('/v1/users/me', users.me);
   app.get('/v1/products',products.list);
   app.get('/v1/products/:id',products.get);
   app.delete('/v1/products',auth.ensureAuthenticated, products.mass_remove);
