@@ -9,6 +9,7 @@
     "connect-redis": "*",
     "mongodb": "1.x",
     "mongoose": "3.x",
+    "mongoose-validate": "x",
     "connect-mongodb": "1.x",
     "passport": "0.1.x",
     "passport-local": "0.x",

@@ -1,12 +1,15 @@
 
-db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
+// db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
 
 [
-  {"_id": ObjectID("4bd87bd8277d094c458d2a43"),
+  {
+   "_id": 'ObjectId',
    "title": "A Love Supreme [Original Recording Reissued]",
    "author" : "John Coltrane",
-   "author_id": ObjectID("4bd87bd8277d094c458d2fa5"),
+   "author_id": 'ObjectID',
 
+   "vendor":ObjectId,
+   
    "details": {
      "number_of_discs": 1,
      "label": "Impulse Records",
@@ -23,9 +26,9 @@ db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
    },
 
    "categories": [
-     ObjectID("4bd87bd8277d094c458d2a43"),
-     ObjectID("4bd87bd8277d094c458d2b44"),
-     ObjectID("4bd87bd8277d094c458d29a1")
+     ObjectID,
+     ObjectID,
+     ObjectID
    ]
   }
 ]
