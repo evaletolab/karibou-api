@@ -3,20 +3,39 @@
 
 [
   {
-   "_id": 'ObjectId',
-   "title": "A Love Supreme [Original Recording Reissued]",
-   "author" : "John Coltrane",
+   title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
+
+   
+ 
+   /* produits */
+   details:{
+     description:"Cultivé depuis l’Egypte Antique, l’épeautre a peu....",
+     remarque:"Garder au sec et surveiller le temps de cuisso...",
+     conservation:{"3 semaines après la date de livraison", isotherme:true},     
+   },  
+
+   producteur:[Producteur],
+
+   /* panier */
+   details:{
+   },
+   
+   /* audio */
+   details: {
+     number_of_discs: 1,
+     label: "Impulse Records",
+     issue_date: "December 9, 1964",
+     average_customer_review: 4.95,
+     asin: "B0000A118M"
+   },
+   
+   bio:true,
+   
+   
    "author_id": 'ObjectID',
 
    "vendor":ObjectId,
    
-   "details": {
-     "number_of_discs": 1,
-     "label": "Impulse Records",
-     "issue_date": "December 9, 1964",
-     "average_customer_review": 4.95,
-     "asin": "B0000A118M"
-   },
 
    "pricing": {
     "list": 1198,

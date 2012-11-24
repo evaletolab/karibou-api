@@ -10,35 +10,16 @@
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
+  , validate = require('mongoose-validate')
   , ObjectId = Schema.ObjectId;
   
 
-
-var Sizes = new Schema({
-    size: { type: String, required: true },
-    available: { type: Number, required: true, min: 0, max: 1000 },
-    sku: { 
-        type: String, 
-        required: true, 
-        validate: [/[a-zA-Z0-9]/, 'Product sku should only have letters and numbers']
-    },
-    price: { type: Number, required: true, min: 0 }
-});
-
-var Images = new Schema({
-    kind: { 
-        type: String, 
-        enum: ['thumbnail', 'catalog', 'detail', 'zoom'],
-        required: true
-    },
-    url: { type: String, required: true }
-});
+ var EnumOGM="Avec Sans".split(' ');
 
 
-var Variants = new Schema({
-    color: String,
-    images: [Images],
-    sizes: [Sizes]
+var Manufacturer = new Schema({
+    name: String,
+    region: {type:String}
 });
 
 
@@ -57,44 +38,31 @@ var Catalogs = new Schema({
 // Product Model
 
 var Product = new Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    style: { type: String, unique: true },
-    images: [Images],
-    categories: [Categories],
-    catalogs: [Catalogs],
-    variants: [Variants],
-    modified: { type: Date, default: Date.now }
+   title: { type: String, required: true },
+   details:{
+     description:{type:String, required:true},
+     remarque:{type:String, required:false},
+   },  
+   attributs:{ bio:Boolean, promote:Boolean, ogm:{type:String, enum:EnumOGM}},
+
+   manufacturer:[Manufacturer],
+   image: {type:String},
+   categories: [Categories],
+   catalogs: [Catalogs],
+   modified: { type: Date, default: Date.now }
 });
 
 
 
 // validation
+Product.path('title').validate(function (title) {
+    return title.length > 10 && title.length < 70;
+}, 'Product title should be between 10 and 70 characters');
 
-Product.path('title').validate(function (v) {
-    console.log("validate title");
-    console.log(v);
-    return v.length > 10 && v.length < 70;
-});
-
-
-
-Product.path('style').validate(function (v) {
-    console.log("validate style");
-    console.log(v);
-    return v.length < 40;
-}, 'Product style attribute is should be less than 40 characters');
-
-
-Product.path('description').validate(function (v) {
-    console.log("validate description");
-    console.log(v);
+Product.path('details.description').validate(function (v) {
     return v.length > 10;
 }, 'Product description should be more than 10 characters');
 
-
-//
-//
 module.exports = mongoose.model('Products', Product);
 
 
