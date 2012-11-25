@@ -34,6 +34,14 @@ var Catalogs = new Schema({
     name: String
 });
 
+var Shops = new Schema({
+    name: { type: String, required: true },
+    description:{ type: String, required: true },
+    bg:{ type: String, required: true },
+    url:{ type: String, required: true },
+    user:[{type: Schema.ObjectId, ref : 'Users'}]
+});
+
 
 // Product Model
 
@@ -49,6 +57,7 @@ var Product = new Schema({
    image: {type:String},
    categories: [Categories],
    catalogs: [Catalogs],
+   vendor: [Shops],
    modified: { type: Date, default: Date.now }
 });
 

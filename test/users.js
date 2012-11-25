@@ -149,7 +149,7 @@ describe("Users", function(){
   it.skip("seller status is denied", function(done){
   });
   
-  describe("Seller", function(){
+  describe("Vendor", function(){
     it.skip("create shop", function(done){
     });
 

@@ -78,7 +78,7 @@ var mongoose = require('mongoose')
     /* */    
     invoices : [{type: Schema.ObjectId, ref : 'Invoice'}],
     
-    /* password and creation date */    
+    /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
 		salt: { type: String, required: false },
 		hash: { type: String, required: false },   

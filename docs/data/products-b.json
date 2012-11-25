@@ -13,6 +13,7 @@
      remarque:"Garder au sec et surveiller le temps de cuisso...",
      conservation:{"3 semaines après la date de livraison", isotherme:true},     
    },  
+   attributs:{ bio:Boolean, promote:Boolean},
 
    producteur:[Producteur],
 
@@ -30,10 +31,9 @@
    },
    
    bio:true,
+   promo:true,
    
-   
-   "author_id": 'ObjectID',
-
+  
    "vendor":ObjectId,
    
 
