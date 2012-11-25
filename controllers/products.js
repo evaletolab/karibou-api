@@ -1,7 +1,9 @@
 // from
 // http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
 
-var ProductModel = require('../models/products.js');
+require('../app/config');
+var db = require('mongoose');
+var ProductModel = db.model('Products');
 
 // REST api
 // POST to CREATE
