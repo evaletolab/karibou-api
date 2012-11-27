@@ -1,5 +1,6 @@
-{'_id': objectid('4b980a6dea2c3f4579da141e'),
- 'user_id': objectid('4b980a6dea2c3f4579a4f54'),
+{
+ '_id': 'objectid',
+ 'user_id': 'objectid',
  'state': 'cart',
 
  'line_items': [

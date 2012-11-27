@@ -7,6 +7,7 @@ module.exports = function(app) {
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
   var products 	= require(path+'products');
+  var users 	= require(path+'users');
 
 
 	
@@ -16,8 +17,9 @@ module.exports = function(app) {
   app.get('/logout', auth.logout);
  	app.get('/login', auth.login);
   app.post('/login', auth.login_post);
-  app.get('/register', auth.register);
-  app.post('/register', auth.register_post);
+  //app.get('/register', auth.register);
+  //app.post('/register', auth.register_post);
+  
   
 	//
 	// home
@@ -26,6 +28,7 @@ module.exports = function(app) {
   //
   // api
   app.get('/v1', api.index);
+  app.get('/v1/users/me', users.me);
   app.get('/v1/products',products.list);
   app.get('/v1/products/:id',products.get);
   app.delete('/v1/products',auth.ensureAuthenticated, products.mass_remove);

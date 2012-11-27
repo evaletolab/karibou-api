@@ -2,12 +2,13 @@
 {  
   "title": "My Awesome T-shirt",  
   "description": "All about the details. Of course it's black.",  
-  "images": [  
-    {  
-      "kind": "thumbnail",  
+  
+  "image": {  
+      "source": "picture.io",  
       "url": "images/products/1234/main.jpg"  
-    }  
-  ],  
+  },
+  
+  
   "categories": [  
       { "name": "Clothes" },  
       { "name": "Shirts" }  

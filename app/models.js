@@ -18,7 +18,7 @@ module.exports = function(app, express) {
 	var Products=require('../models/products');
 
   
-
+  // http://elegantcode.com/2012/05/15/taking-toddler-steps-with-node-js-passport/
 	if(config.auth.twit){
 		var TwitterStrategy = require('passport-twitter').Strategy;
 
@@ -27,14 +27,19 @@ module.exports = function(app, express) {
 				consumerSecret: config.auth.twit.consumerSecret,
 				callbackURL: config.auth.twit.cb
 			},
-			function(token, tokenSecret, profile, done) {
-				console.log(token,tokenSecret,profile);
-    		Users.findOrCreate({ twitterId: profile.id }, function (err, user) {
+			function(token, secret, profile, done) {				
+        console.log("token",token);
+        console.log("secret",secret);
+        
+    		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photos[0].value }, function (err, user) {
       		return done(err, user);
     		});
  			}
 		));
+		
+		
 	}
+
 	
 	// Define local strategy for Passport
 	passport.use(new LocalStrategy({
@@ -61,18 +66,18 @@ module.exports = function(app, express) {
 	
 	
 	app.configure(function () {
-//	  app.use(express.session({ 
-//	    secret:config.session.secret
-//	  }));
-//		app.use(app.router);
+	  app.use(express.session({secret:config.session.secret}));
+/**		
     app.use(express.session({
         store: mongoStore(config.mongo)
       , secret: config.session.secret
       }, function() {
         app.use(app.router);
     }));
+**/
 		app.use(passport.initialize());
 		app.use(passport.session());  
+		app.use(app.router);
 	});
 
 	// connect to Mongo when the app initializes
@@ -82,5 +87,14 @@ module.exports = function(app, express) {
   mongoose.connection.on('open', function() {
     console.log('We have connected to mongodb');
   });
+
+	if(config.auth.twit){
+    app.get('/auth/twitter', passport.authenticate('twitter'));
+    app.get('/auth/twitter/callback', 
+      passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' })
+    );
+		
+	}
+
 
 };

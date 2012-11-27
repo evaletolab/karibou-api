@@ -11,15 +11,24 @@ var Users = mongoose.model('Users');
 
 
 describe("Users", function(){
-  var currentUsers = null;
+  var profile = null;
   var assert = require("assert");
 
   beforeEach(function(done){
-    //add some test data    
-    Users.register("test@test.com", "password", "password", function(err, doc){
-      currentUsers = doc;
-      done();
+
+  	// create a new user
+    var user=new Users({
+		    provider:"twitter",
+		    id:312528659,
+		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png"
     });
+
+    user.save(function(err){
+      profile=user;
+      profile.id.should.equal(312528659);
+	    done();
+    });
+
   });
 
   afterEach(function(done){
@@ -28,18 +37,66 @@ describe("Users", function(){
     });
   });
 
-  
-  it("registers a new User", function(done){
-    Users.register("test2@test.com", "password", "password", function(err, doc){
-      doc.email.should.equal("test2@test.com");
-      done();
-    }, function(message){
-      message.should.equal(null);
-      done();
+  describe("login",function(){
+    
+    it("validate inexistant Oauth user", function(done){
+  		Users.findOrCreate({ id: 1234, provider:profile.provider, photo:profile.photo }, function (err, user) {
+  		  user.id.should.equal(1234);
+    		return done();
+  		});
+      
     });
-  });
 
-  it("retrieves by email", function(done){
+    it("validate existant Oauth user", function(done){
+    		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photo }, function (err, user) {
+  		  user.id.should.equal(profile.id);
+    		return done();
+  		});
+      
+    });
+
+    it("validation for wrong provider", function(done){
+    		Users.findOrCreate({ id: profile.id, provider:"test", photo:profile.photo }, function (err, user) {
+    		err.errors.provider.message.should.equal('Validator "enum" failed for path provider');
+    		return done();
+  		});      
+    });
+
+    it("validation for duplicate id", function(done){
+    		Users.findOrCreate({ id: profile.id, provider:"facebook", photo:profile.photo }, function (err, user) {
+    		assert(err.code,11000);
+    		return done();
+  		});
+      
+    });
+    
+    
+    it.skip("validate provider", function(done){
+      
+    });
+    
+    it.skip("validate provider token", function(done){
+      
+    });
+
+    it.skip("registers a new User", function(done){
+  		Users.findOrCreate({ id: profile.id, provider:profile.provider }, function (err, user) {
+    		return done(err, user);
+  		});
+    
+      Users.register("test2@test.com", "password", "password", function(err, doc){
+        doc.email.should.equal("test2@test.com");
+        done();
+      }, function(message){
+        message.should.equal(null);
+        done();
+      });
+    });
+
+  });
+  
+
+  it.skip("retrieves by email", function(done){
     Users.findByEmail(currentUsers.email, function(doc){
       doc.email.should.equal("test@test.com");
       done();
@@ -92,7 +149,7 @@ describe("Users", function(){
   it.skip("seller status is denied", function(done){
   });
   
-  describe("Seller", function(){
+  describe("Vendor", function(){
     it.skip("create shop", function(done){
     });
 

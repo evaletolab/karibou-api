@@ -25,9 +25,9 @@ module.exports = {
         appId: '111565172259433'
       , appSecret: '85f7e0a0cc804886180b887c1f04a3c1'
     }
-  , twit_: {
-        consumerKey: 'JLCGyLzuOK1BjnKPKGyQ'
-      , consumerSecret: 'GNqKfPqtzOcsCtFbGTMqinoATHvBcy1nzCTimeA9M0'
+  , twit: {
+        consumerKey: 'PzDBUUZoU5hVtigzAz73w'
+      , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
 		  , cb: "http://localhost:3000/auth/twitter/callback"
     }
   , github: {

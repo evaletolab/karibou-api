@@ -1,19 +1,41 @@
 
-db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
+// db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
 
 [
-  {"_id": ObjectID("4bd87bd8277d094c458d2a43"),
-   "title": "A Love Supreme [Original Recording Reissued]",
-   "author" : "John Coltrane",
-   "author_id": ObjectID("4bd87bd8277d094c458d2fa5"),
+  {
+   title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
 
-   "details": {
-     "number_of_discs": 1,
-     "label": "Impulse Records",
-     "issue_date": "December 9, 1964",
-     "average_customer_review": 4.95,
-     "asin": "B0000A118M"
+   
+ 
+   /* produits */
+   details:{
+     description:"Cultivé depuis l’Egypte Antique, l’épeautre a peu....",
+     remarque:"Garder au sec et surveiller le temps de cuisso...",
+     conservation:{"3 semaines après la date de livraison", isotherme:true},     
+   },  
+   attributs:{ bio:Boolean, promote:Boolean},
+
+   producteur:[Producteur],
+
+   /* panier */
+   details:{
    },
+   
+   /* audio */
+   details: {
+     number_of_discs: 1,
+     label: "Impulse Records",
+     issue_date: "December 9, 1964",
+     average_customer_review: 4.95,
+     asin: "B0000A118M"
+   },
+   
+   bio:true,
+   promo:true,
+   
+  
+   "vendor":ObjectId,
+   
 
    "pricing": {
     "list": 1198,
@@ -23,9 +45,9 @@ db.products.find({'_id': ObjectID("4bd87bd8277d094c458d2fa5")});
    },
 
    "categories": [
-     ObjectID("4bd87bd8277d094c458d2a43"),
-     ObjectID("4bd87bd8277d094c458d2b44"),
-     ObjectID("4bd87bd8277d094c458d29a1")
+     ObjectID,
+     ObjectID,
+     ObjectID
    ]
   }
 ]
