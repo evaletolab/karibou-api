@@ -13,7 +13,8 @@ module.exports = {
   },
   
   // TODO load by env
-  mongo:'mongodb://localhost/karibou-test',
+  mongo_:'mongodb://localhost/karibou-test',
+  mongo:'mongodb://karibou:1_karibou@alex.mongohq.com:10044/karibou-test',
 	
 	session:{
 		secret:'karibou-1234'
