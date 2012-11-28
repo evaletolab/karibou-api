@@ -40,6 +40,7 @@ logs in (any request to `/auth/twitter`).
 
 #### Get user data
 `GET /users/:username`
+`GET /users/me`
 
 **Example:** http://api.karibou.io/v1/users/evaleto
 
@@ -52,13 +53,17 @@ logs in (any request to `/auth/twitter`).
 #### List available stores
 `GET /stores/`
 
-#### Sync stores with ???
-`POST /users/:username/stores/`
-
 #### Get store data
 `GET /stores/:store_name`
 
 **Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies
+
+#### Create a new Store
+`POST /users/:username/stores/`
+
+#### Modify a Store
+`PUT /users/:username/stores/:store_name`
+
 
 ### Products API
 `:product_name` is a product.
@@ -71,6 +76,8 @@ logs in (any request to `/auth/twitter`).
 
 #### List products by store
 `GET /stores/:store_name/products/`
+
+**Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies/products
 
 ### Topics API
 `:topic_name` is a string.
