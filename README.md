@@ -39,9 +39,10 @@ logs in (any request to `/auth/twitter`).
 `:username` is a user name user has on twitter.
 
 #### Get user data
-`GET /users/:username`
-`GET /users/me`
-
+```
+GET /users/:username
+GET /users/me
+```
 **Example:** http://api.karibou.io/v1/users/evaleto
 
 #### Delete user
@@ -83,9 +84,11 @@ logs in (any request to `/auth/twitter`).
 `:topic_name` is a string.
 
 #### List topics by store, username, all
-`GET /users/:username/stores/:store_name/topics/`
-`GET /users/:username/topics/`
-`GET /topics/`
+```
+GET /users/:username/stores/:store_name/topics/
+GET /users/:username/topics/
+GET /topics/
+```
 
 **Example:** http://api.karibou.io/v1/users/evaleto/stores/bicycle/topics/
 **Example:** http://api.karibou.io/v1/users/evaleto/topics/
