@@ -13,6 +13,7 @@
     "connect-mongodb": "1.x",
     "passport": "0.1.x",
     "passport-local": "0.x",
+    "passport-twitter": "0.x",
     "bcrypt": "0.x",
     "debug": "0.x",
     "jade": "0.x",
