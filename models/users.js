@@ -68,6 +68,7 @@ var mongoose = require('mongoose')
           primary:{ type: Boolean, required : true, default:false} 
     }],
     
+    /* preferred products*/
     likes: [{type: Schema.Types.ObjectId, ref : 'Products'}],
     
     /* The available Shop for this user */
@@ -128,6 +129,21 @@ UserSchema.statics.findByToken = function(token, success, fail){
     }
   });
 };
+
+UserSchema.methods.addLikes = function(product, callback){
+  this.likes.push(product);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
+
+UserSchema.methods.removeLikes = function(product, callback){
+  this.likes.pop(product);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
+
 
 UserSchema.statics.login = function(email, password, callback){
   console.log("login",email, password);

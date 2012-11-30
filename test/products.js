@@ -185,7 +185,7 @@ describe("Products:", function(){
       });
     });
 
-    it("Find the created Shop", function(done){
+    it("Find One Shop", function(done){
       Shops.findOne({urlpath:"votre-velo-en-ligne"},function(err,shop){
           //shop.user.id.should.equal(user.id);
           shop.name.should.equal("Votre vélo en ligne");
@@ -193,7 +193,7 @@ describe("Products:", function(){
       });
     });
 
-    it("Find the created Shop by the user", function(done){
+    it("Find Shops by the user", function(done){
     
       Shops.findByUser({id:user.id},function(err,shop){
           shop.name.should.equal("Votre vélo en ligne");
@@ -216,7 +216,7 @@ describe("Products:", function(){
     });
     
     
-    it("Find the created product by Shop", function(done){
+    it("Find products by Shop", function(done){
       Shops.findByUser({id:user.id},function(err,shop){
         assert(shop);
         Products.findByShop(shop,function(err,products){          
@@ -225,6 +225,12 @@ describe("Products:", function(){
           done();
         });
       });
+    });
+
+    it.skip("Find products by Shop and Details ", function(done){
+    });
+
+    it.skip("Find products by Category and Details ", function(done){
     });
 
     it.skip("Product can be enabled or disabled", function(done){
