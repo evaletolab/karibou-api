@@ -138,20 +138,7 @@ describe("Users", function(){
   });
 
   it.skip("registers a new User only via twitter", function(done){
-  });
-
-  it.skip("ask to become a seller", function(done){
-  });
-
-  it.skip("seller status is accepted", function(done){
-  });
-
-  it.skip("seller status is denied", function(done){
-  });
-  
-
-  
-  
+  });  
   
 });
 

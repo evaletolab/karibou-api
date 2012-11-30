@@ -64,6 +64,16 @@ describe("Products:", function(){
 
     it.skip("Statistics for products and customers", function(done){
     });
+    
+    it.skip("Requets the shop creation", function(done){
+    });
+
+    it.skip("New shop is accepted", function(done){
+    });
+
+    it.skip("New shop is denied", function(done){
+    });
+    
   });
   
   describe("Customers", function(){
