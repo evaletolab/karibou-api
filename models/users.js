@@ -68,15 +68,11 @@ var mongoose = require('mongoose')
           primary:{ type: Boolean, required : true, default:false} 
     }],
     
-    /* The available Shop for this user 
-    shops: [{
-      value: [Shop],
-      primary:{type:Boolean, default:false}
-    }],
-    */
+    /* The available Shop for this user */
+    shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
     
     /* */    
-    invoices : [{type: Schema.ObjectId, ref : 'Invoice'}],
+    invoices : {type: Schema.ObjectId, ref : 'Invoice'},
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},

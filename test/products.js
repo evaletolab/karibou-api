@@ -3,23 +3,37 @@ var app = require("../app/index");
 
 var mongoose = require("mongoose");
 var Products = mongoose.model('Products');
+var Shops = mongoose.model('Shops');
+var Users = mongoose.model('Users');
 var Sequences = mongoose.model('Sequences');
 
 
 
 describe("Products:", function(){
   var assert = require("assert");
+  var user;
 
   // common befor/after
   before(function(done){
-    done();
+		Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
+		  assert(u);
+		  user=u;
+      done();
+		});
+  
   });
 
   after(function(done){
       // clean sequences ids
-      Sequences.remove({}, function(o) {
-        done();
+      Shops.remove({}, function(o) {
+        Sequences.remove({}, function(o) {
+          Products.remove({}, function(o) {
+            done();
+          });
+
+        });
       });
+      
   });
 
   describe("Categories", function(){
@@ -95,23 +109,23 @@ describe("Products:", function(){
 
     describe("Product is identified by a unique number (SKU Stock-keeping)", function(){
 
-      it("First SKU shoud equals 100000", function(done){
-        Sequences.nextSku(function(err,sku){
-          sku.should.equal(100000);
-          done();
-        });
-      });
-
-      it("Next SKU, 100001", function(done){
+      it("First SKU ", function(done){
         Sequences.nextSku(function(err,sku){
           sku.should.equal(100001);
           done();
         });
       });
 
-      it("Next SKU, 100002", function(done){
-        Sequences.next('sku',function(err,sku){
+      it("Next SKU, ", function(done){
+        Sequences.nextSku(function(err,sku){
           sku.should.equal(100002);
+          done();
+        });
+      });
+
+      it("Next SKU, ", function(done){
+        Sequences.next('sku',function(err,sku){
+          sku.should.equal(100003);
           done();
         });
       });
@@ -130,10 +144,77 @@ describe("Products:", function(){
     it.skip("Create a new Manufacturer", function(done){
     });
 
-    it.skip("Create a new Shop", function(done){
+    it("Create a new Shop", function(done){
+      var s={
+        name: "Votre vélo en ligne",
+        description:"cool ce shop",
+        bgphoto:"http://image.truc.io/bg-01123.jp",
+        fgphoto:"http://image.truc.io/fg-01123.jp"
+      
+      };
+      Shops.create(s,user, function(err,shop){
+        assert(!err);
+        shop.urlpath.should.equal("votre-velo-en-ligne");
+        done();
+      });
     });
 
-    it.skip("Create a new product", function(done){
+    it("Find the created Shop", function(done){
+      Shops.findOne({urlpath:"votre-velo-en-ligne"},function(err,shop){
+          //shop.user.id.should.equal(user.id);
+          shop.name.should.equal("Votre vélo en ligne");
+          done();
+      });
+    });
+
+    it("Find the created Shop by the user", function(done){
+    
+      Shops.findByUser({id:user.id},function(err,shop){
+          shop.name.should.equal("Votre vélo en ligne");
+          done();
+      });
+    });
+
+    it("Create a new product", function(done){
+      var p={
+         title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
+         
+         details:{
+            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
+            comment:"Temps de cuisson : 16 minutes",
+            hasGluten:true, 
+            hasOgm:false,
+            isBio:true, 
+         },  
+         
+         attributes:{
+            isAvailable:true,
+            hasComment:false, 
+            isDiscount:false
+         },
+
+         pricing: {
+            stock:10, 
+            price:3.80,
+            discount:3.0,
+         },
+      
+      };
+      
+      Shops.findByUser({id:user.id},function(err,shop){
+        assert(shop);
+        Products.create(p,shop,function(err,product){
+          assert(product.sku);
+          assert(product.vendor);
+          done();
+        });
+
+      });
+          
+    });
+    
+    
+    it.skip("Find the created product by Shop", function(done){
     });
 
     it.skip("Product can be enabled or disabled", function(done){

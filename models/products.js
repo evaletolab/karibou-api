@@ -8,6 +8,8 @@
 //
 
 var debug = require('debug')('products');
+var assert = require("assert");
+
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
@@ -44,25 +46,30 @@ var Product = new Schema({
    title: { type: String, required: true },
    
    details:{
-     description:{type:String, required:true},
-     comment:{type:String, required:false},
+      description:{type:String, required:true},
+      comment:{type:String, required:false},
+      hasGluten:{type:Boolean, default:true}, 
+      hasOgm:{type:Boolean, default:false},
+      isBio:{type:Boolean, default:true}, 
    },  
    
    attributes:{
-        isAvailable:{type:Boolean, default:true},
-        hasGluten:Boolean, 
-        hasComment:Boolean, 
-        hasOgm:Boolean,
-        stock:Number, 
-        isBio:Boolean, 
-        isPromote:Boolean
+      isAvailable:{type:Boolean, default:true},
+      hasComment:{type:Boolean, default:false}, 
+      isDiscount:{type:Boolean, default:false}
    },
 
+   pricing: {
+      stock:{type:Number, min:0, requiered:true}, 
+      price:{type:Number, min:0, requiered:true},
+      discount:{type:Number, min:0, requiered:true},
+   },
+   
    manufacturer:[Manufacturer],
    image: {type:String},
    categories: [Categories],
    catalogs: [Catalogs],
-   vendor:[{type: Schema.ObjectId, ref : 'Shops'}],  
+   vendor:{type: Schema.ObjectId, ref : 'Shops'},  
    modified: { type: Date, default: Date.now }
 });
 
@@ -82,19 +89,24 @@ Product.path('details.description').validate(function (v) {
 //
 // API
 
-Product.statics.create = function(product,callback){
+Product.statics.create = function(p,s,callback){
   debug("create product: "+product);
-  
+  assert(p);
+  assert(s);
+  assert(callback);
   
 	var Products=this.model('Products');
-  var product =new  Products(product);
+  var product =new  Products(p);
 
   //TODO findNextSKU
   this.model('Sequences').nextSku(function(err,sku){
     if(err)callback(err);
     
-    product.sku=seq;
+    product.sku=sku;
     
+    //
+    //associate product and shop
+    product.vendor=s;
     product.save(function (err) {
       debug("created product, error: "+err);
       debug("created product, product: "+product);
