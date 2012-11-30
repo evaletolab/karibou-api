@@ -1,5 +1,5 @@
 
-var debug = require('debug')('sequences');
+var debug = require('debug')('shops');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
