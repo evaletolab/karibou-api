@@ -124,25 +124,17 @@ Product.statics.findBySku = function(sku, callback){
   });
 };
 
-Product.statics.findByCategory = function(category, success, fail){
-	var Products=this.model('Products');
-  Products.find({categories:category}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+Product.statics.findByCategory = function(category, callback){
+  var Products=this.model('Products');
+  Products.find({categories:category}, function(err, product){
+    callback(err,product);
   });
 };
 
-Product.statics.findByVendor = function(shop, success, fail){
+Product.statics.findByShop = function(shop, callback){
 	var Products=this.model('Products');
-  Products.find({vendor:shop}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+  Products.find({vendor:shop}, function(err, products){
+    callback(err,products);
   });
 };
 

@@ -99,6 +99,32 @@ describe("Products:", function(){
   });
   
   describe("Products", function(){
+      var p={
+         title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
+         
+         details:{
+            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
+            comment:"Temps de cuisson : 16 minutes",
+            hasGluten:true, 
+            hasOgm:false,
+            isBio:true, 
+         },  
+         
+         attributes:{
+            isAvailable:true,
+            hasComment:false, 
+            isDiscount:false
+         },
+
+         pricing: {
+            stock:10, 
+            price:3.80,
+            discount:3.0,
+         },
+      
+      };
+
+
     beforeEach(function(done){
       done();
     });
@@ -176,30 +202,6 @@ describe("Products:", function(){
     });
 
     it("Create a new product", function(done){
-      var p={
-         title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-         
-         details:{
-            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-            comment:"Temps de cuisson : 16 minutes",
-            hasGluten:true, 
-            hasOgm:false,
-            isBio:true, 
-         },  
-         
-         attributes:{
-            isAvailable:true,
-            hasComment:false, 
-            isDiscount:false
-         },
-
-         pricing: {
-            stock:10, 
-            price:3.80,
-            discount:3.0,
-         },
-      
-      };
       
       Shops.findByUser({id:user.id},function(err,shop){
         assert(shop);
@@ -214,7 +216,15 @@ describe("Products:", function(){
     });
     
     
-    it.skip("Find the created product by Shop", function(done){
+    it("Find the created product by Shop", function(done){
+      Shops.findByUser({id:user.id},function(err,shop){
+        assert(shop);
+        Products.findByShop(shop,function(err,products){          
+          assert(products.length);
+          products[0].details.comment.should.equal(p.details.comment);
+          done();
+        });
+      });
     });
 
     it.skip("Product can be enabled or disabled", function(done){

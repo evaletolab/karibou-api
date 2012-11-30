@@ -68,8 +68,11 @@ var mongoose = require('mongoose')
           primary:{ type: Boolean, required : true, default:false} 
     }],
     
+    likes: [{type: Schema.Types.ObjectId, ref : 'Products'}],
+    
     /* The available Shop for this user */
     shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
+    
     
     /* */    
     invoices : {type: Schema.ObjectId, ref : 'Invoice'},
