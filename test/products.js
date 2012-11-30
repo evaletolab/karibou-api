@@ -3,16 +3,24 @@ var app = require("../app/index");
 
 var mongoose = require("mongoose");
 var Products = mongoose.model('Products');
+var Sequences = mongoose.model('Sequences');
 
 
 
 describe("Products:", function(){
   var assert = require("assert");
 
-  beforeEach(function(done){
+  // common befor/after
+  before(function(done){
+    done();
   });
 
-  afterEach(function(done){
+  after(function(done){
+      // clean sequences ids
+      console.log("---------------------------------------------------");
+      Sequences.remove({}, function(o) {
+        done();
+      });
   });
 
   describe("Categories", function(){
@@ -79,12 +87,43 @@ describe("Products:", function(){
   
   describe("Products", function(){
     beforeEach(function(done){
+      done();
     });
 
     afterEach(function(done){
+      done();
     });
 
-    it.skip("Product is identified by a unique number (SKU Stock-keeping)", function(done){
+    describe("Product is identified by a unique number (SKU Stock-keeping)", function(){
+
+      it("First SKU=100000", function(done){
+        Sequences.next('sku',function(err,sku){
+          sku.should.equal(100000);
+          done();
+        });
+      });
+
+      it("Next SKU=100001", function(done){
+        Sequences.next('sku',function(err,sku){
+          sku.should.equal(100001);
+          done();
+        });
+      });
+
+      it("Next SKU=100002", function(done){
+        Sequences.next('sku',function(err,sku){
+          sku.should.equal(100002);
+          done();
+        });
+      });
+
+      it("First OTHER = 100000", function(done){
+        Sequences.next('other',function(err,sku){
+          sku.should.equal(100000);
+          done();
+        });
+      });
+      
     });
 
     it.skip("Product can be enabled or disabled", function(done){

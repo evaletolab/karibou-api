@@ -3,32 +3,42 @@
 
 require('../app/config');
 var db = require('mongoose');
-var ProductModel = db.model('Products');
+var Products = db.model('Products');
 
-// REST api
-// POST to CREATE
 exports.create=function (req, res) {
   var product;
-  console.log("POST: ");
-  console.log(req.body);
-  product = new ProductModel({
-    title: req.body.title,
-    description: req.body.description,
-    style: req.body.style,
-    images: req.body.images,
-    categories: req.body.categories,
-    catalogs: req.body.catalogs,
-    variants: req.body.variants
-  });
-  product.save(function (err) {
-    if (!err) {
-      return console.log("created");
-    } else {
-      return console.log(err);
+
+  Products.create({
+   title: req.body.title,
+   
+   details:{
+     description:req.body.details.description,
+     comment:req.body.details.comment,
+   },  
+   
+   attributes:{
+        isAvailable:req.body.attributs.isAvailable,
+        hasGluten:req.body.attributs.hasGluten, 
+        hasComment:req.body.attributs.hasComment, 
+        hasOgm:req.body.attributs.hasOGM,
+        stock:req.body.attributs.stock, 
+        isBio:req.body.attributs.isBio, 
+        isPromote:req.body.attributs.isPromote
+   },
+   
+   image:req.body.image
+  
+  }, function(err,product){
+    if(err){
+      //TODO error
+      res.json({error:err});
+      return;
     }
+    
+    res.json(product);
   });
-  res.contentType('application/json'); 
-  return res.send(product);
+
+
 };
 
 // PUT to UPDATE

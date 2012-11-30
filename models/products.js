@@ -7,6 +7,7 @@
 // have a look on docs/products-*.json for examples
 //
 
+var debug = require('debug')('products');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
@@ -42,20 +43,31 @@ var Shops = new Schema({
     user:[{type: Schema.ObjectId, ref : 'Users'}]
 });
 
-var Skus = new Schema({
-    stamp:{type:Number,min:1000,unique:true}
+var Sequences = new Schema({
+    name:String,
+    seq:{type:Number,min:100000, default:100000}
 });
 
 // Product Model
 
 var Product = new Schema({
-   sku: { type: String, required: true, unique:true },
+   sku: { type: Number, required: true, unique:true },
    title: { type: String, required: true },
+   
    details:{
      description:{type:String, required:true},
-     remarque:{type:String, required:false},
+     comment:{type:String, required:false},
    },  
-   attributs:{available:{type:Boolean, default:true},stock:Number, bio:Boolean, promote:Boolean, ogm:{type:String, enum:EnumOGM}},
+   
+   attributes:{
+        isAvailable:{type:Boolean, default:true},
+        hasGluten:Boolean, 
+        hasComment:Boolean, 
+        hasOgm:Boolean,
+        stock:Number, 
+        isBio:Boolean, 
+        isPromote:Boolean
+   },
 
    manufacturer:[Manufacturer],
    image: {type:String},
@@ -78,15 +90,58 @@ Product.path('details.description').validate(function (v) {
 
 
 //
+// SEQUENCES API
+
+Sequences.statics.next = function(name, callback){
+  	var Sequences=this.model('Sequences');
+  	var newSeq;
+  	Sequences.findOne({name:name}, function(err, n){
+  	  if (!n){
+    	  n=new Sequences({name:name});
+    	  n.save(function(err){
+          debug("get next sequence ("+name+":"+n.seq+") err:"+err );
+      	  callback(err,n.seq);
+    	  });
+  	  }else{
+
+  	    n.update({$inc: {seq:1}}, { safe: true }, function(err,inc){
+            debug("get next sequence ("+name+":"+n.seq+inc+") err:"+err );
+         	  callback(err,n.seq+inc);
+  	    });
+  	  }
+  	});  	  	
+}; 
+
+
+//
 // API
-Product.statics.findBySku = function(sku, success, fail){
+Product.statics.create = function(product,callback){
+  debug("create product: "+product);
+  
+  
 	var Products=this.model('Products');
-  Products.findOne({sku:sku}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+  var product =new  Products(product);
+
+  //TODO findNextSKU
+  this.model('Sequences').next("skus",function(err,sku){
+    if(err)callback(err);
+    
+    product.sku=seq;
+    
+    product.save(function (err) {
+      debug("created product, error: "+err);
+      debug("created product, product: "+product);
+      callback(err,product);
+    });
+  });
+  
+
+}; 
+
+Product.statics.findBySku = function(sku, callback){
+	var Products=this.model('Products');
+  Products.findOne({sku:sku}, function(e, product){
+    callback(e,product);
   });
 };
 
@@ -112,7 +167,7 @@ Product.statics.findByVendor = function(shop, success, fail){
   });
 };
 
-
+mongoose.model('Sequences', Sequences);
 module.exports = mongoose.model('Products', Product);
 
 
