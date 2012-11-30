@@ -35,13 +35,6 @@ var Catalogs = new Schema({
     name: String
 });
 
-var Shops = new Schema({
-    url:{ type: String, required: true, unique:true },
-    name: { type: String, required: true },
-    description:{ type: String, required: true },
-    bg:{ type: String, required: true },
-    user:[{type: Schema.ObjectId, ref : 'Users'}]
-});
 
 
 // Product Model
@@ -69,7 +62,7 @@ var Product = new Schema({
    image: {type:String},
    categories: [Categories],
    catalogs: [Catalogs],
-   vendor: [Shops],
+   vendor:[{type: Schema.ObjectId, ref : 'Shops'}],  
    modified: { type: Date, default: Date.now }
 });
 
@@ -88,6 +81,7 @@ Product.path('details.description').validate(function (v) {
 
 //
 // API
+
 Product.statics.create = function(product,callback){
   debug("create product: "+product);
   
