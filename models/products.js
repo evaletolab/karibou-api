@@ -112,6 +112,11 @@ Sequences.statics.next = function(name, callback){
   	});  	  	
 }; 
 
+// simple wrapper for SKU
+Sequences.statics.nextSku = function( callback){
+  this.model('Sequences').next("sku",callback);
+};
+
 
 //
 // API
@@ -123,7 +128,7 @@ Product.statics.create = function(product,callback){
   var product =new  Products(product);
 
   //TODO findNextSKU
-  this.model('Sequences').next("skus",function(err,sku){
+  this.model('Sequences').nextSku(function(err,sku){
     if(err)callback(err);
     
     product.sku=seq;

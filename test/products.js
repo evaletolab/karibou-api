@@ -17,7 +17,6 @@ describe("Products:", function(){
 
   after(function(done){
       // clean sequences ids
-      console.log("---------------------------------------------------");
       Sequences.remove({}, function(o) {
         done();
       });
@@ -97,14 +96,14 @@ describe("Products:", function(){
     describe("Product is identified by a unique number (SKU Stock-keeping)", function(){
 
       it("First SKU shoud equals 100000", function(done){
-        Sequences.next('sku',function(err,sku){
+        Sequences.nextSku(function(err,sku){
           sku.should.equal(100000);
           done();
         });
       });
 
       it("Next SKU, 100001", function(done){
-        Sequences.next('sku',function(err,sku){
+        Sequences.nextSku(function(err,sku){
           sku.should.equal(100001);
           done();
         });
