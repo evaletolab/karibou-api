@@ -124,6 +124,17 @@ describe("Products:", function(){
       });
       
     });
+    it.skip("Create a new Category", function(done){
+    });
+
+    it.skip("Create a new Manufacturer", function(done){
+    });
+
+    it.skip("Create a new Shop", function(done){
+    });
+
+    it.skip("Create a new product", function(done){
+    });
 
     it.skip("Product can be enabled or disabled", function(done){
     });
