@@ -149,17 +149,7 @@ describe("Users", function(){
   it.skip("seller status is denied", function(done){
   });
   
-  describe("Vendor", function(){
-    it.skip("create shop", function(done){
-    });
 
-    it.skip("create a products", function(done){
-    });
-
-    it.skip("import images", function(done){
-    });
-
-  });
   
   
   
