@@ -15,6 +15,7 @@ module.exports = function(app, express) {
 
 
 	var Users=require('../models/users');
+	var Seqs=require('../models/sequences');
 	var Products=require('../models/products');
 
   
