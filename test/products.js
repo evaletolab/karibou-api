@@ -13,6 +13,32 @@ describe("Products:", function(){
   var assert = require("assert");
   var user;
 
+  var p={
+     title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
+     
+     details:{
+        description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
+        comment:"Temps de cuisson : 16 minutes",
+        hasGluten:true, 
+        hasOgm:false,
+        isBio:true, 
+     },  
+     
+     attributes:{
+        isAvailable:true,
+        hasComment:false, 
+        isDiscount:false
+     },
+
+     pricing: {
+        stock:10, 
+        price:3.80,
+        discount:3.0,
+     },
+  
+  };
+
+
   // common befor/after
   before(function(done){
 		Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
@@ -109,31 +135,6 @@ describe("Products:", function(){
   });
   
   describe("Products", function(){
-      var p={
-         title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-         
-         details:{
-            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-            comment:"Temps de cuisson : 16 minutes",
-            hasGluten:true, 
-            hasOgm:false,
-            isBio:true, 
-         },  
-         
-         attributes:{
-            isAvailable:true,
-            hasComment:false, 
-            isDiscount:false
-         },
-
-         pricing: {
-            stock:10, 
-            price:3.80,
-            discount:3.0,
-         },
-      
-      };
-
 
     beforeEach(function(done){
       done();
@@ -216,8 +217,10 @@ describe("Products:", function(){
       Shops.findByUser({id:user.id},function(err,shop){
         assert(shop);
         Products.create(p,shop,function(err,product){
+          console.log("SKU:",product.sku);
           assert(product.sku);
           assert(product.vendor);
+          p.sku=product.sku;
           done();
         });
 
@@ -260,7 +263,31 @@ describe("Products:", function(){
   });
   
   describe("Likes products", function(){
-    it.skip("Customer likes/unlikes a product ", function(done){
+    it("Customer likes a product ", function(done){
+      Users.findOne({id:user.id},function(err,user){
+          assert(user);
+          Products.findOneBySku(p.sku,function(err,product){
+            user.addLikes(product);
+            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+              assert(user.likes);
+              user.likes[0].title.should.equal(p.title);
+              done();
+            });
+          });
+      });
+    });
+
+    it("Customer unlikes a product ", function(done){
+      Users.findOne({id:user.id},function(err,user){
+          assert(user);
+          Products.findOneBySku(p.sku,function(err,product){
+            user.removeLikes(product);
+            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+              assert(user.likes.length===0);
+              done();
+            });
+          });
+      });
     });
 
     it.skip("On removed product, customer should be notified", function(done){

@@ -117,7 +117,7 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
-Product.statics.findBySku = function(sku, callback){
+Product.statics.findOneBySku = function(sku, callback){
 	var Products=this.model('Products');
   Products.findOne({sku:sku}, function(e, product){
     callback(e,product);
