@@ -10,6 +10,7 @@ var Sequences = mongoose.model('Sequences');
 
 
 describe("Products:", function(){
+  var async= require("async");
   var assert = require("assert");
   var user;
 
@@ -302,17 +303,33 @@ describe("Products:", function(){
     });
 
     it("On removed product, user likes should be updated", function(done){
-      Users.findOne({id:user.id},function(err,user){
-          assert(user);
+      async.waterfall([
+        function(cb){
+          Users.findOne({id:user.id},function(err,user){
+            assert(user);
+            cb(err,user);
+          });
+        },
+        function(user,cb){
           Products.findOneBySku(p.sku,function(err,product){
             user.addLikes(product);
-            Products.remove({},function(){
-              Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
-                assert(user.likes.length===0);
-                done();
-              });
-            });
+            cb(err,user, product);
           });
+        }
+        ,
+        function(user, product,cb){
+            Products.remove({},function(err){
+              cb(err,user,product);
+            });
+        },
+        function(user,product,cb){
+            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+              assert(user.likes.length===0);
+              done();
+            });
+        }
+      ],function(err,result){
+        assert(!err);
       });
 
     });
