@@ -133,7 +133,19 @@ describe("Products:", function(){
     it.skip("Breadcrumb trail for easy site navigation", function(done){
     });
   });
-  
+
+  describe("System notifications", function(){
+    it.skip("Customers read all notifications", function(done){
+    });
+    
+    it.skip("On subscribed vendor, customer is notified of activities", function(done){
+    });
+
+    it.skip("On subscribed product, customer is notified of activities [disabled/enabled/deleted]", function(done){
+    });  
+    
+  });
+    
   describe("Products", function(){
 
     beforeEach(function(done){
@@ -258,8 +270,7 @@ describe("Products:", function(){
     it.skip("Control if out of stock products can still be shown and are available for purchase", function(done){
     });
 
-    it.skip("Customers can subscribe to products to receive related emails/newsletters", function(done){
-    });
+
   });
   
   describe("Likes products", function(){
@@ -290,10 +301,22 @@ describe("Products:", function(){
       });
     });
 
-    it.skip("On removed product, customer should be notified", function(done){
+    it("On removed product, user likes should be updated", function(done){
+      Users.findOne({id:user.id},function(err,user){
+          assert(user);
+          Products.findOneBySku(p.sku,function(err,product){
+            user.addLikes(product);
+            Products.remove({},function(){
+              Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+                assert(user.likes.length===0);
+                done();
+              });
+            });
+          });
+      });
+
     });
 
-  
   });
 
 
