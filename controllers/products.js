@@ -7,28 +7,11 @@ var Products = db.model('Products');
 
 exports.create=function (req, res) {
   var product;
-
-  Products.create({
-   title: req.body.title,
-   
-   details:{
-     description:req.body.details.description,
-     comment:req.body.details.comment,
-   },  
-   
-   attributes:{
-        isAvailable:req.body.attributs.isAvailable,
-        hasGluten:req.body.attributs.hasGluten, 
-        hasComment:req.body.attributs.hasComment, 
-        hasOgm:req.body.attributs.hasOGM,
-        stock:req.body.attributs.stock, 
-        isBio:req.body.attributs.isBio, 
-        isPromote:req.body.attributs.isPromote
-   },
-   
-   image:req.body.image
   
-  }, function(err,product){
+  console.log(req.body);
+  
+
+  Products.create(req.body, function(err,product){
     if(err){
       //TODO error
       res.json({error:err});
@@ -40,6 +23,41 @@ exports.create=function (req, res) {
 
 
 };
+
+
+// GET to READ
+
+//
+// List products
+// - by category
+// - by shop
+// - by details (bio, glutenfree, ...)
+// - by vendor
+// - by manufacturer
+exports.list=function (req, res) {
+  return Products.find(function (err, products) {
+    if (!err) {
+      return res.json(products);
+    } else {
+      return res.json({error:err});
+    }
+  });
+};
+
+//
+// Single product
+// - by sku
+exports.get=function (req, res) {
+  return Products.findById(req.params.sku, function (err, product) {
+    if (!err) {
+      return res.send(product);
+    } else {
+    	res.status(401);
+      return res.send(err);
+    }
+  });
+};
+
 
 // PUT to UPDATE
 
@@ -88,31 +106,6 @@ exports.update=function (req, res) {
       }
       return res.send(product);
     });
-  });
-};
-
-// GET to READ
-
-// List products
-exports.list=function (req, res) {
-  return ProductModel.find(function (err, products) {
-    if (!err) {
-      return res.send(products);
-    } else {
-      return console.log(err);
-    }
-  });
-};
-
-// Single product
-exports.get=function (req, res) {
-  return ProductModel.findById(req.params.id, function (err, product) {
-    if (!err) {
-      return res.send(product);
-    } else {
-    	res.status(401);
-      return res.send(err);
-    }
   });
 };
 
