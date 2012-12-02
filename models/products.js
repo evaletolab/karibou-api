@@ -118,22 +118,19 @@ Product.statics.create = function(p,s,callback){
 }; 
 
 Product.statics.findOneBySku = function(sku, callback){
-	var Products=this.model('Products');
-  Products.findOne({sku:sku}, function(e, product){
+  return this.model('Products').findOne({sku:sku}, function(e, product){
     callback(e,product);
   });
 };
 
 Product.statics.findByCategory = function(category, callback){
-  var Products=this.model('Products');
-  Products.find({categories:category}, function(err, product){
+  return this.model('Products').find({categories:category}, function(err, product){
     callback(err,product);
   });
 };
 
 Product.statics.findByShop = function(shop, callback){
-	var Products=this.model('Products');
-  Products.find({vendor:shop}, function(err, products){
+  return this.model('Products').find({vendor:shop}, function(err, products){
     callback(err,products);
   });
 };

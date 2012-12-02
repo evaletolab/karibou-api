@@ -109,8 +109,7 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-	var Users=this.model('Users');
-  Users.findOne({email:email}, function(e, doc){
+  return this.model('Users').findOne({email:email}, function(e, doc){
     if(e){
       fail(e)
     }else{
@@ -120,8 +119,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-	var Users=this.model('Users');
-  Users.findOne({provider:token}, function(e, doc){
+  return this.model('Users').findOne({provider:token}, function(e, doc){
     if(e){
       fail(e)
     }else{
@@ -173,7 +171,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 
 UserSchema.statics.authenticate=function(email, password, callback) {
-  this.findOne({ email: email }, function(err, user) {
+  return this.findOne({ email: email }, function(err, user) {
       // on error
       if (err) { return callback(err); }
       
