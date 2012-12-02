@@ -6,6 +6,7 @@ var Products = mongoose.model('Products');
 var Shops = mongoose.model('Shops');
 var Users = mongoose.model('Users');
 var Sequences = mongoose.model('Sequences');
+var Categories = mongoose.model('Categories');
 
 
 
@@ -64,6 +65,20 @@ describe("Products:", function(){
   });
 
   describe("Categories", function(){
+
+    it("Add categories structure", function(done){
+      Categories.create(["Fruits", "Fruits", "Légumes", "Poissons"],function(err,cats){
+        //console.log(cats);
+        done();
+      });
+    });
+
+    it("Add duplicate categories structure", function(done){
+      Categories.create("Fruits",function(err,cat){
+        assert(err);
+        done();
+      });
+    });
 
     it.skip("Products-to-categories structure", function(done){
     });
@@ -267,6 +282,35 @@ describe("Products:", function(){
     });
 
     it.skip("Find products by Category and Details ", function(done){
+      async.waterfall([
+        function(cb){
+          Shops.findByUser({id:user.id},function(err,shop){
+            assert(shop);
+            Products.findByShop(shop,function(err,products){          
+              cb(err,products);
+            });
+          });
+
+        },
+        function(products, cb){
+          Categories.find({},function(err,cats){
+            cb(err,products,cats);
+          });
+        },
+        function(products, cats, cb){
+          products.forEach(function(product){
+            product.addCategories(cats);
+          });
+          cb(null,products,cats);
+        },
+        function(cb){
+          console.log(products);
+          done();
+        }
+      ],function(err,result){
+        assert(!err);
+      });
+
     });
 
     it.skip("Find products by Manufacturer and Category and details ", function(done){

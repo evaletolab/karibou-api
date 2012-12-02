@@ -27,15 +27,6 @@ var Manufacturer = new Schema({
 
 
 
-var Categories = new Schema({
-    name: String
-});
-
-
-
-var Catalogs = new Schema({
-    name: String
-});
 
 
 
@@ -67,8 +58,7 @@ var Product = new Schema({
    
    manufacturer:[Manufacturer],
    image: {type:String},
-   categories: [Categories],
-   catalogs: [Catalogs],
+   categories: [{type: Schema.ObjectId, ref : 'Categories'}],
    vendor:{type: Schema.ObjectId, ref : 'Shops'},  
    modified: { type: Date, default: Date.now }
 });
@@ -116,6 +106,30 @@ Product.statics.create = function(p,s,callback){
   
 
 }; 
+
+Product.methods.addCategories=function(cats,callback){
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      this.categories.push(cat);
+    });
+  }else
+    this.categories.push(cats);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
+
+Product.methods.removeCategories=function(cats,callback){
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      this.categories.pop(cat);
+    });
+  }else
+    this.categories.pop(cats);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
 
 Product.statics.findOneBySku = function(sku, callback){
   return this.model('Products').findOne({sku:sku}, function(e, product){

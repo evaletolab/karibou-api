@@ -81,15 +81,13 @@ Shops.statics.create = function(shop,user, callback){
 }; 
 
 Shops.statics.findByUser=function(u,callback){
-  	var Users=this.model('Users');
-  	Users.findOne(u).populate('shops').exec(function(err,user){
+  	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
   	    callback(err,user.shops[0]);
   	});  	
 };
 
 Shops.statics.findAllByUser=function(u,callback){
-  	var Users=this.model('Users');
-  	Users.findOne(u).populate('shops').exec(function(err,user){
+  	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
   	    callback(err,user.shops);
   	});
   	
@@ -98,7 +96,7 @@ Shops.statics.findAllByUser=function(u,callback){
 
 Shops.statics.findOneShop=function(s,callback){
   	var Shops=this.model('Shops');
-    Shops.findOne(s).populate('user').exec(function(err,shop){
+    return Shops.findOne(s).populate('user').exec(function(err,shop){
       callback(err,shop);
     });
 };
