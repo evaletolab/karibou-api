@@ -56,7 +56,9 @@ describe("Products:", function(){
       Shops.remove({}, function(o) {
         Sequences.remove({}, function(o) {
           Products.remove({}, function(o) {
-            done();
+            Categories.remove({}, function(o) {
+              done();
+            });
           });
 
         });
