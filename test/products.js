@@ -269,6 +269,9 @@ describe("Products:", function(){
     it.skip("Find products by Category and Details ", function(done){
     });
 
+    it.skip("Find products by Manufacturer and Category and details ", function(done){
+    });
+
     it.skip("Product can be enabled or disabled", function(done){
     });
 
