@@ -253,7 +253,17 @@ describe("Products:", function(){
       });
     });
 
-    it.skip("Find products by Shop and Details ", function(done){
+    it("Find BIO products by Shop  ", function(done){
+
+      Shops.findByUser({id:user.id},function(err,shop){
+        assert(shop);
+        Products.findByShop(shop,function(err,products){          
+          assert(products.length);
+          products[0].details.isBio.should.equal(true);
+          done();
+        }).where("details.isBio",true);
+      });
+
     });
 
     it.skip("Find products by Category and Details ", function(done){
