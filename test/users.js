@@ -138,30 +138,7 @@ describe("Users", function(){
   });
 
   it.skip("registers a new User only via twitter", function(done){
-  });
-
-  it.skip("ask to become a seller", function(done){
-  });
-
-  it.skip("seller status is accepted", function(done){
-  });
-
-  it.skip("seller status is denied", function(done){
-  });
-  
-  describe("Vendor", function(){
-    it.skip("create shop", function(done){
-    });
-
-    it.skip("create a products", function(done){
-    });
-
-    it.skip("import images", function(done){
-    });
-
-  });
-  
-  
+  });  
   
 });
 

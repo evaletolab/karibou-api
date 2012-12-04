@@ -68,15 +68,15 @@ var mongoose = require('mongoose')
           primary:{ type: Boolean, required : true, default:false} 
     }],
     
-    /* The available Shop for this user 
-    shops: [{
-      value: [Shop],
-      primary:{type:Boolean, default:false}
-    }],
-    */
+    /* preferred products*/
+    likes: [{type: Schema.Types.ObjectId, ref : 'Products'}],
+    
+    /* The available Shop for this user */
+    shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
+    
     
     /* */    
-    invoices : [{type: Schema.ObjectId, ref : 'Invoice'}],
+    invoices : {type: Schema.ObjectId, ref : 'Invoice'},
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
@@ -109,8 +109,7 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-	var Users=this.model('Users');
-  Users.findOne({email:email}, function(e, doc){
+  return this.model('Users').findOne({email:email}, function(e, doc){
     if(e){
       fail(e)
     }else{
@@ -120,8 +119,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-	var Users=this.model('Users');
-  Users.findOne({provider:token}, function(e, doc){
+  return this.model('Users').findOne({provider:token}, function(e, doc){
     if(e){
       fail(e)
     }else{
@@ -129,6 +127,21 @@ UserSchema.statics.findByToken = function(token, success, fail){
     }
   });
 };
+
+UserSchema.methods.addLikes = function(product, callback){
+  this.likes.push(product);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
+
+UserSchema.methods.removeLikes = function(product, callback){
+  this.likes.pop(product);
+  this.save(function(err){
+    if(err)callback(err);
+  });
+};
+
 
 UserSchema.statics.login = function(email, password, callback){
   console.log("login",email, password);
@@ -158,7 +171,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 
 UserSchema.statics.authenticate=function(email, password, callback) {
-  this.findOne({ email: email }, function(err, user) {
+  return this.findOne({ email: email }, function(err, user) {
       // on error
       if (err) { return callback(err); }
       

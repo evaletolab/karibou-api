@@ -3,33 +3,61 @@
 
 require('../app/config');
 var db = require('mongoose');
-var ProductModel = db.model('Products');
+var Products = db.model('Products');
 
-// REST api
-// POST to CREATE
 exports.create=function (req, res) {
   var product;
-  console.log("POST: ");
+  
   console.log(req.body);
-  product = new ProductModel({
-    title: req.body.title,
-    description: req.body.description,
-    style: req.body.style,
-    images: req.body.images,
-    categories: req.body.categories,
-    catalogs: req.body.catalogs,
-    variants: req.body.variants
+  
+
+  Products.create(req.body, function(err,product){
+    if(err){
+      //TODO error
+      res.json({error:err});
+      return;
+    }
+    
+    res.json(product);
   });
-  product.save(function (err) {
+
+
+};
+
+
+// GET to READ
+
+//
+// List products
+// - by category
+// - by shop
+// - by details (bio, glutenfree, ...)
+// - by vendor
+// - by manufacturer
+exports.list=function (req, res) {
+  return Products.find(function (err, products) {
     if (!err) {
-      return console.log("created");
+      return res.json(products);
     } else {
-      return console.log(err);
+      return res.json({error:err});
     }
   });
-  res.contentType('application/json'); 
-  return res.send(product);
 };
+
+//
+// Single product
+// - by sku
+exports.get=function (req, res) {
+  return Products.findById(req.params.sku, function (err, product) {
+    if (!err) {
+      return res.send(product);
+    } else {
+    	res.status(401);
+      return res.send(err);
+    }
+  });
+};
+
 
 // PUT to UPDATE
 
@@ -78,31 +106,6 @@ exports.update=function (req, res) {
       }
       return res.send(product);
     });
-  });
-};
-
-// GET to READ
-
-// List products
-exports.list=function (req, res) {
-  return ProductModel.find(function (err, products) {
-    if (!err) {
-      return res.send(products);
-    } else {
-      return console.log(err);
-    }
-  });
-};
-
-// Single product
-exports.get=function (req, res) {
-  return ProductModel.findById(req.params.id, function (err, product) {
-    if (!err) {
-      return res.send(product);
-    } else {
-    	res.status(401);
-      return res.send(err);
-    }
   });
 };
 

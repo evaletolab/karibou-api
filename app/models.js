@@ -14,9 +14,15 @@ module.exports = function(app, express) {
 	//  https://github.com/rockbot/CrowdNotes
 
 
-	var Users=require('../models/users');
-	var Products=require('../models/products');
 
+
+  // autoload model
+  files = require("fs").readdirSync( './models' );
+  for(var i in files) {
+    require('../models/'+files[i]);
+  }
+
+  var Users=mongoose.model('Users');
   
   // http://elegantcode.com/2012/05/15/taking-toddler-steps-with-node-js-passport/
 	if(config.auth.twit){
