@@ -1,5 +1,6 @@
 
 module.exports = function(app, express) {
+  var debug =  require('debug')('models');
 
 	// Module dependencies
 	var mongoose = require('mongoose');
@@ -91,7 +92,7 @@ module.exports = function(app, express) {
 
   // Check connection to mongoDB
   mongoose.connection.on('open', function() {
-    console.log('We have connected to mongodb');
+    debug('We have connected to mongodb');
   });
 
 	if(config.auth.twit){
