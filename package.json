@@ -7,8 +7,6 @@
     "underscore": "1.x",
     "express": "3.x",
     "supertest": "0.x",
-    "redis": "*",
-    "connect-redis": "*",
     "mongodb": "1.x",
     "mongoose": "3.x",
     "mongoose-validate": "x",
