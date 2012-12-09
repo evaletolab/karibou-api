@@ -83,7 +83,7 @@ describe("Products:", function(){
 
     });
 
-    it("Create a bad Categories type", function(done){
+    it("Create category with a wrong type", function(done){
       Categories.create({
         name:"Olivier",
         description:"Ebike makers",
