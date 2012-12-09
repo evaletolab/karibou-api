@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "async": "0.x",
     "underscore": "1.x",
     "express": "3.x",
     "supertest": "0.x",

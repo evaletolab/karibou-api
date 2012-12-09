@@ -29,11 +29,16 @@ exports.create=function (req, res) {
 
 //
 // List products
-// - by category
-// - by shop
-// - by details (bio, glutenfree, ...)
-// - by vendor
+// - by category    
+//   /v1/products?c=fruits,légume
+
+// - by details 
+//   /v1/products?a=bio,glutenfree
+
 // - by manufacturer
+//   /v1/products?m=Olivier Evalet
+// - by shop
+// - by vendor
 exports.list=function (req, res) {
   return Products.find(function (err, products) {
     if (!err) {
