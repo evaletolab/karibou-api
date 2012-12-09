@@ -13,6 +13,7 @@ var Categories = mongoose.model('Categories');
 describe("Products:", function(){
   var async= require("async");
   var assert = require("assert");
+  var _ = require("underscore");
   var user;
 
   var p={
@@ -68,9 +69,37 @@ describe("Products:", function(){
 
   describe("Categories", function(){
 
+    it("Create a new Manufacturer", function(done){
+      Categories.create({
+        name:"Olivier",
+        description:"Ebike makers",
+        type:"Manufacturer"
+      },function(err,m){
+        m.name.should.equal("Olivier");
+        m.type.should.equal("Manufacturer");
+        m.description.should.equal("Ebike makers");
+        done();
+      });
+
+    });
+
+    it("Create a bad Categories type", function(done){
+      Categories.create({
+        name:"Olivier",
+        description:"Ebike makers",
+        type:"True"
+      },function(err,m){
+        assert(err);
+        err.errors.type.message.should.be.a.string;
+        done();
+      });
+
+    });
+
     it("Add categories structure", function(done){
-      Categories.create(["Fruits", "Fruits", "Légumes", "Poissons"],function(err,cats){
-        //console.log(cats);
+      Categories.create(["Fruits", "Légumes", "Poissons"],function(err,cats){
+        cats.length.should.equal(3);
+        
         done();
       });
     });
@@ -134,11 +163,6 @@ describe("Products:", function(){
         });
       });
       
-    });
-    it.skip("Create a new Category", function(done){
-    });
-
-    it.skip("Create a new Manufacturer", function(done){
     });
 
     it("Create a new Shop", function(done){

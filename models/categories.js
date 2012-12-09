@@ -13,9 +13,12 @@ var Catalogs = new Schema({
     name: String
 });
 
+var EnumCategories="Manufacturer Categories Other".split(' ');
+
 var Categories = new Schema({
     name: {type:String, unique:true},
-    description:String
+    description:{type:String, unique:false},
+    type:{type:String, unique:false, default:"Categories",enum:EnumCategories}
 });
 
 
@@ -30,8 +33,8 @@ Categories.statics.create = function(names, callback){
 	  var r=[];
     require('async').forEach(names, function(name,cb){
     	Categories.create(name,function(err,cat){
-    	  cb(err);
     	  r.push(cat);
+    	  cb(err);
     	});      
     },function(err){
       callback(err,r);
@@ -41,7 +44,8 @@ Categories.statics.create = function(names, callback){
 
 	//
 	// create a Categories
-  var c =new  Categories({name:names});   
+	var cat=((typeof names) ==="string")?({name:names}):(names);
+  var c =new  Categories(cat);   
   c.save(function (err) {
      callback(err,c);
   });  
