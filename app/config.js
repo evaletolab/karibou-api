@@ -1,7 +1,7 @@
 
 
-var pkgname = require('../package').name;
-var debug = require('debug')(pkgname + ':config');
+//var pkgname = require('../package').name;
+var debug = require('debug')('config');
 
 try {
 

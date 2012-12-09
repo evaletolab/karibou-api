@@ -7,6 +7,9 @@
 // have a look on docs/products-*.json for examples
 //
 
+var debug = require('debug')('products');
+var assert = require("assert");
+
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
@@ -24,44 +27,39 @@ var Manufacturer = new Schema({
 
 
 
-var Categories = new Schema({
-    name: String
-});
 
 
-
-var Catalogs = new Schema({
-    name: String
-});
-
-var Shops = new Schema({
-    url:{ type: String, required: true, unique:true },
-    name: { type: String, required: true },
-    description:{ type: String, required: true },
-    bg:{ type: String, required: true },
-    user:[{type: Schema.ObjectId, ref : 'Users'}]
-});
-
-var Skus = new Schema({
-    stamp:{type:Number,min:1000,unique:true}
-});
 
 // Product Model
 
 var Product = new Schema({
-   sku: { type: String, required: true, unique:true },
+   sku: { type: Number, required: true, unique:true },
    title: { type: String, required: true },
+   
    details:{
-     description:{type:String, required:true},
-     remarque:{type:String, required:false},
+      description:{type:String, required:true},
+      comment:{type:String, required:false},
+      hasGluten:{type:Boolean, default:true}, 
+      hasOgm:{type:Boolean, default:false},
+      isBio:{type:Boolean, default:true}, 
    },  
-   attributs:{available:{type:Boolean, default:true},stock:Number, bio:Boolean, promote:Boolean, ogm:{type:String, enum:EnumOGM}},
+   
+   attributes:{
+      isAvailable:{type:Boolean, default:true},
+      hasComment:{type:Boolean, default:false}, 
+      isDiscount:{type:Boolean, default:false}
+   },
 
+   pricing: {
+      stock:{type:Number, min:0, requiered:true}, 
+      price:{type:Number, min:0, requiered:true},
+      discount:{type:Number, min:0, requiered:true},
+   },
+   
    manufacturer:[Manufacturer],
    image: {type:String},
-   categories: [Categories],
-   catalogs: [Catalogs],
-   vendor: [Shops],
+   categories: [{type: Schema.ObjectId, ref : 'Categories'}],
+   vendor:{type: Schema.ObjectId, ref : 'Shops'},  
    modified: { type: Date, default: Date.now }
 });
 
@@ -77,38 +75,93 @@ Product.path('details.description').validate(function (v) {
 }, 'Product description should be more than 10 characters');
 
 
+
 //
 // API
-Product.statics.findBySku = function(sku, success, fail){
-	var Products=this.model('Products');
-  Products.findOne({sku:sku}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+Product.methods.addCategories=function(cats,callback){
+  var p=this;
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      p.categories.push(cat);
+    });
+  }else{
+    p.categories.push(cats);
+  }
+  p.save(function(err){
+    if(err)callback(err);
   });
 };
 
-Product.statics.findByCategory = function(category, success, fail){
-	var Products=this.model('Products');
-  Products.find({categories:category}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+Product.methods.removeCategories=function(cats,callback){
+  var p=this;
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      p.categories.pop(cat);
+    });
+  }else{
+    p.categories.pop(cats);
+  }
+  p.save(function(err){
+    if(err)callback(err);
   });
 };
 
-Product.statics.findByVendor = function(shop, success, fail){
+Product.statics.create = function(p,s,callback){
+  debug("create product: "+product);
+  assert(p);
+  assert(s);
+  assert(callback);
+  
 	var Products=this.model('Products');
-  Products.find({vendor:shop}, function(e, doc){
-    if(e){
-      fail(e)
-    }else{
-      success(doc);
-    }
+  var product =new  Products(p);
+
+  //TODO findNextSKU
+  this.model('Sequences').nextSku(function(err,sku){
+    if(err)callback(err);
+    
+    product.sku=sku;
+    
+    //
+    //associate product and shop
+    product.vendor=s;
+    product.save(function (err) {
+      debug("created product, error: "+err);
+      debug("created product, product: "+product);
+      callback(err,product);
+    });
+  });
+  
+
+}; 
+
+
+Product.statics.findOneBySku = function(sku, callback){
+  return this.model('Products').findOne({sku:sku}, function(e, product){
+    callback(e,product);
+  });
+};
+
+Product.statics.findByCategory = function(cat, callback){
+  // if cat is array
+  if(Array.isArray(cat)){
+    return callback(new Error("[Array Categories] Not implemented yet!"));
+  }
+  if((typeof cat)==="string"){
+//    this.model('Catgories').findByName(cat,function(e,c){
+//    });
+    return callback( new Error("[String Categories] Not implemented yet!"));
+  }
+  
+  // if cat is an Object
+  
+  return this.model('Products').find({categories:cat}, function(err, product){
+    callback(err,product);
+  });
+};
+
+Product.statics.findByShop = function(shop, callback){
+  return this.model('Products').find({vendor:shop}, function(err, products){
+    callback(err,products);
   });
 };
 

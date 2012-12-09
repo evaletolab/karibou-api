@@ -30,11 +30,11 @@ module.exports = function(app) {
   app.get('/v1', api.index);
   app.get('/v1/users/me', users.me);
   app.get('/v1/products',products.list);
-  app.get('/v1/products/:id',products.get);
+  app.get('/v1/products/:sku',products.get);
   app.delete('/v1/products',auth.ensureAuthenticated, products.mass_remove);
-  app.delete('/v1/products/:id',auth.ensureAuthenticated, products.remove);
+  app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);
   app.post('/v1/products', auth.ensureAuthenticated, products.create);
   app.put('/v1/products', auth.ensureAuthenticated, products.mass_update);
-  app.put('/v1/products/:id', auth.ensureAuthenticated, products.update);
+  app.put('/v1/products/:sku', auth.ensureAuthenticated, products.update);
   
 };
