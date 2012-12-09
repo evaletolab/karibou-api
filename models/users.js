@@ -19,6 +19,15 @@ var mongoose = require('mongoose')
    }
    return true;
  };
+ 
+ validate.postal = function (value) {
+   try {
+   } catch(err) {
+     return false;
+   }
+   return true;
+ };
+ 
 
  // Normalized profile information conforms to the contact schema established by Portable Contacts.
  // http://portablecontacts.net/draft-spec.html#schema
@@ -62,8 +71,8 @@ var mongoose = require('mongoose')
             validate:[validate.alpha, 'Invalide locality'] 
           },
           region: { type: String, required : true, lowercase: true, trim: true, default:"GE" },
-          postalCode: { type: String, required : true,
-            validate:[validate.postalcode,'Invalide postal code'] 
+          postalCode: { type: String, required : false,
+            validate:[validate.postal,'Invalide postal code'] 
           },
           primary:{ type: Boolean, required : true, default:false} 
     }],
