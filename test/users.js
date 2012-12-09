@@ -138,7 +138,40 @@ describe("Users", function(){
   });
 
   it.skip("registers a new User only via twitter", function(done){
-  });  
+  });
+  
+  describe("Customers", function(){
+    it.skip("Customers can view their order history and order statuses", function(done){
+    });
+
+    it.skip("Customers can maintain their multiple shipping and billing addresses", function(done){
+    });
+
+    it.skip("Temporary shopping cart for guests and permanent shopping cart for customers", function(done){
+    });
+
+    it.skip("Fast and friendly quick search and advanced search features", function(done){
+    });
+
+    it.skip("Product reviews for an interactive shopping experience", function(done){
+    });
+
+    it.skip("Secure transactions with SSL", function(done){
+    });
+
+    it.skip("Number of products in each category can be shown or hidden", function(done){
+    });
+
+    it.skip("Global and per-category bestseller lists", function(done){
+    });
+
+    it.skip("Display what other customers have ordered with the current product shown", function(done){
+    });
+
+    it.skip("Breadcrumb trail for easy site navigation", function(done){
+    });
+  });
+    
   
 });
 

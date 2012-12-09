@@ -92,77 +92,7 @@ describe("Products:", function(){
     });
 
   });
-  describe("Administration", function(){
-  
-    it.skip("Contact customers directly via email or newsletters", function(done){
-    });
 
-    it.skip("Contact customers directly via twitter", function(done){
-    });
-    
-    it.skip("Easily backup and restore", function(done){
-    });
-
-    it.skip("Print invoices and packaging lists from the order screen", function(done){
-    });
-
-    it.skip("Statistics for products and customers", function(done){
-    });
-    
-    it.skip("Requets the shop creation", function(done){
-    });
-
-    it.skip("New shop is accepted", function(done){
-    });
-
-    it.skip("New shop is denied", function(done){
-    });
-    
-  });
-  
-  describe("Customers", function(){
-    it.skip("Customers can view their order history and order statuses", function(done){
-    });
-
-    it.skip("Customers can maintain their multiple shipping and billing addresses", function(done){
-    });
-
-    it.skip("Temporary shopping cart for guests and permanent shopping cart for customers", function(done){
-    });
-
-    it.skip("Fast and friendly quick search and advanced search features", function(done){
-    });
-
-    it.skip("Product reviews for an interactive shopping experience", function(done){
-    });
-
-    it.skip("Secure transactions with SSL", function(done){
-    });
-
-    it.skip("Number of products in each category can be shown or hidden", function(done){
-    });
-
-    it.skip("Global and per-category bestseller lists", function(done){
-    });
-
-    it.skip("Display what other customers have ordered with the current product shown", function(done){
-    });
-
-    it.skip("Breadcrumb trail for easy site navigation", function(done){
-    });
-  });
-
-  describe("System notifications", function(){
-    it.skip("Customers read all notifications", function(done){
-    });
-    
-    it.skip("On subscribed vendor, customer is notified of activities", function(done){
-    });
-
-    it.skip("On subscribed product, customer is notified of activities [disabled/enabled/deleted]", function(done){
-    });  
-    
-  });
     
   describe("Products", function(){
 
@@ -283,30 +213,109 @@ describe("Products:", function(){
 
     });
 
-    it.skip("Find products by Category and Details ", function(done){
+    it("Find products by string Category  ", function(done){
+    
       async.waterfall([
+        //
+        // find product and  categories
         function(cb){
-          Shops.findByUser({id:user.id},function(err,shop){
-            assert(shop);
-            Products.findByShop(shop,function(err,products){          
-              cb(err,products);
+            Products.find({},function(err,products){          
+              Categories.find({},function(err,cats){
+                products.forEach(function(product){
+                  product.addCategories(cats);
+                });
+                // should be async
+                cb(err,products,cats);
+              });
+
             });
-          });
 
         },
-        function(products, cb){
-          Categories.find({},function(err,cats){
-            cb(err,products,cats);
-          });
-        },
+        
+        //
+        // find product by Cat
         function(products, cats, cb){
-          products.forEach(function(product){
-            product.addCategories(cats);
+          Products.findByCategory("Fruits",function(err,products){
+            assert(err);
+            cb(null,products,cats);
           });
-          cb(null,products,cats);
+          
         },
+        function(products,cats,cb){
+          done();
+        }
+      ],function(err,result){
+        assert(!err);
+      });
+
+    });
+    
+    it("Find products by Category  ", function(done){
+    
+      async.waterfall([
+        //
+        // find product and  categories
         function(cb){
-          console.log(products);
+            Products.find({},function(err,products){          
+              Categories.find({},function(err,cats){
+                products.forEach(function(product){
+                  product.addCategories(cats);
+                });
+                // should be async
+                cb(err,products,cats);
+              });
+
+            });
+
+        },
+        
+        //
+        // find product by Cat
+        function(products, cats, cb){
+          Products.findByCategory(cats[0],function(err,products){
+            cb(null,products,cats);
+          });
+          
+        },
+        function(products,cats,cb){
+          done();
+        }
+      ],function(err,result){
+        assert(!err);
+      });
+
+    });
+    
+
+    it("Find products by Array Category  ", function(done){
+    
+      async.waterfall([
+        //
+        // find product and  categories
+        function(cb){
+            Products.find({},function(err,products){          
+              Categories.find({},function(err,cats){
+                products.forEach(function(product){
+                  product.addCategories(cats);
+                });
+                // should be async
+                cb(err,products,cats);
+              });
+
+            });
+
+        },
+        
+        //
+        // find product by Cat
+        function(products, cats, cb){
+          Products.findByCategory(cats,function(err,products){
+            assert(err);
+            cb(null,products,cats);
+          });
+          
+        },
+        function(products,cats,cb){
           done();
         }
       ],function(err,result){

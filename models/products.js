@@ -78,6 +78,33 @@ Product.path('details.description').validate(function (v) {
 
 //
 // API
+Product.methods.addCategories=function(cats,callback){
+  var p=this;
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      p.categories.push(cat);
+    });
+  }else{
+    p.categories.push(cats);
+  }
+  p.save(function(err){
+    if(err)callback(err);
+  });
+};
+
+Product.methods.removeCategories=function(cats,callback){
+  var p=this;
+  if(Array.isArray(cats)){
+    cats.forEach(function(cat){
+      p.categories.pop(cat);
+    });
+  }else{
+    p.categories.pop(cats);
+  }
+  p.save(function(err){
+    if(err)callback(err);
+  });
+};
 
 Product.statics.create = function(p,s,callback){
   debug("create product: "+product);
@@ -107,29 +134,6 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
-Product.methods.addCategories=function(cats,callback){
-  if(Array.isArray(cats)){
-    cats.forEach(function(cat){
-      this.categories.push(cat);
-    });
-  }else
-    this.categories.push(cats);
-  this.save(function(err){
-    if(err)callback(err);
-  });
-};
-
-Product.methods.removeCategories=function(cats,callback){
-  if(Array.isArray(cats)){
-    cats.forEach(function(cat){
-      this.categories.pop(cat);
-    });
-  }else
-    this.categories.pop(cats);
-  this.save(function(err){
-    if(err)callback(err);
-  });
-};
 
 Product.statics.findOneBySku = function(sku, callback){
   return this.model('Products').findOne({sku:sku}, function(e, product){
@@ -137,8 +141,20 @@ Product.statics.findOneBySku = function(sku, callback){
   });
 };
 
-Product.statics.findByCategory = function(category, callback){
-  return this.model('Products').find({categories:category}, function(err, product){
+Product.statics.findByCategory = function(cat, callback){
+  // if cat is array
+  if(Array.isArray(cat)){
+    return callback(new Error("[Array Categories] Not implemented yet!"));
+  }
+  if((typeof cat)==="string"){
+//    this.model('Catgories').findByName(cat,function(e,c){
+//    });
+    return callback( new Error("[String Categories] Not implemented yet!"));
+  }
+  
+  // if cat is an Object
+  
+  return this.model('Products').find({categories:cat}, function(err, product){
     callback(err,product);
   });
 };

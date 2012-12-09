@@ -15,7 +15,7 @@ var Catalogs = new Schema({
 
 var Categories = new Schema({
     name: {type:String, unique:true},
-    in:{type:Schema.ObjectId}
+    description:String
 });
 
 
@@ -49,6 +49,11 @@ Categories.statics.create = function(names, callback){
 }; 
 
 
+Categories.statics.findByName = function(name, callback){
+  return this.model('Categories').find({name:name}, function(e, cats){
+    callback(e,cats);
+  });
+};
 module.exports =mongoose.model('Categories', Categories);
 
 
