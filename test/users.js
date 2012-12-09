@@ -38,27 +38,6 @@ describe("Users", function(){
     });
   });
   
-  describe('User controller API ',function(){
-
-    before(function(done){
-      //http.createServer(app,done);
-      done();
-    });
-
-    it('GET /v1/users/me should return 401',function(done){
-      request(app)
-        .get('/v1/users/me')
-        .expect(401,done);
-    });
-
-    it.skip('POST /users should return 200',function(done){
-      request()
-        .post('/users')
-        .set('Content-Type','application/json')
-        .write(JSON.stringify({ username: 'test', password: 'pass' }))
-        .expect(200,done);
-    });
-  });  
 
   describe("login",function(){
     
