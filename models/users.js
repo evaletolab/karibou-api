@@ -3,8 +3,8 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
-	, passport = require('passport')
-	, bcrypt = require('bcrypt');
+	, passport = require('passport');
+//var	bcrypt = require('bcrypt');
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
