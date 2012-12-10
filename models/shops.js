@@ -8,7 +8,6 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
   
 
-var Users = mongoose.model('Users');
 
 var Shops = new Schema({
     urlpath:{ type: String, required: false, unique:true },
