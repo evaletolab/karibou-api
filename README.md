@@ -43,7 +43,7 @@ logs in (any request to `/auth/twitter`).
 GET /users/:username
 GET /users/me
 ```
-**Example:** http://api.karibou.io/v1/users/evaleto
+**Example:** http://karibou-api.cloudfoundry.com/v1/users/me
 
 #### Delete user
 `DELETE /users/:username`
@@ -57,7 +57,7 @@ GET /users/me
 #### Get store data
 `GET /stores/:store_name`
 
-**Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies
+**Example:** http://karibou-api.cloudfoundry.com/v1/stores/bicycle-and-technologies
 
 #### Create a new Store
 `POST /users/:username/stores/`
@@ -90,8 +90,8 @@ GET /users/:username/topics/
 GET /topics/
 ```
 
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/bicycle/topics/
-**Example:** http://api.karibou.io/v1/users/evaleto/topics/
+**Example:** http://karibou-api.cloudfoundry.com/v1/users/evaleto/stores/bicycle/topics/
+**Example:** http://karibou-api.cloudfoundry.com/v1/users/evaleto/topics/
 
 #### Create new topic
 `POST /users/:username/topics/`
@@ -103,12 +103,12 @@ Input:
 #### Get products by topics
 `GET /topics/:topic_name`
 
-**Example:** http://api.karibou.io/v1/topics/motor
+**Example:** http://karibou-api.cloudfoundry.com/v1/topics/motor
 
 #### Get products by store and topics
 `GET /stores/:store_name/topics/:topic_name`
 
-**Example:** http://api.karibou.io/v1/stores/bicycle-and-technologies/topics/motor
+**Example:** http://karibou-api.cloudfoundry.com/v1/stores/bicycle-and-technologies/topics/motor
 
 #### Modify topic
 `PUT /users/:username/stores/:store_name/topics/:topic_name`
@@ -124,7 +124,7 @@ Input:
 ### List topic products
 `GET /users/:username/stores/:store_name/topics/:topic_name/products/`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/ostio/topics/1/products/
+**Example:** http://karibou-api.cloudfoundry.com/v1/users/evaleto/stores/ostio/topics/1/products/
 
 #### Create new product
 `POST /users/:username/stores/:store_name/topics/:topic_name/products/`
@@ -136,7 +136,7 @@ Input:
 #### Get product data
 `GET /users/:username/stores/:store_name/topics/:topic_name/products/:id`
 
-**Example:** http://api.karibou.io/v1/users/evaleto/stores/ostio/topics/1/products/8
+**Example:** http://karibou-api.cloudfoundry.com/v1/users/evaleto/stores/ostio/topics/1/products/8
 
 #### Modify product
 `PUT /users/:username/stores/:store_name/topics/:topic_name/products/:id`
