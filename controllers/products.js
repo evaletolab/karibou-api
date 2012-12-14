@@ -8,17 +8,20 @@ var Products = db.model('Products');
 exports.create=function (req, res) {
   var product;
   
-  console.log(req.body);
+  console.log("user:",req.user);
+  console.log("body:",req.body);
   
-
-  Products.create(req.body, function(err,product){
-    if(err){
-      //TODO error
-      res.json({error:err});
-      return;
-    }
-    
-    res.json(product);
+  Shops.findByUser({id:req.user.id},function(err,shop){
+    assert(shop);
+    Products.create(req.body, function(err,product){
+      if(err){
+        //TODO error
+      	res.status(401);
+        return res.json({error:err});
+      }      
+      console.log(product);
+      res.json(product);
+    });
   });
 
 
@@ -41,11 +44,11 @@ exports.create=function (req, res) {
 // - by vendor
 exports.list=function (req, res) {
   return Products.find(function (err, products) {
-    if (!err) {
-      return res.json(products);
-    } else {
+    if (err) {
+    	res.status(401);
       return res.json({error:err});
     }
+    return res.json(products);
   });
 };
 
@@ -54,12 +57,11 @@ exports.list=function (req, res) {
 // - by sku
 exports.get=function (req, res) {
   return Products.findById(req.params.sku, function (err, product) {
-    if (!err) {
-      return res.send(product);
-    } else {
+    if (err) {
     	res.status(401);
-      return res.send(err);
+      return res.json({error:err});
     }
+    return res.json(product);
   });
 };
 

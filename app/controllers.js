@@ -33,7 +33,7 @@ module.exports = function(app) {
   app.get('/v1/products/:sku',products.get);
   app.delete('/v1/products',auth.ensureAuthenticated, products.mass_remove);
   app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);
-  app.post('/v1/products', auth.ensureAuthenticated, products.create);
+  app.post('/v1/shops/:name/products', auth.ensureAuthenticated, products.create);
   app.put('/v1/products', auth.ensureAuthenticated, products.mass_update);
   app.put('/v1/products/:sku', auth.ensureAuthenticated, products.update);
   
