@@ -21,7 +21,8 @@ describe("Users", function(){
     var user=new Users({
 		    provider:"twitter",
 		    id:312528659,
-		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png"
+		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png",
+		    roles:["admin", "mod"]
     });
 
     user.save(function(err){
@@ -97,6 +98,16 @@ describe("Users", function(){
 
   });
   
+  it('should return true if the user has role', function (done) {
+       profile.hasRole('admin').should.be.true;
+       profile.hasRole('mod').should.be.true;
+       done();
+   });
+   it('should return false if the user does not have role', function (done) {
+     profile.hasRole('astronaut').should.be.false;
+     profile.hasRole('cowboy').should.be.false;
+     done();
+   });  
 
   it.skip("retrieves by email", function(done){
     Users.findByEmail(currentUsers.email, function(doc){

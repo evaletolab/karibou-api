@@ -91,6 +91,7 @@ var mongoose = require('mongoose')
     created:{type:Date, default: Date.now},
 		salt: { type: String, required: false },
 		hash: { type: String, required: false },   
+		roles: Array
 });
 
 
@@ -135,6 +136,19 @@ UserSchema.statics.findByToken = function(token, success, fail){
       success(doc);
     }
   });
+};
+
+UserSchema.methods.hasRole = function (role) {
+ for (var i = 0; i < this.roles.length; i++) {
+   if (this.roles[i] === role) {
+     // if the role that we are chekign matches the 'role' we are
+     // looking for return true
+     return true;
+   }
+
+ };
+ // if the role does not match return false
+ return false;
 };
 
 UserSchema.methods.addLikes = function(product, callback){
