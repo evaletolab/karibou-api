@@ -110,7 +110,7 @@ describe("Products API", function(){
         });
     });    
 
-    it('POST /v1/shops/bicycle-and-rocket/products should return 200 ',function(done){
+    it('POST new shop /v1/shops should return 200 ',function(done){
     
 
       var s={
@@ -131,6 +131,23 @@ describe("Products API", function(){
         .end(function(err,res){
           //console.log(res.text)
           res.should.have.status(200);
+          done();        
+        });
+    });    
+     
+     
+    it('POST /v1/shops/bicycle-and-rocket/products should return 200 ',function(done){
+      // shop must be managed
+      // how to mockup login
+      request(app)
+        .post('/v1/shops/bicycle-and-rocket/products')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .send(p)
+        .end(function(err,res){
+          // shop is not defined
+          res.should.have.status(200);
+          res.body.sku.should.be.above(10000);
           done();        
         });
     });    
