@@ -50,10 +50,10 @@ module.exports = function(app, express) {
 	
 	// Define local strategy for Passport
 	passport.use(new LocalStrategy({
-		  usernameField: 'email'
+		  usernameField: 'id'
 		},
-		function(email, password, done) {
-		  Users.authenticate(email, password, function(err, user) {
+		function(id, password, done) {
+		  Users.authenticate(id, password, function(err, user) {
 		    return done(err, user);
 		  });
 		}

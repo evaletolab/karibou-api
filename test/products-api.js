@@ -37,15 +37,19 @@ describe("Products API", function(){
      },
   
   };
+  
+ 
+ 
 
   before(function(done){
-    request(app)
-      .post('/login')
-      .send({ id: 12345, provider:"twitter" })
-      .end(function(err,res){
-        res.should.have.status(302);
-        done();        
-      });
+    // registered user with password and linked to a provider
+    require('mongoose').model('Users').test(1234,'mypwd', function(e,u){
+      profile=u;
+      assert(!e);
+      profile.id.should.equal(1234);
+	    done();   
+    });     
+
   
   });
 
@@ -67,6 +71,21 @@ describe("Products API", function(){
       .send(p)
       .expect(302,done);
   });
+  
+  describe("Product API with auth", function(){
+  
+    before(function(done){
+	    // login
+      request(app)
+        .post('/login')
+        .send({ id: 1234, password:'mypwd' })
+        .end(function(err,res){
+          res.should.have.status(302);
+          res.headers.location.should.equal('/');
+          done();        
+        });
+      });	    
+    });
     
   it('POST /v1/shops/:name/products should return 200 and created product',function(done){
     // shop must be managed
@@ -80,7 +99,10 @@ describe("Products API", function(){
         //console.log(res);
         done();        
       });
-  });
+  });    
+  
+    
+
   
 });
 

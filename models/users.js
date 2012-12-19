@@ -9,7 +9,7 @@ var	bcrypt = require('bcrypt');
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
- var EnumProvider="twitter facebook goolge".split(' ');
+ var EnumProvider="twitter facebook goolge local".split(' ');
 
  // validate URL
  validate.url = function (value) {
@@ -185,23 +185,28 @@ UserSchema.virtual('password').get(function () {
 
 UserSchema.virtual('password').set(function (password) {
   this._password = password;
-  var salt = this.salt = bcrypt.genSaltSync(10);
-  this.hash = bcrypt.hashSync(password, salt);
+//  var salt = this.salt = bcrypt.genSaltSync(10);
+//  this.hash = bcrypt.hashSync(password, salt);
+  this.hash = require('crypto').createHash('sha1').update(password).digest("hex")
 });
 
 UserSchema.method('verifyPassword', function(password, callback) {
-  bcrypt.compare(password, this.hash, callback);
+  var hash=require('crypto').createHash('sha1').update(password).digest("hex");
+  callback(null,hash===this.hash);  
+//  bcrypt.compare(password, this.hash, callback);
 });
 
 
-UserSchema.statics.authenticate=function(email, password, callback) {
-  return this.findOne({ email: email }, function(err, user) {
+UserSchema.statics.authenticate=function(id, password, callback) {
+  
+  return this.model('Users').findOne({ id: id }, function(err, user) {
       // on error
       if (err) { return callback(err); }
       
+
       // on user is Null
       if (!user) { return callback(null, false); }
-      
+
       // verify passwd
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return callback(err); }
@@ -211,17 +216,34 @@ UserSchema.statics.authenticate=function(email, password, callback) {
     });
 };
 
+//
+//test only
+UserSchema.statics.test = function (id,password, cb){
+  	var Users=this.model('Users');
+  	// create a new user
+    var user=new Users({
+		    provider:"twitter",
+		    id:id,
+		    password:password,
+		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png",
+		    roles:["customer", "seller","admin"]
+    });
 
-UserSchema.statics.register = function(email, password, confirm, callback){
+    user.save(function(err){
+      cb(err,user);
+    });
+};
+
+UserSchema.statics.register = function(id, password, confirm, callback){
 	var Users=this.model('Users');
-	
+	error("TODO, we cannot register a user without matching a common provider (twitter, google, fb, flickr)");
 	// hash password
-	var pwd=require('crypto').createHash('md5').update(password).digest("hex");
+	//var pwd=require('crypto').createHash('md5').update(password).digest("hex");
 	
 	// create a new customer
 	var user=new Users({
-			email:email,
-			provider:"local",
+			id:id,
+			provider:"twitter",
 			password:password,
 			created:new Date()
 	});

@@ -42,6 +42,7 @@ describe("Products:", function(){
   };
 
 
+
   // common befor/after
   before(function(done){
 		Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
