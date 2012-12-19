@@ -4,7 +4,8 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
 	, passport = require('passport');
-//var	bcrypt = require('bcrypt');
+	
+var	bcrypt = require('bcrypt');
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');

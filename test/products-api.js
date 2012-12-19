@@ -38,7 +38,16 @@ describe("Products API", function(){
   
   };
 
-
+  before(function(done){
+    request(app)
+      .post('/login')
+      .send({ id: 12345, provider:"twitter" })
+      .end(function(err,res){
+        res.should.have.status(302);
+        done();        
+      });
+  
+  });
 
   it('GET /v1/products/100001 should return 401',function(done){
     request(app)
