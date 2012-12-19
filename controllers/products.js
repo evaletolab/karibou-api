@@ -4,27 +4,43 @@
 require('../app/config');
 var db = require('mongoose');
 var Products = db.model('Products');
+var assert = require("assert");
 
 exports.create=function (req, res) {
   var product;
   
-  console.log("user:",req.user);
-  console.log("body:",req.body);
+  //console.log("body:",req.body);
+  assert(req.params.shopname);  
+  //TODO? Shops.findByUser({id:req.user.id} 
   
-  Shops.findByUser({id:req.user.id},function(err,shop){
-    assert(shop);
-    Products.create(req.body, function(err,product){
+  db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
+    if(!shop ){
+    	res.status(401);
+      return res.json({error:"Shops is not defined"});
+    };
+    Products.create(req.body,req.user, function(err,product){
       if(err){
         //TODO error
       	res.status(401);
         return res.json({error:err});
       }      
-      console.log(product);
       res.json(product);
     });
   });
 
 
+};
+
+exports.shopCreate=function (req, res) {
+
+  db.model('Shops').create(req.body, req.user, function(err,shop){
+    if(err){
+      //TODO error
+    	res.status(401);
+      return res.json({error:err});
+    }      
+    res.json(shop);
+  });
 };
 
 
@@ -69,7 +85,7 @@ exports.get=function (req, res) {
 // PUT to UPDATE
 
 // Bulk update
-exports.mass_update= function (req, res) {
+exports.massUpdate= function (req, res) {
     var i, len = 0;
     console.log("is Array req.body.products");
     console.log(Array.isArray(req.body.products));
@@ -118,7 +134,7 @@ exports.update=function (req, res) {
 
 
 // Bulk destroy all products
-exports.mass_remove=function (req, res) {
+exports.massRemove=function (req, res) {
   ProductModel.remove(function (err) {
     if (!err) {
       console.log("removed");

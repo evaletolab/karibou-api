@@ -49,8 +49,13 @@ describe("Products API", function(){
       profile.id.should.equal(1234);
 	    done();   
     });     
-
+  });
   
+  after(function(done){
+    require('mongoose').model('Shops').remove({},function(){});
+    require('mongoose').model('Products').remove({},function(){done();});
+    require('mongoose').model('Users').remove({},function(){done();});
+    
   });
 
   it('GET /v1/products/100001 should return 401',function(done){
@@ -73,7 +78,7 @@ describe("Products API", function(){
   });
   
   describe("Product API with auth", function(){
-  
+    var cookie;
     before(function(done){
 	    // login
       request(app)
@@ -82,21 +87,50 @@ describe("Products API", function(){
         .end(function(err,res){
           res.should.have.status(302);
           res.headers.location.should.equal('/');
+          cookie = res.headers['set-cookie'];
+          assert(cookie);
           done();        
-        });
-      });	    
+      });
+    });	    
       
 
-    it('POST /v1/shops/:name/products should return 200 and created product',function(done){
+    it('POST /v1/shops/bicycle-and-rocket/products should return 401 shop not found ',function(done){
       // shop must be managed
       // how to mockup login
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
         .set('Content-Type','application/json')
+        .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
+          // shop is not defined
+          //console.log(res.text);  
+          res.should.have.status(401);
+          done();        
+        });
+    });    
+
+    it('POST /v1/shops/bicycle-and-rocket/products should return 200 ',function(done){
+    
+
+      var s={
+        name: "Bicycle and rocket",
+        description:"cool ce shop",
+        bgphoto:"http://image.truc.io/bg-01123.jp",
+        fgphoto:"http://image.truc.io/fg-01123.jp"      
+      };
+      
+    
+      // shop must be managed
+      // how to mockup login
+      request(app)
+        .post('/v1/shops')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .send(s)
+        .end(function(err,res){
+          //console.log(res.text)
           res.should.have.status(200);
-          //console.log(res);
           done();        
         });
     });    

@@ -55,6 +55,8 @@ describe("Products:", function(){
 
   after(function(done){
       // clean sequences ids
+      Users.remove({}, function(o) {
+      });
       Shops.remove({}, function(o) {
         Sequences.remove({}, function(o) {
           Products.remove({}, function(o) {
@@ -135,24 +137,32 @@ describe("Products:", function(){
     });
 
     describe("Product is identified by a unique number (SKU Stock-keeping)", function(){
+      var SKU;
+      before(function(done){
+        Sequences.findOne({name:'sku'},function(err,sku){
+          assert(!err);
+          SKU=sku.seq;
+          done();
+        });
+      });
 
       it("First SKU ", function(done){
         Sequences.nextSku(function(err,sku){
-          sku.should.equal(100001);
+          sku.should.equal(SKU+1);
           done();
         });
       });
 
       it("Next SKU, ", function(done){
         Sequences.nextSku(function(err,sku){
-          sku.should.equal(100002);
+          sku.should.equal(SKU+2);
           done();
         });
       });
 
       it("Next SKU, ", function(done){
         Sequences.next('sku',function(err,sku){
-          sku.should.equal(100003);
+          sku.should.equal(SKU+3);
           done();
         });
       });
@@ -200,6 +210,7 @@ describe("Products:", function(){
     it("Create a new product", function(done){
       
       Shops.findByUser({id:user.id},function(err,shop){
+
         assert(shop);
         Products.create(p,shop,function(err,product){
           console.log("SKU:",product.sku);
