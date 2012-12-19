@@ -85,21 +85,24 @@ describe("Products API", function(){
           done();        
         });
       });	    
-    });
+      
+
+    it('POST /v1/shops/:name/products should return 200 and created product',function(done){
+      // shop must be managed
+      // how to mockup login
+      request(app)
+        .post('/v1/shops/bicycle-and-rocket/products')
+        .set('Content-Type','application/json')
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(200);
+          //console.log(res);
+          done();        
+        });
+    });    
+      
+  });
     
-  it('POST /v1/shops/:name/products should return 200 and created product',function(done){
-    // shop must be managed
-    // how to mockup login
-    request(app)
-      .post('/v1/shops/bicycle-and-rocket/products')
-      .set('Content-Type','application/json')
-      .send(p)
-      .end(function(err,res){
-        res.should.have.status(200);
-        //console.log(res);
-        done();        
-      });
-  });    
   
     
 
