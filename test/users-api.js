@@ -15,6 +15,7 @@ describe("Users API", function(){
   var request= require('supertest');
   var Users = require('mongoose').model('Users');
   var profile;
+  var cookie;
   
   before(function(done){
 
@@ -44,20 +45,6 @@ describe("Users API", function(){
       .expect(401,done);
   });
 
-  it('POST /login should return 302 on /',function(done){
-  
-    request(app)
-      .post('/login')
-      .send({ id: 1234, password:'mypwd' })
-      .end(function(err,res){
-        res.should.have.status(302);
-//        console.log(res.text);
-        res.headers.location.should.equal('/');
-        done();        
-      });
-  });
-    
-
   it('POST /login should return 302 on /login',function(done){
     request(app)
       .post('/login')
@@ -69,6 +56,27 @@ describe("Users API", function(){
         done();        
       });
   });
+
+  it('POST /login should return 302 on /',function(done){
   
+    request(app)
+      .post('/login')
+      .send({ id: 1234, password:'mypwd' })
+      .end(function(err,res){
+        res.should.have.status(302);
+//        console.log(res.text);
+        cookie = res.headers['set-cookie'];
+        res.headers.location.should.equal('/');
+        done();        
+      });
+  });
+   
+  it('GET /v1/users/me should return 200',function(done){
+    request(app)
+      .get('/v1/users/me')
+      .set('cookie', cookie)
+      .expect(200,done);
+  });
+      
 });
 

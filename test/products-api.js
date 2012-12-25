@@ -35,6 +35,7 @@ describe("Products API", function(){
         price:3.80,
         discount:3.0,
      },
+     
   
   };
   
@@ -110,7 +111,7 @@ describe("Products API", function(){
         });
     });    
 
-    it('POST new shop /v1/shops should return 200 ',function(done){
+    it('POST /v1/shops should return 200 ',function(done){
     
 
       var s={
