@@ -54,7 +54,7 @@ describe("Products API", function(){
   
   after(function(done){
     require('mongoose').model('Shops').remove({},function(){});
-    require('mongoose').model('Products').remove({},function(){done();});
+    require('mongoose').model('Products').remove({},function(){});
     require('mongoose').model('Users').remove({},function(){done();});
     
   });
