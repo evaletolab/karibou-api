@@ -5,7 +5,7 @@ var mongoose = require('mongoose')
   , validate = require('./validate')
 	, passport = require('passport');
 	
-var	bcrypt = require('bcrypt');
+//var	bcrypt = require('bcrypt');
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
