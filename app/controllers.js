@@ -23,7 +23,10 @@ module.exports = function(app) {
   
 	//
 	// home
-  app.get('/', home.index);
+  app.get('/', function(req, res) {
+    console.log(app.routes);  
+    res.render('home',  { api: app.routes, user: req.user });
+  });
   
   //
   // api

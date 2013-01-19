@@ -1,9 +1,59 @@
 !!! 5
 html
   head
-    title mongoose-auth example
-    script(src='http://static.ak.fbcdn.net/connect/en_US/core.js')
+    title Karibou API
+    link(href="/css/bootstrap-white.min.css", rel="stylesheet")
+    link(href="/css/bootstrap-responsive.min.css", rel="stylesheet")
+    link(href="/css/bootswatch.css", rel="stylesheet")
+    //    
+      script(src='http://static.ak.fbcdn.net/connect/en_US/core.js')
   body
-    h1 mongoose-auth Example
-    #main
-      != body
+  
+  body(data-spy="scroll", data-target=".bs-docs-sidebar")
+
+    // Navbar
+    // ================================================== 
+    div.navbar.navbar-inverse.navbar-fixed-top
+      div.navbar-inner
+        div.container
+          button( type="button", class="btn btn-navbar", data-toggle="collapse", data-target=".nav-collapse")
+            span.icon-bar o
+            span.icon-bar
+            span.icon-bar
+          a(class="brand", href="https://github.com/evaletolab/karibou-api") Karibou
+          div.nav-collapse.collapse
+            ul.nav
+              li.active: a(href="./") Home
+              li: a(href="./") About
+  
+          ul(class="nav pull-right", id="main-menu-right")
+            block content
+
+    #main.container
+      h2 Karibou API
+      table.table
+        thead: tr 
+          th: path
+          th: params
+        tbody
+        each route in api.get
+            tr(style="background-color:#eee")
+              td: =route.path
+              td: =route.method
+              td: =route.params
+        each route in api.post
+            tr
+              td: =route.path
+              td: =route.method
+              td: =route.params
+        each route in api.delete
+            tr(style="background-color:#eee")
+              td: =route.path
+              td: =route.method
+              td: =route.params
+        each route in api.put
+            tr
+              td: =route.path
+              td: =route.method
+              td: =route.params
+

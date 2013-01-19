@@ -380,17 +380,32 @@ describe("Products:", function(){
   
   describe("Likes products", function(){
     it("Customer likes a product ", function(done){
-      Users.findOne({id:user.id},function(err,user){
-          assert(user);
+      async.waterfall([
+        function(cb){
+          Users.findOne({id:user.id},function(err,user){
+            assert(user);
+            cb(err,user);
+          });
+        },
+        function(user,cb){
           Products.findOneBySku(p.sku,function(err,product){
             user.addLikes(product);
-            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
-              assert(user.likes);
-              user.likes[0].title.should.equal(p.title);
-              done();
-            });
+            cb(err);
           });
-      });
+        }
+        ,
+        function(cb){
+          Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+            assert(user.likes);
+            cb(null,user);
+          });
+        }]
+        ,    
+        function(err,user){
+          assert(!err);
+          user.likes[0].title.should.equal(p.title);
+          done();
+        });
     });
 
     it("Customer unlikes a product ", function(done){

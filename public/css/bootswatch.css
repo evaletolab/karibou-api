@@ -1,0 +1,184 @@
+body {
+	padding-top: 80px;
+	padding-bottom: 20px;
+}
+
+.affix{
+  margin-top:-340px;
+}
+
+.layout-item{
+  margin:17px;
+  float:left;
+  width:250px;
+  
+  background-color: #Fff;
+  border: 3px solid #E3E3E3;
+  border-radius: 4px 4px 4px 4px;
+  box-shadow-: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+  margin-bottom: 25px;
+  min-height: 20px;
+  padding: 0px;  
+  overflow-:hidden;
+}
+
+.layout-item:hover{
+  box-shadow: 0 1px 15px rgba(0, 0, 0, 0.45) ;
+}
+
+.layout-item img{
+  cursor:pointer;
+  cursor:-Moz-Zoom-In;
+}
+
+.elem{
+  padding: 4px;  
+}
+
+.textshadow {
+    text-align: left;
+    text-shadow: 0 1px 2px #fff;
+}
+
+#backfader{
+  background-color: rgba(240, 240, 240, 0.93);
+  display: none;
+  bottom: 0;
+  left: 0;
+  overflow-x: auto;
+  overflow-y: scroll;
+   position: fixed;
+  right: 0;
+  top: 0;
+  cursor:-Moz-Zoom-Out;
+  z-index: 9999;
+}
+.popupcontent{
+  min-height:1200px;
+  padding:8px;
+  margin:20px auto;
+  border:solid 2px #ddd;
+  background: #fefefe;
+  position: static;
+  z-index: 40000;
+  /*display: none;*/
+  box-shadow: 0 3px 18px rgba(34, 25, 25, 0.4);
+  font-size: 13px;
+  padding: 20px 30px 0;
+  top: 110px !important;
+  width: 600px; 
+}
+
+.noscroll {
+    overflow: hidden !important;
+}
+
+#overview{
+  background-image:url(../img/localfood.jpg);
+  height: 350px;
+  margin-top:-70px;
+  padding-top: 70px;
+  position: relative;
+  top: 0;
+  width: 100%;  
+  z-index:0;
+}
+
+.small {
+  font-size: 85%;
+  line-height:80%;
+}
+
+.navbar a > i {
+	opacity: 0.5;
+}
+
+.navbar a:hover > i {
+	opacity: 1;
+}
+
+section {
+	margin-top: 100px;
+}
+
+
+.subhead {
+	padding-bottom: 0;
+	margin-bottom: 9px;
+}
+
+.subhead h1 {
+	font-size: 54px;
+}
+
+.subnav {
+	margin-bottom: 60px;
+	width: 100%;
+	height: 36px;
+	background-color: #eeeeee; /* Old browsers */
+	background-repeat: repeat-x; /* Repeat the gradient */
+	background-image: -moz-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%); /* FF3.6+ */
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f5f5f5), color-stop(100%,#eeeeee)); /* Chrome,Safari4+ */
+	background-image: -webkit-linear-gradient(top, #f5f5f5 0%,#eeeeee 100%); /* Chrome 10+,Safari 5.1+ */
+	background-image: -ms-linear-gradient(top, #f5f5f5 0%,#eeeeee 100%); /* IE10+ */
+	background-image: -o-linear-gradient(top, #f5f5f5 0%,#eeeeee 100%); /* Opera 11.10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 ); /* IE6-9 */
+	background-image: linear-gradient(top, #f5f5f5 0%,#eeeeee 100%); /* W3C */
+	border: 1px solid #e5e5e5;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.subnav .nav {
+	margin-bottom: 0;
+}
+
+.subnav .nav > li > a {
+	margin: 0;
+	padding-top:    11px;
+	padding-bottom: 11px;
+	border-left: 1px solid #f5f5f5;
+	border-right: 1px solid #e5e5e5;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.subnav .nav > .active > a,
+.subnav .nav > .active > a:hover {
+	padding-left: 13px;
+	color: #777;
+	background-color: #e9e9e9;
+	border-right-color: #ddd;
+	border-left: 0;
+	-webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.05);
+	-moz-box-shadow: inset 0 3px 5px rgba(0,0,0,.05);
+	box-shadow: inset 0 3px 5px rgba(0,0,0,.05);
+}
+
+.subnav .nav > .active > a .caret,
+.subnav .nav > .active > a:hover .caret {
+	border-top-color: #777;
+}
+
+.subnav .nav > li:first-child > a,
+.subnav .nav > li:first-child > a:hover {
+	border-left: 0;
+	padding-left: 12px;
+	-webkit-border-radius: 4px 0 0 4px;
+	-moz-border-radius: 4px 0 0 4px;
+	border-radius: 4px 0 0 4px;
+}
+
+.subnav .nav > li:last-child > a {
+	border-right: 0;
+}
+
+.subnav .dropdown-menu {
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
+}
+

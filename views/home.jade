@@ -1,22 +1,17 @@
-- if (!user)
-  h2 Not Authenticated = 
-  #register
-    a(href='/register') Register
-  #password-login
-    a(href='/login', style='border: 0px') Login with Password
-  #twitter-login(style='float: left; margin-left: 5px')
-    a(href='/auth/twitter', style='border: 0px')
-      img(style='border: 0px;vertical-align:middle', src='http://github.com/intridea/authbuttons/raw/master/png/twitter_32.png')
-      login with Twitter
-- else
-  h2 Authenticated
-  #user-id Logged in with `user.id` #{user.id} - aka #{user.username}, 
-  - if (user.twitter)
-    h3 Twitter User Data
-    p= JSON.stringify(user.twitter.user)
+extends layout
+block content
+  - if (!user)
+    li: a(href='/login', rel="tooltip", title="Login") Login <i class="icon-user"></i>
+    li: a(href='/register', rel="tooltip", title="Login") Register <i class="icon-user"></i>
+    li: a(href='/auth/twitter', rel="tooltip", title="Login") Login with Twitter <i class="icon-user"></i>
   - else
-    h3 User Data
-    p= JSON.stringify(user)
+    #user-id Logged in with `user.id` #{user.id} - aka #{user.username}, 
+    - if (user.twitter)
+      li: =user.twitter.user
+    - else
+      h3 User Data
+      li: =user.displayName
+    
+    
+    li: a(href='/logout') Logout
   
-  h3
-    a(href='/logout') Logout

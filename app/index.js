@@ -51,7 +51,8 @@ app.configure(function () {
   app.use(express.methodOverride());
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   app.use(express.cookieParser());
-  app.use(express.static(path.join(application_root, "public")));
+  app.use(express.static('public'));
+  app.locals.pretty = true;
 });
 
 

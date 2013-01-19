@@ -13,7 +13,7 @@ var assert = require("assert");
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
-  , validate = require('mongoose-validate')
+  , validate = require('./validate')
   , ObjectId = Schema.ObjectId;
   
 
