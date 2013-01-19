@@ -45,15 +45,27 @@ html
             tr
               td: =route.path
               td: =route.method
+              - if(route.callbacks[0])
+                td: b secure
+              - else
+                td: -
               td: =route.params
         each route in api.delete
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
+              - if(route.callbacks[0])
+                td: b secure
+              - else
+                td: -
               td: =route.params
         each route in api.put
             tr
               td: =route.path
               td: =route.method
+              - if(route.callbacks[0])
+                td: b secure
+              - else
+                td: -
               td: =route.params
 

@@ -24,7 +24,6 @@ module.exports = function(app) {
 	//
 	// home
   app.get('/', function(req, res) {
-    console.log(app.routes);  
     res.render('home',  { api: app.routes, user: req.user });
   });
   
@@ -32,8 +31,12 @@ module.exports = function(app) {
   // api
   app.get('/v1', api.index);
   app.get('/v1/users/me', users.me);
-  app.get('/v1/products',products.list);
   app.get('/v1/products/:sku',products.get);
+  app.get('/v1/products',products.list);
+  app.get('/v1/products/category/:category',products.list);
+  app.get('/v1/products/vendor/:vendor',products.list);
+  app.get('/v1/shops/:shopname/products', products.list);
+  app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.delete('/v1/products',auth.ensureAuthenticated, products.massRemove);
   app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);
   app.post('/v1/shops/:shopname/products', auth.ensureAuthenticated, products.create);

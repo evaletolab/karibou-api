@@ -59,6 +59,11 @@ exports.shopCreate=function (req, res) {
 // - by shop
 // - by vendor
 exports.list=function (req, res) {
+  // shop is defined
+  if (req.params.shopname){
+  }
+  
+  //
   return Products.find(function (err, products) {
     if (err) {
     	res.status(401);
