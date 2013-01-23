@@ -5,12 +5,8 @@ block content
     li: a(href='/register', rel="tooltip", title="Login") Register <i class="icon-user"></i>
     li: a(href='/auth/twitter', rel="tooltip", title="Login") Login with Twitter <i class="icon-user"></i>
   - else
-    #user-id Logged in with `user.id` #{user.id} - aka #{user.username}, 
-    - if (user.twitter)
-      li: =user.twitter.user
-    - else
-      h3 User Data
-      li: =user.displayName
+    li: a =user.provider
+    li: a =user.displayName
     
     
     li: a(href='/logout') Logout

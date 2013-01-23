@@ -23,8 +23,9 @@ html
           a(class="brand", href="https://github.com/evaletolab/karibou-api") Karibou
           div.nav-collapse.collapse
             ul.nav
-              li.active: a(href="./") Home
-              li: a(href="./") About
+              li.active: a(href="/") Home
+              li: a(href="/v1") API V1
+              li: a(href="/about") About
   
           ul(class="nav pull-right", id="main-menu-right")
             block content
@@ -36,12 +37,16 @@ html
           th: path
           th: params
         tbody
-        each route in api.get
+        each route in _.filter(api.get, function(route){return filter.test(route.path)})
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
+              - if(route.callbacks.length)
+                td: -
+              - else
+                td: -
               td: =route.params
-        each route in api.post
+        each route in _.filter(api.post, function(route){return filter.test(route.path)})
             tr
               td: =route.path
               td: =route.method
@@ -50,7 +55,7 @@ html
               - else
                 td: -
               td: =route.params
-        each route in api.delete
+        each route in _.filter(api.delete, function(route){return filter.test(route.path)})
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
@@ -59,7 +64,7 @@ html
               - else
                 td: -
               td: =route.params
-        each route in api.put
+        each route in _.filter(api.put, function(route){return filter.test(route.path)})
             tr
               td: =route.path
               td: =route.method
