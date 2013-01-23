@@ -35,27 +35,26 @@ html
       table.table
         thead: tr 
           th: path
+          th: method
+          th: secure
           th: params
         tbody
-        each route in _.filter(api.get, function(route){return filter.test(route.path)})
+        each route in filter(api.get)
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
-              - if(route.callbacks.length)
-                td: -
-              - else
-                td: -
+              td: -
               td: =route.params
-        each route in _.filter(api.post, function(route){return filter.test(route.path)})
+        each route in filter(api.post)
             tr
               td: =route.path
               td: =route.method
-              - if(route.callbacks[0])
+              - if(route.callbacks.length)
                 td: b secure
               - else
                 td: -
               td: =route.params
-        each route in _.filter(api.delete, function(route){return filter.test(route.path)})
+        each route in filter(api.delete)
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
@@ -64,7 +63,7 @@ html
               - else
                 td: -
               td: =route.params
-        each route in _.filter(api.put, function(route){return filter.test(route.path)})
+        each route in filter(api.put)
             tr
               td: =route.path
               td: =route.method

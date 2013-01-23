@@ -12,7 +12,10 @@ exports.index = function(app){
       api: app.routes, 
       user: req.user, 
       _:_, 
-      filter:/^\/[^v].*/g};
+      filter:function(api){
+        return _.filter(api, function(route){return route.path.indexOf("/v1")==-1;});
+      } 
+    };
     res.render('home',  model);
   }
 };
