@@ -37,7 +37,7 @@ function name_to_slug(str) {
 
   return str;
 }
-
+Shops.statics.slug = name_to_slug;
 Shops.statics.create = function(shop,user, callback){
   assert(shop);
   assert(user);
@@ -81,7 +81,7 @@ Shops.statics.create = function(shop,user, callback){
 
 Shops.statics.findByUser=function(u,callback){
   	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
-  	    callback(err,user.shops[0]);
+  	    callback(err,user.shops);
   	});  	
 };
 

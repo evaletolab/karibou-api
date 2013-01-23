@@ -22,7 +22,7 @@ var mongoose = require('mongoose')
 
 var Manufacturer = new Schema({
     name: String,
-    region: {type:String}
+    location: {type:String}
 });
 
 
@@ -55,12 +55,14 @@ var Product = new Schema({
       price:{type:Number, min:0, requiered:true},
       discount:{type:Number, min:0, requiered:true},
    },
-   
-   manufacturer:[Manufacturer],
+
    image: {type:String},
+   modified: { type: Date, default: Date.now },
+
+   // Relations   
+   manufacturer:[Manufacturer],
    categories: [{type: Schema.ObjectId, ref : 'Categories'}],
-   vendor:{type: Schema.ObjectId, ref : 'Shops'},  
-   modified: { type: Date, default: Date.now }
+   vendor:{type: Schema.ObjectId, ref : 'Shops'}  
 });
 
 
@@ -78,6 +80,23 @@ Product.path('details.description').validate(function (v) {
 
 //
 // API
+
+//
+// map an array of Values defined by the key to an array of Category.
+// - throw an error if one element doesn't exist
+Manufacturer.statics.map = function(key,values, callback){
+  var db=this;  
+    
+  require('async').map(values, function(value,cb){
+    var c={};c[key]=value;
+  	db.model('Manufacturer').find(c,function(err,cat){
+  	  cb(err,cat);
+  	});      
+  },function(err,r){
+    callback(err,r);
+  });	
+};
+
 Product.methods.addCategories=function(cats,callback){
   var p=this;
   if(Array.isArray(cats)){
@@ -125,8 +144,6 @@ Product.statics.create = function(p,s,callback){
     //associate product and shop
     product.vendor=s;
     product.save(function (err) {
-      debug("created product, error: "+err);
-      debug("created product, product: "+product);
       callback(err,product);
     });
   });
@@ -166,6 +183,7 @@ Product.statics.findByShop = function(shop, callback){
 };
 
 
-module.exports = mongoose.model('Products', Product);
+exports.Products = mongoose.model('Products', Product);
+exports.Manufacturers = mongoose.model('Manufacturers', Manufacturer);
 
 

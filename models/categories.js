@@ -28,22 +28,22 @@ Categories.statics.create = function(names, callback){
 	var Categories=this.model('Categories');	
 	
 	//
-	// case of cat array
+	// manage batch creation
 	if(Array.isArray(names)){
-	  var r=[];
-    require('async').forEach(names, function(name,cb){
+    var r=[];require('async').forEach(names, function(name,cb){
     	Categories.create(name,function(err,cat){
     	  r.push(cat);
     	  cb(err);
     	});      
     },function(err){
       callback(err,r);
-    });	
+    });
+    // end of array	
     return;
 	}
 
 	//
-	// create a Categories
+	// create one Category
 	var cat=((typeof names) ==="string")?({name:names}):(names);
   var c =new  Categories(cat);   
   c.save(function (err) {
@@ -52,9 +52,31 @@ Categories.statics.create = function(names, callback){
 
 }; 
 
+//
+// map an array of Values defined by the key to an array of Category.
+// - throw an error if one element doesn't exist
+Categories.statics.map = function(key,values, callback){
+  var db=this;
 
-Categories.statics.findByName = function(name, callback){
-  return this.model('Categories').find({name:name}, function(e, cats){
+  require('async').map(values, function(value,cb){
+    var c={};c[key]=value;
+  	db.model('Categories').findOne(c,function(err,cat){
+  	  if (!cat){
+  	    err="The category '"+value+"' doesn't exist";
+  	  }
+  	  cb(err,cat);
+  	});      
+  },function(err,result){
+    callback(err,result);
+  });	
+
+
+};
+
+
+
+Categories.statics.findByName = function(n, callback){
+  return this.model('Categories').findOne({name:n}, function(e, cats){
     callback(e,cats);
   });
 };

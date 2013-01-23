@@ -70,60 +70,6 @@ describe("Products:", function(){
       
   });
 
-  describe("Categories", function(){
-
-    it("Create a new Manufacturer", function(done){
-      Categories.create({
-        name:"Olivier",
-        description:"Ebike makers",
-        type:"Manufacturer"
-      },function(err,m){
-        m.name.should.equal("Olivier");
-        m.type.should.equal("Manufacturer");
-        m.description.should.equal("Ebike makers");
-        done();
-      });
-
-    });
-
-    it("Create category with a wrong type", function(done){
-      Categories.create({
-        name:"Olivier",
-        description:"Ebike makers",
-        type:"True"
-      },function(err,m){
-        assert(err);
-        err.errors.type.message.should.be.a.string;
-        done();
-      });
-
-    });
-
-    it("Add categories structure", function(done){
-      Categories.create(["Fruits", "Légumes", "Poissons"],function(err,cats){
-        cats.length.should.equal(3);
-        
-        done();
-      });
-    });
-
-    it("Add duplicate categories structure", function(done){
-      Categories.create("Fruits",function(err,cat){
-        assert(err);
-        done();
-      });
-    });
-
-    it.skip("Products-to-categories structure", function(done){
-    });
-    
-    it.skip("Categories-to-categories structure", function(done){
-    });
-    
-    it.skip("Add/Edit/Remove categories, products, manufacturers, customers, and reviews", function(done){
-    });
-
-  });
 
     
   describe("Products", function(){
@@ -201,18 +147,19 @@ describe("Products:", function(){
 
     it("Find Shops by the user", function(done){
     
-      Shops.findByUser({id:user.id},function(err,shop){
-          shop.name.should.equal("Votre vélo en ligne");
+      Shops.findByUser({id:user.id},function(err,shops){
+          shops[0].name.should.equal("Votre vélo en ligne");
+          shops.length.should.equal(1);
           done();
       });
     });
 
     it("Create a new product", function(done){
       
-      Shops.findByUser({id:user.id},function(err,shop){
+      Shops.findByUser({id:user.id},function(err,shops){
 
-        assert(shop);
-        Products.create(p,shop,function(err,product){
+        assert(shops);
+        Products.create(p,shops[0],function(err,product){
           console.log("SKU:",product.sku);
           assert(product.sku);
           assert(product.vendor);
@@ -226,9 +173,9 @@ describe("Products:", function(){
     
     
     it("Find products by Shop", function(done){
-      Shops.findByUser({id:user.id},function(err,shop){
-        assert(shop);
-        Products.findByShop(shop,function(err,products){          
+      Shops.findByUser({id:user.id},function(err,shops){
+        assert(shops);
+        Products.findByShop(shops[0],function(err,products){          
           assert(products.length);
           products[0].details.comment.should.equal(p.details.comment);
           done();
@@ -238,9 +185,9 @@ describe("Products:", function(){
 
     it("Find BIO products by Shop  ", function(done){
 
-      Shops.findByUser({id:user.id},function(err,shop){
-        assert(shop);
-        Products.findByShop(shop,function(err,products){          
+      Shops.findByUser({id:user.id},function(err,shops){
+        assert(shops);
+        Products.findByShop(shops[0],function(err,products){          
           assert(products.length);
           products[0].details.isBio.should.equal(true);
           done();

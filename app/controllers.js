@@ -36,14 +36,14 @@ module.exports = function(app) {
   app.get('/v1/products',products.list);
   app.get('/v1/products/category/:category',products.list);
   app.get('/v1/products/location/:location',products.list);
-  app.get('/v1/products/category/:category/attrs/:attrs',products.list);
+  app.get('/v1/products/category/:category/detail/:detail',products.list);
   app.get('/v1/products/location/:location/category/:category',products.list);
-  app.get('/v1/products/location/:location/category/:category/attrs/:attrs',products.list);
+  app.get('/v1/products/location/:location/category/:category/detail/:detail',products.list);
   
   // shop products
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
-  app.get('/v1/shops/:shopname/products/category/:category/attrs/:attrs', products.list);
+  app.get('/v1/shops/:shopname/products/category/:category/detail/:detail', products.list);
   
   app.delete('/v1/products',auth.ensureAuthenticated, products.massRemove);
   app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);

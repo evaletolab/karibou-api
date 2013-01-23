@@ -3,30 +3,59 @@
 
 require('../app/config');
 var db = require('mongoose');
+var Shops = db.model('Shops');
 var Products = db.model('Products');
+var Manufacturers = db.model('Manufacturers');
 var assert = require("assert");
+var _=require('underscore');
 
 exports.create=function (req, res) {
   var product;
   
   //console.log("body:",req.body);
-  assert(req.params.shopname);  
-  //TODO? Shops.findByUser({id:req.user.id} 
   
-  db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
-    if(!shop ){
+  
+  //
+  // check shop owner 
+  assert(req.params.shopname);    
+  Shops.findByUser({id:req.user.id},function (err,shops){
+    if (err){
     	res.status(401);
-      return res.json({error:"Shops is not defined"});
-    };
+      return res.json({error:err});    
+    }
+    
+    var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
+    if (!s){
+    	res.status(401);
+      return res.json({error:"Shops is not defined or not associed to the user"});    
+    }
+
+    //
+    // manufacturer
+    if(req.query.manufacurer){
+      Manufacturers.map("_id", req.query.manufacurer, function(err,makers){
+      });
+    }
+
+    //
+    // category
+    if(req.query.category){
+      Categories.map("_id", req.query.category, function(err,category){
+      });
+    }
+    
+    //
+    // ready to create one product
     Products.create(req.body,req.user, function(err,product){
       if(err){
-        //TODO error
       	res.status(401);
         return res.json({error:err});
       }      
       res.json(product);
     });
+    
   });
+  
 
 
 };
