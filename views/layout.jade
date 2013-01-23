@@ -32,6 +32,8 @@ html
 
     #main.container
       h2 Karibou API
+      - if (user)
+        pre: =JSON.stringify(user)
       table.table
         thead: tr 
           th: path
