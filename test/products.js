@@ -350,6 +350,7 @@ describe("Products:", function(){
         ,    
         function(err,user){
           assert(!err);
+          //FIXME once likes was NULL ??? check this if it repeats
           user.likes[0].title.should.equal(p.title);
           done();
         });
