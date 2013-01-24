@@ -13,12 +13,12 @@ var Catalogs = new Schema({
     name: String
 });
 
-var EnumCategories="Manufacturer Categories Other".split(' ');
+var EnumCategories="Category Catalog".split(' ');
 
 var Categories = new Schema({
     name: {type:String, unique:true},
     description:{type:String, unique:false},
-    type:{type:String, unique:false, default:"Categories",enum:EnumCategories}
+    type:{type:String, unique:false, default:"Category",enum:EnumCategories}
 });
 
 
@@ -55,19 +55,23 @@ Categories.statics.create = function(names, callback){
 //
 // map an array of Values defined by the key to an array of Category.
 // - throw an error if one element doesn't exist
-Categories.statics.map = function(key,values, callback){
+Categories.statics.map = function(values, callback){
   var db=this;
 
   require('async').map(values, function(value,cb){
-    var c={};c[key]=value;
-  	db.model('Categories').findOne(c,function(err,cat){
-  	  if (!cat){
-  	    err="The category '"+value+"' doesn't exist";
+    if((typeof value)!=="object"){
+      cb(new Error("find selector '"+value+"' is not typed Object as excpected"));
+      return;
+    }
+  	db.model('Categories').findOne(value,function(err,cat){
+   	  if (!cat){
+  	    err=new Error("The category '"+JSON.stringify(value)+"' doesn't exist");
   	  }
   	  cb(err,cat);
+  	  //console.log(cat)
   	});      
-  },function(err,result){
-    callback(err,result);
+  },function(err,r){
+    callback(err,r);
   });	
 
 
@@ -76,7 +80,7 @@ Categories.statics.map = function(key,values, callback){
 
 
 Categories.statics.findByName = function(n, callback){
-  return this.model('Categories').findOne({name:n}, function(e, cats){
+  return this.model('Categories').find({name:n}, function(e, cats){
     callback(e,cats);
   });
 };

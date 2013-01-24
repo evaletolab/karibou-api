@@ -9,20 +9,21 @@
 
 var debug = require('debug')('products');
 var assert = require("assert");
-
+var _=require('underscore');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('./validate')
-  , ObjectId = Schema.ObjectId;
+  , ObjectId = Schema.Types.ObjectId;
   
 
- var EnumOGM="Avec Sans".split(' ');
-
+var EnumOGM="Avec Sans".split(' ');
+var EnumLocation="Genève Lausanne Gex".split(' ');
 
 var Manufacturer = new Schema({
-    name: String,
-    location: {type:String}
+    name: {type:String, unique:true, required:true},
+    description: String,
+    location: {type:String, default:"Genève", enum:EnumLocation}
 });
 
 
@@ -59,10 +60,10 @@ var Product = new Schema({
    image: {type:String},
    modified: { type: Date, default: Date.now },
 
-   // Relations   
-   manufacturer:[Manufacturer],
-   categories: [{type: Schema.ObjectId, ref : 'Categories'}],
-   vendor:{type: Schema.ObjectId, ref : 'Shops'}  
+   // Relations  (manufacturer should BE MANDATORY)
+   manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
+   categories: [{type: Schema.Types.ObjectId, ref : 'Categories'}],
+   vendor:{type: Schema.Types.ObjectId, ref : 'Shops'}  
 });
 
 
@@ -81,19 +82,34 @@ Product.path('details.description').validate(function (v) {
 //
 // API
 
+Manufacturer.statics.create=function(m,cb){
+  var Manufacturer= this.model('Manufacturers');
+  var maker=new Manufacturer(m);
+  maker.save(function (err) {
+    cb(err,maker);
+  });
+  return this;
+};
+
+
 //
 // map an array of Values defined by the key to an array of Category.
 // - throw an error if one element doesn't exist
-Manufacturer.statics.map = function(key,values, callback){
+Manufacturer.statics.map = function(values, callback){
   var db=this;  
-    
+
   require('async').map(values, function(value,cb){
-    var c={};c[key]=value;
-  	db.model('Manufacturer').find(c,function(err,cat){
-  	  cb(err,cat);
+  
+    if((typeof value)!=="object"){
+      cb(new Error("find selector '"+value+"' is not typed Object as excpected"));
+      return;
+    }
+
+  	db.model('Manufacturers').find(value,function(err,map){
+  	  cb(err,map);
   	});      
-  },function(err,r){
-    callback(err,r);
+  },function(err,maps){
+    callback(err,maps);
   });	
 };
 
@@ -125,27 +141,70 @@ Product.methods.removeCategories=function(cats,callback){
   });
 };
 
+
+//
+// create a new product 'p' for the shop 's'
 Product.statics.create = function(p,s,callback){
-  debug("create product: "+product);
+  debug("create product: "+p);
   assert(p);
   assert(s);
   assert(callback);
-  
+  var db=this;
 	var Products=this.model('Products');
-  var product =new  Products(p);
+
 
   //TODO findNextSKU
   this.model('Sequences').nextSku(function(err,sku){
-    if(err)callback(err);
+    if(err){
+      callback(err);
+      return;
+    }
     
-    product.sku=sku;
-    
-    //
+    // the unique identifier
+    p.sku=sku;
+        
     //associate product and shop
-    product.vendor=s;
-    product.save(function (err) {
-      callback(err,product);
-    });
+    p.vendor=s;
+    
+    require('async').waterfall([
+      function(cb){
+        //
+        // set manufacturer 
+        if(!p.manufacturer){
+          cb(null);
+          return;
+        }
+        db.model('Manufacturers').findOne(p.manufacurer, function(err,m){
+          p.manufacturer=m._id;
+          cb(err);
+        });
+      },
+      function(cb){
+        //
+        // set category (NOT MANDATORY)
+        if(!p.categories){
+          cb(null)
+          return;
+        }
+        db.model('Categories').map(p.categories, function(err,categories){
+          
+          p.categories=_.collect(categories,function(m){return m._id});;
+          cb(err);
+        });
+      },
+      function(cb){
+        //
+        // ready to create one product
+        var product =new  Products(p);
+        product.save(function (err) {
+          cb(err,product);
+        });
+
+      }],
+      function(err,product){
+        callback(err,product);
+      });
+    
   });
   
 

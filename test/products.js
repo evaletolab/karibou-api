@@ -336,14 +336,16 @@ describe("Products:", function(){
         },
         function(user,cb){
           Products.findOneBySku(p.sku,function(err,product){
-            user.addLikes(product);
-            cb(err);
+            user.addLikes(product,function(err){
+              cb(err);
+            });
           });
         }
         ,
         function(cb){
           Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
             assert(user.likes);
+            //console.log(user);
             cb(null,user);
           });
         }]
@@ -360,10 +362,13 @@ describe("Products:", function(){
       Users.findOne({id:user.id},function(err,user){
           assert(user);
           Products.findOneBySku(p.sku,function(err,product){
-            user.removeLikes(product);
-            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
-              assert(user.likes.length===0);
-              done();
+            user.removeLikes(product, function(err){
+              assert(!err)
+              Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+                assert(user.likes.length===0);
+                done();
+              });
+
             });
           });
       });
@@ -379,8 +384,9 @@ describe("Products:", function(){
         },
         function(user,cb){
           Products.findOneBySku(p.sku,function(err,product){
-            user.addLikes(product);
-            cb(err,user, product);
+            user.addLikes(product,function(err){
+              cb(err,user, product);
+            });
           });
         }
         ,

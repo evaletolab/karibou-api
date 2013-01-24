@@ -137,16 +137,16 @@ UserSchema.methods.hasRole = function (role) {
 };
 
 UserSchema.methods.addLikes = function(product, callback){
-  this.likes.push(product);
+  this.likes.push(product._id);
   this.save(function(err){
-    if(err)callback(err);
+    callback(err);
   });
 };
 
 UserSchema.methods.removeLikes = function(product, callback){
-  this.likes.pop(product);
+  this.likes.pop(product._id);
   this.save(function(err){
-    if(err)callback(err);
+    callback(err);
   });
 };
 

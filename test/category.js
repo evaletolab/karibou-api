@@ -7,7 +7,7 @@ var Shops = mongoose.model('Shops');
 var Users = mongoose.model('Users');
 var Sequences = mongoose.model('Sequences');
 var Categories = mongoose.model('Categories');
-
+var _ = require('underscore');
 
 
 describe("Categories", function(){
@@ -23,15 +23,16 @@ describe("Categories", function(){
     });
     
     
-    it("Create a new Manufacturer", function(done){
+    it("Create catalog ", function(done){
       Categories.create({
         name:"Olivier",
         description:"Ebike makers",
-        type:"Manufacturer"
+        type:"Catalog"
       },function(err,m){
         m.name.should.equal("Olivier");
-        m.type.should.equal("Manufacturer");
         m.description.should.equal("Ebike makers");
+        m.type.should.equal("Catalog");
+        assert(!err)
         done();
       });
 
@@ -41,16 +42,16 @@ describe("Categories", function(){
       Categories.create({
         name:"Olivier",
         description:"Ebike makers",
-        type:"True"
+        type:"Pouet"
       },function(err,m){
         assert(err);
-        err.errors.type.message.should.be.a.string;
+        err.message.should.equal("Validation failed")
         done();
       });
 
     });
 
-    it("Add categories structure", function(done){
+    it("Create categories from array of strings", function(done){
       Categories.create(["Fruits", "Légumes", "Poissons"],function(err,cats){
         assert(!err)
         cats.length.should.equal(3);
@@ -62,7 +63,15 @@ describe("Categories", function(){
     it("Find by name", function(done){
       Categories.findByName("Fruits",function(err,cat){
         assert(!err);
-        cat.name.should.equal("Fruits");
+        cat[0].name.should.equal("Fruits");
+        done();
+      });
+    });
+
+    it("Find inexistant name", function(done){
+      Categories.findByName("prfk",function(err,cat){
+        assert(!err);
+        cat.length.should.equal(0)
         done();
       });
     });
@@ -75,22 +84,33 @@ describe("Categories", function(){
     });
 
     it("Maps string array to category", function(done){
-      Categories.map("name",["Fruits", "Légumes", "Poissons"],function(err,cats){
+      var on=_.map(category,function(v,k){return {name:v.name};});
+      Categories.map(on,function(err,cats){
         cats.length.should.equal(3);
         done();
       });      
     });
 
     it("Maps ObjectId array to category", function(done){
-      var oid=require('underscore').map(category,function(v,k){return v._id;});
-      Categories.map("_id",oid,function(err,cats){
+      var oid=_.map(category,function(v,k){return {_id:v._id};});
+      Categories.map(oid,function(err,cats){
         cats.length.should.equal(3);
         done();
       });      
     });
 
-    it("Maps WRONG string array shoudl generate an error", function(done){
-      Categories.map("name",["FFruits", "Légumes", "Poissons"],function(err,cats){
+    it("Bad element for string array should generate an error", function(done){
+      var on=_.map(["FFruits", "Légumes", "Poissons"],function(v,k){return {name:v};});
+      Categories.map(on,function(err,cats){
+        assert(err);
+        done();
+      });      
+    });
+
+    it("Bad format for string array should generate an error", function(done){
+      Categories.map(["Fruits", "Légumes", "Poissons"],function(err,cats){
+        //console.log("ERROR",err);
+        //console.log("RESULT",cats);
         assert(err);
         done();
       });      

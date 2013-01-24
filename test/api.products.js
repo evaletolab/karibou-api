@@ -9,11 +9,17 @@ var app = require("../app/index");
 
 
 describe("Products API", function(){
-  var profile = null;
   var assert = require("assert");
   var request= require('supertest');
+  var async= require('async');
 
- var p={
+  var db = require('mongoose');
+  var _=require('underscore');
+  
+  var profile;
+  var cats; 
+  var maker;
+  var p={
      title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
      
      details:{
@@ -21,7 +27,7 @@ describe("Products API", function(){
         comment:"Temps de cuisson : 16 minutes",
         hasGluten:true, 
         hasOgm:false,
-        isBio:true, 
+        isBio:false, 
      },  
      
      attributes:{
@@ -34,28 +40,50 @@ describe("Products API", function(){
         stock:10, 
         price:3.80,
         discount:3.0,
-     },
-     
-  
+     }
   };
   
  
  
 
   before(function(done){
-    // registered user with password and linked to a provider
-    require('mongoose').model('Users').test(1234,'mypwd', function(e,u){
-      profile=u;
-      assert(!e);
-      profile.id.should.equal(1234);
-	    done();   
-    });     
+    async.waterfall([
+      function(cb){
+        // registered new user with password and provider
+        db.model('Users').test(1234,'mypwd', function(err,u){
+          profile=u;
+	        cb(err);   
+        });     
+      },
+      function(cb){
+        // create some categories
+        db.model('Categories').create(["Fruits", "Légumes", "Poissons"],function(err,c){
+          cats=_.collect(c, function(c){return {_id:c._id}});  
+          console.log(c[0].length)
+	        cb(err);             
+        });
+      },
+      function(cb){
+        // create some manufacturers
+        db.model('Manufacturers').create({name:'Olivier', description:'cool'},function(err,m){
+          maker=m;  
+	        cb(err);   
+        });
+      }],
+      function(err,r){
+        assert(!err);
+        done();
+      });
+
   });
   
   after(function(done){
-    require('mongoose').model('Shops').remove({},function(){});
-    require('mongoose').model('Products').remove({},function(){});
-    require('mongoose').model('Users').remove({},function(){done();});
+
+    db.model('Manufacturers').remove({},function(){});
+    db.model('Categories').remove({},function(){});
+    db.model('Shops').remove({},function(){});
+    db.model('Products').remove({},function(){});
+    db.model('Users').remove({},function(){done();});
     
   });
 
@@ -106,6 +134,7 @@ describe("Products API", function(){
         .end(function(err,res){
           // shop is not defined
           //console.log(res.text);  
+          
           res.should.have.status(401);
           done();        
         });
@@ -121,9 +150,8 @@ describe("Products API", function(){
         fgphoto:"http://image.truc.io/fg-01123.jp"      
       };
       
-    
-      // shop must be managed
-      // how to mockup login
+      //
+      // create new shop 'bicycle-and-rocket'
       request(app)
         .post('/v1/shops')
         .set('Content-Type','application/json')
@@ -136,10 +164,11 @@ describe("Products API", function(){
         });
     });    
      
-     
+    //
+    // create a new product without ref to (manufacter, categories)
+    //
     it('POST /v1/shops/bicycle-and-rocket/products should return 200 ',function(done){
       // shop must be managed
-      // how to mockup login
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
         .set('Content-Type','application/json')
@@ -149,6 +178,55 @@ describe("Products API", function(){
           // shop is not defined
           res.should.have.status(200);
           res.body.sku.should.be.above(10000);
+          res.body.details.isBio.should.equal(false);
+          done();        
+        });
+    });    
+
+    //
+    // create a new product with a manufacter
+    //
+    it('POST /v1/shops/bicycle-and-rocket/products with manufacturer should return 200 ',function(done){
+      // shop must be managed
+      p.manufacturer={_id:maker._id};
+      p.title="Test new product";
+      request(app)
+        .post('/v1/shops/bicycle-and-rocket/products')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .send(p)
+        .end(function(err,res){
+          // shop is not defined
+          res.should.have.status(200);
+          res.body.sku.should.be.above(10001);
+          res.body.manufacturer.should.be.a.string;
+          //res.body.manufacturer.location.should.equal("Genève");
+          done();        
+        });
+    });    
+
+    //
+    // create a new product with a manufacter and some categories
+    //
+    it('POST /v1/shops/bicycle-and-rocket/products with manufacturer should return 200 ',function(done){
+      // shop must be managed
+      p.manufacturer={_id:maker._id};
+      p.categories=cats;
+      p.title="Test more new product";
+      //console.log(p);
+      request(app)
+        .post('/v1/shops/bicycle-and-rocket/products')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .send(p)
+        .end(function(err,res){
+          // shop is not defined
+          //console.log(res.body)
+          res.should.have.status(200);
+          res.body.sku.should.be.above(10001);
+          res.body.manufacturer.should.be.a.string;
+          res.body.categories.should.be.an.array;
+          //res.body.manufacturer.location.should.equal("Genève");
           done();        
         });
     });    

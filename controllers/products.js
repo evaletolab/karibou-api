@@ -31,29 +31,15 @@ exports.create=function (req, res) {
     }
 
     //
-    // manufacturer
-    if(req.query.manufacurer){
-      Manufacturers.map("_id", req.query.manufacurer, function(err,makers){
-      });
-    }
-
-    //
-    // category
-    if(req.query.category){
-      Categories.map("_id", req.query.category, function(err,category){
-      });
-    }
-    
-    //
     // ready to create one product
-    Products.create(req.body,req.user, function(err,product){
-      if(err){
-      	res.status(401);
-        return res.json({error:err});
-      }      
-      res.json(product);
+    Products.create(req.body,s, function(err,product){
+        if(err){
+        	res.status(401);
+          return res.json({error:err});    
+        }
+        res.json(product);            
     });
-    
+
   });
   
 
