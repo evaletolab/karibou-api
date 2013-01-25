@@ -1,6 +1,7 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
+var fx = require("./fixtures/common");
 var mongoose = require("mongoose");
 var Products = mongoose.model('Products');
 var Shops = mongoose.model('Shops');
@@ -54,20 +55,8 @@ describe("Products:", function(){
   });
 
   after(function(done){
-      // clean sequences ids
-      Users.remove({}, function(o) {
-      });
-      Shops.remove({}, function(o) {
-        Sequences.remove({}, function(o) {
-          Products.remove({}, function(o) {
-            Categories.remove({}, function(o) {
-              done();
-            });
-          });
-
-        });
-      });
-      
+    // clean sequences ids
+    fx.clean(done);      
   });
 
 
