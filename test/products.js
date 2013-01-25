@@ -201,7 +201,7 @@ describe("Products:", function(){
               });
 
             });
-
+var mongoose = require("mongoose");
         },
         
         //
