@@ -56,7 +56,10 @@ describe("Products:", function(){
 
   after(function(done){
     // clean sequences ids
-    fx.clean(done);      
+    fx.clean(function(e){
+      assert(!e);
+      done()
+    });      
   });
 
 

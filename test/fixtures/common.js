@@ -9,7 +9,7 @@ var Sequences = mongoose.model('Sequences');
 var Categories= mongoose.model('Categories');
 
 
-exports.clean=function(done){
+exports.clean=function(callback){
   async.waterfall([
     function(cb){
       Users.remove({}, function(e) {
@@ -43,6 +43,6 @@ exports.clean=function(done){
     }
   ],
   function(e,r){
-    done();
+    callback(e,r);
   });
 };
