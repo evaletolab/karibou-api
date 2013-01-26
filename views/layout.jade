@@ -5,8 +5,16 @@ html
     link(href="/css/bootstrap-white.min.css", rel="stylesheet")
     link(href="/css/bootstrap-responsive.min.css", rel="stylesheet")
     link(href="/css/bootswatch.css", rel="stylesheet")
+    script(src="js/jquery-1.9.0.min.js")
+    script(src="js/bootstrap.min.js")
+
     //    
       script(src='http://static.ak.fbcdn.net/connect/en_US/core.js')
+    script
+      $(function(){
+        var a = $('a.menu[href="' + window.location.pathname + '"]');
+        a.parent().addClass('active');
+      });
   body
   
   body(data-spy="scroll", data-target=".bs-docs-sidebar")
@@ -23,30 +31,38 @@ html
           a(class="brand", href="https://github.com/evaletolab/karibou-api") Karibou
           div.nav-collapse.collapse
             ul.nav
-              li.active: a(href="/") Home
-              li: a(href="/v1") API V1
-              li: a(href="/about") About
+              li: a.menu(href="/") Home
+              li: a.menu(href="/v1") API V1
+              li: a.menu(href="/about") About
   
           ul(class="nav pull-right", id="main-menu-right")
             block content
 
     #main.container
-      h2 Karibou API
+      h2 Karibou API, the open source Marketplace
+      p
+      |Karibou is an open-source projects aim to help the creation of a online community marketplace. 
+      |The Karibou-api is the backend - for develeppers - and is implemented as JSON and follow the rules of <a http="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>. 
+      |The current development has just started and is far away from an alpha stage. You can follow the evolution at the page <a href="/v1">API V1</a>.
       - if (user)
         pre: =JSON.stringify(user)
-      table.table
+      table.table(style="font-family: sans-serif;")
         thead: tr 
           th: path
           th: method
           th: secure
           th: params
         tbody
+        tr(colspan=4)
+          td: b Selections
         each route in filter(api.get)
             tr(style="background-color:#eee")
               td: =route.path
               td: =route.method
               td: -
               td: =route.params
+        tr(colspan=4)
+          td: b Creations
         each route in filter(api.post)
             tr
               td: =route.path
@@ -56,6 +72,8 @@ html
               - else
                 td: -
               td: =route.params
+        tr(colspan=4)
+          td: b Deletions
         each route in filter(api.delete)
             tr(style="background-color:#eee")
               td: =route.path
@@ -65,6 +83,8 @@ html
               - else
                 td: -
               td: =route.params
+        tr(colspan=4)
+          td: b Updates
         each route in filter(api.put)
             tr
               td: =route.path
