@@ -1,7 +1,7 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var fx = require("./fixtures/common");
+var fx = require("./fixtures/products");
 var mongoose = require("mongoose");
 var Products = mongoose.model('Products');
 var Shops = mongoose.model('Shops');
@@ -15,50 +15,31 @@ describe("Products:", function(){
   var async= require("async");
   var assert = require("assert");
   var _ = require("underscore");
-  var user;
+  var user,uid;
 
-  var p={
-     title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-     
-     details:{
-        description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-        comment:"Temps de cuisson : 16 minutes",
-        hasGluten:true, 
-        hasOgm:false,
-        isBio:true, 
-     },  
-     
-     attributes:{
-        isAvailable:true,
-        hasComment:false, 
-        isDiscount:false
-     },
-
-     pricing: {
-        stock:10, 
-        price:3.80,
-        discount:3.0,
-     },
-  
-  };
-
+  var products, shop, cats;
 
 
   // common befor/after
   before(function(done){
-		Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
-		  assert(u);
-		  user=u;
-      done();
-		});
+    fx.clean(function(e){
+      assert(!e);
+		  Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
+		    assert(u);
+		    user={_id:u._id};
+		    uid=u.id;
+        done();
+		  });
+      
+    });      
+
   
   });
 
   after(function(done){
-    // clean sequences ids
     fx.clean(function(e){
       assert(!e);
-      done()
+      done();
     });      
   });
 
@@ -66,13 +47,20 @@ describe("Products:", function(){
     
   describe("Products", function(){
 
-    beforeEach(function(done){
+    before(function(done){
+      fx.creates(user,function(err, c, s, p){
+        p.length.should.equal(2);
+        c.length.should.equal(3);
+        s.urlpath.should.equal("votre-velo-en-ligne");
+        products=p;shop=s;cats=c;
+        done();
+      });
+    });
+    
+    after(function(done){
       done();
     });
 
-    afterEach(function(done){
-      done();
-    });
 
     describe("Product is identified by a unique number (SKU Stock-keeping)", function(){
       var SKU;
@@ -116,7 +104,7 @@ describe("Products:", function(){
 
     it("Create a new Shop", function(done){
       var s={
-        name: "Votre vélo en ligne",
+        name: "Votre nouveau vélo en ligne ",
         description:"cool ce shop",
         bgphoto:"http://image.truc.io/bg-01123.jp",
         fgphoto:"http://image.truc.io/fg-01123.jp"
@@ -124,7 +112,7 @@ describe("Products:", function(){
       };
       Shops.create(s,user, function(err,shop){
         assert(!err);
-        shop.urlpath.should.equal("votre-velo-en-ligne");
+        shop.urlpath.should.equal("votre-nouveau-velo-en-ligne");
         done();
       });
     });
@@ -138,26 +126,20 @@ describe("Products:", function(){
     });
 
     it("Find Shops by the user", function(done){
-    
-      Shops.findByUser({id:user.id},function(err,shops){
+      Shops.findByUser({id:uid},function(err,shops){
           shops[0].name.should.equal("Votre vélo en ligne");
-          shops.length.should.equal(1);
+          shops.length.should.equal(2);
           done();
       });
     });
 
     it("Create a new product", function(done){
       
-      Shops.findByUser({id:user.id},function(err,shops){
+      Shops.findByUser({id:uid},function(err,shops){
 
         assert(shops);
-        Products.create(p,shops[0],function(err,product){
-          console.log("SKU:",product.sku);
-          assert(product.sku);
-          assert(product.vendor);
-          p.sku=product.sku;
-          done();
-        });
+        // basic product creation is on fixture 
+        done();
 
       });
           
@@ -165,11 +147,12 @@ describe("Products:", function(){
     
     
     it("Find products by Shop", function(done){
-      Shops.findByUser({id:user.id},function(err,shops){
+      Shops.findByUser({id:uid},function(err,shops){
         assert(shops);
         Products.findByShop(shops[0],function(err,products){          
           assert(products.length);
-          products[0].details.comment.should.equal(p.details.comment);
+          
+          products[0].details.comment.should.equal("Temps de cuisson : 16 minutes");
           done();
         });
       });
@@ -177,13 +160,13 @@ describe("Products:", function(){
 
     it("Find BIO products by Shop  ", function(done){
 
-      Shops.findByUser({id:user.id},function(err,shops){
+      Shops.findByUser({id:uid},function(err,shops){
         assert(shops);
         Products.findByShop(shops[0],function(err,products){          
           assert(products.length);
-          products[0].details.isBio.should.equal(true);
+          products[0].details.isBio.should.equal(false);
           done();
-        }).where("details.isBio",true);
+        }).where("details.isBio",false);
       });
 
     });
@@ -199,12 +182,9 @@ describe("Products:", function(){
                 products.forEach(function(product){
                   product.addCategories(cats);
                 });
-                // should be async
                 cb(err,products,cats);
               });
-
             });
-var mongoose = require("mongoose");
         },
         
         //
@@ -236,7 +216,6 @@ var mongoose = require("mongoose");
                 products.forEach(function(product){
                   product.addCategories(cats);
                 });
-                // should be async
                 cb(err,products,cats);
               });
 
@@ -321,13 +300,13 @@ var mongoose = require("mongoose");
     it("Customer likes a product ", function(done){
       async.waterfall([
         function(cb){
-          Users.findOne({id:user.id},function(err,user){
+          Users.findOne({id:uid},function(err,user){
             assert(user);
             cb(err,user);
           });
         },
         function(user,cb){
-          Products.findOneBySku(p.sku,function(err,product){
+          Products.findOneBySku(products[0].sku,function(err,product){
             user.addLikes(product,function(err){
               cb(err);
             });
@@ -335,7 +314,7 @@ var mongoose = require("mongoose");
         }
         ,
         function(cb){
-          Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+          Users.findOne({id:uid}).populate("likes").exec(function(err,user){
             assert(user.likes);
             //console.log(user);
             cb(null,user);
@@ -345,18 +324,18 @@ var mongoose = require("mongoose");
         function(err,user){
           assert(!err);
           //FIXME once likes was NULL ??? check this if it repeats
-          user.likes[0].title.should.equal(p.title);
+          user.likes[0].title.should.equal(products[0].title);
           done();
         });
     });
 
     it("Customer unlikes a product ", function(done){
-      Users.findOne({id:user.id},function(err,user){
+      Users.findOne({id:uid},function(err,user){
           assert(user);
-          Products.findOneBySku(p.sku,function(err,product){
+          Products.findOneBySku(products[0].sku,function(err,product){
             user.removeLikes(product, function(err){
               assert(!err)
-              Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+              Users.findOne({id:uid}).populate("likes").exec(function(err,user){
                 assert(user.likes.length===0);
                 done();
               });
@@ -369,13 +348,13 @@ var mongoose = require("mongoose");
     it("On removed product, user likes should be updated", function(done){
       async.waterfall([
         function(cb){
-          Users.findOne({id:user.id},function(err,user){
+          Users.findOne({id:uid},function(err,user){
             assert(user);
             cb(err,user);
           });
         },
         function(user,cb){
-          Products.findOneBySku(p.sku,function(err,product){
+          Products.findOneBySku(products[0].sku,function(err,product){
             user.addLikes(product,function(err){
               cb(err,user, product);
             });
@@ -388,7 +367,7 @@ var mongoose = require("mongoose");
             });
         },
         function(user,product,cb){
-            Users.findOne({id:user.id}).populate("likes").exec(function(err,user){
+            Users.findOne({id:uid}).populate("likes").exec(function(err,user){
               assert(user.likes.length===0);
               done();
             });

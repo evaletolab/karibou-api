@@ -61,13 +61,18 @@ Shops.statics.create = function(shop,user, callback){
 
     //
     // bind user with shop
-    Users.findOne(user,function(err,user){
-      if(!user){
-        callback(err);
+    Users.find(user,function(err,u){
+      if(!u.length>1){
+        callback(new Error("Multiple instance of user for this input: "+user));
         return;
       }
-      user.shops.push(s);
-      user.save(function(err){
+
+      if(!u[0]){
+        callback(new Error("Cannot find user: "+user));
+        return;
+      }
+      u[0].shops.push(s);
+      u[0].save(function(err){
         if(err){
           callback(err);
           return;

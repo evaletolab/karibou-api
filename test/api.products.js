@@ -4,7 +4,8 @@ var app = require("../app/index");
 
 // why not using
 // https://github.com/1602/jugglingdb
-
+// HTTP Error list
+// http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 
 
 

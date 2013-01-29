@@ -18,9 +18,16 @@ describe("Categories", function(){
     before(function(done){
       Categories.remove({}, function(o) {
         done();
+      });      
+    });
+    
+    after(function(done){
+      Categories.remove({}, function(o) {
+        done();
       });
       
     });
+    
     
     
     it("Create catalog ", function(done){
