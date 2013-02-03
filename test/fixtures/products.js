@@ -36,6 +36,11 @@ exports.clean=function(callback){
       Shops.remove({}, function(e) {
         cb(e);
       });
+    },
+    function(cb){
+      mongoose.model('Manufacturers').remove({}, function(e) {
+        cb(e);
+      });
     }
   ],
   function(e,r){
@@ -43,7 +48,9 @@ exports.clean=function(callback){
   });
 };
 
-exports.creates=function(user,callback){
+
+
+exports.create_all_but_product=function(user,callback){
   async.waterfall([
     // create some categories
     function(cb){
@@ -52,8 +59,14 @@ exports.creates=function(user,callback){
       });
       
     },
+    function(cats,cb){
+      // create some manufacturers
+      mongoose.model('Manufacturers').create({name:'roman', description:'cool', location:'Genève'},function(err,m){
+        cb(err,cats, m);   
+      });
+    },    
     // create shop
-    function(cats, cb){
+    function(cats,maker, cb){
       var s={
         name: "Votre vélo en ligne",
         description:"cool ce shop",
@@ -62,75 +75,13 @@ exports.creates=function(user,callback){
       
       };
       Shops.create(s,user, function(err,shop){
-       cb(err,cats, shop);
+       cb(err,cats, maker, shop);
       });      
     },
-    // create some categories
-    function(cats, shop, cb){
-      var p={
-         title: "01 Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-         
-         details:{
-            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-            comment:"Temps de cuisson : 16 minutes",
-            hasGluten:true, 
-            hasOgm:false,
-            isBio:true, 
-         },  
-         
-         attributes:{
-            isAvailable:true,
-            hasComment:false, 
-            isDiscount:false
-         },
-
-         pricing: {
-            stock:10, 
-            price:3.80,
-            discount:3.0,
-         },
-      
-      };
-      Products.create(p,shop,function(err,product){
-        product.addCategories(cats[0]);
-        
-        cb(err,cats, shop, product);
-      });
-    },
-    function(cats,shop, p1, cb){
-
-      var p={
-         title: "02 Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-         
-         details:{
-            description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-            comment:"Temps de cuisson : 16 minutes",
-            hasGluten:true, 
-            hasOgm:false,
-            isBio:false, 
-         },  
-         
-         attributes:{
-            isAvailable:true,
-            hasComment:false, 
-            isDiscount:false
-         },
-
-         pricing: {
-            stock:10, 
-            price:3.80,
-            discount:3.0,
-         },
-      
-      };
-      Products.create(p,shop,function(err,p2){
-        p2.addCategories(cats[1]);
-        cb(err,cats,shop,[p1, p2]);
-      });
-    }
-    
   ],
-  function(err,cats, shop, ps){
-    callback(err, cats, shop, ps);
+  function(err,cats, maker, shop){
+    callback(err, cats, shop, maker);
   });
 };
+
+

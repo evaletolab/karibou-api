@@ -16,6 +16,7 @@ describe("Products API", function(){
 
   var db = require('mongoose');
   var _=require('underscore');
+  var fx = require('./fixtures/products');
   
   var profile;
   var cats; 
@@ -50,6 +51,11 @@ describe("Products API", function(){
   before(function(done){
     async.waterfall([
       function(cb){
+        fx.clean(function(err){
+          cb();
+        });
+      },
+      function(cb){
         // registered new user with password and provider
         db.model('Users').test(1234,'mypwd', function(err,u){
           profile=u;
@@ -59,14 +65,13 @@ describe("Products API", function(){
       function(cb){
         // create some categories
         db.model('Categories').create(["Fruits", "Légumes", "Poissons"],function(err,c){
-          cats=_.collect(c, function(c){return {_id:c._id}});  
-          console.log(c[0].length)
+          cats=_.collect(c, function(c){return {_id:c._id}}); 
 	        cb(err);             
         });
       },
       function(cb){
         // create some manufacturers
-        db.model('Manufacturers').create({name:'Olivier', description:'cool'},function(err,m){
+        db.model('Manufacturers').create({name:'roman', description:'cool', location:'Genève'},function(err,m){
           maker=m;  
 	        cb(err);   
         });
@@ -121,7 +126,18 @@ describe("Products API", function(){
           assert(cookie);
           done();        
       });
-    });	    
+    });	   
+
+    it("Should be loged-in", function(done){
+      request(app)
+        .get('/v1/users/me')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .end(function(err,res){
+          res.should.have.status(200);
+          done();        
+      });
+    });     
       
 
     it('POST /v1/shops/bicycle-and-rocket/products should return 401 shop not found ',function(done){
@@ -168,7 +184,7 @@ describe("Products API", function(){
     //
     // create a new product without ref to (manufacter, categories)
     //
-    it('POST /v1/shops/bicycle-and-rocket/products should return 200 ',function(done){
+    it('POST /v1/shops/bicycle-and-rocket/products without manufacturer should return 400 ',function(done){
       // shop must be managed
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
@@ -177,17 +193,15 @@ describe("Products API", function(){
         .send(p)
         .end(function(err,res){
           // shop is not defined
-          res.should.have.status(200);
-          res.body.sku.should.be.above(10000);
-          res.body.details.isBio.should.equal(false);
+          res.should.have.status(400);
           done();        
         });
     });    
 
     //
-    // create a new product with a manufacter
+    // create a new product with a manufacter, but without category
     //
-    it('POST /v1/shops/bicycle-and-rocket/products with manufacturer should return 200 ',function(done){
+    it('POST /v1/shops/bicycle-and-rocket/products with manufacturer without category should return 400 ',function(done){
       // shop must be managed
       p.manufacturer={_id:maker._id};
       p.title="Test new product";
@@ -197,10 +211,8 @@ describe("Products API", function(){
         .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
-          // shop is not defined
-          res.should.have.status(200);
-          res.body.sku.should.be.above(10001);
-          res.body.manufacturer.should.be.a.string;
+          // shop is not defined 
+          res.should.have.status(400);
           //res.body.manufacturer.location.should.equal("Genève");
           done();        
         });

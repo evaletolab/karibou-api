@@ -23,7 +23,7 @@ var EnumLocation="Genève Lausanne Gex".split(' ');
 var Manufacturer = new Schema({
     name: {type:String, unique:true, required:true},
     description: String,
-    location: {type:String, default:"Genève", enum:EnumLocation}
+    location: {type:String, required:true,  enum:EnumLocation}
 });
 
 
@@ -171,7 +171,7 @@ Product.statics.create = function(p,s,callback){
         //
         // set manufacturer 
         if(!p.manufacturer){
-          cb(null);
+          cb(("manufacturer is missing"));
           return;
         }
         db.model('Manufacturers').findOne(p.manufacurer, function(err,m){
@@ -183,7 +183,7 @@ Product.statics.create = function(p,s,callback){
         //
         // set category (NOT MANDATORY)
         if(!p.categories){
-          cb(null)
+          cb(("categories is missing"))
           return;
         }
         db.model('Categories').map(p.categories, function(err,categories){
@@ -220,12 +220,12 @@ Product.statics.findOneBySku = function(sku, callback){
 Product.statics.findByCategory = function(cat, callback){
   // if cat is array
   if(Array.isArray(cat)){
-    return callback(new Error("[Array Categories] Not implemented yet!"));
+    return callback(("[Array Categories] Not implemented yet!"));
   }
   if((typeof cat)==="string"){
 //    this.model('Catgories').findByName(cat,function(e,c){
 //    });
-    return callback( new Error("[String Categories] Not implemented yet!"));
+    return callback(("[String Categories] Not implemented yet!"));
   }
   
   // if cat is an Object

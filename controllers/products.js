@@ -24,6 +24,11 @@ exports.create=function (req, res) {
       return res.json({error:err});    
     }
     
+    if (!shops){
+      res.status(401);
+      return res.json({error:new Error("User has no shop")});    
+    }
+
     var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     if (!s){
     	res.status(401);
@@ -34,7 +39,7 @@ exports.create=function (req, res) {
     // ready to create one product
     Products.create(req.body,s, function(err,product){
         if(err){
-        	res.status(401);
+        	res.status(400);
           return res.json({error:err});    
         }
         res.json(product);            

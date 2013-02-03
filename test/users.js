@@ -34,9 +34,7 @@ describe("Users", function(){
   });
 
   afterEach(function(done){
-    Users.remove({}, function(o) {
-      done();
-    });
+    done();
   });
   
 
