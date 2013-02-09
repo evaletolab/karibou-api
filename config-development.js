@@ -6,6 +6,10 @@ var PATH = function(p) {
 
 module.exports = {
 
+  cors:{
+    allowedDomains:'*'
+  },
+
   express: {
     port: process.env.PORT || 3000,
     views: PATH('views'),

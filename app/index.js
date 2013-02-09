@@ -42,6 +42,16 @@ for (var name in config.express) {
   app.set(name, config.express[name]);
 }
 
+//
+// CORS middleware
+// Allow cross-domain 
+var CORS = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', config.cors.allowedDomains);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+}
 
 
 // config
@@ -51,6 +61,7 @@ app.configure(function () {
   app.use(express.methodOverride());
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   app.use(express.cookieParser());
+  app.use(CORS);  
   app.use(express.static('public'));
   app.locals.pretty = true;
 });

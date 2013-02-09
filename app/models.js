@@ -71,6 +71,10 @@ module.exports = function(app, express) {
 		});
 	});
 	
+	function SSO(req, res, next){
+	  console.log(req.sessio)
+	  next();
+	}
 	
 	app.configure(function () {
 	  app.use(express.session({secret:config.session.secret}));
@@ -84,6 +88,7 @@ module.exports = function(app, express) {
 **/
 		app.use(passport.initialize());
 		app.use(passport.session());  
+		app.use(SSO);
 		app.use(app.router);
 	});
 
