@@ -12,9 +12,9 @@ var mongoose = require('mongoose')
 var Shops = new Schema({
     urlpath:{ type: String, required: false, unique:true },
     name: { type: String, required: true, unique:true },
-    description:{ type: String, required: true },
-    bgphoto:{ type: String, required: true },
-    fgphoto:{ type: String, required: true },
+    description:{ type: String, required: false },
+    bgphoto:{ type: String, required: false },
+    fgphoto:{ type: String, required: false },
 });
 
 
@@ -59,6 +59,9 @@ Shops.statics.create = function(shop,user, callback){
     debug("created shop - error: "+err);
     debug("created shop : "+s);
 
+    if (err){
+      return callback(err);
+    }
     //
     // bind user with shop
     Users.find(user,function(err,u){

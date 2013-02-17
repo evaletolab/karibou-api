@@ -57,10 +57,10 @@ describe("Products API", function(){
       },
       function(cb){
         // registered new user with password and provider
-        db.model('Users').test(1234,'mypwd', function(err,u){
-          profile=u;
+        db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "mypwd", "mypwd", function(err, user){
+          profile=user;
 	        cb(err);   
-        });     
+        });
       },
       function(cb){
         // create some categories
@@ -77,6 +77,7 @@ describe("Products API", function(){
         });
       }],
       function(err,r){
+        console.log(err)
         assert(!err);
         done();
       });
@@ -118,7 +119,7 @@ describe("Products API", function(){
 	    // login
       request(app)
         .post('/login')
-        .send({ id: 1234, password:'mypwd' })
+        .send({ id: "evaleto@gluck.com".hash(), password:'mypwd',provider:'local' })
         .end(function(err,res){
           res.should.have.status(302);
           res.headers.location.should.equal('/');

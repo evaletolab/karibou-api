@@ -23,12 +23,12 @@ var mongoose = require('mongoose')
     /* The provider which with the user authenticated (facebook, twitter, etc.) */
     provider: {type:String, required: true, unique: false, enum: EnumProvider}, 
     
-    emails :[{
-      email:{type : String, index:true, unique: false, required : false, 
+    email:{
+      address:{type : String, index:true, unique: false, required : false, 
         validate:[validate.email, 'invalid email address']
       },
-      primary:Boolean
-    }],
+      status:Schema.Types.Mixed,
+    },
     
     /* The name of this user, suitable for display.*/
     displayName:String, 
@@ -70,7 +70,7 @@ var mongoose = require('mongoose')
     
     
     /* */    
-    invoices : {type: Schema.ObjectId, ref : 'Invoice'},
+    invoices : {type: Schema.Types.ObjectId, ref : 'Invoice'},
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
@@ -104,21 +104,21 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-  return this.model('Users').findOne({email:email}, function(e, doc){
-    if(e){
-      fail(e)
+  return this.model('Users').findOne({'email.address':email}).populate('shops').exec(function(err,user){
+    if(err){
+      fail(err)
     }else{
-      success(doc);
+      success(user);
     }
   });
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-  return this.model('Users').findOne({provider:token}, function(e, doc){
-    if(e){
-      fail(e)
+  return this.model('Users').findOne({provider:token}).populate('shops').exec(function(err,user){
+    if(err){
+      fail(err)
     }else{
-      success(doc);
+      success(user);
     }
   });
 };
@@ -176,15 +176,15 @@ UserSchema.virtual('password').set(function (password) {
 
 UserSchema.method('verifyPassword', function(password, callback) {
   var hash=require('crypto').createHash('sha1').update(password).digest("hex");
+
   callback(null,hash===this.hash);  
 //  bcrypt.compare(password, this.hash, callback);
 });
 
 
 UserSchema.statics.authenticate=function(id, password, callback) {
-  
-  return this.model('Users').findOne({ id: id }, function(err, user) {
-      // on error
+
+  return this.model('Users').findOne({ id: id }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
       
 
@@ -200,42 +200,39 @@ UserSchema.statics.authenticate=function(id, password, callback) {
     });
 };
 
-//
-//test only
-UserSchema.statics.test = function (id,password, cb){
-  	var Users=this.model('Users');
-  	// create a new user
-    var user=new Users({
-		    provider:"twitter",
-		    id:id,
-		    password:password,
-		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png",
-		    roles:["customer", "seller","admin"]
-    });
 
-    user.save(function(err){
-      cb(err,user);
-    });
-};
 
-UserSchema.statics.register = function(id, password, confirm, callback){
+UserSchema.statics.register = function(email, first, last, password, confirm, callback){
 	var Users=this.model('Users');
-	error("TODO, we cannot register a user without matching a common provider (twitter, google, fb, flickr)");
-	// hash password
-	//var pwd=require('crypto').createHash('md5').update(password).digest("hex");
+	//error("TODO, we cannot register a user without matching a common provider (twitter, google, fb, flickr)");
 	
+	if (password !==confirm){
+	  callback(("password confirmation is not identical"));
+	  return;
+	}
+	
+	//hash password (see virtual methods )
+	//var pwd=require('crypto').createHash('sha1').update(password).digest("hex");
+	
+    
+  /* The name of this user, suitable for display.*/
+  
 	// create a new customer
 	var user=new Users({
-			id:id,
-			provider:"twitter",
+	    id:email.hash(),
+      displayName:first+" "+last, 
+      name: {
+          familyName: last,
+          givenName: first
+      },
+      email:{address:email,status:new Date()},
+			provider:"local",
 			password:password,
 			created:new Date()
 	});
-	
 
-	
 	//save it
-	user.save(function(err){
+	user.save(function(err){	  
 		callback(err, user);
 	});
 };

@@ -39,6 +39,7 @@ module.exports = function(app, express) {
         console.log("secret",secret);
         
     		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photos[0].value }, function (err, user) {
+    		  user.token=token;
       		return done(err, user);
     		});
  			}
@@ -53,6 +54,10 @@ module.exports = function(app, express) {
 		  usernameField: 'id'
 		},
 		function(id, password, done) {
+		  if(isNaN(id)){
+		    id=id.hash()
+		  }
+		  
 		  Users.authenticate(id, password, function(err, user) {
 		    return done(err, user);
 		  });
@@ -66,13 +71,12 @@ module.exports = function(app, express) {
 
 	// deserialize user on logout
 	passport.deserializeUser(function(id, done) {
-		Users.findById(id, function (err, user) {
+		Users.findById(id).populate('shops').exec(function (err, user) {
 		  done(err, user);
 		});
 	});
 	
 	function SSO(req, res, next){
-	  console.log(req.sessio)
 	  next();
 	}
 	
@@ -105,8 +109,23 @@ module.exports = function(app, express) {
     app.get('/auth/twitter/callback', 
       passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' })
     );
-		
-	}
+/**
+ This is usefull for debug twitter auth
+    app.get('/auth/twitter/callback', function(req, res, next) {
+      console.log("session",req.session)
+      console.log("params",req.session['oauth:twitter'].oauth_token)
+      var  token=req.session['oauth:twitter'].oauth_token;
+      var  success='/';
+      var  failure='/login';
+      if (req.session.redirect && token){
+        success=req.session.redirect+'/auth/twitter/'+token;
+        failure=req.session.redirect+'/auth/twitter/fail';
+      }
+      passport.authenticate('twitter', { successRedirect: success, failureRedirect: failure })(req, res, next);    
+	  });
+**/
+    
+  }
 
 
 };

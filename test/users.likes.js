@@ -24,7 +24,9 @@ describe("Products:", function(){
   // common befor/after
   before(function(done){
     Products.find(function(err,p){
+      assert(p)
       products=p;
+
       done()
     });
   });

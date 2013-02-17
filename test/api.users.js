@@ -20,12 +20,10 @@ describe("Users API", function(){
   before(function(done){
 
     // registered user with password and linked to a provider
-    Users.test(1234,'mypwd', function(e,u){
-      profile=u;
-      assert(!e);
-      profile.id.should.equal(1234);
-	    done();
-    });     
+    Users.register("evaleto@gluck.com", "olivier", "evalet", "mypwd", "mypwd", function(err, user){
+      profile=user;
+      done();   
+    });
 
 
   });
@@ -48,7 +46,7 @@ describe("Users API", function(){
   it('POST /login should return 302 on /login',function(done){
     request(app)
       .post('/login')
-      .send({ id: 123456, password:'mypwd' })
+      .send({ id: "evaleto@gluck.com".hash(), password:'12', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(302);
         res.headers.location.should.equal('/login');
@@ -57,19 +55,19 @@ describe("Users API", function(){
       });
   });
 
-  it('POST /login should return 302 on /',function(done){
+  it('POST /login with ID should return 302 on /',function(done){
   
     request(app)
       .post('/login')
-      .send({ id: 1234, password:'mypwd' })
+      .send({ id:"evaleto@gluck.com".hash(), provider:'local', password:'mypwd' })
       .end(function(err,res){
         res.should.have.status(302);
-//        console.log(res.text);
         cookie = res.headers['set-cookie'];
         res.headers.location.should.equal('/');
         done();        
       });
   });
+
    
   it('GET /v1/users/me should return 200',function(done){
     request(app)

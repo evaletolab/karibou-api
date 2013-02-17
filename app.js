@@ -16,7 +16,7 @@ var app = require('./app/index');
 
 
 // launch server
-var port = (process.env.VMC_APP_PORT || process.env.C9_PORT || 3000);
+var port = (process.env.VMC_APP_PORT || process.env.C9_PORT || config.express.port);
 var host = (process.env.VMC_APP_HOST || 'localhost');
 
 //

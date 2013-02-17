@@ -7,9 +7,11 @@ var PATH = function(p) {
 module.exports = {
 
   cors:{
-    allowedDomains:'*'
+    allowedDomains:'http://localshop.gelux.ch',
+    credentials:true,
+    age:3600
   },
-
+  
   express: {
     port: process.env.PORT || 3000,
     views: PATH('views'),
@@ -17,7 +19,7 @@ module.exports = {
   },
   
   // TODO load by env  
-  mongo:'mongodb://localhost/karibou-v1',
+  mongo:'mongodb://localhost/karibou-v1-1',
   mongo_:'mongodb://karibou:1_karibou@alex.mongohq.com:10044/karibou-v1',
 	
 	session:{

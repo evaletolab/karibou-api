@@ -7,11 +7,13 @@ var PATH = function(p) {
 module.exports = {
 
   cors:{
-    allowedDomains:'*'
+    allowedDomains:'http://lo.cal:3000',
+    credentials:true,
+    age:3600
   },
 
   express: {
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 4000,
     views: PATH('views'),
     'view engine': 'jade'
   },
@@ -32,7 +34,7 @@ module.exports = {
   , twit: {
         consumerKey: 'PzDBUUZoU5hVtigzAz73w'
       , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
-		  , cb: "http://localhost:3000/auth/twitter/callback"
+		  , cb: "http://localhost:4000/auth/twitter/callback"
     }
   , github: {
         appId: '11932f2b6d05d2a5fa18'

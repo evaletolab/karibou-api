@@ -80,16 +80,12 @@ describe("Users", function(){
       
     });
 
-    it.skip("registers a new User", function(done){
-  		Users.findOrCreate({ id: profile.id, provider:profile.provider }, function (err, user) {
-    		return done(err, user);
-  		});
+    it("registers a new User", function(done){
     
-      Users.register("test2@test.com", "password", "password", function(err, doc){
-        doc.email.should.equal("test2@test.com");
-        done();
-      }, function(message){
-        message.should.equal(null);
+      Users.register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
+        doc.email.address.should.equal("test2@test.com");
+        doc.name.familyName.should.equal("evalet");
+        doc.name.givenName.should.equal("olivier");
         done();
       });
     });
@@ -109,14 +105,14 @@ describe("Users", function(){
 
   it.skip("retrieves by email", function(done){
     Users.findByEmail(currentUsers.email, function(doc){
-      doc.email.should.equal("test@test.com");
+      doc.email.address.should.equal("test@test.com");
       done();
     });
   });
 
   it.skip("retrieves by token (eg. twitter)", function(done){
     Users.findByToken(currentUsers.auth_token, function(doc){
-      doc.email.should.equal("test@test.com");
+      doc.email.address.should.equal("test@test.com");
       done();
     });
   });
