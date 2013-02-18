@@ -73,7 +73,7 @@ describe("api.products", function(){
 	    // login
       request(app)
         .post('/login')
-        .send({ id: "evaleto@gluck.com", password:'mypwd',provider:'local' })
+        .send({ email: "evaleto@gluck.com", password:'mypwd',provider:'local' })
         .end(function(err,res){
           res.should.have.status(200);
           //res.headers.location.should.equal('/');

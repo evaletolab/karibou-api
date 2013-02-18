@@ -51,14 +51,13 @@ module.exports = function(app, express) {
 	
 	// Define local strategy for Passport
 	passport.use(new LocalStrategy({
-		  usernameField: 'id'
+		  usernameField: 'email'
 		},
-		function(id, password, done) {
-		  if(isNaN(id)){
-		    id=id.hash()
+		function(email, password, done) {
+		  if(isNaN(email)){
 		  }
 		  
-		  Users.authenticate(id, password, function(err, user) {
+		  Users.authenticate(email, password, function(err, user) {
 		    return done(err, user);
 		  });
 		}

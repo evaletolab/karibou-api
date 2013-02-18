@@ -69,7 +69,7 @@ describe("api.users", function(){
   
     request(app)
       .post('/login')
-      .send({ id:"evaleto@gluck.com", provider:'local', password:'mypwd' })
+      .send({ email:"evaleto@gluck.com", provider:'local', password:'mypwd' })
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("evaleto@gluck.com");

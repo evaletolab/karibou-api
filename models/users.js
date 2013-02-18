@@ -182,9 +182,9 @@ UserSchema.method('verifyPassword', function(password, callback) {
 });
 
 
-UserSchema.statics.authenticate=function(id, password, callback) {
+UserSchema.statics.authenticate=function(email, password, callback) {
 
-  return this.model('Users').findOne({ id: id }).populate('shops').exec(function(err,user){
+  return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
       
 
