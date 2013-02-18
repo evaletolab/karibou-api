@@ -11,7 +11,7 @@ var Categories = mongoose.model('Categories');
 
 
 
-describe("Products:", function(){
+describe("products.create:", function(){
   var async= require("async");
   var assert = require("assert");
   var _ = require("underscore");
@@ -28,7 +28,7 @@ describe("Products:", function(){
 		    assert(u);
 		    user={_id:u._id};
 		    uid=u.id;
-        fx.create_all_but_product(user,function(err, c, s, m){
+        fx.create_base(user,function(err, c, s, m){
           shop = s;
           cats = c;
           maker= m;
@@ -212,7 +212,6 @@ describe("Products:", function(){
         Products.create(p,shops[0],function(err,product){
           done();          
         });
-
       });
 
     });

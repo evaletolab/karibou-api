@@ -22,10 +22,13 @@ describe("Shops", function(){
 
 
   before(function(done){
+      fx.clean(function(){
       Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
           user=u;
           done();
       });      
+
+      });
   });
     
 
@@ -53,10 +56,10 @@ describe("Shops", function(){
     });
   });
 
-  it.skip("Find Shops by the user", function(done){
+  it("Find Shops by the user", function(done){
     Shops.findByUser({id:uid},function(err,shops){
-        shops[1].name.should.equal("Votre nouveau vélo en ligne");
-        shops.length.should.equal(2);
+        shops[0].name.should.equal("Votre nouveau vélo en ligne");
+        shops.length.should.equal(1);
         done();
     });
   });

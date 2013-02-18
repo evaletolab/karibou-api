@@ -9,7 +9,7 @@ var app = require("../app/index");
 
 
 
-describe("Products API", function(){
+describe("api.products", function(){
   var assert = require("assert");
   var request= require('supertest');
   var async= require('async');
@@ -19,78 +19,32 @@ describe("Products API", function(){
   var fx = require('./fixtures/products');
   
   var profile;
+  var shop;
   var cats; 
   var maker;
-  var p={
-     title: "Pâtes complètes à l'épeautre ''bio reconversion'' 500g",
-     
-     details:{
-        description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
-        comment:"Temps de cuisson : 16 minutes",
-        hasGluten:true, 
-        hasOgm:false,
-        isBio:false, 
-     },  
-     
-     attributes:{
-        isAvailable:true,
-        hasComment:false, 
-        isDiscount:false
-     },
-
-     pricing: {
-        stock:10, 
-        price:3.80,
-        discount:3.0,
-     }
-  };
-  
+  var p=_.clone(fx.p1);  
  
  
 
+  var products, shop, cats, maker;
+
+
+  // common befor/after
   before(function(done){
-    async.waterfall([
-      function(cb){
-        fx.clean(function(err){
-          cb();
-        });
-      },
-      function(cb){
-        // registered new user with password and provider
-        db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "mypwd", "mypwd", function(err, user){
-          profile=user;
-	        cb(err);   
-        });
-      },
-      function(cb){
-        // create some categories
-        db.model('Categories').create(["Fruits", "Légumes", "Poissons"],function(err,c){
-          cats=_.collect(c, function(c){return {_id:c._id}}); 
-	        cb(err);             
-        });
-      },
-      function(cb){
-        // create some manufacturers
-        db.model('Manufacturers').create({name:'roman', description:'cool', location:'Genève'},function(err,m){
-          maker=m;  
-	        cb(err);   
-        });
-      }],
-      function(err,r){
-        console.log(err)
-        assert(!err);
-        done();
-      });
-
+    fx.create_all(function(err,s,c,m,p){
+      assert(!err);
+      shop=s;cats=c;maker=m;products=p;
+      done()
+    })
+  
   });
+
   
   after(function(done){
 
-    db.model('Manufacturers').remove({},function(){});
-    db.model('Categories').remove({},function(){});
-    db.model('Shops').remove({},function(){});
-    db.model('Products').remove({},function(){});
-    db.model('Users').remove({},function(){done();});
+    fx.clean(function(){    
+      db.model('Users').remove({},function(){done();});
+    });
     
   });
 
@@ -119,10 +73,11 @@ describe("Products API", function(){
 	    // login
       request(app)
         .post('/login')
-        .send({ id: "evaleto@gluck.com".hash(), password:'mypwd',provider:'local' })
+        .send({ id: "evaleto@gluck.com", password:'mypwd',provider:'local' })
         .end(function(err,res){
-          res.should.have.status(302);
-          res.headers.location.should.equal('/');
+          res.should.have.status(200);
+          //res.headers.location.should.equal('/');
+          res.body.email.address.should.equal("evaleto@gluck.com");
           cookie = res.headers['set-cookie'];
           assert(cookie);
           done();        

@@ -12,36 +12,40 @@ var Categories = mongoose.model('Categories');
 
 
 
-describe("Products:", function(){
+describe("users.likes", function(){
   var async= require("async");
   var assert = require("assert");
   var _ = require("underscore");
-  var user,uid=12345;
 
-  var products, shop, cats;
+
+
+  var db = require('mongoose');
+  var fx = require('./fixtures/products');
+  
+  var profile;
+  var p=_.clone(fx.p1);  
+ 
+
+  var products, shop, cats, maker;
 
 
   // common befor/after
   before(function(done){
-    Products.find(function(err,p){
-      assert(p)
-      products=p;
-
+    fx.create_all(function(err,s,c,m,p){
+      assert(!err);
+      shop=s;cats=c;maker=m;products=p;
       done()
-    });
+    })
+  
   });
 
 
-
- 
-  
   describe("Likes products", function(){
     it("Customer likes a product ", function(done){
       async.waterfall([
         function(cb){
-          Users.findOne({id:uid},function(err,user){
-            assert(user);
-            cb(err,user);
+          Users.findOne({"email.address":"evaleto@gluck.com"},function(err,user){
+            cb(err,user)
           });
         },
         function(user,cb){
@@ -53,7 +57,7 @@ describe("Products:", function(){
         }
         ,
         function(cb){
-          Users.findOne({id:uid}).populate("likes").exec(function(err,user){
+          Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
             assert(user.likes);
             //console.log(user);
             cb(null,user);
@@ -69,12 +73,12 @@ describe("Products:", function(){
     });
 
     it("Customer unlikes a product ", function(done){
-      Users.findOne({id:uid},function(err,user){
+      Users.findOne({"email.address":"evaleto@gluck.com"},function(err,user){
           assert(user);
           Products.findOneBySku(products[0].sku,function(err,product){
             user.removeLikes(product, function(err){
               assert(!err)
-              Users.findOne({id:uid}).populate("likes").exec(function(err,user){
+              Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
                 assert(user.likes.length===0);
                 done();
               });
@@ -87,7 +91,7 @@ describe("Products:", function(){
     it("On removed product, user likes should be updated", function(done){
       async.waterfall([
         function(cb){
-          Users.findOne({id:uid},function(err,user){
+          Users.findOne({"email.address":"evaleto@gluck.com"},function(err,user){
             assert(user);
             cb(err,user);
           });
@@ -106,7 +110,7 @@ describe("Products:", function(){
             });
         },
         function(user,product,cb){
-            Users.findOne({id:uid}).populate("likes").exec(function(err,user){
+            Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
               assert(user.likes.length===0);
               done();
             });

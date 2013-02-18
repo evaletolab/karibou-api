@@ -12,7 +12,7 @@ var Categories = mongoose.model('Categories');
 
 
 
-describe("Products", function(){
+describe("products", function(){
   var async= require("async");
   var assert = require("assert");
   var _ = require("underscore");

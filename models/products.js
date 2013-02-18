@@ -212,9 +212,14 @@ Product.statics.create = function(p,s,callback){
 
 
 Product.statics.findOneBySku = function(sku, callback){
-  return this.model('Products').findOne({sku:sku}, function(e, product){
-    callback(e,product);
-  });
+  var cb=function(err, products){
+    callback(err,products);
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
+
+  return this.model('Products').findOne({sku:sku}, cb);
 };
 
 Product.statics.findByCategory = function(cat, callback){
@@ -229,16 +234,26 @@ Product.statics.findByCategory = function(cat, callback){
   }
   
   // if cat is an Object
+  var cb=function(err, products){
+    callback(err,products);
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
   
-  return this.model('Products').find({categories:cat}, function(err, product){
-    callback(err,product);
-  });
+  return this.model('Products').find({categories:cat}, cb);
 };
 
 Product.statics.findByShop = function(shop, callback){
-  return this.model('Products').find({vendor:shop}, function(err, products){
+  var cb=function(err, products){
     callback(err,products);
-  });
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
+  
+  
+  return this.model('Products').find({vendor:shop._id}, cb);
 };
 
 

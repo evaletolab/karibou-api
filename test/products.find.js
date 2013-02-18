@@ -12,23 +12,28 @@ var Categories = mongoose.model('Categories');
 
 
 
-describe("Products:", function(){
+describe("products.find:", function(){
   var async= require("async");
   var assert = require("assert");
   var _ = require("underscore");
-  var uid = 12345;
 
-  var products, shop, cats;
+  var products, shop, cats, maker;
 
 
   // common befor/after
   before(function(done){
-    done()
+    fx.create_all(function(err,s,c,m,p){
+      assert(!err);
+      shop=s;cats=c;maker=m;products=p;
+      done()
+    })
   
   });
 
   after(function(done){
-    done();
+    fx.clean(function(){
+      done();
+    })
   });
 
 
@@ -37,7 +42,7 @@ describe("Products:", function(){
     
     
     it("Find products by Shop", function(done){
-      Shops.findByUser({id:uid},function(err,shops){
+      Shops.findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
         assert(shops);
         Products.findByShop(shops[0],function(err,products){          
           assert(products.length);
@@ -50,13 +55,13 @@ describe("Products:", function(){
 
     it("Find non-BIO products by Shop  ", function(done){
 
-      Shops.findByUser({id:uid},function(err,shops){
+      Shops.findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
         assert(shops);
-        Products.findByShop(shops[0],function(err,products){          
-          assert(products.length);
+        Products.findByShop(shops[0]).where("details.isBio",false).exec(function(err,products){          
+          products.length.should.equal(1)
           products[0].details.isBio.should.equal(false);
           done();
-        }).where("details.isBio",false);
+        });
       });
 
     });

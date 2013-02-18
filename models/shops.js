@@ -89,12 +89,14 @@ Shops.statics.create = function(shop,user, callback){
 
 Shops.statics.findByUser=function(u,callback){
   	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
+  	    if (!user) return callback(err)
   	    callback(err,user.shops);
   	});  	
 };
 
 Shops.statics.findAllByUser=function(u,callback){
   	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
+  	    if (!user) return callback(err)
   	    callback(err,user.shops);
   	});
   	
