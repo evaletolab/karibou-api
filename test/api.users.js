@@ -57,7 +57,7 @@ describe("api.users", function(){
   it('POST /login should return 401 ',function(done){
     request(app)
       .post('/login')
-      .send({ id: "evaleto@gluck.com", password:'12', provider:'local' })
+      .send({ email: "evaleto@gluck.com", password:'12', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(401);
         res.body.error.should.be.a.string;        
