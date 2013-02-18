@@ -67,7 +67,7 @@ describe("api.products", function(){
       .expect(302,done);
   });
   
-  describe("Product API with auth", function(){
+  describe("with auth", function(){
     var cookie;
     before(function(done){
 	    // login

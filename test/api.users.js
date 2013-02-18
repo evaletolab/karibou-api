@@ -9,7 +9,7 @@ var app = require("../app/index");
 
 
 
-describe("Users API", function(){
+describe("api.users", function(){
   var profile = null;
   var assert = require("assert");
   var request= require('supertest');
@@ -23,69 +23,19 @@ describe("Users API", function(){
   var cookie;
 
   var profile;
-  var shop;
-  var cats; 
-  var maker;
   var p=_.clone(fx.p1);  
   
+  var products, shop, cats, maker;
 
+
+  // common befor/after
   before(function(done){
-    async.waterfall([
-      function(cb){
-        fx.clean(function(err){
-          cb(err);
-        });
-      },
-      function(cb){
-        // registered new user with password and provider
-        db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "mypwd", "mypwd", function(err, user){
-          profile=user;
-	        cb(err);   
-        });
-      },
-      function(cb){
-        fx.create_base(profile,function(err, c, s, m){
-          shop = s;
-          cats = c;
-          maker= m;
-          cb(err);  
-        });
-
-
-      },
-      function(cb){
-        //
-        // set the manfacturer
-        
-        var p=_.clone(fx.p1);
-        p.manufacturer=maker;
-        p.categories=[cats[0]];
-        db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
-          assert(shops);
-          db.model('Products').create(p,shops[0],function(err,product){
-            cb(err)  
-          });
-        });
-      },
-      function(cb){
-
-        var p=_.clone(fx.p2);
-        p.manufacturer=maker;
-        p.categories=[cats[1]];
-        db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
-          assert(shops);
-          db.model('Products').create(p,shops[0],function(err,product){
-            cb(err)  
-          });
-        });
-
-      }],
-      function(err,r){
-        err && console.log("ERROR -------------",err)
-        assert(!err);
-        done();
-      });
-
+    fx.create_all(function(err,s,c,m,p){
+      assert(!err);
+      shop=s;cats=c;maker=m;products=p;
+      done()
+    })
+  
   });
   
 
