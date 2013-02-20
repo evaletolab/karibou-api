@@ -105,7 +105,7 @@ Shops.statics.findAllByUser=function(u,callback){
 
 Shops.statics.findOneShop=function(s,callback){
   	var Shops=this.model('Shops');
-    return Shops.findOne(s).populate('user').exec(function(err,shop){
+    return Shops.findOne(s, function(err,shop){
       callback(err,shop);
     });
 };

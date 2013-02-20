@@ -8,6 +8,7 @@ module.exports = function(app) {
   var home 			= require(path+'home');
   var products 	= require(path+'products');
   var users 	= require(path+'users');
+  var shops 	= require(path+'shops');
   var _       = require('underscore');
 
 
@@ -41,6 +42,7 @@ module.exports = function(app) {
   app.get('/v1/products/location/:location/category/:category/detail/:detail',products.list);
   
   // shop products
+  app.get('/v1/shops/:shopname', shops.get);
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.get('/v1/shops/:shopname/products/category/:category/detail/:detail', products.list);
