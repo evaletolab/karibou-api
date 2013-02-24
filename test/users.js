@@ -50,6 +50,7 @@ describe("Users", function(){
 
     it("validate existant Oauth user", function(done){
     		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photo }, function (err, user) {
+
   		  user.id.should.equal(profile.id);
     		return done();
   		});

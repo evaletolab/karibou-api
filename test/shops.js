@@ -37,9 +37,10 @@ describe("Shops", function(){
     var s={
       name: "Votre nouveau vélo en ligne",
       description:"cool ce shop",
-      bgphoto:"http://image.truc.io/bg-01123.jp",
-      fgphoto:"http://image.truc.io/fg-01123.jp"
-    
+      photo:{
+        bg:"http://image.truc.io/bg-01123.jp",
+        fg:"http://image.truc.io/fg-01123.jp"
+      }    
     };
     Shops.create(s,user, function(err,shop){
       assert(!err);
@@ -55,6 +56,51 @@ describe("Shops", function(){
         done();
     });
   });
+
+  it("Update shop", function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne",
+      description:"berk ce shop",
+      photo:{
+        bg:"bg",
+        fg:"fg"
+      }
+    
+    };
+    Shops.update({name:s.name},s,function(err,shop){
+        //shop.user.id.should.equal(user.id);
+        shop.photo.fg.should.equal("fg");
+        done();
+    });
+  });
+  
+  it.skip("Update shop with wrong id",function(done){
+  });
+  
+  it.skip("Update shop with illegal field",function(done){
+
+  });
+  
+  it.skip("Update shop without id",function(done){
+  });
+
+  it("Update shop, remove  bg photo",function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne",
+      description:"berk ce shop",
+      photo:{
+        fg:"fg"
+      }
+    
+    };
+    Shops.update({name:s.name},s,function(err,shop){
+        //shop.user.id.should.equal(user.id);
+        shop.photo.fg.should.equal("fg");
+        shop.photo.should.not.have.property('bg')
+        done();
+    });
+  });
+  
 
   it("Find Shops by the user", function(done){
     Shops.findByUser({id:uid},function(err,shops){

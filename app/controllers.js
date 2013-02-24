@@ -41,16 +41,23 @@ module.exports = function(app) {
   app.get('/v1/products/location/:location/category/:category',products.list);
   app.get('/v1/products/location/:location/category/:category/detail/:detail',products.list);
   
-  // shop products
+  // shop 
+  app.get('/v1/shops', shops.list);
   app.get('/v1/shops/:shopname', shops.get);
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.get('/v1/shops/:shopname/products/category/:category/detail/:detail', products.list);
+
+  app.post('/v1/shops', auth.ensureAuthenticated, shops.create);
+  app.post('/v1/shops/:shopname', auth.ensureAuthenticated, shops.update);
+    
+  app.post('/v1/shops/:shopname/products', auth.ensureAuthenticated, products.create);
+
+  app.post('/v1/shops/:shopname/delete',auth.ensureAuthenticated, shops.remove);
+
   
   app.delete('/v1/products',auth.ensureAuthenticated, products.massRemove);
   app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);
-  app.post('/v1/shops/:shopname/products', auth.ensureAuthenticated, products.create);
-  app.post('/v1/shops', auth.ensureAuthenticated, products.shopCreate);
   app.put('/v1/products', auth.ensureAuthenticated, products.massUpdate);
   app.put('/v1/products/:sku', auth.ensureAuthenticated, products.update);
   

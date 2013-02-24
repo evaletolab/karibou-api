@@ -51,17 +51,7 @@ exports.create=function (req, res) {
 
 };
 
-exports.shopCreate=function (req, res) {
 
-  db.model('Shops').create(req.body, req.user, function(err,shop){
-    if(err){
-      //TODO error
-    	res.status(401);
-      return res.json({error:err});
-    }      
-    res.json(shop);
-  });
-};
 
 
 // GET to READ

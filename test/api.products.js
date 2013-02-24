@@ -119,8 +119,10 @@ describe("api.products", function(){
       var s={
         name: "Bicycle and rocket",
         description:"cool ce shop",
-        bgphoto:"http://image.truc.io/bg-01123.jp",
-        fgphoto:"http://image.truc.io/fg-01123.jp"      
+        photo:{ 
+          bg:"http://image.truc.io/bg-01123.jp",
+          fg:"http://image.truc.io/fg-01123.jp"      
+        }
       };
       
       //

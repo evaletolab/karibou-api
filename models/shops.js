@@ -13,8 +13,12 @@ var Shops = new Schema({
     urlpath:{ type: String, required: false, unique:true },
     name: { type: String, required: true, unique:true },
     description:{ type: String, required: false },
-    bgphoto:{ type: String, required: false },
-    fgphoto:{ type: String, required: false },
+    photo:{
+      bg:{ type: String, required: false },
+      fg:{ type: String, required: false }
+    },
+    status:Schema.Types.Mixed,
+    created:{type:Date, default: Date.now}
 });
 
 
@@ -87,9 +91,28 @@ Shops.statics.create = function(shop,user, callback){
 
 }; 
 
+//
+// update shop content
+Shops.statics.update=function(id,s,callback){
+	var Shops=this.model('Shops');	
+	
+	//
+	// check owner
+
+  return Shops.findOne(id, function (err, shop) {
+    //
+    // other fields are not managed by update
+    shop.description = s.description;
+    shop.photo = s.photo;
+    return shop.save(function (err) {
+      return callback(err,shop);
+    });
+  });
+};
+
 Shops.statics.findByUser=function(u,callback){
   	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
-  	    if (!user) return callback(err)
+  	    if (!user) return callback(err);
   	    callback(err,user.shops);
   	});  	
 };

@@ -140,8 +140,10 @@ var create_base=exports.create_base=function(user,callback){
       var s={
         name: "Votre vélo en ligne",
         description:"cool ce shop",
-        bgphoto:"http://image.truc.io/bg-01123.jp",
-        fgphoto:"http://image.truc.io/fg-01123.jp"
+        photo:{ 
+          bg:"http://image.truc.io/bg-01123.jp",
+          fg:"http://image.truc.io/fg-01123.jp"      
+        }
       
       };
       db.model('Shops').create(s,user, function(err,shop){
