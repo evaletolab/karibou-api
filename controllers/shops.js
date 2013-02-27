@@ -12,7 +12,6 @@ var Shops = db.model('Shops');
 
 exports.create=function (req, res) {
 
-  console.log("create", req.body);
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
       //TODO error
@@ -28,7 +27,7 @@ exports.remove=function (req, res) {
     // FOR DEV ONLY!
     //return res.send(401, {error:"Your are not the owner of this shop"});
   }
-  console.log("remove", req.params);
+
 
   db.model('Shops').remove({urlpath:req.params.shopname},function(err){
     if (err){
@@ -66,7 +65,6 @@ exports.update=function(req,res){
     return res.send(401, {error:"Your are not the owner of this shop"});
   }
   
-  console.log(req.body);
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){
     	res.status(401);
@@ -84,10 +82,6 @@ exports.list=function (req, res) {
       return res.json({error:err});    
     }
     
-    if (!shops.length ){
-      res.status(401);
-      return res.json({error:("Cannot find any shop ")});    
-    }
 
     return res.json(shops);  
   });

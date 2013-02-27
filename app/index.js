@@ -65,9 +65,11 @@ var CORS = function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', config.cors.credentials);
     res.header('Access-Control-Allow-Origin', config.cors.allowedDomains);
     res.header('Access-Control-Max-Age', config.cors.age);
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-
+    if( req.method.toLowerCase() === "options" ) {
+        return res.send( 200 );
+    }
     next();
 }
 
