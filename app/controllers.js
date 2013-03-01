@@ -28,11 +28,12 @@ module.exports = function(app) {
 	//
 	// home
   app.get('/', home.index(app));
+  app.get('/v1', api.index(app));
   
   //
-  // api
-  app.get('/v1', api.index(app));
+  // user
   app.get('/v1/users/me', users.me);
+  app.post('/v1/users/:id', users.update);
   
   // global products 
   app.get('/v1/products/:sku',products.get);

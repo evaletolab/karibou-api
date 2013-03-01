@@ -24,7 +24,7 @@ var mongoose = require('mongoose')
     provider: {type:String, required: true, unique: false, enum: EnumProvider}, 
     
     email:{
-      address:{type : String, index:true, unique: false, required : false, 
+      address:{type : String, index:true, unique: true, required : false, 
         validate:[validate.email, 'invalid email address']
       },
       status:Schema.Types.Mixed,
@@ -236,6 +236,31 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 		callback(err, user);
 	});
 };
+
+
+//
+// update shop content
+UserSchema.statics.update=function(id, u,callback){
+	var Users=this.model('Users');	
+	
+	//
+	// check owner
+
+  return Users.findOne(id).populate('shops').exec(function (err, user) {
+    if (u.name&&u.name.familyName) user.name.familyName=u.name.familyName;
+    if (u.name&&u.name.givenName) user.name.givenName=u.name.givenName;
+    if (u.email&&u.email.address) {
+      if (user.email.address!==u.email.address)
+        user.email.status=new Date();
+      user.email.address=u.email.address;
+    }
+    
+    return user.save(function (err) {
+      return callback(err,user);
+    });
+  });
+};
+
 
 module.exports = mongoose.model('Users', UserSchema);
 
