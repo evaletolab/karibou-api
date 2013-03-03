@@ -91,7 +91,7 @@ Emails.statics.validate=function(uid,callback){
       //
       // remove this validation process
       if (!err) validate.remove();
-      return callback(err);
+      return callback(err, validate.owner);
     });
   });
 };

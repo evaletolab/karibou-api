@@ -45,7 +45,7 @@ exports.validate=function (req, res) {
     return res.send(400, err.message);
   }
     
-  Emails.validate(req.params.uid,function (err,email){
+  Emails.validate(req.params.uid,function (err,user){
 
     if (err){
     	res.status(200);
@@ -53,7 +53,7 @@ exports.validate=function (req, res) {
     }
     
 
-    return res.json(email);  
+    return res.json(user);  
   });
 };
 

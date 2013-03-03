@@ -128,6 +128,7 @@ describe("api.validate", function(){
       .end(function(err,res){
         //console.log(res.text)
         res.should.have.status(200);
+        res.body.email.status.should.equal(true)
         done()
       });
   });
@@ -145,6 +146,9 @@ describe("api.validate", function(){
       });
   });   
     
+  it.skip('Cannot validate after a timeout (>48h)');
+  it.skip('Cannot validate if email has changed');
+  it.skip('Clean old orphan validation  (for timeout > 100 days)');
       
 });
 
