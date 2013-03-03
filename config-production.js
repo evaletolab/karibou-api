@@ -21,6 +21,13 @@ module.exports = {
   // TODO load by env  
   mongo:'mongodb://localhost/karibou-v1-1',
   mongo_:'mongodb://karibou:1_karibou@alex.mongohq.com:10044/karibou-v1',
+
+ /**
+  * Time to validate an email
+  */
+  validate:{
+    email:60*60*24*2
+  },
 	
 	session:{
 		secret:'karibou-1234'

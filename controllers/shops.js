@@ -10,7 +10,28 @@ var assert = require("assert");
 var db = require('mongoose');
 var Shops = db.model('Shops');
 
+var check = require('validator').check,
+    sanitize = require('validator').sanitize;
+
+
+function check(req){
+    if (!req.body)return;
+    if(req.body.name) check(req.body.name).len(3, 34).isAlphanumeric();
+    if(req.body.description){
+      check(req.body.description).len(4, 64).isAlphanumeric();
+          req.body.description=sanitize(req.body.description).xss();
+    }
+    if(req.body.photo.bg) check(req.body.photo.bg).len(6, 64).isUrl();
+    
+}
+
 exports.create=function (req, res) {
+
+  try{
+    check(req);
+  }catch(err){
+    return res.send(401, err.message);
+  }  
 
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
@@ -23,6 +44,13 @@ exports.create=function (req, res) {
 };
 
 exports.remove=function (req, res) {
+
+  try{
+    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+  }catch(err){
+    return res.send(401, err.message);
+  }  
+
   if(!_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname})){
     // FOR DEV ONLY!
     //return res.send(401, {error:"Your are not the owner of this shop"});
@@ -41,7 +69,12 @@ exports.remove=function (req, res) {
 exports.get=function (req, res) {
   //
   // check shop owner 
-  assert(req.params.shopname);    
+  try{
+    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+  }catch(err){
+    return res.send(401, err.message);
+  }
+    
   Shops.findOneShop({urlpath:req.params.shopname},function (err,shop){
     if (err){
     	res.status(401);
@@ -59,11 +92,19 @@ exports.get=function (req, res) {
 
 exports.update=function(req,res){
   //
-  // check shop owner 
-  assert(req.params.shopname);    
+  // check && validate input field
+  try{
+    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+    check(req);
+  }catch(err){
+    return res.send(401, err.message);
+  }  
+
+
   if(!_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname})){
     return res.send(401, {error:"Your are not the owner of this shop"});
   }
+
   
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){

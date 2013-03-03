@@ -59,12 +59,12 @@ describe("api.products", function(){
       });
   });
 
-  it('POST /v1/shops/:name/products should return 302 for anonymous',function(done){
+  it('POST /v1/shops/:name/products should return 401 for anonymous',function(done){
     request(app)
       .post('/v1/shops/bicycle-and-rocket/products')
       .set('Content-Type','application/json')
       .send(p)
-      .expect(302,done);
+      .expect(401,done);
   });
   
   describe("with auth", function(){

@@ -18,6 +18,14 @@ module.exports = {
     'view engine': 'jade'
   },
   
+ /**
+  * Time to validate an email
+  */
+  validate:{
+    email:60*60*24*2
+  },
+  
+  
   // TODO load by env  
   mongo:'mongodb://localhost/karibou-test',
   mongo_:'mongodb://karibou:1_karibou@alex.mongohq.com:10044/karibou-test',

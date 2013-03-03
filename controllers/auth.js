@@ -10,7 +10,9 @@ var _ = require('underscore');
 
 exports.ensureAuthenticated=function(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
-	res.redirect('/login');
+	//res.redirect('/login');
+  res.statusCode = 401;
+  res.send(401);	
 }
 
 

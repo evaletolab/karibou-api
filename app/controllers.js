@@ -9,6 +9,7 @@ module.exports = function(app) {
   var products 	= require(path+'products');
   var users 	= require(path+'users');
   var shops 	= require(path+'shops');
+  var emails 	= require(path+'emails');
   var _       = require('underscore');
 
 
@@ -29,6 +30,13 @@ module.exports = function(app) {
 	// home
   app.get('/', home.index(app));
   app.get('/v1', api.index(app));
+  
+  //
+  // email validation
+  app.get ('/v1/validate',auth.ensureAuthenticated, emails.list);
+  app.post('/v1/validate/create',auth.ensureAuthenticated, emails.create);
+  app.post('/v1/validate/:uid', emails.validate);
+  
   
   //
   // user

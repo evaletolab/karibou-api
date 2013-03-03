@@ -70,7 +70,7 @@ var mongoose = require('mongoose')
     
     
     /* */    
-    invoices : {type: Schema.Types.ObjectId, ref : 'Invoice'},
+    invoices : [{type: Schema.Types.ObjectId, ref : 'Invoice'}],
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
@@ -150,6 +150,17 @@ UserSchema.methods.removeLikes = function(product, callback){
   });
 };
 
+UserSchema.methods.display = function(){
+  if (this.displayName)return this.displayName;
+  if (this.name && (this.name.givenName || this.name.familyName)) {
+    return this.name.givenName+' '+this.name.familyName
+  }
+  if (this.id){
+    return this.id+'@'+this.provider;
+  }
+    
+  return 'Anonymous';
+};
 
 UserSchema.statics.login = function(email, password, callback){
   console.log("login",email, password);
