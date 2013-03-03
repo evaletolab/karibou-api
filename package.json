@@ -7,7 +7,7 @@
     "async": "0.x",
     "underscore": "1.x",
     "express": "3.x",
-    "node-validator": "0.4.x",
+    "validator": "0.4.x",
     "supertest": "0.x",
     "mongodb": "1.x",
     "mongoose": "3.x",
