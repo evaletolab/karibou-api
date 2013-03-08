@@ -17,6 +17,21 @@ var Emails = new Schema({
 });
 
 
+Emails.statics.findOrCreate=function(e,callback){
+	var Emails=this.model('Emails');
+  return Emails.findOne(e, function(err, email){
+    if(!email){
+      var email=new Emails(e);
+      email.save(function(err){
+        callback(err,email);
+      });
+    }else{
+      callback(err, email);
+    }
+  });
+};
+
+
 Emails.statics.create = function(user, callback){
   assert(user);
   assert(callback);
@@ -28,30 +43,28 @@ Emails.statics.create = function(user, callback){
   // check user for this email
   this.model('Users').findOne({id:user.id},function(err,u){
     if(!u){
-      return callback(new Error("Cannot find user: "+user.display()));
+      return callback(("Cannot find user: "+user.display()));
     }
 
     
     //
     // a unique url is created with this user and his email
+    // FIXME hash method are not safe, use bcrypt 
     var uid=require('crypto').createHash('sha1').update(u.email.address+u.id).digest("hex");
     
-    
-    var validate =new  Emails({owner:u,uid:uid,email:u.email.address});
-    
-    validate.save(function (err) {
-      return callback(err,validate);
-    });  
-
+    Emails.findOrCreate({owner:u,uid:uid,email:u.email.address}, function(err,validate){
+      validate.created=new Date();
+      validate.save(function (err) {
+        return callback(err,validate);
+      });  
+    });
   });    
-   
-  
 
 }; 
 
 //
 // validate email 
-Emails.statics.validate=function(uid,callback){
+Emails.statics.validate=function(uid,email,callback){
 	var Emails=this.model('Emails');	
 	
 
@@ -67,22 +80,22 @@ Emails.statics.validate=function(uid,callback){
     //
     // validate existant email
     if(!validate){
-      return callback(new Error("This validation url is no more avaiable (1)"));
+      return callback(("This validation url is no more avaiable (1)"));
     }
 
 
     //
     // validate check existant email
-    if(validate.email!==validate.owner.email.address){
-      return callback(new Error("Cannot find the email ["+validate.email+"] for a validation"));
+    if(email!==validate.owner.email.address || validate.email!==email){
+      return callback( ("Cannot validate the email ["+email+"] "));
     }
     
     //
-    // validate check timeout
+    // validate check timeout to,leave TTL
     if (((validate.created-new Date())/1000)>config.validate.email){
       // remove this validation process
       validate.remove();
-      return callback(new Error("This validation url is no more avaiable (2)"));
+      return callback(("This validation url is no more avaiable (2)"));
     };
     
     validate.owner.email.status=true;

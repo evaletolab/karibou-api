@@ -58,8 +58,7 @@ describe("api.validate", function(){
 
   it('GET /v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d should return 200 and error field',function(done){
     request(app)
-      .post('/v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d')
-      .send({ email:"evaleto@gluck.com"})
+      .get('/v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d/pouet@ruc.com')
       .end(function(err,res){
         res.should.have.status(200);
         res.body.error.should.be.a.string;
@@ -108,6 +107,19 @@ describe("api.validate", function(){
       });
   });
 
+  it('POST again should not create a new',function(done){
+    request(app)
+      .post('/v1/validate/create')
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(200);
+        res.body.email.should.equal("evaleto@gluck.com");
+        res.body.uid.should.have.length(40);
+
+        done()
+      });
+  });
+
 
   it('GET /v1/validate should return 200 ad 1 validation',function(done){
     request(app)
@@ -121,14 +133,25 @@ describe("api.validate", function(){
         done()
       });
   });   
-  
-  it('GET /v1/validate/<uid> should return 200 ',function(done){
+
+
+
+  it('GET /v1/validate/<uid>/evaleto@poet.com should return 200 ',function(done){
     request(app)
-      .post('/v1/validate/'+uid)
+      .get('/v1/validate/'+uid+'/evaleto@poet.com')
       .end(function(err,res){
-        //console.log(res.text)
         res.should.have.status(200);
-        res.body.email.status.should.equal(true)
+        done()
+      });
+  });
+  
+  it('GET /v1/validate/<uid>/evaleto@gluck.com should return 200 ',function(done){
+    console.log("api.validate:", '/v1/validate/'+uid+'/evaleto@gluck.com')
+    request(app)
+      .get('/v1/validate/'+uid+'/evaleto@gluck.com')
+      .end(function(err,res){
+        console.log(res.text)
+        res.should.have.status(200);
         done()
       });
   });

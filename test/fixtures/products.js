@@ -144,7 +144,6 @@ var create_base=exports.create_base=function(user,callback){
           bg:"http://image.truc.io/bg-01123.jp",
           fg:"http://image.truc.io/fg-01123.jp"      
         }
-      
       };
       db.model('Shops').create(s,user, function(err,shop){
        cb(err,cats, maker, shop);
@@ -152,6 +151,7 @@ var create_base=exports.create_base=function(user,callback){
     },
   ],
   function(err,cats, maker, shop){
+    if(err)console.log("DEBUG------------------>",err)
     callback(err, cats, shop, maker);
   });
 };

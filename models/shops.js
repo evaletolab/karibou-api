@@ -18,6 +18,7 @@ var Shops = new Schema({
       fg:{ type: String, required: false }
     },
     status:Schema.Types.Mixed,
+    owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
     created:{type:Date, default: Date.now}
 });
 
@@ -52,6 +53,9 @@ Shops.statics.create = function(shop,user, callback){
   
 	var Shops=this.model('Shops');	
 	var Users=this.model('Users');
+	
+  if(!shop.owner)shop.owner = user._id;
+  //FIXME-- remove:58 : shop.owner = s.owner
   var s =new  Shops(shop);
    
   // if !urlpath => convert name to slug 
@@ -70,7 +74,7 @@ Shops.statics.create = function(shop,user, callback){
     // bind user with shop
     Users.find(user,function(err,u){
       if(!u.length>1){
-        callback(new Error("Multiple instance of user for this input: "+user));
+        callback(("Multiple instance of user for this input: "+user));
         return;
       }
 
@@ -104,6 +108,8 @@ Shops.statics.update=function(id,s,callback){
     // other fields are not managed by update
     shop.description = s.description;
     shop.photo = s.photo;
+    if(!shop.owner)shop.owner = s.owner;
+    //FIXME-- remove:110 : shop.owner = s.owner
     return shop.save(function (err) {
       return callback(err,shop);
     });
@@ -128,7 +134,7 @@ Shops.statics.findAllByUser=function(u,callback){
 
 Shops.statics.findOneShop=function(s,callback){
   	var Shops=this.model('Shops');
-    return Shops.findOne(s, function(err,shop){
+    return Shops.findOne(s).populate('owner').exec(function(err,shop){
       callback(err,shop);
     });
 };

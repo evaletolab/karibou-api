@@ -16,12 +16,13 @@ var check = require('validator').check,
 
 function check(req){
     if (!req.body)return;
-    if(req.body.name) check(req.body.name).len(3, 34).isAlphanumeric();
+    if(req.body.name) check(req.body.name,"Invalide characters for shop name").len(3, 34).isAlphanumeric();
     if(req.body.description){
-      check(req.body.description).len(4, 64).isAlphanumeric();
-          req.body.description=sanitize(req.body.description).xss();
+      //check(req.body.description).len(4, 104,"Invalide characters for shop description").isAlphanumeric();
+      req.body.description=sanitize(req.body.description).xss();
     }
-    if(req.body.photo.bg) check(req.body.photo.bg).len(6, 64).isUrl();
+    if(req.body.photo.bg) check(req.body.photo.bg).len(6, 164).isUrl();
+    if(req.body.photo.fg) check(req.body.photo.fg).len(6, 164).isUrl();
     
 }
 
@@ -46,7 +47,7 @@ exports.create=function (req, res) {
 exports.remove=function (req, res) {
 
   try{
-    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(401, err.message);
   }  
@@ -70,7 +71,7 @@ exports.get=function (req, res) {
   //
   // check shop owner 
   try{
-    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(401, err.message);
   }
@@ -94,7 +95,7 @@ exports.update=function(req,res){
   //
   // check && validate input field
   try{
-    check(req.params.shopname).len(3, 34).isAlphanumeric();    
+    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
     check(req);
   }catch(err){
     return res.send(401, err.message);
@@ -105,7 +106,7 @@ exports.update=function(req,res){
     return res.send(401, {error:"Your are not the owner of this shop"});
   }
 
-  
+  if(!req.body.owner)req.body.owner=req.user;
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){
     	res.status(401);

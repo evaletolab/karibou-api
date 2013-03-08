@@ -15,7 +15,7 @@ var check = require('validator').check,
 
 
 function check(req){
-    if(req.body&&req.body.email) check(req.body.email).len(3, 34).isEmail();
+    if(req.body&&req.body.email) check(req.body.email).len(3, 40).isEmail();
     
 }
 
@@ -41,11 +41,12 @@ exports.validate=function (req, res) {
   // check email owner 0
   try{
     check(req.params.uid).len(40).isAlphanumeric();    
+    check(req.params.email).len(3,40).isEmail();    
   }catch(err){
     return res.send(400, err.message);
   }
     
-  Emails.validate(req.params.uid,function (err,user){
+  Emails.validate(req.params.uid,req.params.email,function (err,user){
 
     if (err){
     	res.status(200);
@@ -53,7 +54,7 @@ exports.validate=function (req, res) {
     }
     
 
-    return res.json(user);  
+    return res.send("Ok");  
   });
 };
 

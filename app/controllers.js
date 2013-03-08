@@ -35,7 +35,7 @@ module.exports = function(app) {
   // email validation
   app.get ('/v1/validate',auth.ensureAuthenticated, emails.list);
   app.post('/v1/validate/create',auth.ensureAuthenticated, emails.create);
-  app.post('/v1/validate/:uid', emails.validate);
+  app.get('/v1/validate/:uid/:email', emails.validate);
   
   
   //

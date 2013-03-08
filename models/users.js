@@ -92,8 +92,8 @@ UserSchema.statics.findOrCreate=function(u,callback){
   Users.findOne(u, function(err, user){
     if(!user){
       var newuser=new Users(u);
-      newuser.save(function(e,user){
-        callback(e,user);
+      newuser.save(function(e){
+        callback(e,newuser);
       });
     }else{
       callback(err, user);
@@ -180,9 +180,13 @@ UserSchema.virtual('password').get(function () {
 
 UserSchema.virtual('password').set(function (password) {
   this._password = password;
+// more safe
 //  var salt = this.salt = bcrypt.genSaltSync(10);
 //  this.hash = bcrypt.hashSync(password, salt);
-  this.hash = require('crypto').createHash('sha1').update(password).digest("hex")
+  var crypto= require('crypto');
+  var salt  = this.salt = crypto.randomBytes(32).toString('base64'); 
+  // FIXME hash method are not safe, use bcrypt 
+  this.hash = crypto.createHash('sha1').update(password).digest("hex")
 });
 
 UserSchema.method('verifyPassword', function(password, callback) {
