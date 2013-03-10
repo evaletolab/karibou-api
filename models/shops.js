@@ -8,8 +8,11 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
   
 
+var EnumPlace=config.shop.places.list;
 
 var Shops = new Schema({
+    version:{type:Number, default: 1},
+    
     urlpath:{ type: String, required: false, unique:true },
     name: { type: String, required: true, unique:true },
     description:{ type: String, required: false },
@@ -17,6 +20,15 @@ var Shops = new Schema({
       bg:{ type: String, required: false },
       fg:{ type: String, required: false }
     },
+    
+    place: [{type: String, required: false, enum: EnumPlace, default:config.shop.places.default}],
+    
+    faq:[{
+      q:{type: String, required: true},
+      a:{type: String, required: true},
+      updated:{type:Date, default: Date.now}
+    }],
+    
     status:Schema.Types.Mixed,
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
     created:{type:Date, default: Date.now}
@@ -108,6 +120,8 @@ Shops.statics.update=function(id,s,callback){
     // other fields are not managed by update
     shop.description = s.description;
     shop.photo = s.photo;
+    shop.faq = s.faq;
+    shop.place = s.place;
     if(!shop.owner)shop.owner = s.owner;
     //FIXME-- remove:110 : shop.owner = s.owner
     return shop.save(function (err) {

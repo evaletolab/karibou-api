@@ -5,6 +5,12 @@ var PATH = function(p) {
 };
 
 module.exports = {
+  shop:{
+    places:{
+      list:["Eaux-vives", "Carouge", "Plain-palais"],
+      default:"Eaux-vives"
+    }
+  },
 
   cors:{
     allowedDomains:'http://localshop.gelux.ch',
@@ -20,7 +26,6 @@ module.exports = {
   
   // TODO load by env  
   mongo:'mongodb://localhost/karibou-v1-1',
-  mongo_:'mongodb://karibou:1_karibou@alex.mongohq.com:10044/karibou-v1',
 
  /**
   * Time to validate an email
