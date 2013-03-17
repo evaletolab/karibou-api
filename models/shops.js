@@ -17,10 +17,14 @@ var Shops = new Schema({
     name: { type: String, required: true, unique:true },
     description:{ type: String, required: false },
     photo:{
+      owner:{ type: String, required: false },
       bg:{ type: String, required: false },
       fg:{ type: String, required: false }
     },
     
+    details:{
+      bio:{type: Boolean,default:false}
+    },
     place: [{type: String, required: false, enum: EnumPlace, default:config.shop.places.default}],
     
     faq:[{
@@ -70,6 +74,7 @@ Shops.statics.create = function(shop,user, callback){
   //FIXME-- remove:58 : shop.owner = s.owner
   var s =new  Shops(shop);
    
+  
   // if !urlpath => convert name to slug 
   if(!s.urlpath){
     s.urlpath=name_to_slug(s.name);
@@ -84,14 +89,14 @@ Shops.statics.create = function(shop,user, callback){
     }
     //
     // bind user with shop
-    Users.find(user,function(err,u){
+    Users.find({_id:user._id},function(err,u){
       if(!u.length>1){
         callback(("Multiple instance of user for this input: "+user));
         return;
       }
 
       if(!u[0]){
-        callback(new Error("Cannot find user: "+user));
+        callback(("Cannot find user: "+user));
         return;
       }
       u[0].shops.push(s);
@@ -118,6 +123,7 @@ Shops.statics.update=function(id,s,callback){
   return Shops.findOne(id, function (err, shop) {
     //
     // other fields are not managed by update
+    //console.log(shop)
     shop.description = s.description;
     shop.photo = s.photo;
     shop.faq = s.faq;

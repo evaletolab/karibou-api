@@ -23,6 +23,7 @@ function check(req){
     }
     if(req.body.photo.bg) check(req.body.photo.bg).len(6, 164).isUrl();
     if(req.body.photo.fg) check(req.body.photo.fg).len(6, 164).isUrl();
+    if(req.body.photo.owner) check(req.body.photo.owner).len(6, 164).isUrl();
     
 }
 
@@ -37,7 +38,8 @@ exports.create=function (req, res) {
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
       //TODO error
-    	res.status(401);
+      console.log(err);
+    	res.status(400);
       return res.json({error:err});
     }      
     res.json(shop);
