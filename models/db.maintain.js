@@ -7,7 +7,6 @@ var mongoose = require('mongoose')
 var DbMaintain = new Schema({
 	version: { type: Number, required: false},
   log: { type: String, required: false},
-  error: { type: String, required: false},
   date: {type:Date, default: Date.now}
 });
 
@@ -32,8 +31,9 @@ DbMaintain.statics.findAll = function(callback){
 
 DbMaintain.statics.findLatestVersion = function(callback){
     var Maintain=this.model('DbMaintain');
-    Maintain.find('{}', 'version', {limit: 1, sort:{_id:-1}}, function(err,version){
-      return callback(err, version[0].version);
+    Maintain.find('{}', 'version', {limit: 1, sort:{_id:-1}}, function(err, versionColl){
+      var version = (versionColl[0])?(versionColl[0].version):(0);
+      return callback(err, version);
     });
 };
 

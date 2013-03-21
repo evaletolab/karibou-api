@@ -18,12 +18,19 @@ describe("DbMaintain", function(){
     });
   });
 
+  it("Find latest version with no entry", function(done){
+    DbMaintain.findLatestVersion(function(err, version){
+        assert(!err);
+        assert.equal(version, 0);
+        done();
+     });
+  });
+
 
   it("First DbMaintain entry", function(done){
     var dbm={
       version: 1,
       log:"standard log",
-      error:"standard error",
     };
     DbMaintain.save(dbm, function(err, new_dbm){
         assert(!err);
@@ -37,7 +44,6 @@ describe("DbMaintain", function(){
     var dbm={
      version: 2,
       log:"new log",
-      error:"new error",
     };
     DbMaintain.save(dbm, function(err, new_dbm){
         assert(!err);
