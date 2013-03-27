@@ -7,6 +7,7 @@ var Shops     = mongoose.model('Shops');
 var Users     = mongoose.model('Users');
 var Sequences = mongoose.model('Sequences');
 var Categories= mongoose.model('Categories');
+var DbMaintain= mongoose.model('DbMaintain');
 
 
 exports.clean=function(callback){
@@ -38,6 +39,11 @@ exports.clean=function(callback){
     },
     function(cb){
       Shops.remove({}, function(e) {
+        cb(e);
+      });
+    },
+    function(cb){
+      DbMaintain.remove({}, function(e){
         cb(e);
       });
     }
