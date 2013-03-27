@@ -6,12 +6,57 @@ var PATH = function(p) {
 
 module.exports = {
   shop:{
-    places:{
+    marketplace:{
       list:["Eaux-vives", "Carouge", "Plain-palais"],
       default:"Eaux-vives"
+    },
+    location:{
+      list:["Aire-la-Ville","Anières","Avully","Avusy","Bardonnex","Bellevue",
+            "Bernex","Carouge","Cartigny","Céligny","Chancy","Chêne-Bougeries",
+            "Chêne-Bourg","Choulex","Collex-Bossy","Collonge-Bellerive",
+            "Cologny","Confignon","Corsier","Dardagny","Genève-Ville",
+            "Genthod","Grand-Saconnex","Gy","Hermance","Jussy","Laconnex",
+            "Lancy","Meinier","Meyrin","Onex","Perly-Certoux",
+            "Plan-les-Ouates","Pregny-Chambésy","Presinge","Puplinge",
+            "Russin","Satigny","Soral","Thônex","Troinex","Vandoeuvres",
+            "Vernier","Versoix","Veyrier"
+      ]
+    },
+    product:{
+      location:["Appenzell Rhodes-Extérieures",
+                "Appenzell Rhodes-Intérieures",
+                "Argovie",
+                "Bâle-Campagne",
+                "Bâle-Ville",
+                "Berne",
+                "Fribourg",
+                "Genève",
+                "Glaris",
+                "Grisons",
+                "Jura",
+                "Lucerne",
+                "Neuchâtel",
+                "Nidwald",
+                "Obwald",
+                "Saint-Gall",
+                "Schaffhouse",
+                "Schwyz",
+                "Soleure",
+                "Tessin",
+                "Thurgovie",
+                "Uri",
+                "Valais",
+                "Vaud",
+                "Zoug",
+                "Zurich"]
     }
+
   },
 
+  admin:{
+    emails:['evaleto@gmail.com']
+  },
+  
   cors:{
     allowedDomains:'http://lo.cal:3000',
     credentials:true,
@@ -33,7 +78,7 @@ module.exports = {
   
   
   // TODO load by env  
-  mongo:'mongodb://localhost/karibou-test',
+  mongo:'mongodb://localhost/karibou-devel',
 
 	
 	session:{

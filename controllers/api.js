@@ -16,3 +16,8 @@ exports.index = function(app){
     res.render('home',  model);
   }
 };
+
+
+exports.config = function(req, res) {
+    res.json(config.shop);
+};

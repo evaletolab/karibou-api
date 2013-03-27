@@ -58,6 +58,8 @@ module.exports = function(app, express) {
 		  }
 		  
 		  Users.authenticate(email, password, function(err, user) {
+		    //
+		    // check the first admin
 		    return done(err, user);
 		  });
 		}
@@ -65,12 +67,27 @@ module.exports = function(app, express) {
 		    
 	// serialize user on login
 	passport.serializeUser(function(user, done) {
+	  
 		done(null, user._id);
 	});
 
 	// deserialize user on logout
 	passport.deserializeUser(function(id, done) {
 		Users.findById(id).populate('shops').exec(function (err, user) {
+		  //
+		  // don't serialise the private hash, but confirm the password existance
+		  if (user.hash) user.hash=true;
+		  
+	    //
+	    // check the first admin
+	    config.admin.emails.forEach(function(admin){
+        if (user&&user.email.address === admin){
+          user.roles.push('admin');
+        }
+	    });
+	    //console.log(id,config.admin.emails, user.email)
+
+		  
 		  done(err, user);
 		});
 	});

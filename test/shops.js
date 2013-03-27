@@ -74,14 +74,62 @@ describe("Shops", function(){
     });
   });
   
-  it.skip("Update shop with wrong id",function(done){
-  });
-  
-  it.skip("Update shop with illegal field",function(done){
+  it("Update shop with wrong id",function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne 2",
+      description:"berk ce shop",
+      photo:{
+        bg:"bg",
+        fg:"fg"
+      }
+    
+    };
+    Shops.update({name:s.name},s,function(err,shop){
+        //shop.user.id.should.equal(user.id);
+        err.should.be.a.string;
+        done();
+    });
 
   });
   
-  it.skip("Update shop without id",function(done){
+  it("Update shop with illegal field",function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne",
+      description:"berk ce shop",
+      photo:{
+        bg:"bg",
+        fg:"fg"
+      },
+      options:{
+        bio:"hello",
+        avoid:"hello"
+      }
+    
+    };
+    Shops.update({name:s.name},s,function(err,shop){
+        shop.options.bio.should.be.true;
+        shop.options.should.not.have.property('avoid');
+        done();
+    });
+
+  });
+  
+  it("Update shop without id",function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne 2",
+      description:"berk ce shop",
+      photo:{
+        bg:"bg",
+        fg:"fg"
+      }
+    
+    };
+    Shops.update({},s,function(err,shop){
+        //shop.user.id.should.equal(user.id);
+        err.should.be.a.string;
+        done();
+    });
+
   });
 
   it("Update shop, remove  bg photo",function(done){

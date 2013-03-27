@@ -16,6 +16,16 @@ exports.ensureAuthenticated=function(req, res, next) {
 }
 
 
+exports.ensureAuthenticatedAndAdmin=function(req, res, next) {
+	if (req.isAuthenticated()) { 
+	  if(_.any(req.user.roles,function(role){return role==='admin'}))
+  	  return next(); 
+	}
+	//res.redirect('/login');
+  res.statusCode = 401;
+  res.send(401);	
+}
+
 
 exports.logout = function (req, res) {
       req.logout();      
@@ -45,6 +55,21 @@ exports.login_post=function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
      if (err) { return res.json(401,{error:err}); }
      if (!user) { return res.json(401,{error:info?info:'Bad user credential'}); }
+
+      // CUSTOM USER CONTENT
+		  //
+		  // don't serialise the private hash, but confirm the password existance
+		  if (user.hash) user.hash=true;
+		  
+	    //
+	    // check the first admin
+	    config.admin.emails.forEach(function(admin){
+        if (user&&user.email.address === admin){
+          user.roles.push('admin');
+        }
+	    });
+     
+     
      req.logIn(user, function(err) {
        if (err) { return res.json(403,{error:err}); }
        return res.json(req.user);

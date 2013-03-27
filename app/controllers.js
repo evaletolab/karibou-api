@@ -30,6 +30,10 @@ module.exports = function(app) {
 	// home
   app.get('/', home.index(app));
   app.get('/v1', api.index(app));
+
+  //
+  //config
+  app.get ('/v1/config', api.config);
   
   //
   // email validation

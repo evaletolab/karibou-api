@@ -123,6 +123,10 @@ UserSchema.statics.findByToken = function(token, success, fail){
   });
 };
 
+UserSchema.methods.isAdmin = function () {
+  return this.hasRole('admin');
+};
+
 UserSchema.methods.hasRole = function (role) {
  for (var i = 0; i < this.roles.length; i++) {
    if (this.roles[i] === role) {
@@ -201,6 +205,7 @@ UserSchema.statics.authenticate=function(email, password, callback) {
 
   return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
+      
       
 
       // on user is Null

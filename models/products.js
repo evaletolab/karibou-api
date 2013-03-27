@@ -18,7 +18,7 @@ var mongoose = require('mongoose')
   
 
 var EnumOGM="Avec Sans".split(' ');
-var EnumLocation="Genève Lausanne Gex".split(' ');
+var EnumLocation=config.shop.product.location;
 
 var Manufacturer = new Schema({
     name: {type:String, unique:true, required:true},

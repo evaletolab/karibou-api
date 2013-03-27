@@ -21,30 +21,65 @@ module.exports = {
             "Russin","Satigny","Soral","Thônex","Troinex","Vandoeuvres",
             "Vernier","Versoix","Veyrier"
       ]
+    },
+    product:{
+      location:["Appenzell Rhodes-Extérieures",
+                "Appenzell Rhodes-Intérieures",
+                "Argovie",
+                "Bâle-Campagne",
+                "Bâle-Ville",
+                "Berne",
+                "Fribourg",
+                "Genève",
+                "Glaris",
+                "Grisons",
+                "Jura",
+                "Lucerne",
+                "Neuchâtel",
+                "Nidwald",
+                "Obwald",
+                "Saint-Gall",
+                "Schaffhouse",
+                "Schwyz",
+                "Soleure",
+                "Tessin",
+                "Thurgovie",
+                "Uri",
+                "Valais",
+                "Vaud",
+                "Zoug",
+                "Zurich"]
     }
+
   },
 
+  admin:{
+    emails:['evaleto@gmail.com']
+  },
+  
   cors:{
-    allowedDomains:'http://localshop.gelux.ch',
+    allowedDomains:'http://lo.cal:3000',
     credentials:true,
     age:3600
   },
-  
+
   express: {
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 4000,
     views: PATH('views'),
     'view engine': 'jade'
   },
   
-  // TODO load by env  
-  mongo:'mongodb://localhost/karibou-v1-1',
-
  /**
   * Time to validate an email
   */
   validate:{
     email:60*60*24*2
   },
+  
+  
+  // TODO load by env  
+  mongo:'mongodb://localhost/karibou-test',
+
 	
 	session:{
 		secret:'karibou-1234'
@@ -58,7 +93,7 @@ module.exports = {
   , twit: {
         consumerKey: 'PzDBUUZoU5hVtigzAz73w'
       , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
-		  , cb: "http://karibou-api.cloudfoundry.com/auth/twitter/callback"
+		  , cb: "http://localhost:4000/auth/twitter/callback"
     }
   , github: {
         appId: '11932f2b6d05d2a5fa18'

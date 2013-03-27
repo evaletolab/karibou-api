@@ -8,7 +8,8 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
   
 
-var EnumPlace=config.shop.places.list;
+var EnumPlace=config.shop.marketplace.list;
+var EnumLocation=config.shop.location.list;
 
 var Shops = new Schema({
     version:{type:Number, default: 1},
@@ -16,16 +17,21 @@ var Shops = new Schema({
     urlpath:{ type: String, required: false, unique:true },
     name: { type: String, required: true, unique:true },
     description:{ type: String, required: false },
+    url:{ type: String, required: false },
     photo:{
       owner:{ type: String, required: false },
       bg:{ type: String, required: false },
       fg:{ type: String, required: false }
     },
     
-    details:{
-      bio:{type: Boolean,default:false}
+    options:{
+      bio:{type: Boolean,default:false},
+      gluten:{type: Boolean,default:false},
+      lactose:{type: Boolean,default:false},
+      local:{type: Boolean,default:false}      
     },
-    place: [{type: String, required: false, enum: EnumPlace, default:config.shop.places.default}],
+    marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
+    location: {type: String, required: false, enum: EnumLocation},
     
     faq:[{
       q:{type: String, required: true},
@@ -33,6 +39,18 @@ var Shops = new Schema({
       updated:{type:Date, default: Date.now}
     }],
     
+    available:{
+      active:{type: Boolean,default:false},
+      comment:{type: String}
+    },
+
+    info:{
+      active:{type: Boolean,default:false},
+      comment:{type: String}
+    },
+    
+    //
+    // type Date on pending, set true on active, false on deleted
     status:Schema.Types.Mixed,
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
     created:{type:Date, default: Date.now}
@@ -117,19 +135,26 @@ Shops.statics.create = function(shop,user, callback){
 Shops.statics.update=function(id,s,callback){
 	var Shops=this.model('Shops');	
 	
-	//
-	// check owner
+	if (!Object.keys(id).length) return callback("Could not find shop for update");
 
   return Shops.findOne(id, function (err, shop) {
     //
     // other fields are not managed by update
     //console.log(shop)
+    if (!shop){
+      return callback("Could not find shop for update")
+    }
+    
     shop.description = s.description;
+    shop.url = s.url;
     shop.photo = s.photo;
     shop.faq = s.faq;
-    shop.place = s.place;
-    if(!shop.owner)shop.owner = s.owner;
-    //FIXME-- remove:110 : shop.owner = s.owner
+    shop.location = s.location;
+    shop.marketplace = s.marketplace;
+    shop.options=s.options;
+    shop.available=s.available;
+    shop.info=s.info;
+    
     return shop.save(function (err) {
       return callback(err,shop);
     });
