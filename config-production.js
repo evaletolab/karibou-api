@@ -24,7 +24,40 @@ module.exports = {
             "Russin","Satigny","Soral","Thônex","Troinex","Vandoeuvres",
             "Vernier","Versoix","Veyrier"
       ]
+    },
+    product:{
+      location:["Appenzell Rhodes-Extérieures",
+                "Appenzell Rhodes-Intérieures",
+                "Argovie",
+                "Bâle-Campagne",
+                "Bâle-Ville",
+                "Berne",
+                "Fribourg",
+                "Genève",
+                "Glaris",
+                "Grisons",
+                "Jura",
+                "Lucerne",
+                "Neuchâtel",
+                "Nidwald",
+                "Obwald",
+                "Saint-Gall",
+                "Schaffhouse",
+                "Schwyz",
+                "Soleure",
+                "Tessin",
+                "Thurgovie",
+                "Uri",
+                "Valais",
+                "Vaud",
+                "Zoug",
+                "Zurich"]
     }
+
+  },
+
+  admin:{
+    emails:['evaleto@gmail.com']
   },
 
   cors:{
