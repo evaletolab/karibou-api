@@ -7,10 +7,11 @@ module.exports = function(app) {
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
   var products 	= require(path+'products');
-  var users 	= require(path+'users');
-  var shops 	= require(path+'shops');
-  var emails 	= require(path+'emails');
-  var _       = require('underscore');
+  var users 	  = require(path+'users');
+  var shops 	  = require(path+'shops');
+  var emails 	  = require(path+'emails');
+  var categories= require(path+'categories');
+  var _         = require('underscore');
 
 
 	
@@ -19,17 +20,17 @@ module.exports = function(app) {
 	
   //
   // auth 
-  app.get('/logout', auth.logout);
- 	app.get('/login', auth.login);
+  app.get ('/logout', auth.logout);
+ 	app.get ('/login', auth.login);
   app.post('/login', auth.login_post);
-  app.get('/register', auth.register);
+  app.get ('/register', auth.register);
   app.post('/register', auth.register_post);
   
   
 	//
 	// home
-  app.get('/', home.index(app));
-  app.get('/v1', api.index(app));
+  app.get ('/', home.index(app));
+  app.get ('/v1', api.index(app));
 
   //
   //config
@@ -39,8 +40,15 @@ module.exports = function(app) {
   // email validation
   app.get ('/v1/validate',auth.ensureAuthenticated, emails.list);
   app.post('/v1/validate/create',auth.ensureAuthenticated, emails.create);
-  app.get('/v1/validate/:uid/:email', emails.validate);
+  app.get ('/v1/validate/:uid/:email', emails.validate);
   
+  //
+  // category
+  app.get ('/v1/category', categories.list);
+  app.get ('/v1/category/:category', categories.get);
+  app.post('/v1/category', auth.ensureAdmin, categories.create);
+  app.post('/v1/category/:category', auth.ensureAdmin, categories.update);
+  app.delete('/v1/category/:category', auth.ensureAdmin, categories.remove);
   
   //
   // user
@@ -64,16 +72,16 @@ module.exports = function(app) {
   app.get('/v1/shops/:shopname/products/category/:category/detail/:detail', products.list);
 
   app.post('/v1/shops', auth.ensureAuthenticated, shops.create);
-  app.post('/v1/shops/:shopname', auth.ensureAuthenticated, shops.update);
+  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, shops.update);
     
-  app.post('/v1/shops/:shopname/products', auth.ensureAuthenticated, products.create);
+  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, products.create);
 
-  app.post('/v1/shops/:shopname/delete',auth.ensureAuthenticated, shops.remove);
+  app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, shops.remove);
 
   
-  app.delete('/v1/products',auth.ensureAuthenticated, products.massRemove);
-  app.delete('/v1/products/:sku',auth.ensureAuthenticated, products.remove);
-  app.put('/v1/products', auth.ensureAuthenticated, products.massUpdate);
-  app.put('/v1/products/:sku', auth.ensureAuthenticated, products.update);
+  app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
+  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, products.remove);
+  app.put('/v1/products', products.ensureOwnerOrAdmin, products.massUpdate);
+  app.put('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
   
 };
