@@ -6,6 +6,9 @@ var PATH = function(p) {
 
 module.exports = {
   shop:{
+    category:{
+      types:['Category', 'Catalog']
+    },
     marketplace:{
       list:["Eaux-vives", "Carouge", "Plain-palais"],
       default:"Eaux-vives"

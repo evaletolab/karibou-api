@@ -4,11 +4,11 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "node.extend" : "1.0.0",
     "async": "0.x",
     "underscore": "1.x",
     "express": "3.x",
     "validator": "0.4.x",
-    "supertest": "0.x",
     "mongodb": "1.x",
     "mongoose": "3.x",
     "mongoose-validate": "x",
@@ -17,8 +17,11 @@
     "passport-local": "0.x",
     "passport-twitter": "0.x",
     "debug": "0.x",
-    "jade": "0.x",
+    "jade": "0.x"
+  },
+  "devDependencies" : {
     "mocha": "1.x",
+    "supertest": "0.x",
     "should": "1.2.1"
   }
 }

@@ -9,6 +9,31 @@ var Manufacturers = db.model('Manufacturers');
 var assert = require("assert");
 var _=require('underscore');
 
+exports.ensureOwnerOrAdmin=function(req, res, next) {
+  function isUserProductOwner(){
+    //return (!_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname}));
+    return true;
+  }
+    
+  //
+  // ensure auth
+	if (!req.isAuthenticated()) { 
+      return res.send(401);	
+	}
+
+  // if admin, we've done here
+  if (req.user.isAdmin()) 
+    return next();  
+
+  //
+  // ensure owner
+	if(!isUserProductOwner()){ 
+    return res.send(401, "Your are not the owner of this product"); 
+	}
+	
+  return next();
+
+}
 exports.create=function (req, res) {
   var product;
   
@@ -20,27 +45,23 @@ exports.create=function (req, res) {
   assert(req.params.shopname);    
   Shops.findByUser({id:req.user.id},function (err,shops){
     if (err){
-    	res.status(401);
-      return res.json({error:err});    
+      return res.json(400, err);    
     }
     
     if (!shops){
-      res.status(401);
-      return res.json({error:new Error("User has no shop")});    
+      return res.json(400, "User has no shop");    
     }
 
     var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     if (!s){
-    	res.status(401);
-      return res.json({error:"Shops is not defined or not associed to the user"});    
+      return res.json(400, "Shops is not defined or not associed to the user");    
     }
 
     //
     // ready to create one product
     Products.create(req.body,s, function(err,product){
         if(err){
-        	res.status(400);
-          return res.json({error:err});    
+          return res.json(400, err);    
         }
         res.json(product);            
     });
@@ -76,8 +97,7 @@ exports.list=function (req, res) {
   //
   return Products.find(function (err, products) {
     if (err) {
-    	res.status(401);
-      return res.json({error:err});
+      return res.json(400,err);
     }
     return res.json(products);
   });
@@ -89,8 +109,7 @@ exports.list=function (req, res) {
 exports.get=function (req, res) {
   return Products.findById(req.params.sku, function (err, product) {
     if (err) {
-    	res.status(401);
-      return res.json({error:err});
+      return res.json(400,err);
     }
     return res.json(product);
   });

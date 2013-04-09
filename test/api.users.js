@@ -60,7 +60,7 @@ describe("api.users", function(){
       .send({ email: "evaleto@gluck.com", password:'12', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(401);
-        res.body.error.should.be.a.string;        
+        res.body.should.be.a.string;        
         done();        
       });
   });

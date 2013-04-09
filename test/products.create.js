@@ -163,7 +163,7 @@ describe("products.create:", function(){
     Shops.findByUser({id:uid},function(err,shops){
       assert(shops);
       Products.create(p,shops[0],function(err,product){
-        err.should.equal("categories is missing");
+        err.should.equal("category is missing");
         done();          
       });
 

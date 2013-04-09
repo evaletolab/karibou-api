@@ -9,30 +9,45 @@ var mongoose = require('mongoose')
   
 
 
-var Catalogs = new Schema({
-    name: String
-});
-
-var EnumCategories="Category Catalog".split(' ');
-
 var Categories = new Schema({
     name: {type:String, unique:true},
+    slug: {type:String, unique:true},
     description:{type:String, unique:false},
-    type:{type:String, unique:false, default:"Category",enum:EnumCategories}
+    group:{type:String, unique:false},
+    type:{type:String, unique:false, default:"Category",enum:config.shop.category.types}
 });
 
 
-Categories.statics.create = function(names, callback){
-  assert(names);
-  debug("create catgories: "+names);
+// API FIXME name_to_slug must be in shared code
+function name_to_slug(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+  
+  // remove accents, swap ñ for n, etc
+  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+  var to   = "aaaaeeeeiiiioooouuuunc------";
+  for (var i=0, l=from.length ; i<l ; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+    .replace(/-+/g, '-'); // collapse dashes
+
+  return str;
+}
+
+
+Categories.statics.create = function(cats, callback){
+  assert(cats);
 	var Categories=this.model('Categories');	
 	
 	//
 	// manage batch creation
-	if(Array.isArray(names)){
-    var r=[];require('async').forEach(names, function(name,cb){
-    	Categories.create(name,function(err,cat){
-    	  r.push(cat);
+	if(Array.isArray(cats)){
+    var r=[];require('async').forEach(cats, function(cat,cb){
+    	Categories.create(cat,function(err,c){
+    	  r.push(c);
     	  cb(err);
     	});      
     },function(err){
@@ -44,7 +59,8 @@ Categories.statics.create = function(names, callback){
 
 	//
 	// create one Category
-	var cat=((typeof names) ==="string")?({name:names}):(names);
+	var cat=((typeof cats) ==="string")?({name:cats}):(cats);
+	cat.slug=name_to_slug(cat.name);
   var c =new  Categories(cat);   
   c.save(function (err) {
      callback(err,c);
@@ -77,11 +93,16 @@ Categories.statics.map = function(values, callback){
 
 };
 
+Categories.statics.findBySlug = function(name, callback){
+  return this.model('Categories').findOne({slug:name}, function(e, cat){
+    callback(e,cat);
+  });
+};
 
 
 Categories.statics.findByName = function(n, callback){
-  return this.model('Categories').find({name:n}, function(e, cats){
-    callback(e,cats);
+  return this.model('Categories').findOne({name:n}, function(e, cat){
+    callback(e,cat);
   });
 };
 module.exports =mongoose.model('Categories', Categories);

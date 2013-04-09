@@ -69,7 +69,7 @@ describe("Categories", function(){
   it("Find by name", function(done){
     Categories.findByName("Fruits",function(err,cat){
       assert(!err);
-      cat[0].name.should.equal("Fruits");
+      cat.name.should.equal("Fruits");
       done();
     });
   });
@@ -77,7 +77,7 @@ describe("Categories", function(){
   it("Find inexistant name", function(done){
     Categories.findByName("prfk",function(err,cat){
       assert(!err);
-      cat.length.should.equal(0)
+      assert(!cat)
       done();
     });
   });

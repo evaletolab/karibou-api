@@ -48,11 +48,11 @@ describe("api.products", function(){
     
   });
 
-  it('GET /v1/products/100001 should return 401',function(done){
+  it('GET /v1/products/100001 should return 400',function(done){
     request(app)
       .get('/v1/products/100001')
       .expect('Content-Type', /json/)
-      .expect(401)
+      .expect(400)
       .end(function(err, res){
         if (err) throw err;
         done();
@@ -96,7 +96,7 @@ describe("api.products", function(){
     });     
       
 
-    it('POST /v1/shops/bicycle-and-rocket/products should return 401 shop not found ',function(done){
+    it('POST /v1/shops/bicycle-and-rocket/products should return 401 not shop owner  ',function(done){
       // shop must be managed
       // how to mockup login
       request(app)
@@ -133,7 +133,6 @@ describe("api.products", function(){
         .set('cookie', cookie)
         .send(s)
         .end(function(err,res){
-          //console.log(res.text)
           res.should.have.status(200);
           done();        
         });
@@ -142,7 +141,7 @@ describe("api.products", function(){
     //
     // create a new product without ref to (manufacter, categories)
     //
-    it('POST /v1/shops/bicycle-and-rocket/products without manufacturer should return 400 ',function(done){
+    it.skip('POST /v1/shops/bicycle-and-rocket/products without manufacturer should return 400 ',function(done){
       // shop must be managed
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
@@ -170,6 +169,7 @@ describe("api.products", function(){
         .send(p)
         .end(function(err,res){
           // shop is not defined 
+          //console.log(res.text)
           res.should.have.status(400);
           //res.body.manufacturer.location.should.equal("Genève");
           done();        

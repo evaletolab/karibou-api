@@ -15,15 +15,20 @@ exports.ensureAuthenticated=function(req, res, next) {
   res.send(401);	
 }
 
-
-exports.ensureAuthenticatedAndAdmin=function(req, res, next) {
-	if (req.isAuthenticated()) { 
-	  if(_.any(req.user.roles,function(role){return role==='admin'}))
-  	  return next(); 
+exports.ensureAdmin=function(req, res, next) {
+    
+  //
+  // ensure auth
+	if (!req.isAuthenticated()) { 
+      return res.send(401);	
 	}
-	//res.redirect('/login');
-  res.statusCode = 401;
-  res.send(401);	
+
+  // if not admin, 
+  if (!req.user.isAdmin()) { 
+      return res.send(401);	
+	}
+	
+  return next();
 }
 
 
@@ -53,8 +58,8 @@ exports.login_post=function(req, res, next) {
   }
   //res.json({info:"hello"});
   passport.authenticate('local', function(err, user, info) {
-     if (err) { return res.json(401,{error:err}); }
-     if (!user) { return res.json(401,{error:info?info:'Bad user credential'}); }
+     if (err) { return res.json(401,err); }
+     if (!user) { return res.json(401,info?info:'Bad user credential'); }
 
       // CUSTOM USER CONTENT
 		  //
@@ -71,7 +76,7 @@ exports.login_post=function(req, res, next) {
      
      
      req.logIn(user, function(err) {
-       if (err) { return res.json(403,{error:err}); }
+       if (err) { return res.json(403,err); }
        return res.json(req.user);
      });
 
@@ -101,12 +106,12 @@ exports.register_post= function(req, res) {
 		  function(err,user){
 		    if (err){
         	res.status(401);
-          return res.json({error:err});    
+          return res.json(err);    
 		    }
 
         if (!user){
           res.status(401);
-          return res.json({error:new Error("Unknow error on registration")});    
+          return res.json("Unknow error on registration");    
         }
         var redirect=req.param('redirect');
         if(redirect){

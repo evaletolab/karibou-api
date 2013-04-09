@@ -42,7 +42,8 @@ var Product = new Schema({
       comment:{type:String, required:false},
       hasGluten:{type:Boolean, default:true}, 
       hasOgm:{type:Boolean, default:false},
-      isBio:{type:Boolean, default:true}, 
+      isBio:{type:Boolean, default:false}, 
+      isBiodegradable:{type:Boolean, default:false}, 
    },  
    
    attributes:{
@@ -60,7 +61,7 @@ var Product = new Schema({
    image: {type:String},
    modified: { type: Date, default: Date.now },
 
-   // Relations  (manufacturer should BE MANDATORY)
+   // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
    categories: [{type: Schema.Types.ObjectId, ref : 'Categories'}],
    vendor:{type: Schema.Types.ObjectId, ref : 'Shops'}  
@@ -183,7 +184,7 @@ Product.statics.create = function(p,s,callback){
         //
         // set category (NOT MANDATORY)
         if(!p.categories){
-          cb(("categories is missing"))
+          cb(("category is missing"))
           return;
         }
         db.model('Categories').map(p.categories, function(err,categories){
