@@ -120,7 +120,7 @@ module.exports = function(app, express) {
 
   // Check connection to mongoDB
   mongoose.connection.on('open', function() {
-    debug('We have connected to mongodb');
+    //debug('We have connected to mongodb');
   });
 
 	if(config.auth.twit){

@@ -87,7 +87,6 @@ describe("Users", function(){
     });
 
     it("registers a new User", function(done){
-    
       db.model('Users').register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
         doc.email.address.should.equal("test2@test.com");
         doc.name.familyName.should.equal("evalet");
@@ -96,7 +95,18 @@ describe("Users", function(){
       });
     });
 
+    it("authenticates and returns User with valid login", function(done){
+      db.model('Users').authenticate('test2@test.com', "password", function(err, user){
+        should.not.exist(err)
+        user.email.address.should.equal("test2@test.com");
+        done();
+      });
+    });
+
   });
+  
+
+  
   
   it('should return true if the user has role', function (done) {
       db.model('Users').findOne({id:312528659},function(err,profile){
@@ -133,15 +143,12 @@ describe("Users", function(){
   	done();
   });
 
-  it.skip("confirm mail for registration", function(done){
-  	done();
-  });
 
-  it.skip("authenticates and returns User with valid login", function(done){
-    db.model('Users').authenticate(currentUsers.email, "password", function(err, user){
-      User.email.should.equal("test@test.com");
-      done();
+  it.skip("confirm mail for registration", function(done){
+    db.model('Users').find({},function(e,u){
+  	done();
     });
+  	done();
   });
 
   it.skip("authenticates and returns fail with invalid login", function(done){

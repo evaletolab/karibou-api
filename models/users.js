@@ -212,8 +212,7 @@ UserSchema.statics.authenticate=function(email, password, callback) {
       if (err) { return callback(err); }
 
       // on user is Null
-      if (!user) { return callback(null, false); }
-
+      if (!user) { return callback("L'utilisateur ou le mot de passe est incorrect", false); }
       // verify passwd
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return callback(err); }
