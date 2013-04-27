@@ -63,8 +63,11 @@ exports.login_post=function(req, res, next) {
 
       // CUSTOM USER CONTENT
 		  //
-		  // don't serialise the private hash, but confirm the password existance
-		  if (user.hash) user.hash=true;
+		  // don't serialise the private hash/salt, but confirm the password existance
+		  if (user.hash){ 
+		    user.hash=true;
+		    user.salt=true;
+		  }
 		  
 	    //
 	    // check the first admin

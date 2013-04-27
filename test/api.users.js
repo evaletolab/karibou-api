@@ -58,7 +58,10 @@ describe("api.users", function(){
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("evaleto@gluck.com");
+        res.body.hash.should.equal('true');
+        res.body.salt.should.equal('true');
         cookie = res.headers['set-cookie'];
+        
         //res.headers.location.should.equal('/');
         done();        
       });
