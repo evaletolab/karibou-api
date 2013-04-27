@@ -1,47 +1,52 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var mongoose = require("mongoose");
-var Users = mongoose.model('Users');
+var db = require("mongoose");
 
-// why not using
-// https://github.com/1602/jugglingdb
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js"]);
 
 
 
 
 describe("Users", function(){
-  var profile = null;
-  var assert = require("assert");
-  var request= require('supertest');
 
-  beforeEach(function(done){
-
-  	// create a new user
-    var user=new Users({
-		    provider:"twitter",
-		    id:312528659,
-		    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png",
-		    roles:["admin", "mod"]
+  before(function(done){
+    dbtools.load(["../fixtures/Users.js"],db, function(err){
+      should.not.exist(err)      
+      done();
     });
-
-    user.save(function(err){
-      profile=user;
-      profile.id.should.equal(312528659);
-	    done();
-    });
-
+    
   });
 
-  afterEach(function(done){
+  after(function(done){
     done();
   });
   
 
   describe("login",function(){
     
-    it("validate inexistant Oauth user", function(done){
-  		Users.findOrCreate({ id: 1234, provider:profile.provider, photo:profile.photo }, function (err, user) {
+    it("validate inexistant  user", function(done){
+  		db.model('Users').findOne({ id: 1234 }, function (err, user) {
+  		  should.not.exist(user);
+    		return done();
+  		});
+      
+    });
+
+    it("inexistant 'local' user should not created ", function(done){
+  		db.model('Users').findOrCreate({ id: 1234, provider:'local' }, function (err, user) {
+  		  should.exist(err);
+   		  should.not.exist(user);
+    		return done();
+  		});
+      
+    });
+
+    it("inexistant Oauth id should create user 'TODO with a default email????'", function(done){
+  		db.model('Users').findOrCreate({ id: 1234, provider:'twitter', photo:'olivier.jpg' }, function (err, user) {
+  		  should.exist(user);
   		  user.id.should.equal(1234);
     		return done();
   		});
@@ -49,24 +54,24 @@ describe("Users", function(){
     });
 
     it("validate existant Oauth user", function(done){
-    		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photo }, function (err, user) {
-
-  		  user.id.should.equal(profile.id);
+  		db.model('Users').findOrCreate({ id: data.Users[0].id }, function (err, user) {
+  		  user.email.address.should.equal(data.Users[0].email.address);
     		return done();
   		});
       
     });
 
     it("validation for wrong provider", function(done){
-    		Users.findOrCreate({ id: profile.id, provider:"test", photo:profile.photo }, function (err, user) {
+   		db.model('Users').findOrCreate({ id:12345678, provider:'toto', photo:'olivier.jpg' }, function (err, user) {
     		err.errors.provider.message.should.equal('Validator "enum" failed for path provider');
     		return done();
   		});      
     });
 
     it("validation for duplicate id", function(done){
-    		Users.findOrCreate({ id: profile.id, provider:"facebook", photo:profile.photo }, function (err, user) {
-    		assert(err.code,11000);
+      db.model('Users').findOrCreate({ id: 1234, provider:"facebook" }, function (err, user) {
+    		should.exist(err.code);
+    		err.code.should.equal(11000);
     		return done();
   		});
       
@@ -83,7 +88,7 @@ describe("Users", function(){
 
     it("registers a new User", function(done){
     
-      Users.register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
+      db.model('Users').register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
         doc.email.address.should.equal("test2@test.com");
         doc.name.familyName.should.equal("evalet");
         doc.name.givenName.should.equal("olivier");
@@ -94,25 +99,30 @@ describe("Users", function(){
   });
   
   it('should return true if the user has role', function (done) {
-       profile.hasRole('admin').should.be.true;
-       profile.hasRole('mod').should.be.true;
-       done();
+      db.model('Users').findOne({id:312528659},function(err,profile){
+        profile.hasRole('admin').should.be.true;
+        profile.hasRole('mod').should.be.true;
+        done();
+      });
    });
+   
    it('should return false if the user does not have role', function (done) {
-     profile.hasRole('astronaut').should.be.false;
-     profile.hasRole('cowboy').should.be.false;
-     done();
+     db.model('Users').findOne({id:312528659},function(err,profile){
+       profile.hasRole('astronaut').should.be.false;
+       profile.hasRole('cowboy').should.be.false;
+       done();
+     });
    });  
 
   it.skip("retrieves by email", function(done){
-    Users.findByEmail(currentUsers.email, function(doc){
+    db.model('Users').findByEmail(currentUsers.email, function(doc){
       doc.email.address.should.equal("test@test.com");
       done();
     });
   });
 
   it.skip("retrieves by token (eg. twitter)", function(done){
-    Users.findByToken(currentUsers.auth_token, function(doc){
+    db.model('Users').findByToken(currentUsers.auth_token, function(doc){
       doc.email.address.should.equal("test@test.com");
       done();
     });
@@ -128,20 +138,14 @@ describe("Users", function(){
   });
 
   it.skip("authenticates and returns User with valid login", function(done){
-    Users.authenticate(currentUsers.email, "password", function(User){
+    db.model('Users').authenticate(currentUsers.email, "password", function(err, user){
       User.email.should.equal("test@test.com");
-      done();
-    }, function(){
-      throw("oops");
       done();
     });
   });
 
   it.skip("authenticates and returns fail with invalid login", function(done){
-    Users.authenticate(currentUser.email, "liar", function(User){
-      throw("This shouldn't happen");
-    }, function(){
-      done();
+    db.model('Users').authenticate(currentUser.email, "liar", function(err, user){
     });
   });
 

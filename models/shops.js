@@ -7,6 +7,7 @@ var mongoose = require('mongoose')
   , validate = require('mongoose-validate')
   , ObjectId = Schema.ObjectId;
   
+var extend      = require( 'node.extend' );
 
 var EnumPlace=config.shop.marketplace.list;
 var EnumLocation=config.shop.location.list;
@@ -32,6 +33,8 @@ var Shops = new Schema({
     },
     marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
     location: {type: String, required: false, enum: EnumLocation},
+    
+    catalog:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
     
     faq:[{
       q:{type: String, required: true},
@@ -88,8 +91,11 @@ Shops.statics.create = function(shop,user, callback){
 	var Shops=this.model('Shops');	
 	var Users=this.model('Users');
 	
-  if(!shop.owner)shop.owner = user._id;
-  //FIXME-- remove:58 : shop.owner = s.owner
+  shop.owner = user._id;
+  //FIXME check if category.type=='Catalog'
+  if (!shop.catalog){
+    return callback("Votre boutique doit figurer dans le catalogue");
+  }
   var s =new  Shops(shop);
    
   
@@ -135,16 +141,21 @@ Shops.statics.create = function(shop,user, callback){
 Shops.statics.update=function(id,s,callback){
 	var Shops=this.model('Shops');	
 	
-	if (!Object.keys(id).length) return callback("Could not find shop for update");
+	if (!Object.keys(id).length) return callback("You have to define one shop for update");
 
+  //findOneAndUpdate(conditions, update) 
   return Shops.findOne(id, function (err, shop) {
     //
     // other fields are not managed by update
     //console.log(shop)
     if (!shop){
-      return callback("Could not find shop for update")
+      return callback("Could not find shop for update "+JSON.stringify(id))
     }
-    
+    s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
+    delete(s.owner);
+    extend(shop,s);
+
+/**
     shop.description = s.description;
     shop.url = s.url;
     shop.photo = s.photo;
@@ -154,6 +165,8 @@ Shops.statics.update=function(id,s,callback){
     shop.options=s.options;
     shop.available=s.available;
     shop.info=s.info;
+    shop.catalog=(s.catalog._id)?s.catalog._id:s.catalog;
+**/    
     
     return shop.save(function (err) {
       return callback(err,shop);
@@ -162,14 +175,14 @@ Shops.statics.update=function(id,s,callback){
 };
 
 Shops.statics.findByUser=function(u,callback){
-  	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
+  	return this.model('Users').findOne(u).populate('shops').populate('catalog').exec(function(err,user){
   	    if (!user) return callback(err);
   	    callback(err,user.shops);
   	});  	
 };
 
 Shops.statics.findAllByUser=function(u,callback){
-  	return this.model('Users').findOne(u).populate('shops').exec(function(err,user){
+  	return this.model('Users').findOne(u).populate('shops').populate('catalog').exec(function(err,user){
   	    if (!user) return callback(err)
   	    callback(err,user.shops);
   	});
@@ -179,7 +192,7 @@ Shops.statics.findAllByUser=function(u,callback){
 
 Shops.statics.findOneShop=function(s,callback){
   	var Shops=this.model('Shops');
-    return Shops.findOne(s).populate('owner').exec(function(err,shop){
+    return Shops.findOne(s).populate('owner').populate('catalog').exec(function(err,shop){
       callback(err,shop);
     });
 };

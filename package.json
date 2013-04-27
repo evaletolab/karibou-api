@@ -22,7 +22,8 @@
   "devDependencies" : {
     "mocha": "1.x",
     "supertest": "0.x",
-    "should": "1.2.1"
+    "should": "1.2.1",
+    "pow-mongoose-fixtures": "x"
   }
 }
 

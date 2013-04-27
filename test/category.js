@@ -1,32 +1,37 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var mongoose = require("mongoose");
-var Products = mongoose.model('Products');
-var Shops = mongoose.model('Shops');
-var Users = mongoose.model('Users');
-var Sequences = mongoose.model('Sequences');
-var Categories = mongoose.model('Categories');
-var _ = require('underscore');
+
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
+
+var Categories = db.model('Categories');
+
 
 
 describe("Categories", function(){
-  var async= require("async");
+  var _ = require('underscore');
   var assert = require("assert");
   var category=[];
+
+
   before(function(done){
-    Categories.remove({}, function(o) {
-      done();
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js"],db,function(err){
+        should.not.exist(err);
+        done();
+      });
     });      
   });
+
   
   after(function(done){
-    Categories.remove({}, function(o) {
+    dbtools.clean(function(){    
       done();
-    });
-    
-  });
-  
+    });    
+  });  
   
   
   it("Create catalog ", function(done){

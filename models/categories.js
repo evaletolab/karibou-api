@@ -37,6 +37,10 @@ function name_to_slug(str) {
   return str;
 }
 
+Categories.methods.slugName=function(){
+  return name_to_slug(this.name);
+};
+
 
 Categories.statics.create = function(cats, callback){
   assert(cats);

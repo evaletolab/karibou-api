@@ -63,9 +63,17 @@ module.exports = function(app) {
   app.get('/v1/products/category/:category/detail/:detail',products.list);
   app.get('/v1/products/location/:location/category/:category',products.list);
   app.get('/v1/products/location/:location/category/:category/detail/:detail',products.list);
+
+  app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
+  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
+
+  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, products.remove);
+  //app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
+
   
   // shop 
   app.get('/v1/shops', shops.list);
+  app.get('/v1/shops/category/:category', shops.list);
   app.get('/v1/shops/:shopname', shops.get);
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
@@ -79,9 +87,5 @@ module.exports = function(app) {
   app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, shops.remove);
 
   
-  app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
-  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, products.remove);
-  app.put('/v1/products', products.ensureOwnerOrAdmin, products.massUpdate);
-  app.put('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
   
 };

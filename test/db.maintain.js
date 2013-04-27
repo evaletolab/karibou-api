@@ -1,27 +1,30 @@
 var app = require("../app/index");
-var mongoose = require("mongoose");
 
-var DbMaintain = mongoose.model('DbMaintain');
+
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js"]);
+
+var DbMaintain = db.model('DbMaintain');
+
 
 describe("DbMaintain", function(){
-  var async= require("async");
-  var assert = require("assert");
   var _ = require("underscore");
-  var fx = require("./fixtures/common");
 
   var error, log;
 
 
   before(function(done){
-   fx.clean(function(){      
-          done();
+    dbtools.clean(function(){      
+      done();
     });
   });
 
   it("Find latest version with no entry", function(done){
     DbMaintain.findLatestVersion(function(err, version){
-        assert(!err);
-        assert.equal(version, 0);
+        should.not.exist(err);
+        version.should.equal(0);
         done();
      });
   });
@@ -33,8 +36,8 @@ describe("DbMaintain", function(){
       log:"standard log",
     };
     DbMaintain.save(dbm, function(err, new_dbm){
-        assert(!err);
-        assert.equal(new_dbm['version'], dbm['version']);
+        should.not.exist(err);
+        new_dbm['version'].should.equal(dbm['version'])
         done();
     });
   });
@@ -46,24 +49,24 @@ describe("DbMaintain", function(){
       log:"new log",
     };
     DbMaintain.save(dbm, function(err, new_dbm){
-        assert(!err);
-        assert.equal(new_dbm['version'], dbm['version'])
+        should.not.exist(err);
+        new_dbm['version'].should.equal(dbm['version'])
         done();
     });
   });
 
   it("Find all entries", function(done){
     DbMaintain.findAll(function(err, version){
-        assert(!err);
-        assert.equal(version.length, 2);
+        should.not.exist(err);
+        version.length.should.equal(2);
         done();
      });
   });
 
   it("Find lates version", function(done){
     DbMaintain.findLatestVersion(function(err, version){
-        assert(!err);
-        assert.equal(version, 2);
+        should.not.exist(err);
+        version.should.equal(2);
         done();
      });
   });

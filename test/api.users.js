@@ -1,48 +1,33 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-
-// why not using
-// https://github.com/1602/jugglingdb
-// http://www.scotchmedia.com/tutorials/express/authentication/2/03
-
-
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
 describe("api.users", function(){
-  var profile = null;
-  var assert = require("assert");
   var request= require('supertest');
-  var Users = require('mongoose').model('Users');
-  var async= require('async');
 
-  var db = require('mongoose');
   var _=require('underscore');
-  var fx = require('./fixtures/products');
 
   var cookie;
 
-  var profile;
-  var p=_.clone(fx.p1);  
-  
-  var products, shop, cats, maker;
-
-
-  // common befor/after
   before(function(done){
-    fx.create_all(function(err,s,c,m,p){
-      assert(!err);
-      shop=s;cats=c;maker=m;products=p;
-      done()
-    })
-  
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js","../fixtures/Products.js"],db,function(err){
+        should.not.exist(err);
+        done();
+      });
+    });      
   });
-  
 
+  
   after(function(done){
-    fx.clean(function(){    
-      db.model('Users').remove({},function(){done();});
-    });
+    dbtools.clean(function(){    
+      done();
+    });    
   });
   
 
@@ -69,7 +54,7 @@ describe("api.users", function(){
   
     request(app)
       .post('/login')
-      .send({ email:"evaleto@gluck.com", provider:'local', password:'mypwd' })
+      .send({ email:"evaleto@gluck.com", provider:'local', password:'password' })
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("evaleto@gluck.com");

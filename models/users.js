@@ -92,6 +92,9 @@ UserSchema.statics.findOrCreate=function(u,callback){
 	var Users=this.model('Users');
   Users.findOne(u, function(err, user){
     if(!user){
+      if (u.provider==='local'){
+        return callback("The system can not automaticaly create user for local provider");
+      }
       var newuser=new Users(u);
       newuser.save(function(err){
         //if ( err && err.code === 11000 )
@@ -207,8 +210,6 @@ UserSchema.statics.authenticate=function(email, password, callback) {
 
   return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
-      
-      
 
       // on user is Null
       if (!user) { return callback(null, false); }
@@ -238,7 +239,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 	
     
   /* The name of this user, suitable for display.*/
-  
+  //FIXME email.hash() should be replaced by (id++)+10000000
 	// create a new customer
 	var user=new Users({
 	    id:email.hash(),
@@ -255,7 +256,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 
 	//save it
 	user.save(function(err){	  
-	  //if ( err && err.code === 11000 )
+	  //FIXME manage the duplicate address ( err && err.code === 11000 )
 		callback(err, user);
 	});
 };

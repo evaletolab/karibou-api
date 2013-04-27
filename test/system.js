@@ -1,21 +1,13 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var mongoose = require("mongoose");
-var Products = mongoose.model('Products');
-var Shops = mongoose.model('Shops');
-var Users = mongoose.model('Users');
-var Sequences = mongoose.model('Sequences');
-var Categories = mongoose.model('Categories');
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
-
-describe("Backoffice:", function(){
-  var async= require("async");
-  var assert = require("assert");
-
-
-
+describe("system", function(){
 
   describe("Administration", function(){
   

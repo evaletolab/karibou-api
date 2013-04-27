@@ -18,24 +18,26 @@ function checkParams(req){
 
 exports.list=function (req, res) {
   try{
-    req.body.group&&check(req.body.group, "Invalid group filter").len(2, 32).isAlphanumeric();
-    req.body.name&&check(req.body.name, "Invalid name filter").len(2, 32).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
+    req.query.group&&check(req.query.group, "Le groupe du filtre est invalide").len(2, 32).isAlphanumeric();
+    req.query.name&&check(req.query.name, "Le nom du filtre est invalide").len(2, 32).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
+    req.query.type&&check(req.query.type, "Le type de catégorie est invalide").len(1, 32).is(/^[a-zA-ZÀ-ÿ0-9-*]+$/);
   }catch(err){
     return res.send(400, err.message);
   }  
-  
-  var query=Categories.find({});
+  var type=(req.query.type)?{type:req.query.type}:{};
+  //if (req.query.type==='*')type={};
+  var query=Categories.find(type);
 
   //
   // filter
-  if (req.body.group){
-    query=query.where("group",new RegExp(req.body.group, "i"))
+  if (req.query.group){
+    query=query.where("group",new RegExp(req.query.group, "i"))
   }
   
   //
   // filter
-  if (req.body.name){
-    query=query.where("name",new RegExp(req.body.name, "i"))
+  if (req.query.name){
+    query=query.where("name",new RegExp(req.query.name, "i"))
   }
   
   query.exec(function(err,cats){
@@ -81,6 +83,7 @@ exports.update=function (req, res) {
       return res.send(400,err);
     }
     extend(cat,req.body);
+    cat.slug=cat.slugName();
     cat.save(function(err){
       if(err){
         return res.send(400,err);

@@ -113,7 +113,13 @@ module.exports = function(app, express) {
 	});
 
 	// connect to Mongo when the app initializes
-	mongoose.connect(config.mongo);
+	mongoose.connect(config.mongo,function(e){
+	    //double check for database drop
+    	if(config.dropdb && process.env.NODE_ENV==='test'){
+    	  mongoose.connection.db.dropDatabase(function(err,done){
+    	  });
+    	}
+	});
 
   // Check connection to mongoDB
   mongoose.connection.on('open', function() {

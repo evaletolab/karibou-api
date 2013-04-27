@@ -2,24 +2,31 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var fx = require("./fixtures/products");
-var mongoose = require("mongoose");
-var Products = mongoose.model('Products');
-var Shops = mongoose.model('Shops');
-var Users = mongoose.model('Users');
-var Sequences = mongoose.model('Sequences');
-var Categories = mongoose.model('Categories');
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js"]);
 
 
 
 describe("products", function(){
-  var async= require("async");
-  var assert = require("assert");
   var _ = require("underscore");
-  var user,uid;
 
+  before(function(done){
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js"],db,function(err){
+        should.not.exist(err);
+        done();
+      });
+    });      
+  });
 
-
+  
+  after(function(done){
+    dbtools.clean(function(){    
+      done();
+    });    
+  });
  
 
   it.skip("Find products by Manufacturer and Category and details ", function(done){

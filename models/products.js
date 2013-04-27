@@ -42,6 +42,7 @@ var Product = new Schema({
       comment:{type:String, required:false},
       hasGluten:{type:Boolean, default:true}, 
       hasOgm:{type:Boolean, default:false},
+      hasLactose:{type:Boolean, default:false},
       isBio:{type:Boolean, default:false}, 
       isBiodegradable:{type:Boolean, default:false}, 
    },  
@@ -55,6 +56,7 @@ var Product = new Schema({
    pricing: {
       stock:{type:Number, min:0, requiered:true}, 
       price:{type:Number, min:0, requiered:true},
+      part:{type:String, requiered:true},
       discount:{type:Number, min:0, requiered:true},
    },
 
@@ -63,8 +65,8 @@ var Product = new Schema({
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
-   categories: [{type: Schema.Types.ObjectId, ref : 'Categories'}],
-   vendor:{type: Schema.Types.ObjectId, ref : 'Shops'}  
+   categories: [{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true}],
+   vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true}  
 });
 
 
@@ -146,7 +148,6 @@ Product.methods.removeCategories=function(cats,callback){
 //
 // create a new product 'p' for the shop 's'
 Product.statics.create = function(p,s,callback){
-  debug("create product: "+p);
   assert(p);
   assert(s);
   assert(callback);
@@ -170,7 +171,8 @@ Product.statics.create = function(p,s,callback){
     require('async').waterfall([
       function(cb){
         //
-        // set manufacturer 
+        // set manufacturer , not currently needed
+        /**
         if(!p.manufacturer){
           cb(("manufacturer is missing"));
           return;
@@ -179,16 +181,19 @@ Product.statics.create = function(p,s,callback){
           p.manufacturer=m._id;
           cb(err);
         });
+        **/
+        cb();
       },
       function(cb){
         //
         // set category (NOT MANDATORY)
-        if(!p.categories){
+        if(!p.categories.length){
           cb(("category is missing"))
           return;
         }
         db.model('Categories').map(p.categories, function(err,categories){
-          
+          // FIXME
+          //check category is well typed 'category'
           p.categories=_.collect(categories,function(m){return m._id});;
           cb(err);
         });

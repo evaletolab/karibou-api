@@ -5,6 +5,7 @@ var PATH = function(p) {
 };
 
 module.exports = {
+  dropdb:true,
   shop:{
     category:{
       types:['Category', 'Catalog']

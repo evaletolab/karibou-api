@@ -9,12 +9,7 @@ var Manufacturers = db.model('Manufacturers');
 var assert = require("assert");
 var _=require('underscore');
 
-exports.ensureOwnerOrAdmin=function(req, res, next) {
-  function isUserProductOwner(){
-    //return (!_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname}));
-    return true;
-  }
-    
+function isUserAdminOrWithRole(req, res, next, checkRole){
   //
   // ensure auth
 	if (!req.isAuthenticated()) { 
@@ -25,15 +20,40 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   if (req.user.isAdmin()) 
     return next();  
 
-  //
-  // ensure owner
-	if(!isUserProductOwner()){ 
-    return res.send(401, "Your are not the owner of this product"); 
-	}
+  return checkRole(req, res, next);
+}
+exports.ensureOwnerOrAdmin=function(req, res, next) {
+   
+  return isUserAdminOrWithRole(req, res, next,function(){
+    function isUserProductOwner(){
+      //return (!_.any(req.user.shops,function(s){return s.sku===req.params.sku}));
+      return true;
+    }
+    //
+    // ensure owner
+	  if(!isUserProductOwner()){ 
+      return res.send(401, "Your are not the owner of this product"); 
+	  }
 	
-  return next();
+    return next();
+  }); 
 
 }
+exports.ensureShopOwnerOrAdmin=function(req, res, next) {
+  return isUserAdminOrWithRole(req, res, next,function(){
+    function isUserShopOwner(){
+      return (!_.any(req.user.shops,function(s){return s.urlpath===req.body.owner.urlpath}));
+    }
+    //
+    // ensure owner
+	  if(!isUserShopOwner()){ 
+      return res.send(401, "Your are not the owner of the shop"); 
+	  }
+	
+    return next();
+  }); 
+}
+
 exports.create=function (req, res) {
   var product;
   

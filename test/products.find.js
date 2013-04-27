@@ -1,37 +1,32 @@
-// Use a different DB for tests
-// Use a different DB for tests
 var app = require("../app/index");
 
-var fx = require("./fixtures/products");
-var mongoose = require("mongoose");
-var Products = mongoose.model('Products');
-var Shops = mongoose.model('Shops');
-var Users = mongoose.model('Users');
-var Sequences = mongoose.model('Sequences');
-var Categories = mongoose.model('Categories');
+var db = require("mongoose");
 
+
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Products.js",,"Shops.js"]);
+var Users=db.model('Users');
 
 
 describe("products.find:", function(){
   var async= require("async");
-  var assert = require("assert");
   var _ = require("underscore");
+  var Products=db.model('Products');
 
-  var products, shop, cats, maker;
 
-
-  // common befor/after
   before(function(done){
-    fx.create_all(function(err,s,c,m,p){
-      assert(!err);
-      shop=s;cats=c;maker=m;products=p;
-      done()
-    })
-  
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js","../fixtures/Products.js"],db,function(err){
+        should.not.exist(err);
+        done();
+      });
+    });      
   });
 
+
   after(function(done){
-    fx.clean(function(){
+    dbtools.clean(function(){
       done();
     })
   });
@@ -39,11 +34,10 @@ describe("products.find:", function(){
 
     
   it("Find products by Shop", function(done){
-    Shops.findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
-      assert(shops);
+    db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
+      should.exist(shops[0]);
       Products.findByShop(shops[0],function(err,products){          
-        assert(products.length);
-        
+        products.length.should.equal(2);        
         products[0].details.comment.should.equal("Temps de cuisson : 16 minutes");
         done();
       });
@@ -52,8 +46,8 @@ describe("products.find:", function(){
 
   it("Find non-BIO products by Shop  ", function(done){
 
-    Shops.findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
-      assert(shops);
+    db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
+      should.exist(shops);
       Products.findByShop(shops[0]).where("details.isBio",false).exec(function(err,products){          
         products.length.should.equal(1)
         products[0].details.isBio.should.equal(false);
@@ -70,7 +64,7 @@ describe("products.find:", function(){
       // find product and  categories
       function(cb){
           Products.find({},function(err,products){          
-            Categories.find({},function(err,cats){
+            db.model('Categories').find({},function(err,cats){
               products.forEach(function(product){
                 product.addCategories(cats);
               });
@@ -83,7 +77,7 @@ describe("products.find:", function(){
       // find product by Cat
       function(products, cats, cb){
         Products.findByCategory("Fruits",function(err,products){
-          assert(err);
+          should.exist(err);
           cb(null,products,cats);
         });
         
@@ -92,7 +86,7 @@ describe("products.find:", function(){
         done();
       }
     ],function(err,result){
-      assert(!err);
+      should.not.exist(err);
     });
 
   });
@@ -104,7 +98,7 @@ describe("products.find:", function(){
       // find product and  categories
       function(cb){
           Products.find({},function(err,products){          
-            Categories.find({},function(err,cats){
+            db.model('Categories').find({},function(err,cats){
               products.forEach(function(product){
                 product.addCategories(cats);
               });
@@ -127,7 +121,7 @@ describe("products.find:", function(){
         done();
       }
     ],function(err,result){
-      assert(!err);
+      should.not.exist(err);
     });
 
   });
@@ -140,7 +134,7 @@ describe("products.find:", function(){
       // find product and  categories
       function(cb){
           Products.find({},function(err,products){          
-            Categories.find({},function(err,cats){
+            db.model('Categories').find({},function(err,cats){
               products.forEach(function(product){
                 product.addCategories(cats);
               });
@@ -156,7 +150,7 @@ describe("products.find:", function(){
       // find product by Cat
       function(products, cats, cb){
         Products.findByCategory(cats,function(err,products){
-          assert(err);
+          should.exist(err);
           cb(null,products,cats);
         });
         
@@ -165,7 +159,7 @@ describe("products.find:", function(){
         done();
       }
     ],function(err,result){
-      assert(!err);
+      should.not.exist(err);
     });
 
   });

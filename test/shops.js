@@ -2,38 +2,36 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-var fx = require("./fixtures/products");
-var mongoose = require("mongoose");
-var Products = mongoose.model('Products');
-var Shops = mongoose.model('Shops');
-var Users = mongoose.model('Users');
-var Sequences = mongoose.model('Sequences');
-var Categories = mongoose.model('Categories');
+var db = require("mongoose");
+var Shops = db.model('Shops');
 
+
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js"]);
 
 
 describe("Shops", function(){
-  var async= require("async");
-  var assert = require("assert");
   var _ = require("underscore");
-  var user,uid=12345;
-
-  var products, shop, cats;
 
 
   before(function(done){
-      fx.clean(function(){
-      Users.findOrCreate({ id: 12345, provider:"twitter", photo:"jpg" }, function (err, u) {
-          user=u;
-          done();
-      });      
-
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js"],db,function(err){
+        should.not.exist(err);
+        done();
       });
+    });      
+  });
+    
+  after(function(done){
+    dbtools.clean(function(){
+      done();
+    });      
   });
     
 
-
-  it("Create a new Shop", function(done){
+  it("Create a new Shop without catalog should throw an error ", function(done){
     var s={
       name: "Votre nouveau vélo en ligne",
       description:"cool ce shop",
@@ -42,8 +40,25 @@ describe("Shops", function(){
         fg:"http://image.truc.io/fg-01123.jp"
       }    
     };
-    Shops.create(s,user, function(err,shop){
-      assert(!err);
+    Shops.create(s,data.Users[0], function(err,shop){
+      should.exist(err);
+      should.not.exist(shop);
+      done();
+    });
+  });
+
+  it("Create a new Shop ", function(done){
+    var s={
+      name: "Votre nouveau vélo en ligne",
+      description:"cool ce shop",
+      catalog:data.Categories[0]._id,
+      photo:{
+        bg:"http://image.truc.io/bg-01123.jp",
+        fg:"http://image.truc.io/fg-01123.jp"
+      }    
+    };
+    Shops.create(s,data.Users[0], function(err,shop){
+      should.not.exist(err);
       shop.urlpath.should.equal("votre-nouveau-velo-en-ligne");
       done();
     });
@@ -151,7 +166,7 @@ describe("Shops", function(){
   
 
   it("Find Shops by the user", function(done){
-    Shops.findByUser({id:uid},function(err,shops){
+    Shops.findByUser({id:data.Users[0].id},function(err,shops){
         shops[0].name.should.equal("Votre nouveau vélo en ligne");
         shops.length.should.equal(1);
         done();

@@ -1,41 +1,33 @@
 // Use a different DB for tests
 var app = require("../app/index");
 
-
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
 describe("api.categories", function(){
-  var profile = null;
-  var assert = require("assert");
   var request= require('supertest');
-  var Users = require('mongoose').model('Users');
-  var async= require('async');
-
-  var db = require('mongoose');
   var _=require('underscore');
 
   var cookie;
-
-  var profile;
   
-
-  // common befor/after
   before(function(done){
-      // create 3 user and one shop
-    db.model('Categories').remove({},function(){});
-    db.model('Users').register("evaleto@gmail.com", "olivier", "evalet", "mypwd", "mypwd", function(err, user){
-        profile=user;
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js"],db,function(err){
+        should.not.exist(err);
         done();
       });
-  
+    });      
   });
-  
 
-  after(function(done){
-    db.model('Categories').remove({},function(){});
-    db.model('Users').remove({},function(){done();});
-  });
   
+  after(function(done){
+    dbtools.clean(function(){    
+      done();
+    });    
+  });
 
 
 
@@ -72,7 +64,7 @@ describe("api.categories", function(){
   it('POST /login should return 200 ',function(done){
     request(app)
       .post('/login')
-      .send({ email: "evaleto@gmail.com", password:'mypwd', provider:'local' })
+      .send({ email: "evaleto@gmail.com", password:'password', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(200);
         cookie = res.headers['set-cookie'];
@@ -85,16 +77,39 @@ describe("api.categories", function(){
     request(app)
       .post('/v1/category')
       .set('cookie', cookie)
-      .send({name:'truc légal'})
+      .send({name:'category légal'})
       .end(function(err, res){
         res.should.have.status(200);
         done();
       });
   });
 
-  it('POST /v1/category/true-legal update cat when signed and admin must return 200  ',function(done){
+  it('GET /v1/category type Catalog should return 200 and [].length==1',function(done){
     request(app)
-      .post('/v1/category/truc-legal')
+      .get('/v1/category')
+      .send({type:'Catalog'})
+      .end(function(err, res){
+        res.should.have.status(200);
+        res.body.should.have.length(1)
+        done();
+      });
+  });
+
+
+  it('POST /v1/category add Catalog  must return 200  ',function(done){
+    request(app)
+      .post('/v1/category')
+      .set('cookie', cookie)
+      .send({name:'catalog special', type:'Catalog'})
+      .end(function(err, res){
+        res.should.have.status(200);
+        done();
+      });
+  });
+
+  it('POST /v1/category/category-legal update cat when signed and admin must return 200  ',function(done){
+    request(app)
+      .post('/v1/category/category-legal')
       .set('cookie', cookie)
       .send({group:'test'})
       .end(function(err, res){
@@ -104,22 +119,20 @@ describe("api.categories", function(){
       });
   });
 
-  it('GET /v1/category should return 200 and [].length==1',function(done){
+  it('GET /v1/category should return 200 and [catalog,category].length==2',function(done){
     request(app)
       .get('/v1/category')
       .end(function(err, res){
         res.should.have.status(200);
-        res.body.should.have.length(1)
+        res.body.should.have.length(2)
         done();
       });
   });
 
   it('GET /v1/category?group=tes should return 200 and [].length==1',function(done){
     request(app)
-      .get('/v1/category')
-      .send({group:'tes'})
+      .get('/v1/category?group=tes')
       .end(function(err, res){
-        //console.log(res.text)
         res.should.have.status(200);
         res.body.should.have.length(1)
         done();
@@ -127,9 +140,9 @@ describe("api.categories", function(){
   });
 
   
-  it('DEL /v1/category/true-legal  when signed and admin must return 200  ',function(done){
+  it('DEL /v1/category/category-legal  when signed and admin must return 200  ',function(done){
     request(app)
-      .del('/v1/category/truc-legal')
+      .del('/v1/category/category-legal')
       .set('cookie', cookie)
       .end(function(err, res){
         res.should.have.status(200);
@@ -137,12 +150,12 @@ describe("api.categories", function(){
       });
   });
     
-  it('GET /v1/category should return 200 and []',function(done){
+  it('GET /v1/category should return 200 and [catalog].len==1',function(done){
     request(app)
       .get('/v1/category')
       .end(function(err, res){
         res.should.have.status(200);
-        res.body.should.have.length(0)
+        res.body.should.have.length(1)
         done();
       });
   });

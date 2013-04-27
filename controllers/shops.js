@@ -3,12 +3,14 @@
  * home
  */
 
-var db=require('../app/config');
+var app=require('../app/config');
 var _=require('underscore');
 var assert = require("assert");
 
 var db = require('mongoose');
 var Shops = db.model('Shops');
+var ObjectId = db.Types.ObjectId;
+
 
 var check = require('validator').check,
     sanitize = require('validator').sanitize;
@@ -44,7 +46,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 function checkParams(req){
     if (!req.body)return;
 
-    if(req.body.name) check(req.body.name.replace(/ /g,''),"Invalide characters for shop name").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
+    if(req.body.name) check(req.body.name,"Le nom de votre boutique n'est pas valide").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     if(req.body.description){
       req.body.description=sanitize(req.body.description).xss();
     }
@@ -64,19 +66,19 @@ function checkParams(req){
       req.body.options.local && check(req.body.options.local).is(/^(true|false)$/);
     }
     
-    for (var faq in req.body.faq){
-      check(faq.q).len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
-      check(faq.a).len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
+    for (var i in req.body.faq){      
+      check(req.body.faq[i].q,"Le format de la question n'est pas valide").len(3, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=? ]+$/);
+      check(req.body.faq[i].a,"Le format de la réponse n'est pas valide").len(3, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
     }
     
     if (req.body.available){
       req.body.available.active && check(req.body.available.active).is(/^(true|false)$/);
-      req.body.available.comment && check(req.body.available.comment).len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
+      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     }
 
     if (req.body.info){
       req.body.info.active && check(req.body.info.active).is(/^(true|false)$/);
-      req.body.info.comment && check(req.body.info.comment).len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
+      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     }
       
     //marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
@@ -95,7 +97,6 @@ exports.create=function (req, res) {
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
       //TODO error
-      console.log(err);
     	res.status(400);
       return res.json(err);
     }      
@@ -106,7 +107,7 @@ exports.create=function (req, res) {
 exports.remove=function (req, res) {
 
   try{
-    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -129,7 +130,7 @@ exports.get=function (req, res) {
   //
   // check shop owner 
   try{
-    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(400, err.message);
   }
@@ -153,7 +154,7 @@ exports.update=function(req,res){
   //
   // check && validate input field
   try{
-    check(req.params.shopname, "Invalid characters for shop name").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
     checkParams(req);
   }catch(err){
     return res.send(400, err.message);
@@ -175,14 +176,57 @@ exports.update=function(req,res){
 };
 
 exports.list=function (req, res) {
-  Shops.find({})/*.where("status",true)*/.exec(function (err,shops){
-    if (err){
-    	res.status(400);
-      return res.json(err);    
+  //
+  // check && validate input field
+  try{
+    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").is(/^[a-z0-9-]+$/)
+    req.query.valid&&check(req.query.valid, "Le format de validation n'est pas valide").is(/^(true|false|yes|no)$/);    
+    req.query.group&&check(req.query.group, "Le format de groupe n'est pas valide").len(1, 34).is(/^[a-z0-9-.]+$/);    
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  function getShops(where){
+    var query=Shops.find(where);
+
+
+    if (req.query.sort){
+      query=query.sort(req.query.sort);
     }
     
-
-    return res.json(shops);  
-  });
-
+    if(req.query.valid){
+      query=query.where("status",true);
+    }
+    
+    query.populate('catalog').exec(function (err,shops){
+      if (err){
+      	res.status(400);
+        return res.json(err);    
+      }
+      //
+      // as we dont know how to group by 
+      if (req.query.group){
+        grouped=_.groupBy(shops,function(shop){
+          return shop.catalog&&shop.catalog.name;
+        });
+        return res.json(grouped);
+      }
+    
+      return res.json(shops);  
+    });
+  }
+  
+  if (req.params.category){
+    return db.model('Categories').findBySlug(req.params.category,function(e,c){
+      if (e){
+        return res.send(400,e);
+      }
+      if (!c){
+        return res.send(400,"Il n'existe pas de catégorie "+req.params.category);
+      }
+      return getShops({catalog:c._id});
+    });    
+  }
+  return getShops({});
+  
 };
