@@ -6,6 +6,11 @@ var fx = require('pow-mongoose-fixtures');
 
 
 exports.clean=function(callback){
+  if (process.env.NODE_ENV!=='test'){
+    console.log('cannot run test without test environement: NODE_ENV=test mocha')
+    process.exit(1);
+  }
+
   var collections=['Users','Categories','Shops','Products','Sequences','DbMaintain', 'Emails'];
   var iterator = function(name, nextcb){
     db.model(name).remove({},function(e){
@@ -16,6 +21,11 @@ exports.clean=function(callback){
 };
 
 exports.fixtures=function(names){
+  if (process.env.NODE_ENV!=='test'){
+    console.log('cannot run test without test environement: NODE_ENV=test mocha')
+    process.exit(1);
+  }
+    
   var data={};
   names.forEach(function(name) {
     var fx=require('../fixtures/'+name);
@@ -26,6 +36,11 @@ exports.fixtures=function(names){
   return data;
 }
 exports.load=function(fixtures, cb, callback){
+  if (process.env.NODE_ENV!=='test'){
+    console.log('cannot run test without test environement: NODE_ENV=test mocha')
+    process.exit(1);
+  }
+
   var iterator = function(fixture, nextcb){
         fx.load(fixture,db, nextcb);
   };

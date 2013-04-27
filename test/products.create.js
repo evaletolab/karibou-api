@@ -69,10 +69,14 @@ describe("products.create", function(){
   });
 
 
-  it.skip("Error on creation of a new product without manufacturer", function(done){
+  it.skip("Error on creation of a new product with wrong category type", function(done){
     var p=_.clone(data.Products[0]);
+    p.title="test wrong product"
+    delete(p.sku);
+    delete(p._id);
+    p.categories[data.Categories[2]._id];
     Products.create(p,data.Shops[0],function(err,product){
-      err.should.equal("manufacturer is missing");
+      err.should.equal("cannot associate product and catalog");
       done();          
     });
   });
@@ -80,6 +84,8 @@ describe("products.create", function(){
 
   it("Error on creation of a new product without category", function(done){
     var p=_.clone(data.Products[0]);
+    delete(p._id);
+    p.categories[data.Categories[1]._id];
     Products.create(p,data.Shops[0],function(err,product){
       err.should.equal("category is missing");
       done();          
@@ -91,8 +97,9 @@ describe("products.create", function(){
     //
     // set the manfacturer
     //p.manufacturer=maker;
-    var p=_.clone(data.Products[0]);
-    p.categories=[data.Categories[1]];
+    var p=_.clone(data.Products[1]);
+    delete(p._id);
+    p.categories=[data.Categories[2]];
     Products.create(p,data.Shops[0],function(err,product){
       should.not.exist(err);
       should.exist(product);

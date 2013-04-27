@@ -35,9 +35,6 @@ module.exports = function(app, express) {
 				callbackURL: config.auth.twit.cb
 			},
 			function(token, secret, profile, done) {				
-        console.log("token",token);
-        console.log("secret",secret);
-        
     		Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photos[0].value }, function (err, user) {
     		  user.token=token;
       		return done(err, user);
@@ -113,7 +110,7 @@ module.exports = function(app, express) {
 	});
 
 	// connect to Mongo when the app initializes
-	mongoose.connect(config.mongo,function(e){
+	mongoose.connect(config.mongo,function(e){  
 	    //double check for database drop
     	if(config.dropdb && process.env.NODE_ENV==='test'){
     	  mongoose.connection.db.dropDatabase(function(err,done){
