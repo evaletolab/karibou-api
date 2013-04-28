@@ -13,7 +13,6 @@ var Categories = db.model('Categories');
 
 describe("Categories", function(){
   var _ = require('underscore');
-  var assert = require("assert");
   var category=[];
 
 
@@ -43,7 +42,7 @@ describe("Categories", function(){
       m.name.should.equal("Olivier");
       m.description.should.equal("Ebike makers");
       m.type.should.equal("Catalog");
-      assert(!err)
+      should.not.exist(err)
       done();
     });
 
@@ -55,7 +54,7 @@ describe("Categories", function(){
       description:"Ebike makers",
       type:"Pouet"
     },function(err,m){
-      assert(err);
+      should.exist(err);
       err.message.should.equal("Validation failed")
       done();
     });
@@ -64,16 +63,23 @@ describe("Categories", function(){
 
   it("Create categories from array of strings", function(done){
     Categories.create(["Fruits", "Légumes", "Poissons"],function(err,cats){
-      assert(!err)
+      should.not.exist(err)
       cats.length.should.equal(3);
       category=cats;  
       done();
     });
   });
 
+  it("Add duplicate categories structure", function(done){
+    Categories.create("Fruits",function(err,cat){
+      should.exist(err);
+      done();
+    });
+  });
+
   it("Find by name", function(done){
     Categories.findByName("Fruits",function(err,cat){
-      assert(!err);
+      should.not.exist(err);
       cat.name.should.equal("Fruits");
       done();
     });
@@ -81,18 +87,12 @@ describe("Categories", function(){
 
   it("Find inexistant name", function(done){
     Categories.findByName("prfk",function(err,cat){
-      assert(!err);
-      assert(!cat)
+      should.not.exist(err);
+      should.not.exist(cat)
       done();
     });
   });
 
-  it("Add duplicate categories structure", function(done){
-    Categories.create("Fruits",function(err,cat){
-      assert(err);
-      done();
-    });
-  });
 
   it("Maps string array to category", function(done){
     var on=_.map(category,function(v,k){return {name:v.name};});
@@ -113,7 +113,7 @@ describe("Categories", function(){
   it("Bad element for string array should generate an error", function(done){
     var on=_.map(["FFruits", "Légumes", "Poissons"],function(v,k){return {name:v};});
     Categories.map(on,function(err,cats){
-      assert(err);
+      should.exist(err);
       done();
     });      
   });
@@ -122,7 +122,7 @@ describe("Categories", function(){
     Categories.map(["Fruits", "Légumes", "Poissons"],function(err,cats){
       //console.log("ERROR",err);
       //console.log("RESULT",cats);
-      assert(err);
+      should.exist(err);
       done();
     });      
   });
