@@ -40,17 +40,17 @@ var Product = new Schema({
    details:{
       description:{type:String, required:true},
       comment:{type:String, required:false},
-      hasGluten:{type:Boolean, default:true}, 
-      hasOgm:{type:Boolean, default:false},
-      hasLactose:{type:Boolean, default:false},
-      isBio:{type:Boolean, default:false}, 
-      isBiodegradable:{type:Boolean, default:false}, 
+      gluten:{type:Boolean, default:true}, 
+      ogm:{type:Boolean, default:false},
+      lactose:{type:Boolean, default:false},
+      bio:{type:Boolean, default:false}, 
+      biodegradable:{type:Boolean, default:false}, 
    },  
    
    attributes:{
-      isAvailable:{type:Boolean, default:true},
-      hasComment:{type:Boolean, default:false}, 
-      isDiscount:{type:Boolean, default:false}
+      available:{type:Boolean, default:true},
+      comment:{type:Boolean, default:false}, 
+      discount:{type:Boolean, default:false}
    },
 
    pricing: {
@@ -262,6 +262,65 @@ Product.statics.findByShop = function(shop, callback){
   return this.model('Products').find({vendor:shop._id}, cb);
 };
 
+/**
+ * available criterias{
+ *   shopname:slug,
+ *   category:slug,
+ *   details:details
+ *   valid:true|false,
+ *   sort:----
+ * }
+ */
+Product.statics.findByCriteria = function(criteria, callback){
+  var Products=this.model('Products'), 
+      Categories=this.model('Categories'),
+      Shops=this.model('Shops');
+      
+  require('async').waterfall([
+    function(cb){
+      if (criteria.shopname){
+        Shops.findOne({urlpath:criteria.shopname},function(err,shop){
+          if(!shop){return cb("La boutique n'existe pas");}
+          return cb(err,shop);
+        });
+      }else cb(false,false);
+    },
+    function(shop, cb){
+      if (criteria.category){
+        Categories.findOne({slug:criteria.category},function(err,category){
+          if(!category){return cb("La catégorie n'existe pas");}
+          return cb(err,shop,category);
+        });
+      }else cb(false,false,false);
+    }],
+    function(err,shop, category){
+      if(err) return callback(err);
+      var query=Products.find({});
+      if(shop){
+        query=query.where("vendor",shop._id);
+      }  
+      if(category){
+        query=query.where("categories",category._id);
+      }  
+
+      if (criteria.location){
+      }
+      if (criteria.details){
+        var details=criteria.details.split(/[+,]/);
+        details.forEach(function(detail){
+          query=query.where("details."+detail,true);
+        });
+        
+      }
+      if(callback){
+        return query.exec(callback);
+      }
+      return query;
+    }
+  );
+
+
+};
 
 exports.Products = mongoose.model('Products', Product);
 exports.Manufacturers = mongoose.model('Manufacturers', Manufacturer);

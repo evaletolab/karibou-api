@@ -80,7 +80,27 @@ var mongoose = require('mongoose')
 		roles: Array
 });
 
+/**
+UserSchema.pre("save",function(next, done) {
+    var self = this;
+    if (!self.email || true) {
+      done();
+      return next();
+    }
+    this.model("Users").findOne({'email.address' : self.email.address},function(err, user) {
+        if(err) {
+            done(err);
+        } else if(user) {
+            self.invalidate("email.address","L'address email doit être unique");
+            done(new Error("L'address email doit être unique"));
+        } else {
+            done();
+        }
+    });
+    next();
+});
 
+  **/
 /**
  * validation functions
  */

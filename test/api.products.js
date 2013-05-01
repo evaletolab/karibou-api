@@ -27,9 +27,9 @@ describe("api.products", function(){
     });    
   });
 
-  it('GET /v1/products/100001 should return 400',function(done){
+  it('GET /v1/products/1000301 should return 400',function(done){
     request(app)
-      .get('/v1/products/100001')
+      .get('/v1/products/1000301')
       .expect('Content-Type', /json/)
       .expect(400)
       .end(function(err, res){

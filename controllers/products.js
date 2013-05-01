@@ -5,9 +5,10 @@ require('../app/config');
 var db = require('mongoose');
 var Shops = db.model('Shops');
 var Products = db.model('Products');
-var Manufacturers = db.model('Manufacturers');
-var assert = require("assert");
 var _=require('underscore');
+
+var check = require('validator').check,
+    sanitize = require('validator').sanitize;
 
 function isUserAdminOrWithRole(req, res, next, checkRole){
   //
@@ -54,6 +55,42 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   }); 
 }
 
+
+function checkParams(req){
+    if (!req.body)return;
+
+    if(req.body.title) check(req.body.title,"Le nom de votre produit n'est pas valide").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    
+    if(req.body.details){
+      req.body.details.description&&check(req.body.details.description).len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
+      req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
+      req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
+      req.body.details.local && check(req.body.details.local).is(/^(true|false)$/);
+
+    }
+    
+
+    if (req.body.photo){
+      req.body.photo.bg && check(req.body.photo.bg).len(6, 164).isUrl();
+      req.body.photo.fg && check(req.body.photo.fg).len(6, 164).isUrl();
+      req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
+    }
+        
+    
+    if (req.body.available){
+      req.body.available.active && check(req.body.available.active).is(/^(true|false)$/);
+      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    }
+
+    if (req.body.info){
+      req.body.info.active && check(req.body.info.active).is(/^(true|false)$/);
+      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    }
+      
+    
+}
+
 exports.create=function (req, res) {
   var product;
   
@@ -62,19 +99,18 @@ exports.create=function (req, res) {
   
   //
   // check shop owner 
-  assert(req.params.shopname);    
+  if(!req.params.shopname){ 
+    return res.json(400,"Vous devez définir une boutique")
+  }
   Shops.findByUser({id:req.user.id},function (err,shops){
     if (err){
       return res.json(400, err);    
     }
     
-    if (!shops){
-      return res.json(400, "User has no shop");    
-    }
 
     var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     if (!s){
-      return res.json(400, "Shops is not defined or not associed to the user");    
+      return res.json(400, "Vous devez définir une boutique qui existe et qui vous appartient");    
     }
 
     //
@@ -99,23 +135,26 @@ exports.create=function (req, res) {
 
 //
 // List products
-// - by category    
-//   /v1/products?c=fruits,légume
+// /v1/products/category/:category
+// /v1/products/location/:location
+// /v1/products/category/:category/details/:details
+// /v1/products/location/:location/category/:category
+// /v1/products/location/:location/category/:category/details/:details
+// /v1/shops/:shopname/products/category/:category
+// /v1/shops/:shopname/products/category/:category/details/:details
 
-// - by details 
-//   /v1/products?a=bio,glutenfree
-
-// - by manufacturer
-//   /v1/products?m=Olivier Evalet
-// - by shop
-// - by vendor
 exports.list=function (req, res) {
-  // shop is defined
-  if (req.params.shopname){
+  //
+  // check inputs
+  
+  try{
+    checkParams(req);
+  }catch(e){
+    return res.json(400,e);
   }
   
   //
-  return Products.find(function (err, products) {
+  return Products.findByCriteria(req.params,function (err, products) {
     if (err) {
       return res.json(400,err);
     }
@@ -127,9 +166,12 @@ exports.list=function (req, res) {
 // Single product
 // - by sku
 exports.get=function (req, res) {
-  return Products.findById(req.params.sku, function (err, product) {
+  return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
       return res.json(400,err);
+    }
+    if(!product){
+      return res.json(400,"Ce produit n'existe pas");
     }
     return res.json(product);
   });

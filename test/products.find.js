@@ -5,7 +5,7 @@ var db = require("mongoose");
 
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.js",,"Shops.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Products.more.js",,"Shops.js"]);
 var Users=db.model('Users');
 
 
@@ -17,7 +17,7 @@ describe("products.find:", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js","../fixtures/Products.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js","../fixtures/Products.more.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -48,123 +48,67 @@ describe("products.find:", function(){
 
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
       should.exist(shops);
-      Products.findByShop(shops[0]).where("details.isBio",false).exec(function(err,products){          
+      Products.findByShop(shops[0]).where("details.bio",false).exec(function(err,products){          
         products.length.should.equal(1)
-        products[0].details.isBio.should.equal(false);
+        products[0].details.bio.should.equal(false);
         done();
       });
     });
 
   });
 
-  it("Find products by string Category  ", function(done){
-  
-    async.waterfall([
-      //
-      // find product and  categories
-      function(cb){
-          Products.find({},function(err,products){          
-            db.model('Categories').find({},function(err,cats){
-              products.forEach(function(product){
-                product.addCategories(cats);
-              });
-              cb(err,products,cats);
-            });
-          });
-      },
-      
-      //
-      // find product by Cat
-      function(products, cats, cb){
-        Products.findByCategory("Fruits",function(err,products){
-          should.exist(err);
-          cb(null,products,cats);
-        });
-        
-      },
-      function(products,cats,cb){
-        done();
-      }
-    ],function(err,result){
+  it("Find products by Category object  ", function(done){
+    Products.find({categories:data.Categories[2]._id},function(err,products){
       should.not.exist(err);
-    });
+      should.exist(products);
+      products.length.should.equal(2)
+      products[0].sku.should.equal(1000001);
+      products[1].sku.should.equal(1000003);
+      done();
+    });  
 
   });
   
-  it("Find products by Category  ", function(done){
-  
-    async.waterfall([
-      //
-      // find product and  categories
-      function(cb){
-          Products.find({},function(err,products){          
-            db.model('Categories').find({},function(err,cats){
-              products.forEach(function(product){
-                product.addCategories(cats);
-              });
-              cb(err,products,cats);
-            });
+  it("Find products by slug Category  ", function(done){
 
-          });
-
-      },
-      
-      //
-      // find product by Cat
-      function(products, cats, cb){
-        Products.findByCategory(cats[0],function(err,products){
-          cb(null,products,cats);
-        });
-        
-      },
-      function(products,cats,cb){
-        done();
-      }
-    ],function(err,result){
+    Products.findByCriteria({category:data.Categories[2].slug},function(err,products){
       should.not.exist(err);
-    });
+      should.exist(products);
+      products.length.should.equal(2)
+      products[0].sku.should.equal(1000001);
+      products[1].sku.should.equal(1000003);
+      done();
+    });  
 
   });
   
 
-  it("Find products by Array Category  ", function(done){
+  it.skip("Find products by Array Category  ", function(done){
+
   
-    async.waterfall([
-      //
-      // find product and  categories
-      function(cb){
-          Products.find({},function(err,products){          
-            db.model('Categories').find({},function(err,cats){
-              products.forEach(function(product){
-                product.addCategories(cats);
-              });
-              // should be async
-              cb(err,products,cats);
-            });
-
-          });
-
-      },
-      
-      //
-      // find product by Cat
-      function(products, cats, cb){
-        Products.findByCategory(cats,function(err,products){
-          should.exist(err);
-          cb(null,products,cats);
-        });
-        
-      },
-      function(products,cats,cb){
-        done();
-      }
-    ],function(err,result){
-      should.not.exist(err);
-    });
 
   });
 
-  it.skip("Find products by Manufacturer and Category and details ", function(done){
+  it("Find products by Category and details(bio=true) ", function(done){
+    Products.findByCriteria({category:data.Categories[2].slug,details:'bio'},function(err,products){
+      should.not.exist(err);
+      should.exist(products);
+      products.length.should.equal(1)
+      products[0].sku.should.equal(1000003);
+      done();
+    });  
+
+  });
+
+  it("Find products by Category and details(bio=true, ogm free=true, gluten free=true) ", function(done){
+    Products.findByCriteria({category:data.Categories[3].slug,details:'bio+ogm+gluten'},function(err,products){
+      should.not.exist(err);
+      should.exist(products);
+      products.length.should.equal(1)
+      products[0].sku.should.equal(1000002);
+      done();
+    });  
+
   });
 
   it.skip("Product can be enabled or disabled", function(done){

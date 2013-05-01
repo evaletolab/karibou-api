@@ -20,7 +20,7 @@ module.exports = function(app, express) {
   // autoload model
   files = require("fs").readdirSync( './models' );
   for(var i in files) {
-    require('../models/'+files[i]);
+	  if(/\.js$/.test(files[i])) require('../models/'+files[i]);
   }
 
   var Users=mongoose.model('Users');

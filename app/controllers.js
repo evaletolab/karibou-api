@@ -60,9 +60,9 @@ module.exports = function(app) {
   app.get('/v1/products',products.list);
   app.get('/v1/products/category/:category',products.list);
   app.get('/v1/products/location/:location',products.list);
-  app.get('/v1/products/category/:category/detail/:detail',products.list);
+  app.get('/v1/products/category/:category/details/:details',products.list);
   app.get('/v1/products/location/:location/category/:category',products.list);
-  app.get('/v1/products/location/:location/category/:category/detail/:detail',products.list);
+  app.get('/v1/products/location/:location/category/:category/details/:details',products.list);
 
   app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
   app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
@@ -77,7 +77,7 @@ module.exports = function(app) {
   app.get('/v1/shops/:shopname', shops.get);
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
-  app.get('/v1/shops/:shopname/products/category/:category/detail/:detail', products.list);
+  app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);
 
   app.post('/v1/shops', auth.ensureAuthenticated, shops.create);
   app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, shops.update);

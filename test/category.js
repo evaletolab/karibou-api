@@ -66,12 +66,14 @@ describe("Categories", function(){
       should.not.exist(err)
       cats.length.should.equal(3);
       category=cats;  
+      //console.log(cats)
       done();
     });
   });
 
   it("Add duplicate categories structure", function(done){
     Categories.create("Fruits",function(err,cat){
+      //console.log(cat)
       should.exist(err);
       done();
     });

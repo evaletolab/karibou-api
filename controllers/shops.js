@@ -204,7 +204,7 @@ exports.list=function (req, res) {
         return res.json(err);    
       }
       //
-      // as we dont know how to group by 
+      // as we dont know how to group by with mongo
       if (req.query.group){
         grouped=_.groupBy(shops,function(shop){
           return shop.catalog&&shop.catalog.name;

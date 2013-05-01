@@ -10,8 +10,8 @@ var mongoose = require('mongoose')
 
 
 var Categories = new Schema({
-    name: {type:String, unique:true},
-    slug: {type:String, unique:true},
+    name: {type:String, unique:true, index:true},
+    slug: {type:String, unique:true, index:true},
     description:{type:String, unique:false},
     group:{type:String, unique:false},
     type:{type:String, unique:false, default:"Category",enum:config.shop.category.types}
