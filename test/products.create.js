@@ -87,7 +87,7 @@ describe("products.create", function(){
     delete(p._id);
     p.categories[data.Categories[1]._id];
     Products.create(p,data.Shops[0],function(err,product){
-      err.should.equal("category is missing");
+      err.should.equal("Il manque la catégorie");
       done();          
     });
   });

@@ -51,7 +51,7 @@ exports.list=function (req, res) {
 
 exports.get=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(3, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -72,7 +72,7 @@ exports.get=function (req, res) {
 
 exports.update=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(3, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
     checkParams(req);
   }catch(err){
     return res.send(400, err.message);
@@ -97,7 +97,7 @@ exports.update=function (req, res) {
 
 exports.remove=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(3, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
   }catch(err){
     return res.send(400, err.message);
   } 

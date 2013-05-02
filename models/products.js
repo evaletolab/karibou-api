@@ -116,6 +116,7 @@ Manufacturer.statics.map = function(values, callback){
   });	
 };
 
+//db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
 Product.methods.addCategories=function(cats,callback){
   var p=this;
   if(Array.isArray(cats)){
@@ -169,10 +170,10 @@ Product.statics.create = function(p,s,callback){
     p.vendor=s;
     
     require('async').waterfall([
+    /*
       function(cb){
         //
         // set manufacturer , not currently needed
-        /**
         if(!p.manufacturer){
           cb(("manufacturer is missing"));
           return;
@@ -181,14 +182,13 @@ Product.statics.create = function(p,s,callback){
           p.manufacturer=m._id;
           cb(err);
         });
-        **/
-        cb();
       },
+      */
       function(cb){
         //
         // set category (NOT MANDATORY)
         if(!p.categories.length){
-          cb(("category is missing"))
+          cb("Il manque la catégorie")
           return;
         }
         db.model('Categories').map(p.categories, function(err,categories){
@@ -197,20 +197,18 @@ Product.statics.create = function(p,s,callback){
           p.categories=_.collect(categories,function(m){return m._id});;
           cb(err);
         });
-      },
-      function(cb){
+      }],
+      function(err){
+        if (err){
+          return callback(err);
+        }
         //
         // ready to create one product
         var product =new  Products(p);
         product.save(function (err) {
-          cb(err,product);
+          callback(err,product);
         });
-
-      }],
-      function(err,product){
-        callback(err,product);
       });
-    
   });
   
 
@@ -228,39 +226,7 @@ Product.statics.findOneBySku = function(sku, callback){
   return this.model('Products').findOne({sku:sku}, cb);
 };
 
-Product.statics.findByCategory = function(cat, callback){
-  // if cat is array
-  if(Array.isArray(cat)){
-    return callback(("[Array Categories] Not implemented yet!"));
-  }
-  if((typeof cat)==="string"){
-//    this.model('Catgories').findByName(cat,function(e,c){
-//    });
-    return callback(("[String Categories] Not implemented yet!"));
-  }
-  
-  // if cat is an Object
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
-  }
-  
-  return this.model('Products').find({categories:cat}, cb);
-};
 
-Product.statics.findByShop = function(shop, callback){
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
-  }
-  
-  
-  return this.model('Products').find({vendor:shop._id}, cb);
-};
 
 /**
  * available criterias{
@@ -276,6 +242,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
       
+  var query=Products.find({});
   require('async').waterfall([
     function(cb){
       if (criteria.shopname){
@@ -295,7 +262,6 @@ Product.statics.findByCriteria = function(criteria, callback){
     }],
     function(err,shop, category){
       if(err) return callback(err);
-      var query=Products.find({});
       if(shop){
         query=query.where("vendor",shop._id);
       }  
@@ -309,16 +275,15 @@ Product.statics.findByCriteria = function(criteria, callback){
         var details=criteria.details.split(/[+,]/);
         details.forEach(function(detail){
           query=query.where("details."+detail,true);
-        });
-        
+        });        
       }
       if(callback){
         return query.exec(callback);
       }
-      return query;
     }
   );
 
+  return query;
 
 };
 
