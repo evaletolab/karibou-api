@@ -27,13 +27,13 @@ describe("api.products", function(){
     });    
   });
 
-  it('GET /v1/products/1000301 should return 400',function(done){
+  it('GET /v1/products should return 200',function(done){
     request(app)
-      .get('/v1/products/1000301')
+      .get('/v1/products')
       .expect('Content-Type', /json/)
-      .expect(400)
       .end(function(err, res){
-        if (err) throw err;
+        res.should.have.status(200);
+        res.body.length.should.equal(3)
         done();
       });
   });
@@ -122,56 +122,17 @@ describe("api.products", function(){
         });
     });    
      
-    //
-    // create a new product without ref to (manufacter, categories)
-    //
-    it.skip('POST /v1/shops/bicycle-and-rocket/products without manufacturer should return 400 ',function(done){
-      // shop must be managed
-      var p=_.clone(data.Products[0]);
-      delete(p._id);
-      request(app)
-        .post('/v1/shops/bicycle-and-rocket/products')
-        .set('Content-Type','application/json')
-        .set('cookie', cookie)
-        .send(p)
-        .end(function(err,res){
-          // shop is not defined
-          res.should.have.status(400);
-          done();        
-        });
-    });    
-
-    //
-    // create a new product with a manufacter, but without category
-    //
-    it('POST /v1/shops/bicycle-and-rocket/products with manufacturer without category should return 400 ',function(done){
-      // shop must be managed
-      //p.manufacturer={_id:maker._id};
-      var p=_.clone(data.Products[0]);
-      delete(p._id);
-      p.title="Test new product";
-      request(app)
-        .post('/v1/shops/bicycle-and-rocket/products')
-        .set('Content-Type','application/json')
-        .set('cookie', cookie)
-        .send(p)
-        .end(function(err,res){
-          res.should.have.status(400);
-          //res.body.manufacturer.location.should.equal("Genève");
-          done();        
-        });
-    });    
-
-    //
-    // create a new product with a manufacter and some categories
-    //
+ 
     it('POST /v1/shops/bicycle-and-rocket/products  should return 200 ',function(done){
       // shop must be managed
       //p.manufacturer={_id:maker._id};
       var p=_.clone(data.Products[0]);
       delete(p._id);
-      p.categories=[data.Categories[1]];
+      p.categories=[data.Categories[1]._id];
       p.title="Test more new product";
+      p.details.description="Test more new product";
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
         .set('Content-Type','application/json')
@@ -179,9 +140,33 @@ describe("api.products", function(){
         .send(p)
         .end(function(err,res){
           res.should.have.status(200);
-          res.body.sku.should.be.above(10001);
+          res.body.sku.should.equal(100000);
           res.body.categories.should.be.an.array;
           //res.body.manufacturer.location.should.equal("Genève");
+          done();        
+        });
+    });    
+
+    it('POST /v1/shops/bicycle-and-rocket/products check sku should return 200 ',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      p.categories=[data.Categories[2]._id,data.Categories[1]._id];
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      request(app)
+        .post('/v1/shops/bicycle-and-rocket/products')
+        .set('Content-Type','application/json')
+        .set('cookie', cookie)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(200);
+          res.body.sku.should.equal(100001);
+          res.body.categories.should.be.an.array;
+          res.body.categories.length.should.equal(2);
           done();        
         });
     });    

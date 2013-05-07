@@ -58,18 +58,29 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
 
 function checkParams(req){
     if (!req.body)return;
-
     if(req.body.title) check(req.body.title,"Le nom de votre produit n'est pas valide").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     
+    
     if(req.body.details){
-      req.body.details.description&&check(req.body.details.description).len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      check(req.body.details.description).len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
       req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
       req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
       req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
       req.body.details.local && check(req.body.details.local).is(/^(true|false)$/);
 
+    }else{
+      throw new Error("Vous devez définir une description");
     }
     
+    if(req.body.pricing){
+      check(req.body.pricing.price, "La valeur du prix n'est pas correct").isFloat();
+      req.body.pricing.discount&&check(req.body.pricing.discount, "La valeur du discount n'est pas correct").isFloat();
+      
+      check(req.body.pricing.stock, "La valeur du stock n'est pas correct").isInt();
+      check(req.body.pricing.part, "La valeur d'une partie n'est pas correct").isAlphanumeric();
+    }else{
+      throw new Error("Vous devez définir un prix");
+    }
 
     if (req.body.photo){
       req.body.photo.bg && check(req.body.photo.bg).len(6, 164).isUrl();
@@ -93,8 +104,12 @@ function checkParams(req){
 
 exports.create=function (req, res) {
   var product;
-  
-  //console.log("body:",req.body);
+
+  try{  
+    checkParams(req,res);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
   
   
   //
@@ -110,7 +125,7 @@ exports.create=function (req, res) {
 
     var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     if (!s){
-      return res.json(400, "Vous devez définir une boutique qui existe et qui vous appartient");    
+      return res.json(400, "Vous devez utiliser une boutique qui vous appartient");    
     }
 
     //
@@ -148,7 +163,7 @@ exports.list=function (req, res) {
   // check inputs
   
   try{
-    checkParams(req);
+
   }catch(e){
     return res.json(400,e);
   }

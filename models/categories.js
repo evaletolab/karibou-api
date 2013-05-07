@@ -80,12 +80,13 @@ Categories.statics.map = function(values, callback){
 
   require('async').map(values, function(value,cb){
     if((typeof value)!=="object"){
-      cb(new Error("find selector '"+value+"' is not typed Object as excpected"));
-      return;
+      //
+      // reformat selector, as the default field name is _id
+      value={_id:value};
     }
   	db.model('Categories').findOne(value,function(err,cat){
    	  if (!cat){
-  	    err=new Error("The category '"+JSON.stringify(value)+"' doesn't exist");
+  	    err=("La catégorie '"+JSON.stringify(value)+"' n'existe pas!");
   	  }
   	  cb(err,cat);
   	  //console.log(cat)

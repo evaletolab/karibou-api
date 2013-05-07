@@ -64,7 +64,8 @@ module.exports = function(app) {
   app.get('/v1/products/location/:location/category/:category',products.list);
   app.get('/v1/products/location/:location/category/:category/details/:details',products.list);
 
-  app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
+  // not needed for now
+  //app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
   app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
 
   app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, products.remove);

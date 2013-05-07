@@ -82,11 +82,20 @@ describe("products.create", function(){
   });
 
 
+  it("Error on creation of a empty {} product", function(done){
+    Products.create({},data.Shops[0],function(err,product){
+      should.exist(err)
+      done();          
+    });
+  });
+
+
   it("Error on creation of a new product without category", function(done){
     var p=_.clone(data.Products[0]);
     delete(p._id);
-    p.categories[data.Categories[1]._id];
+    p.categories=null;
     Products.create(p,data.Shops[0],function(err,product){
+      //console.log(err)
       err.should.equal("Il manque la catégorie");
       done();          
     });

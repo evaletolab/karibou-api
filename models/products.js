@@ -70,16 +70,6 @@ var Product = new Schema({
 });
 
 
-//
-// validation
-Product.path('title').validate(function (title) {
-    return title.length > 10 && title.length < 70;
-}, 'Product title should be between 10 and 70 characters');
-
-Product.path('details.description').validate(function (v) {
-    return v.length > 10;
-}, 'Product description should be more than 10 characters');
-
 
 
 //
@@ -104,8 +94,9 @@ Manufacturer.statics.map = function(values, callback){
   require('async').map(values, function(value,cb){
   
     if((typeof value)!=="object"){
-      cb(new Error("find selector '"+value+"' is not typed Object as excpected"));
-      return;
+      //
+      // reformat selector, as the default field name is _id
+      value={_id:value};
     }
 
   	db.model('Manufacturers').find(value,function(err,map){
@@ -187,15 +178,18 @@ Product.statics.create = function(p,s,callback){
       function(cb){
         //
         // set category (NOT MANDATORY)
-        if(!p.categories.length){
+        if(!p.categories||!p.categories.length){
           cb("Il manque la catégorie")
           return;
         }
         db.model('Categories').map(p.categories, function(err,categories){
           // FIXME
           //check category is well typed 'category'
+          if(err){
+            return cb(err);
+          }
           p.categories=_.collect(categories,function(m){return m._id});;
-          cb(err);
+          cb();
         });
       }],
       function(err){

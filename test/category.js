@@ -95,8 +95,16 @@ describe("Categories", function(){
     });
   });
 
-
   it("Maps string array to category", function(done){
+    var on=_.map(category,function(v,k){return id._v;});
+    Categories.map(on,function(err,cats){
+      cats.length.should.equal(3);
+      done();
+    });      
+  });
+
+
+  it("Maps name array to category", function(done){
     var on=_.map(category,function(v,k){return {name:v.name};});
     Categories.map(on,function(err,cats){
       cats.length.should.equal(3);
@@ -104,7 +112,7 @@ describe("Categories", function(){
     });      
   });
 
-  it("Maps ObjectId array to category", function(done){
+  it("Maps _id array to category", function(done){
     var oid=_.map(category,function(v,k){return {_id:v._id};});
     Categories.map(oid,function(err,cats){
       cats.length.should.equal(3);
