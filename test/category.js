@@ -96,7 +96,7 @@ describe("Categories", function(){
   });
 
   it("Maps string array to category", function(done){
-    var on=_.map(category,function(v,k){return id._v;});
+    var on=_.map(category,function(v,k){return v._id;});
     Categories.map(on,function(err,cats){
       cats.length.should.equal(3);
       done();
