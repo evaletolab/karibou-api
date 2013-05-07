@@ -60,7 +60,7 @@ var Product = new Schema({
       discount:{type:Number, min:0, requiered:true},
    },
 
-   image: {type:String},
+   photo: {type:String},
    modified: { type: Date, default: Date.now },
 
    // Relations  (manufacturer should NOT BE MANDATORY)
