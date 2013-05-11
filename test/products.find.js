@@ -37,7 +37,7 @@ describe("products.find:", function(){
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
       should.exist(shops[0]);
       Products.findByCriteria({shopname:shops[0].urlpath},function(err,products){          
-        products.length.should.equal(3);        
+        products.length.should.equal(2);        
         products[0].details.comment.should.equal("Temps de cuisson : 16 minutes");
         done();
       });

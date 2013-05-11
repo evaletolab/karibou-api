@@ -126,6 +126,7 @@ exports.remove=function (req, res) {
   });
 };
 
+
 exports.get=function (req, res) {
   //
   // check shop owner 

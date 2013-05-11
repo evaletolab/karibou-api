@@ -6,6 +6,7 @@ var mongoose = require('mongoose')
 	, passport = require('passport');
 	
 //var	bcrypt = require('bcrypt');
+var extend      = require( 'node.extend' );
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
@@ -53,14 +54,18 @@ var mongoose = require('mongoose')
     addresses: [{
           type: { type: String, required : true, lowercase: true, trim: true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
-          locality: { type: String, required : true, lowercase: true, trim: true,
-            validate:[validate.alpha, 'Invalide locality'] 
+          locality: { type: String, required : true, trim: true /**,
+            validate:[validate.alpha, 'Invalide locality'] **/
           },
-          region: { type: String, required : true, lowercase: true, trim: true, default:"GE" },
-          postalCode: { type: String, required : false,
-            validate:[validate.postal,'Invalide postal code'] 
+          region: { type: String, required : true, trim: true, default:"GE" },
+          postalCode: { type: String, required : false /**,
+            validate:[validate.postal,'Invalide postal code'] **/
           },
-          primary:{ type: Boolean, required : true, default:false} 
+          primary:{ type: Boolean, required : true, default:false},
+          location:{
+            lat:{type:Number, required: true},
+            lng:{type:Number, required: true}
+          }
     }],
     
     /* preferred products*/
@@ -115,6 +120,13 @@ UserSchema.statics.findOrCreate=function(u,callback){
       if (u.provider==='local'){
         return callback("The system can not automaticaly create user for local provider");
       }
+      
+//      Users.findOne({'email.address' : u.email.address},function(err, user) {
+//        if(user){
+//          callback("L'address");
+//        }
+//      });
+      
       var newuser=new Users(u);
       newuser.save(function(err){
         //if ( err && err.code === 11000 )
@@ -292,15 +304,17 @@ UserSchema.statics.update=function(id, u,callback){
   return Users.findOne(id).populate('shops').exec(function (err, user) {
     if (u.name&&u.name.familyName) user.name.familyName=u.name.familyName;
     if (u.name&&u.name.givenName) user.name.givenName=u.name.givenName;
+    
     if (u.email&&u.email.address) {
       if (user.email.address!==u.email.address)
         user.email.status=new Date();
       user.email.address=u.email.address;
     }
+    if (u.addresses) user.addresses=u.addresses;
     
-    return user.save(function (err) {
+    user.save(function (err) {
       //if ( err && err.code === 11000 )
-      return callback(err,user);
+      callback(err,user);
     });
   });
 };

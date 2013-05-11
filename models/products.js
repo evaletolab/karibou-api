@@ -235,7 +235,6 @@ Product.statics.findByCriteria = function(criteria, callback){
   var Products=this.model('Products'), 
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
-      
   var query=Products.find({});
   require('async').waterfall([
     function(cb){
@@ -252,7 +251,7 @@ Product.statics.findByCriteria = function(criteria, callback){
           if(!category){return cb("La catégorie n'existe pas");}
           return cb(err,shop,category);
         });
-      }else cb(false,false,false);
+      }else cb(false,shop,false);
     }],
     function(err,shop, category){
       if(err) return callback(err);
@@ -272,7 +271,7 @@ Product.statics.findByCriteria = function(criteria, callback){
         });        
       }
       if(callback){
-        return query.exec(callback);
+        return query.populate('vendor').exec(callback);
       }
     }
   );
@@ -280,6 +279,31 @@ Product.statics.findByCriteria = function(criteria, callback){
   return query;
 
 };
+
+//
+// update shop content
+Product.statics.update=function(id,p,callback){
+	var Products=this.model('Products');	
+	
+	if (!Object.keys(id).length) return callback("You have to define one product for update");
+
+  //findOneAndUpdate(conditions, update) 
+  return Products.findOne(id, function (err, product) {
+    //
+    // other fields are not managed by update
+    //console.log(product)
+    if (!product){
+      return callback("Could not find product for update "+JSON.stringify(id))
+    }
+    extend(product,s);
+
+ 
+    return product.save(function (err) {
+      return callback(err,product);
+    });
+  });
+};
+
 
 exports.Products = mongoose.model('Products', Product);
 exports.Manufacturers = mongoose.model('Manufacturers', Manufacturer);

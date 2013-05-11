@@ -155,19 +155,7 @@ Shops.statics.update=function(id,s,callback){
     delete(s.owner);
     extend(shop,s);
 
-/**
-    shop.description = s.description;
-    shop.url = s.url;
-    shop.photo = s.photo;
-    shop.faq = s.faq;
-    shop.location = s.location;
-    shop.marketplace = s.marketplace;
-    shop.options=s.options;
-    shop.available=s.available;
-    shop.info=s.info;
-    shop.catalog=(s.catalog._id)?s.catalog._id:s.catalog;
-**/    
-    
+ 
     return shop.save(function (err) {
       return callback(err,shop);
     });

@@ -173,6 +173,15 @@ exports.list=function (req, res) {
     if (err) {
       return res.json(400,err);
     }
+    //
+    // as we dont know how to group by with mongo
+    if (req.query.group){
+      grouped=_.groupBy(products,function(product){
+        return product.categories.length&&product.categories[0];
+      });
+      return res.json(grouped);
+    }
+    
     return res.json(products);
   });
 };
@@ -224,49 +233,43 @@ exports.massUpdate= function (req, res) {
 
 // Single update
 exports.update=function (req, res) {
-  return ProductModel.findById(req.params.id, function (err, product) {
-    product.title = req.body.title;
-    product.description = req.body.description;
-    product.style = req.body.style;
-    product.images = req.body.images;
-    product.categories = req.body.categories;
-    product.catalogs = req.body.catalogs;
-    product.variants = req.body.variants;
-    return product.save(function (err) {
-      if (!err) {
-        console.log("updated");
-      } else {
-        console.log(err);
-      }
-      return res.send(product);
-    });
-  });
-};
+ //
+  // check && validate input field
+  try{
+    check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();    
+    checkParams(req);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
 
-
-// Bulk destroy all products
-exports.massRemove=function (req, res) {
-  ProductModel.remove(function (err) {
-    if (!err) {
-      console.log("removed");
-      return res.send('');
-    } else {
-      console.log(err);
+  //
+  //normalize ref
+  req.body.vendor=(req.body.vendor&&req.body.vendor._id)?req.body.vendor._id:req.body.vendor;
+  delete(req.body._id);
+  Products.findOneAndUpdate({sku:req.params.sku},req.body,function(err,product){
+    if (err){
+      return res.json(400,err);    
     }
+    return res.json(product);  
   });
 };
+
 
 // remove a single product
 exports.remove=function (req, res) {
-  return ProductModel.findById(req.params.id, function (err, product) {
-    return product.remove(function (err) {
-      if (!err) {
-        console.log("removed");
-        return res.send('');
-      } else {
-        console.log(err);
-      }
-    });
+
+  try{
+    check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  Products.remove({sku:req.params.sku},function(err){
+    if (err){
+    	res.status(400);
+      return res.json(err);    
+    }
+    return res.send(200);
   });
 };
 

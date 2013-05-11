@@ -28,14 +28,13 @@ exports.update=function(req,res){
     check(req.params.id).isInt();
     check(req);
   }catch(err){
-    return res.send(401, err.message);
+    return res.send(400, err);
   }  
       
   
   db.model('Users').update({id:req.params.id},req.body,function(err,user){
     if (err){
-    	res.status(401);
-      return res.json({error:err});    
+      return res.json(400,err);    
     }
     return res.json(user);  
   });

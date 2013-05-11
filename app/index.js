@@ -63,7 +63,9 @@ for (var name in config.express) {
 // Allow cross-domain 
 var CORS = function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', config.cors.credentials);
-    res.header('Access-Control-Allow-Origin', config.cors.allowedDomains);
+    if(Array.isArray(config.cors.allowedDomains))config.cors.allowedDomains.forEach(function(domain){
+      res.header('Access-Control-Allow-Origin', domain);
+    });
     res.header('Access-Control-Max-Age', config.cors.age);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
