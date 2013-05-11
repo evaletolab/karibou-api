@@ -62,7 +62,7 @@ module.exports = {
   },
 
   admin:{
-    emails:['evaleto@gmail.com']
+    emails:['evaleto@gmail.com', 'delphine.cluzel@gmail.com']
   },
 
   cors:{
