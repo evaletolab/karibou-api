@@ -13,6 +13,11 @@ module.exports = {
       list:["Eaux-vives", "Carouge", "Plain-palais"],
       default:"Eaux-vives"
     },
+    user:{
+      location:{
+        list:["Genève-Ville", "Carouge"]
+      }
+    },
     location:{
       list:["Aire-la-Ville","Anières","Avully","Avusy","Bardonnex","Bellevue",
             "Bernex","Carouge","Cartigny","Céligny","Chancy","Chêne-Bougeries",
@@ -61,7 +66,7 @@ module.exports = {
   },
 
   cors:{
-    allowedDomains:'http://localshop.gelux.ch',
+    allowedDomains:['http://localshop.gelux.ch'],
     credentials:true,
     age:3600
   },
