@@ -66,7 +66,7 @@ module.exports = {
   },
 
   cors:{
-    allowedDomains:['http://localshop.gelux.ch'],
+    allowedDomains:['http://localshop.gelux.ch','http://karibou.evaletolab.ch/'],
     credentials:true,
     age:3600
   },
