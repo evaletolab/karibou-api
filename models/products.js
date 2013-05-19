@@ -217,7 +217,7 @@ Product.statics.findOneBySku = function(sku, callback){
     cb=undefined;
   }
 
-  return this.model('Products').findOne({sku:sku}, cb);
+  return this.model('Products').findOne({sku:sku}).populate('vendor').exec(cb);
 };
 
 
