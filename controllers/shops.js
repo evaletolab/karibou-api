@@ -46,7 +46,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 function checkParams(req){
     if (!req.body)return;
 
-    if(req.body.name) check(req.body.name,"Le nom de votre boutique n'est pas valide").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.name) check(req.body.name,"Le nom de votre boutique n'est pas valide").len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     if(req.body.description){
       req.body.description=sanitize(req.body.description).xss();
     }

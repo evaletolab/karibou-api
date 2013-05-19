@@ -27,6 +27,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
    
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
+      console.log("isUserProductOwner",req.body.sku)
       //return (!_.any(req.user.shops,function(s){return s.sku===req.params.sku}));
       return true;
     }
@@ -40,29 +41,16 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   }); 
 
 }
-exports.ensureShopOwnerOrAdmin=function(req, res, next) {
-  return isUserAdminOrWithRole(req, res, next,function(){
-    function isUserShopOwner(){
-      return (!_.any(req.user.shops,function(s){return s.urlpath===req.body.owner.urlpath}));
-    }
-    //
-    // ensure owner
-	  if(!isUserShopOwner()){ 
-      return res.send(401, "Your are not the owner of the shop"); 
-	  }
-	
-    return next();
-  }); 
-}
+
 
 
 function checkParams(req){
     if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom de votre produit n'est pas valide").len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.title) check(req.body.title,"Le nom de votre produit n'est pas valide").len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     
     
     if(req.body.details){
-      check(req.body.details.description).len(3, 34).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      check(req.body.details.description).len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
       req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
       req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
       req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
@@ -77,7 +65,7 @@ function checkParams(req){
       req.body.pricing.discount&&check(req.body.pricing.discount, "La valeur du discount n'est pas correct").isFloat();
       
       check(req.body.pricing.stock, "La valeur du stock n'est pas correct").isInt();
-      check(req.body.pricing.part, "La valeur d'une partie n'est pas correct").isAlphanumeric();
+      check(req.body.pricing.part, "La valeur d'une portion n'est pas correct").len(3, 10);
     }else{
       throw new Error("Vous devez définir un prix");
     }

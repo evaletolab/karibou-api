@@ -40,7 +40,7 @@ var Product = new Schema({
    details:{
       description:{type:String, required:true},
       comment:{type:String, required:false},
-      gluten:{type:Boolean, default:true}, 
+      gluten:{type:Boolean, default:false}, 
       ogm:{type:Boolean, default:false},
       lactose:{type:Boolean, default:false},
       bio:{type:Boolean, default:false}, 
