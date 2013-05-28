@@ -42,7 +42,7 @@ Sequences.statics.nextSku = function( callback){
   this.model('Sequences').next("sku",callback);
 };
 
-
+Sequences.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Sequences', Sequences);
 
 

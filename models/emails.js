@@ -109,7 +109,7 @@ Emails.statics.validate=function(uid,email,callback){
   });
 };
 
-
+Emails.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Emails', Emails);
 
 

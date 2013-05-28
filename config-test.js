@@ -97,7 +97,10 @@ module.exports = {
   
   
   // TODO load by env  
-  mongo:'mongodb://localhost/karibou-test',
+  mongo:{
+    name:'mongodb://localhost/karibou-test',
+    ensureIndex:true
+  },
 
 	
 	session:{

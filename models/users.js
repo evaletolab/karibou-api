@@ -27,7 +27,7 @@ var extend      = require( 'node.extend' );
     
     email:{
       address:{type : String, index:true, unique: true, required : false, 
-        validate:[validate.email, 'invalid email address']
+        validate:[validate.email, 'adresse email invalide']
       },
       status:Schema.Types.Mixed,
     },
@@ -53,7 +53,7 @@ var extend      = require( 'node.extend' );
     
     addresses: [{
           type: { type: String, required : true, lowercase: true, trim: true },
-          node: { type: String, trim: true },
+          note: { type: String, trim: true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
           locality: { type: String, required : true, trim: true /**,
             validate:[validate.alpha, 'Invalide locality'] **/
@@ -305,6 +305,7 @@ UserSchema.statics.update=function(id, u,callback){
   return Users.findOne(id).populate('shops').exec(function (err, user) {
     if (u.name&&u.name.familyName) user.name.familyName=u.name.familyName;
     if (u.name&&u.name.givenName) user.name.givenName=u.name.givenName;
+    user.displayName=user.name.givenName+" "+user.name.familyName;
     
     if (u.email&&u.email.address) {
       if (user.email.address!==u.email.address)
@@ -319,8 +320,7 @@ UserSchema.statics.update=function(id, u,callback){
     });
   });
 };
-
-
+UserSchema.set('autoIndex', config.mongo.ensureIndex);
 module.exports = mongoose.model('Users', UserSchema);
 
 

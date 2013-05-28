@@ -11,7 +11,7 @@ var check       = require('validator').check,
     sanitize    = require('validator').sanitize;
 
 function checkParams(req){
-  check(req.body.name, "Le format du nom est invalide").len(2, 45);
+  req.body.name&&check(req.body.name, "Le format du nom est invalide").len(2, 45);
   req.body.description && check(req.body.description, "Le format de la description est invalide").len(3, 400);
   req.body.image && check(req.body.image, "Le format de l'image est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);
   req.body.color && check(req.body.color, "Le format de la couleur est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);

@@ -304,7 +304,7 @@ Product.statics.update=function(id,p,callback){
   });
 };
 
-
+Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);
 exports.Manufacturers = mongoose.model('Manufacturers', Manufacturer);
 

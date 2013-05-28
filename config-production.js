@@ -87,8 +87,10 @@ module.exports = {
     'view engine': 'jade'
   },
   
-  // TODO load by env  
-  mongo:'mongodb://localhost/karibou-v1-1',
+  mongo:{
+    name:'mongodb://localhost/karibou-v1-1',
+    ensureIndex:true
+  }
 
  /**
   * Time to validate an email

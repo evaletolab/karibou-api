@@ -73,11 +73,10 @@ describe("Users", function(){
     		should.exist(err.code);
     		err.code.should.equal(11000);
     		return done();
-  		});
-      
+  		});      
     });
     
-    
+        
     it.skip("validate provider", function(done){
       
     });
@@ -87,7 +86,16 @@ describe("Users", function(){
     });
 
     it("registers a new User", function(done){
+      db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "password", "password", function(err, doc){
+    		should.exist(err.code);
+    		err.code.should.equal(11000);
+        done();
+      });
+    });
+
+    it("validation for duplicate email", function(done){
       db.model('Users').register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
+        
         doc.email.address.should.equal("test2@test.com");
         doc.name.familyName.should.equal("evalet");
         doc.name.givenName.should.equal("olivier");

@@ -59,8 +59,7 @@ exports.validate=function (req, res) {
   Emails.validate(req.params.uid,req.params.email,function (err,user){
 
     if (err){
-    	res.status(200);
-      return res.json({error:err});    
+      return res.json(400,err);    
     }
     
 

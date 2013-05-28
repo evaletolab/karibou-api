@@ -112,6 +112,7 @@ Categories.statics.findByName = function(n, callback){
     callback(e,cat);
   });
 };
+Categories.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Categories', Categories);
 
 

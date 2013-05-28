@@ -49,12 +49,11 @@ describe("api.validate", function(){
       .expect(401,done);
   });
 
-  it('GET /v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d should return 200 and error field',function(done){
+  it('GET /v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d should return 400 and error field',function(done){
     request(app)
       .get('/v1/validate/18e16c6ba591b84b6fd69ce6e4c313a4a9c4057d/pouet@ruc.com')
       .end(function(err,res){
-        res.should.have.status(200);
-        res.body.error.should.be.a.string;
+        res.should.have.status(400);
         done()
       });
   });
@@ -129,21 +128,19 @@ describe("api.validate", function(){
 
 
 
-  it('GET /v1/validate/<uid>/evaleto@poet.com should return 200 ',function(done){
+  it('GET /v1/validate/<uid>/evaleto@poet.com should return 400 ',function(done){
     request(app)
       .get('/v1/validate/'+uid+'/evaleto@poet.com')
       .end(function(err,res){
-        res.should.have.status(200);
+        res.should.have.status(400);
         done()
       });
   });
   
   it('GET /v1/validate/<uid>/evaleto@gluck.com should return 200 ',function(done){
-    console.log("api.validate:", '/v1/validate/'+uid+'/evaleto@gluck.com')
     request(app)
       .get('/v1/validate/'+uid+'/evaleto@gluck.com')
       .end(function(err,res){
-        console.log(res.text)
         res.should.have.status(200);
         done()
       });

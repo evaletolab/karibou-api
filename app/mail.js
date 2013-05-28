@@ -48,9 +48,15 @@ module.exports = function(app) {
     });
   }
 
+  if (process.env.NODE_ENV==='test'){
+    sendmail=function(to, subject, content, template, cb){
+      cb(null,"test is running")
+    }
+  }
+
   app.configure(function() {
     app.use(function(req, res, next){
-      req.sendmail=sendmail;
+        req.sendmail=sendmail;
       next();
     });
   });

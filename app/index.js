@@ -91,7 +91,7 @@ app.configure(function () {
   app.use(express.static('public'));
   app.locals.pretty = true;
 	app.use(function(req,res,next){
-	  if(!req.cookies.token ){
+	  if(!req.cookies.token && false){
 	    
 	    var t=token(16);
 	    res.cookie('token', t);
