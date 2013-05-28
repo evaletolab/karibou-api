@@ -8,8 +8,8 @@ module.exports = function(app, express) {
   var mongoStore = require('connect-mongodb');
   
 	// dependencies for authentication
-	var passport = require('passport')
-		, LocalStrategy = require('passport-local').Strategy;
+	var passport = require('passport'),
+		  LocalStrategy = require('passport-local').Strategy;
 		
  	// fix the issue with auth by using passport,
 	//  https://github.com/rockbot/CrowdNotes
@@ -94,7 +94,9 @@ module.exports = function(app, express) {
 	}
 	
 	app.configure(function () {
-	  app.use(express.session({secret:config.session.secret}));
+	  app.use(express.session({
+	    secret:config.session.secret
+	  }));
 /**		
     app.use(express.session({
         store: mongoStore(config.mongo)

@@ -4,6 +4,26 @@ var DbMaintain = mongoose.model('DbMaintain');
 var async     = require("async");
 
 
+/**
+ * Maintain mongo database
+ * http://docs.mongodb.org/manual/reference/operator/#AdvancedQueries-%24type
+ *
+ * Use case
+ * 1) How to change the type of a field?
+ *    see type here http://docs.mongodb.org/manual/reference/operator/type/#op._S_type
+ *  db.foo.find( { 'bad' : { $type : 1 } } ).forEach( function (x) {   
+ *   x.bad = new String(x.bad); // convert field to string
+ *   db.foo.save(x);
+ *  });
+ *
+ * 2) How to rename a field
+ *    db.students.update( { _id: 1 }, { $rename: { "name.first": "name.fname" } } )
+ *    db.students.update( { _id: 1 }, { $rename: { "name.last": "contact.lname" } } )
+ *
+ *
+ */
+
+
 exports.update = function(app){
 	// get async list of scripts
 	var mongo_scripts = fs.readdirSync('./db_maintain');

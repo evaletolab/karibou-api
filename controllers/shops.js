@@ -46,9 +46,10 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 function checkParams(req){
     if (!req.body)return;
 
-    if(req.body.name) check(req.body.name,"Le nom de votre boutique n'est pas valide").len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.name) check(req.body.name,"Le nom n'est pas valide ou trop long").len(3, 48);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     if(req.body.description){
-      req.body.description=sanitize(req.body.description).xss();
+      check(req.body.description,"La description n'est pas valide ou trop longue").len(3, 400);
+      req.body.description=sanitize(req.body.description,"La description n'est pas valide").xss();
     }
     
     if(req.body.url) check(req.body.url).len(6, 164).isUrl();
@@ -67,13 +68,13 @@ function checkParams(req){
     }
     
     for (var i in req.body.faq){      
-      check(req.body.faq[i].q,"Le format de la question n'est pas valide").len(3, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=? ]+$/);
-      check(req.body.faq[i].a,"Le format de la réponse n'est pas valide").len(3, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
+      check(req.body.faq[i].q,"La question n'est pas valide ou trop longue").len(3, 128);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=? ]+$/);
+      check(req.body.faq[i].a,"La réponse n'est pas valide ou trop longue").len(3, 400);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
     }
     
     if (req.body.available){
       req.body.available.active && check(req.body.available.active).is(/^(true|false)$/);
-      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.available.comment && check(req.body.available.comment,"Le commentaire n'est pas valide ou trop long").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     }
 
     if (req.body.info){

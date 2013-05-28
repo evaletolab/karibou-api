@@ -15,8 +15,7 @@ var DbMaintain = new Schema({
 DbMaintain.statics.save = function(maintain, callback){
   var Maintain = this.model('DbMaintain');
     var dbm = Maintain(maintain);
-    dbm.save(function (err, doc) 
-    {
+    dbm.save(function (err, doc){
       return callback(err,doc);
     });
 }; 

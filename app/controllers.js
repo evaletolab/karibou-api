@@ -26,6 +26,12 @@ module.exports = function(app) {
   app.get ('/register', auth.register);
   app.post('/register', auth.register_post);
   
+  //
+  // user
+  app.get('/v1/users/me', users.me);
+  app.post('/v1/users/:id',users.ensureMe, users.update);
+  app.post('/v1/users/:id/password',users.ensureMe, users.password);
+  app.post('/v1/revover/:email/password', users.recover);
   
 	//
 	// home
@@ -37,7 +43,7 @@ module.exports = function(app) {
   app.get ('/v1/config', api.config);
   
   //
-  // email validation
+  // validation validation
   app.get ('/v1/validate',auth.ensureAuthenticated, emails.list);
   app.post('/v1/validate/create',auth.ensureAuthenticated, emails.create);
   app.get ('/v1/validate/:uid/:email', emails.validate);
@@ -50,10 +56,6 @@ module.exports = function(app) {
   app.post('/v1/category/:category', auth.ensureAdmin, categories.update);
   app.delete('/v1/category/:category', auth.ensureAdmin, categories.remove);
   
-  //
-  // user
-  app.get('/v1/users/me', users.me);
-  app.post('/v1/users/:id', users.update);
   
   // global products 
   app.get('/v1/products/:sku',products.get);

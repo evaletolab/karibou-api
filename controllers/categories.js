@@ -11,9 +11,11 @@ var check       = require('validator').check,
     sanitize    = require('validator').sanitize;
 
 function checkParams(req){
-  req.body.name && check(req.body.name).len(2, 32).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
-  req.body.description && check(req.body.description).len(3, 264).is(/^[a-zA-ZÀ-ÿ0-9' ]+$/);
-  req.body.group && check(req.body.group).len(2, 32).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
+  check(req.body.name, "Le format du nom est invalide").len(2, 45);
+  req.body.description && check(req.body.description, "Le format de la description est invalide").len(3, 400);
+  req.body.image && check(req.body.image, "Le format de l'image est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);
+  req.body.color && check(req.body.color, "Le format de la couleur est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);
+  req.body.group && check(req.body.group, "Le format du group est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
 }
 
 exports.list=function (req, res) {
@@ -82,7 +84,7 @@ exports.update=function (req, res) {
     if(err){
       return res.send(400,err);
     }
-    extend(cat,req.body);
+    _.extend(cat,req.body);
     cat.slug=cat.slugName();
     cat.save(function(err){
       if(err){

@@ -46,11 +46,11 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 function checkParams(req){
     if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom de votre produit n'est pas valide").len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
     
     
     if(req.body.details){
-      check(req.body.details.description).len(3, 34);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 128);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
       req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
       req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
       req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);

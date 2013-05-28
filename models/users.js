@@ -53,6 +53,7 @@ var extend      = require( 'node.extend' );
     
     addresses: [{
           type: { type: String, required : true, lowercase: true, trim: true },
+          node: { type: String, trim: true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
           locality: { type: String, required : true, trim: true /**,
             validate:[validate.alpha, 'Invalide locality'] **/

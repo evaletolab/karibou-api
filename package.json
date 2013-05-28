@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "password-generator" : "0.2.x", 
+    "nodemailer": "0.4.x",
+    "email-templates" :"0.x.0",
     "node.extend" : "1.0.0",
     "async": "0.x",
     "underscore": "1.x",

@@ -22,16 +22,26 @@ function check(req){
 exports.create=function (req, res) {
  
 
-  db.model('Emails').create(req.user, function(err,email){
+  db.model('Emails').create(req.user, function(err,validate){
     if(err){
-      //TODO error
-    	res.status(400);
-      return res.json({error:err});
+      return res.json(400,err);
     }      
     
+    var content=req.user;
+    content.validate=validate;
     //
     // send email
-    res.json(email);
+    req.sendmail(req.user.email.address, 
+                 "Confirmation de votre adresse e-mail", 
+                 content, 
+                 "confirm", function(err, status){
+      if(err){
+        console.log(err,status)
+        return res.json(400,err);
+      }      
+                 
+      res.json(validate);                 
+    })
   });
 };
 

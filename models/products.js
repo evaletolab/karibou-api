@@ -61,7 +61,7 @@ var Product = new Schema({
    },
 
    photo: {type:String},
-   modified: { type: Date, default: Date.now },
+   created: { type: Date, default: Date.now },
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 

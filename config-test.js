@@ -61,6 +61,16 @@ module.exports = {
     }
 
   },
+  mail:{
+    from:'james@karibou.evaletolab.ch',
+    default:'mandril',
+    mandril:{    
+      host:'smtp.mandrillapp.com',
+      port:587,
+      user:'',
+      code:''
+    }
+  },
 
   admin:{
     emails:['evaleto@gmail.com']
