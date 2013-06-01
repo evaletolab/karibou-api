@@ -6,7 +6,9 @@
 var app = require('../app/config');
 var db  = require('mongoose');
 var passport = require('passport');
-var _ = require('underscore');
+var _ = require('underscore'),
+    check = require('validator').check,
+    sanitize = require('validator').sanitize;
 
 exports.ensureAuthenticated=function(req, res, next) {
 	if (req.isAuthenticated()) { return next(); }
@@ -49,17 +51,24 @@ exports.login_post=function(req, res, next) {
   //  md5=MD5(username+new Date())
   //  redirect=<URL>?access_token=md5
   //  session.access_token=md5
+
+  try{
+    check(req.body.email,"Le format de l'email est invalide").isEmail();
+    check(req.body.provider).len(3, 64);
+    check(req.body.password).len(4, 64);
+  }catch(err){  
+    return res.send(400, err.message);
+  }  
   
-  redirect='/';
-  if (req.param('redirect')){
-    var redirect=req.param('redirect')
-    var token_str=req.param('id')+new Date()
-    var token=require('crypto').createHash('sha1').update(token_str).digest("hex");
-  }
   //res.json({info:"hello"});
   passport.authenticate('local', function(err, user, info) {
-     if (err) { return res.json(401,err); }
-     if (!user) { return res.json(401,info?info:'Bad user credential'); }
+     if (err) { 
+       return res.send(400,err); 
+     }
+     if (!user) { 
+       info=(info)?info:'Bad user credential';
+       return res.send(400,info); 
+     }
 
       // CUSTOM USER CONTENT
 		  //
@@ -79,7 +88,7 @@ exports.login_post=function(req, res, next) {
      
      
      req.logIn(user, function(err) {
-       if (err) { return res.json(403,err); }
+       if (err) { return res.send(403,err); }
        return res.json(req.user);
      });
 
@@ -104,16 +113,25 @@ exports.register= function(req, res) {
   // app.post('/register'...)
 exports.register_post= function(req, res) {
 
+    try{
+      check(req.body.email).isEmail();
+      check(req.body.firstname).len(3, 64);
+      check(req.body.lastname).len(3, 64);
+      check(req.body.password).len(4, 64);
+    }catch(err){
+      return res.send(400, err.message);
+    }  
+  
 		db.model('Users')
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
 		    if (err){
-        	res.status(401);
+        	res.status(400);
           return res.json(err);    
 		    }
 
         if (!user){
-          res.status(401);
+          res.status(400);
           return res.json("Unknow error on registration");    
         }
         var redirect=req.param('redirect');

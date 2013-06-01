@@ -234,7 +234,7 @@ exports.update=function (req, res) {
   //normalize ref
   req.body.vendor=(req.body.vendor&&req.body.vendor._id)?req.body.vendor._id:req.body.vendor;
   delete(req.body._id);
-  Products.findOneAndUpdate({sku:req.params.sku},req.body,function(err,product){
+  Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){
     if (err){
       return res.json(400,err);    
     }

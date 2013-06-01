@@ -39,19 +39,48 @@ describe("api.users", function(){
       .expect(401,done);
   });
 
-  it('POST /login should return 401 ',function(done){
+  it('POST /login should return 400 ',function(done){
     request(app)
       .post('/login')
       .send({ email: "evaleto@gluck.com", password:'12', provider:'local' })
       .end(function(err,res){      
-        res.should.have.status(401);
+        res.should.have.status(400);
         res.body.should.be.a.string;        
         done();        
       });
   });
 
-  it('POST /login with ID should return 302 on /',function(done){
-  
+  it('POST /login without email should return 400',function(done){  
+    request(app)
+      .post('/login')
+      .send({ provider:'local', password:'password' })
+      .end(function(err,res){
+        res.should.have.status(400);
+        done();        
+      });
+  });
+
+  it('POST /login wrong data should return 500',function(done){  
+    request(app)
+      .post('/login')
+      .send({ email:'oo@oo.com',provider:'local', password:'ppppp' })
+      .end(function(err,res){
+        res.should.have.status(500);
+        done();        
+      });
+  });
+
+  it('POST /login without data should return 400',function(done){  
+    request(app)
+      .post('/login')
+      .end(function(err,res){
+        res.should.have.status(400);
+        done();        
+      });
+  });
+
+
+  it('POST /login should return 200',function(done){  
     request(app)
       .post('/login')
       .send({ email:"evaleto@gluck.com", provider:'local', password:'password' })

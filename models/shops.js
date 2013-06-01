@@ -144,7 +144,7 @@ Shops.statics.update=function(id,s,callback){
 	if (!Object.keys(id).length) return callback("You have to define one shop for update");
 
   //findOneAndUpdate(conditions, update) 
-  return Shops.findOne(id, function (err, shop) {
+  return Shops.findOne(id).populate('owner').exec(function (err, shop) {
     //
     // other fields are not managed by update
     //console.log(shop)

@@ -102,6 +102,9 @@ module.exports = {
     ensureIndex:true
   },
 
+	nodetime:{
+	},
+	
 	
 	session:{
 		secret:'karibou-1234'

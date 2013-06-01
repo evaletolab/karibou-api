@@ -43,13 +43,16 @@ exports.me = function (req, res, next)  {
 
 exports.recover=function(req,res){
   try{
+    //check(req.params.token,"token inconnu").isEmail();
     check(req.params.email,"Utilisateur inconnu").isEmail();
   }catch(err){
     return res.send(400, err.message);
   }  
 
-  db.model('Users').findOne({'email.address': req.params.email, id:req.params.id},
+
+  db.model('Users').findOne({'email.address': req.params.email},
     function(err,user){
+      
       if (err){
         return res.json(400,err);    
       }
@@ -59,11 +62,12 @@ exports.recover=function(req,res){
   
       //
       // change the password
-      var content=req.user;      
-      content.password=user.password=password();
+      var content=user;      
+      content.password=user.password=password();  
       user.save(function(err){
         if(err)return res.json(400,err);    
         
+
         //
         // send email
         req.sendmail(user.email.address, 
@@ -82,7 +86,6 @@ exports.recover=function(req,res){
       });      
       
   });
-  res.json("");
 };
 
 exports.password=function(req,res){
@@ -91,7 +94,7 @@ exports.password=function(req,res){
     check(req.params.id).isInt();
     check(req.body.email).isEmail();
     check(req.body.new,"Votre nouveau password est trop court ou trop long").len(4,32);
-    if(req.body.current && req.user.hash) throw new Error("Il manque votre password");
+    if(!req.body.current && req.user.hash) throw new Error("Il manque votre password");
   }catch(err){
     return res.send(400, err.message);
   }  

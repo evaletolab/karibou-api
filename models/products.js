@@ -288,7 +288,7 @@ Product.statics.update=function(id,p,callback){
 	if (!Object.keys(id).length) return callback("You have to define one product for update");
 
   //findOneAndUpdate(conditions, update) 
-  return Products.findOne(id, function (err, product) {
+  return Products.findOne(id).populate('vendor').exec(function (err, product) {
     //
     // other fields are not managed by update
     //console.log(product)
@@ -296,6 +296,7 @@ Product.statics.update=function(id,p,callback){
       return callback("Could not find product for update "+JSON.stringify(id))
     }
     extend(product,s);
+    console.log(s)
 
  
     return product.save(function (err) {

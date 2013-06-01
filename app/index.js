@@ -12,7 +12,6 @@ var debug = require('debug')('app');
 
 
 var app = module.exports = express();
-var token = require('password-generator');
 
 
 // export api
@@ -85,23 +84,9 @@ app.configure(function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   
   app.use(CORS);  
-  
-  
   app.use(express.cookieParser());
   app.use(express.static('public'));
   app.locals.pretty = true;
-	app.use(function(req,res,next){
-	  if(!req.cookies.token && false){
-	    
-	    var t=token(16);
-	    res.cookie('token', t);
-	    res.header('token', t);
-	    
-    	console.log(t)
-	  }
-	  next();
-	})
-
 });
 
 

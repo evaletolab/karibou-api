@@ -15,6 +15,8 @@ module.exports = function(app, express) {
 	//  https://github.com/rockbot/CrowdNotes
 
 
+  // manage date
+  var moment= require('moment');
 
 
   // autoload model
@@ -73,7 +75,10 @@ module.exports = function(app, express) {
 		Users.findById(id).populate('shops').exec(function (err, user) {
 		  //
 		  // don't serialise the private hash, but confirm the password existance
-		  if (user.hash) user.hash=true;
+		  if (user.hash) {
+		    user.hash=true;
+		    user.salt=true;
+		  }
 		  
 	    //
 	    // check the first admin
@@ -107,8 +112,20 @@ module.exports = function(app, express) {
 **/
 		app.use(passport.initialize());
 		app.use(passport.session());  
-		app.use(SSO);
+	  app.use(function(req,res,next){
+      if( req.method.toLowerCase() !== "get" ) {
+        return next();
+      }
+	    
+	    //
+	    // simple checker that should be replaced by an API-KEY
+	    var d=moment().format('DDMMYYYYHH');
+	    res.header('X-token', new Buffer(d+'kb').toString('base64'));
+	    next();
+	  })
+		
 		app.use(app.router);
+		
 	});
 
 	// connect to Mongo when the app initializes

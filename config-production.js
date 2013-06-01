@@ -90,8 +90,12 @@ module.exports = {
   mongo:{
     name:'mongodb://localhost/karibou-v1-1',
     ensureIndex:true
-  }
+  },
 
+	nodetime:{
+	  apikey:'f39e0560aedf625a03b0b06dbcb015907c1a3736'
+	},
+	
  /**
   * Time to validate an email
   */

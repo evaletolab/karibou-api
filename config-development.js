@@ -101,6 +101,9 @@ module.exports = {
     ensureIndex:true
   },
 
+	nodetime:{
+	  apikey:'f39e0560aedf625a03b0b06dbcb015907c1a3736'
+	},
 	
 	session:{
 		secret:'karibou-1234'
