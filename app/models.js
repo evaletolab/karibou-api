@@ -98,10 +98,15 @@ module.exports = function(app, express) {
 	  next();
 	}
 	
+	//
+	// manaing session
+	// http://stackoverflow.com/questions/8749907/what-is-a-good-session-store-for-a-single-host-node-js-production-app
 	app.configure(function () {
-	  app.use(express.session({
-	    secret:config.session.secret
-	  }));
+	  
+	  app.use(express.cookieSession({
+      secret: config.middleware.session.secret,
+      cookie: config.middleware.cookie
+    }));
 /**		
     app.use(express.session({
         store: mongoStore(config.mongo)

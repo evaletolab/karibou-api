@@ -1,13 +1,6 @@
-//
-// refs:
-// - http://kylebanker.com/blog/2010/04/30/mongodb-and-ecommerce/
-// - http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
 
-//
-// have a look on docs/products-*.json for examples
-//
 
-var debug = require('debug')('products');
+var debug = require('debug')('orders');
 var assert = require("assert");
 var _=require('underscore');
 
@@ -17,58 +10,84 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.Types.ObjectId;
   
 
-var EnumOGM="Avec Sans".split(' ');
-var EnumLocation=config.shop.product.location;
+//
+// managing geospatial with mongo
+// http://blog.nodeknockout.com/post/35215504793/the-wonderful-world-of-geospatial-indexes-in-mongodb
+//  Db.connect("mongodb://localhost:27017/geodb", function(err, db) {
+//    if(err) return console.dir(err)
+//  
+//    db.collection('places').geoNear(50, 50, {$maxDistance:10}, function(err, result) {
+//      if(err) return console.dir(err)
+//  
+//      assert.equal(result.results, 2);
+//    });
+//  });
 
-var Manufacturer = new Schema({
-    name: {type:String, unique:true, required:true},
-    description: String,
-    location: {type:String, required:true,  enum:EnumLocation}
-});
+// Orders Model
+var EnumOrderStatus    =config.shop.order.status;
+var EnumCancelReason   =config.shop.order.cancelreason;
+var EnumFinancialStatus=config.shop.order.financialstatus;
+var EnumOrderGateway   =config.shop.order.gateway;
+var EnumShippingMode   =config.shop.order.shippingmode;
 
-
-
-
-
-
-// Product Model
-
-var Product = new Schema({
-   sku: { type: Number, required: true, unique:true },
-   title: { type: String, required: true },
+var Orders = new Schema({
+   /** order identifier */
+   ac: { type: Number, required: true, unique:true },
    
-   details:{
-      description:{type:String, required:true},
-      comment:{type:String, required:false},
-      origin:{type:String, required:false},
-      gluten:{type:Boolean, default:false}, 
-      ogm:{type:Boolean, default:false},
-      lactose:{type:Boolean, default:false},
-      local:{type:Boolean, default:false},
-      bio:{type:Boolean, default:false}, 
-      biodegradable:{type:Boolean, default:false}, 
-   },  
-   
-   attributes:{
-      available:{type:Boolean, default:true},
-      comment:{type:Boolean, default:false}, 
-      discount:{type:Boolean, default:false}
-   },
-
-   pricing: {
-      stock:{type:Number, min:0, requiered:true}, 
-      price:{type:Number, min:0, requiered:true},
-      part:{type:String, requiered:true},
-      discount:{type:Number, min:0, requiered:true},
-   },
-
-   photo: {type:String},
+   /* customer email */
+   email:{type: String},
    created: { type: Date, default: Date.now },
+   
+   /* full customer details */
+   customer:{type: Schema.Types.Mixed, required:true},
+   
+   /* order canceled reason and dates */
+   cancel_reason:{type:String, enum:EnumCancelReason},
+   cancelled_at:{type: Date},
+   closed_at:{type: String},
+   
+   /* discount_code:{type: String}, */   
+   /* cart_token:{type: String}, */
+   
+   financial_status:{type:String, enum:EnumFinancialStatus},
 
-   // Relations  (manufacturer should NOT BE MANDATORY)
-   manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
-   categories: [{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true}],
-   vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true}  
+   fulfillments:{
+     status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
+   },
+
+   items:[{
+      sku:{type:Number, min:10000, requiered:true}, 
+      name:{type:String, required:true},
+      vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+      quantity:{type:Number, min:1, max:100, requiered:true}, 
+      price:{type:Number, min:0, max:1000, requiered:true},
+      /* new price is maximum +/- 10% of price */
+      finalprice:{type:Number, min:0, max:1000, requiered:true},
+      note:{type:String, required:false},    
+      variant_id:{type:String, required:false},  
+      variant_name:{type:String, required:false},      
+      
+      /* where is the product now? */      
+      fulfillment_status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
+      fulfillment_note:{type: String, required: true},
+      
+      /* fulfillment_service:{}, */
+      requires_shipping:{type:String,enum:EnumShippingMode, required:true},      
+      landing:{type:Schema.Types.Mixed}
+   }],
+   
+   
+   shipping:{
+      when:{type:Date, required:true},
+      address:{type:Schema.Types.Mixed,required:true}
+   },
+   
+   billing_address:{type:Schema.Types.Mixed, required:true},
+   
+   payment:{
+      gateway:{type:String,enum: EnumOrderGateway, required:true}
+   }   
+   
 });
 
 
@@ -77,71 +96,11 @@ var Product = new Schema({
 //
 // API
 
-Manufacturer.statics.create=function(m,cb){
-  var Manufacturer= this.model('Manufacturers');
-  var maker=new Manufacturer(m);
-  maker.save(function (err) {
-    cb(err,maker);
-  });
-  return this;
-};
-
-
-//
-// map an array of Values defined by the key to an array of Category.
-// - throw an error if one element doesn't exist
-Manufacturer.statics.map = function(values, callback){
-  var db=this;  
-
-  require('async').map(values, function(value,cb){
-  
-    if((typeof value)!=="object"){
-      //
-      // reformat selector, as the default field name is _id
-      value={_id:value};
-    }
-
-  	db.model('Manufacturers').find(value,function(err,map){
-  	  cb(err,map);
-  	});      
-  },function(err,maps){
-    callback(err,maps);
-  });	
-};
-
 //db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
-Product.methods.addCategories=function(cats,callback){
-  var p=this;
-  if(Array.isArray(cats)){
-    cats.forEach(function(cat){
-      p.categories.push(cat);
-    });
-  }else{
-    p.categories.push(cats);
-  }
-  p.save(function(err){
-    if(err)callback(err);
-  });
-};
-
-Product.methods.removeCategories=function(cats,callback){
-  var p=this;
-  if(Array.isArray(cats)){
-    cats.forEach(function(cat){
-      p.categories.pop(cat);
-    });
-  }else{
-    p.categories.pop(cats);
-  }
-  p.save(function(err){
-    if(err)callback(err);
-  });
-};
 
 
 //
-// create a new product 'p' for the shop 's'
-Product.statics.create = function(p,s,callback){
+Orders.statics.create = function(p,s,callback){
   assert(p);
   assert(s);
   assert(callback);
@@ -211,19 +170,6 @@ Product.statics.create = function(p,s,callback){
 }; 
 
 
-Product.statics.findOneBySku = function(sku, callback){
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
-  }
-
-  return this.model('Products').findOne({sku:sku}).populate('vendor').exec(cb);
-};
-
-
-
 /**
  * available criterias{
  *   shopname:slug,
@@ -233,7 +179,7 @@ Product.statics.findOneBySku = function(sku, callback){
  *   sort:----
  * }
  */
-Product.statics.findByCriteria = function(criteria, callback){
+Orders.statics.findByCriteria = function(criteria, callback){
   var Products=this.model('Products'), 
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
@@ -284,7 +230,7 @@ Product.statics.findByCriteria = function(criteria, callback){
 
 //
 // update shop content
-Product.statics.update=function(id,p,callback){
+Orders.statics.update=function(id,p,callback){
 	var Products=this.model('Products');	
 	
 	if (!Object.keys(id).length) return callback("You have to define one product for update");
@@ -307,8 +253,7 @@ Product.statics.update=function(id,p,callback){
   });
 };
 
-Product.set('autoIndex', config.mongo.ensureIndex);
-exports.Products = mongoose.model('Products', Product);
-exports.Manufacturers = mongoose.model('Manufacturers', Manufacturer);
+Orders.set('autoIndex', config.mongo.ensureIndex);
+exports.Orders = mongoose.model('Orders', Orders);
 
 

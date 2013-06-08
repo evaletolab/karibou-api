@@ -57,6 +57,20 @@ module.exports = {
                 "Vaud",
                 "Zoug",
                 "Zurich"]
+    },
+    order:{
+      financialstatus:["pending",
+                       "authorized",
+                       "partially_paid",
+                       "paid",
+                       "partially_refunded",
+                       "refunded",
+                       "voided"
+      ],
+      cancelreason:["customer", "fraud", "inventory", "other"],
+      status:["created","partial","fulfilled", "failure"],
+      gateway:[ "postfinance", "paypal"],
+      shippingmode:["karibou", "none"]
     }
 
   },
@@ -103,10 +117,6 @@ module.exports = {
     email:60*60*24*2
   },
 	
-	session:{
-		secret:'karibou-1234'
-	},
-
 	auth:{
     fb: {
         appId: '111565172259433'
@@ -153,6 +163,7 @@ module.exports = {
        *              (via "x-forwarded-proto")
       */
 
+  		secret:'cp3a2v0elt955h9uqhgmskplhg85ljjm',
       key: 'sid',
       cookie: {
         path: '/',
