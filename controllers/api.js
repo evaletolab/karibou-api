@@ -19,5 +19,6 @@ exports.index = function(app){
 
 
 exports.config = function(req, res) {
+    config.shop.env=process.env;
     res.json(config.shop);
 };
