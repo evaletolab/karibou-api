@@ -20,6 +20,7 @@
     "passport": "0.1.x",
     "passport-local": "0.x",
     "passport-twitter": "0.x",
+    "moment": "2.0.0",
     "debug": "0.x",
     "jade": "0.x"
   },
