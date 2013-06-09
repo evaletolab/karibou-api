@@ -1,5 +1,7 @@
 # Karibou-api
-Karibou is an open-source projects aim to help the creation of a online community marketplace. Karibou-api is the backend part. 
+Karibou is an open-source project aim to help the creation of an 
+online community marketplace. Our goal is to allow local food producers, artisans and artists 
+to sell their products locally. There is alpha frontend available here http://karibou.evaletolab.ch/
 
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
@@ -23,14 +25,7 @@ Running
 ## API
 Current API version is v1. You need to prepend `v1/` to app requests except auth.
 
-* [Users](#users-api)
-* [Shops](#stores-api)
-* [Category](#topics-api)
-* [Products](#products-api)
-* [Orders](#order-api)
-* backend, http://karibou-api.cloudfoundry.com/v1
-* frontend, http://karibou.evaletolab.ch/
-* 
+* backend, http://karibou-api.cloudfoundry.com/v1 
 
 ### Auth
 All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
