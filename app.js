@@ -18,8 +18,8 @@ var nodetime=require('nodetime').profile({
 var debug = require('debug')('app');
 var app = require('./app/index');
 
- // update the db if necessary
-require('./app/db.maintain').update();
+// update the db if necessary
+//require('./app/db.maintain').update();
 
 // launch server
 var port = (process.env.VMC_APP_PORT || process.env.C9_PORT || config.express.port);
@@ -28,6 +28,12 @@ var host = (process.env.VMC_APP_HOST || 'localhost');
 // manage c9 env
 if (process.env.C9_PORT ){
     host='0.0.0.0';
+}
+if (process.env.OPENSHIFT_NODEJS_IP){
+    host=process.env.OPENSHIFT_NODEJS_IP;
+}
+if (process.env.OPENSHIFT_NODEJS_PORT){
+    port=process.env.OPENSHIFT_NODEJS_PORT;
 }
 
 app.listen(port);
