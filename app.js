@@ -57,7 +57,7 @@ var setupTerminationHandlers = function(){
         });
     });
 };
-app.listen(port);
+app.listen(port,host);
 
 
 
