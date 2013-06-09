@@ -30,6 +30,9 @@
     "should": "1.2.1",
     "pow-mongoose-fixtures": "x"
   },
+  "scripts": { 
+    "start": "node app.js"
+  }, 
   "main": "app.js"
 }
 
