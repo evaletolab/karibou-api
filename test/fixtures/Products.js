@@ -23,6 +23,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'100gr'
      },
      categories: [],
      vendor:'515ec12e56a8d5961e000004'     
@@ -46,6 +47,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'100gr'
      },
      categories: [],
      vendor:'515ec12e56a8d5961e000004'
@@ -69,6 +71,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'100gr'
      },
      categories: [],
      vendor:'515ec12e56a8d5961e000005'

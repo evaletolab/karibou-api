@@ -54,11 +54,11 @@ describe("api.products", function(){
 	    // login
       request(app)
         .post('/login')
-        .send({ email: "evaleto@gluck.com", password:'password',provider:'local' })
+        .send({ email: "evaleto@gmail.com", password:'password',provider:'local' })
         .end(function(err,res){
           res.should.have.status(200);
           //res.headers.location.should.equal('/');
-          res.body.email.address.should.equal("evaleto@gluck.com");
+          res.body.email.address.should.equal("evaleto@gmail.com");
           cookie = res.headers['set-cookie'];
           should.exist(cookie);
           done();        
@@ -77,7 +77,7 @@ describe("api.products", function(){
     });     
       
 
-    it('POST /v1/shops/bicycle-and-rocket/products should return 401 not shop owner  ',function(done){
+    it('POST /v1/shops/bicycle-and-rocket/products should return 400 not shop owner  ',function(done){
       // shop must be managed
       // how to mockup login
       var p=_.clone(data.Products[0]);
@@ -88,10 +88,8 @@ describe("api.products", function(){
         .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
-          // shop is not defined
           //console.log(res.text);  
-          
-          res.should.have.status(401);
+          res.should.have.status(400);
           done();        
         });
     });    

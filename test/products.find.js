@@ -5,7 +5,7 @@ var db = require("mongoose");
 
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.more.js",,"Shops.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Products.more.js","Shops.js"]);
 var Users=db.model('Users');
 
 
@@ -31,7 +31,6 @@ describe("products.find:", function(){
     })
   });
 
-
     
   it("Find products by Shop", function(done){
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
@@ -47,7 +46,7 @@ describe("products.find:", function(){
   it("Find Non-OGM products by Shop  ", function(done){
 
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
-      should.exist(shops);
+      should.exist(shops[0]);
       Products.findByCriteria({shopname:shops[0].urlpath,details:'ogm'},function(err,products){          
         products.length.should.equal(1)
         products[0].details.ogm.should.equal(true);

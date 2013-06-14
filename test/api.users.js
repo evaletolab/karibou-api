@@ -105,5 +105,26 @@ describe("api.users", function(){
 
   });
       
+  it('user.get(12346) /v1/users/12346 should return 404',function(done){
+    request(app)
+      .get('/v1/users/12346')
+      .set('cookie', cookie)
+      .expect(404,done);
+  });
+
+  it('user.update(12346) /v1/users/12346 should return 401',function(done){
+    request(app)
+      .post('/v1/users/12346')      
+      .set('cookie', cookie)
+      .expect(401,done);
+  });
+
+  it('user.update(12345) /v1/users/12345 should return 200',function(done){
+    request(app)
+      .post('/v1/users/12345')      
+      .set('cookie', cookie)
+      .expect(200,done);
+  });
+
 });
 

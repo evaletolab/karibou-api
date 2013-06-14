@@ -79,6 +79,9 @@ var extend      = require( 'node.extend' );
     /* */    
     invoices : [{type: Schema.Types.ObjectId, ref : 'Invoice'}],
     
+    /* make user valid/invalid */
+    valid:{type:Boolean, default: true},
+    
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
 		salt: { type: String, required: false },
@@ -296,26 +299,66 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 	});
 };
 
+UserSchema.statics.updateStatus=function(id, valid,callback){
+	var Users=this.model('Users');	
+
+  return Users.findOne(id).populate('shops').exec(function (err, user) {
+    if(err){
+      return callback(err);
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
+    user.valid=valid;
+    
+    user.save(function (err) {
+      //
+      // update all shops
+      require('async').forEach(user.shops, function(shop,cb){
+          shop.updateStatus(valid,function(err){
+            cb(err)
+          });        
+      },function(err){
+        callback(err);
+      });    
+    });
+  
+  });
+}
 
 //
 // update shop content
 UserSchema.statics.update=function(id, u,callback){
 	var Users=this.model('Users');	
-	
-	//
-	// check owner
 
   return Users.findOne(id).populate('shops').exec(function (err, user) {
+    if(err){
+      return callback(err);
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
+
     if (u.name&&u.name.familyName) user.name.familyName=u.name.familyName;
     if (u.name&&u.name.givenName) user.name.givenName=u.name.givenName;
     user.displayName=user.name.givenName+" "+user.name.familyName;
     
+    //
+    // check is email has changed (require a validation)
     if (u.email&&u.email.address) {
       if (user.email.address!==u.email.address)
         user.email.status=new Date();
       user.email.address=u.email.address;
     }
+    //
+    // update the adress
     if (u.addresses) user.addresses=u.addresses;
+    
+    //
+    // DO NOT update the validation here
+    // ONLY ADMIN CAN DO THAT
+    if(u.valid!=user.valid){
+    }
     
     user.save(function (err) {
       //if ( err && err.code === 11000 )

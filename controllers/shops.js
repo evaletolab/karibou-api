@@ -15,6 +15,12 @@ var ObjectId = db.Types.ObjectId;
 var check = require('validator').check,
     sanitize = require('validator').sanitize;
 
+exports.ensureShopLimit=function(req, res, next) {
+  if (!req.user.isAdmin() && req.user.shops.length>0){
+    return res.send(401, "Vous ne pouvez plus ajouter de nouvelles boutiques"); 
+  }
+  return next(); 
+}
     
 exports.ensureOwnerOrAdmin=function(req, res, next) {
   function isUserShopOwner(){
@@ -193,12 +199,24 @@ exports.list=function (req, res) {
 
 
     if (req.query.sort){
+      console.log("sort shop by creation date: ",req.query.sort);
       query=query.sort(req.query.sort);
     }
     
-    if(req.query.valid){
+    // filter 
+    if(req.query.status){
       query=query.where("status",true);
     }
+    
+    //
+    //FILTER only visible shop are available: 
+    //       if (req.user._id == shop.owner || shop.status==true)
+    var filter=[{'status':true}];
+    if(req.user){
+      filter.push({'owner':req.user._id});
+    }    
+    query=query.or(filter);
+    
     
     query.populate('catalog').exec(function (err,shops){
       if (err){

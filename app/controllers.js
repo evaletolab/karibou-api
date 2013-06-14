@@ -28,10 +28,12 @@ module.exports = function(app) {
   
   //
   // user
-  app.get('/v1/users/me', users.me);
-  app.post('/v1/users/:id',users.ensureMe, users.update);
+  app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
+  app.get('/v1/users', auth.ensureAdmin, users.list);
+  app.post('/v1/users/:id', users.ensureMe,users.update);
+  app.post('/v1/users/:id/status', auth.ensureAdmin,users.status);
   app.post('/v1/users/:id/password',users.ensureMe, users.password);
-  app.post('/v1/recover/:token/:email/password', users.recover);
+  app.post('/v1/recover/token/:email/password', users.recover);
   
 	//
 	// home
@@ -68,9 +70,9 @@ module.exports = function(app) {
 
   // not needed for now
   //app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
-  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, products.update);
+  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, auth.ensureUserValid, products.update);
 
-  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, products.remove);
+  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  products.remove);
   //app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
 
   
@@ -82,12 +84,13 @@ module.exports = function(app) {
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);
 
-  app.post('/v1/shops', auth.ensureAuthenticated, shops.create);
-  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, shops.update);
+  app.post('/v1/shops', auth.ensureAuthenticated, auth.ensureUserValid, shops.ensureShopLimit, shops.create);
+  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
+  app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
     
-  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, products.create);
+  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, products.create);
 
-  app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, shops.remove);
+  app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.remove);
 
   
   

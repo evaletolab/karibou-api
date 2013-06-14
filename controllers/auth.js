@@ -11,10 +11,26 @@ var _ = require('underscore'),
     sanitize = require('validator').sanitize;
 
 exports.ensureAuthenticated=function(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-	//res.redirect('/login');
-  res.statusCode = 401;
-  res.send(401);	
+	if (!req.isAuthenticated()) { 
+      return res.send(401);	
+	}
+	
+	//
+	// admin user doenst depend on valid status
+	if (!req.user.isAdmin()&&!req.user.valid) { 
+      return res.send(401, "Votre compte n'est pas actif");	
+	}
+	
+  return next();
+}
+
+exports.ensureUserValid=function(req, res, next) {
+	//
+	// admin user doenst depend on valid status
+	if (!req.user.isAdmin()&&!req.user.valid) { 
+      return res.send(401, "Votre compte n'est pas actif");	
+	}
+  return next();
 }
 
 exports.ensureAdmin=function(req, res, next) {
@@ -85,6 +101,11 @@ exports.login_post=function(req, res, next) {
           user.roles.push('admin');
         }
 	    });
+	    
+	    /* account is not valid */
+	    if (!user.isAdmin() && !user.valid){
+	      return res.send(401,"Votre compte est désactivé");
+	    }
      
      
      req.logIn(user, function(err) {

@@ -46,6 +46,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'0.75L'
      },
      categories: [data.Categories[3]._id],
      vendor:'515ec12e56a8d5961e000004'
@@ -69,6 +70,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'0.75L'
      },
      categories: [data.Categories[2]._id,data.Categories[3]._id],
      vendor:'515ec12e56a8d5961e000005'

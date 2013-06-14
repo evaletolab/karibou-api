@@ -90,7 +90,7 @@ Shops.statics.create = function(shop,user, callback){
   
 	var Shops=this.model('Shops');	
 	var Users=this.model('Users');
-	
+
   shop.owner = user._id;
   //FIXME check if category.type=='Catalog'
   if (!shop.catalog){
@@ -137,6 +137,27 @@ Shops.statics.create = function(shop,user, callback){
 }; 
 
 //
+// validate shop
+//   valid: true, invalid: Date, deleted:false
+Shops.methods.updateStatus=function(valid,callback){
+  // special case
+  if (valid===undefined && callback===undefined){
+  }
+  
+  //
+  // 
+  if(valid!==true){
+    this.status=Date.now;
+    return this.save(callback)
+  }
+  
+  //
+  // 
+  this.status=true;
+  return this.save(callback)
+}
+
+//
 // update shop content
 Shops.statics.update=function(id,s,callback){
 	var Shops=this.model('Shops');	
@@ -151,12 +172,14 @@ Shops.statics.update=function(id,s,callback){
     if (!shop){
       return callback("Could not find shop for update "+JSON.stringify(id))
     }
+    
     s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
-    delete(s.owner);
+    s.owner&&delete(s.owner);
+    s.status&&delete(s.status);
     extend(shop,s);
 
  
-    return shop.save(function (err) {
+    return shop.save(function (err) {    
       return callback(err,shop);
     });
   });

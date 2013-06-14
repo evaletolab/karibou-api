@@ -31,15 +31,23 @@ exports.ensureMe=function(req, res, next) {
 }
 
 
-exports.me = function (req, res, next)  {
 
-  if (!req.isAuthenticated()) { 
-      res.statusCode = 401;
-      res.send(401);
-      return;
-  }
+
+exports.me = function (req, res, next)  {
   res.json(req.user);
 };
+
+
+exports.list = function (req, res, next)  {
+  //
+  // TODO add criteria
+  db.model('Users').find({},function(err,users){
+      if (err){
+        return res.send(400,err);    
+      }
+      return res.json(200,users);
+  });
+}
 
 exports.recover=function(req,res){
   try{
@@ -54,7 +62,7 @@ exports.recover=function(req,res){
     function(err,user){
       
       if (err){
-        return res.json(400,err);    
+        return res.send(400,err);    
       }
       if(!user){
         return res.json(400,"Utilisateur inconnu");    
@@ -65,7 +73,7 @@ exports.recover=function(req,res){
       var content=user;      
       content.password=user.password=password();  
       user.save(function(err){
-        if(err)return res.json(400,err);    
+        if(err)return res.send(400,err);    
         
 
         //
@@ -156,6 +164,26 @@ exports.update=function(req,res){
       
   
   db.model('Users').update({id:req.params.id},req.body,function(err,user){
+    if (err){
+      return res.json(400,err);    
+    }
+    return res.json(user);  
+  });
+
+};
+
+
+exports.status=function(req,res){
+
+  try{
+    check(req.params.id).isInt();
+    if(!req.body.valid)throw new Error("Invalid request");;
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+      
+  
+  db.model('Users').updateStatus({id:req.params.id},req.body.valid,function(err,user){
     if (err){
       return res.json(400,err);    
     }
