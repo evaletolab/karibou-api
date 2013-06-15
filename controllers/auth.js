@@ -17,7 +17,7 @@ exports.ensureAuthenticated=function(req, res, next) {
 	
 	//
 	// admin user doenst depend on valid status
-	if (!req.user.isAdmin()&&!req.user.valid) { 
+	if (!req.user.isAdmin()&&!req.user.status) { 
       return res.send(401, "Votre compte n'est pas actif");	
 	}
 	
@@ -27,7 +27,7 @@ exports.ensureAuthenticated=function(req, res, next) {
 exports.ensureUserValid=function(req, res, next) {
 	//
 	// admin user doenst depend on valid status
-	if (!req.user.isAdmin()&&!req.user.valid) { 
+	if (!req.user.isAdmin()&&!req.user.status) { 
       return res.send(401, "Votre compte n'est pas actif");	
 	}
   return next();
@@ -103,7 +103,7 @@ exports.login_post=function(req, res, next) {
 	    });
 	    
 	    /* account is not valid */
-	    if (!user.isAdmin() && !user.valid){
+	    if (!user.isAdmin() && !user.status){
 	      return res.send(401,"Votre compte est désactivé");
 	    }
      

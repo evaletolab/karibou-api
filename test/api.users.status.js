@@ -7,7 +7,7 @@ var should = require("should");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
-describe("api.users.valid", function(){
+describe("api.users.status", function(){
   var request= require('supertest');
   var _=require('underscore');
 
@@ -38,7 +38,7 @@ describe("api.users.valid", function(){
     request(app)
       .post('/login')
       .send({ email: "evaleto@gmail.com", password:'password', provider:'local' })
-      .end(function(err,res){
+      .end(function(err,res){        
         res.should.have.status(200);
         cookie = res.headers['set-cookie'];
         done();        
@@ -93,19 +93,20 @@ describe("api.users.valid", function(){
         res.should.have.status(200);
         done();        
       });
-    });
+  });
   
-  it('shops.post status false /v1/shops should return 200 ',function(done){
+  it('shops.post status FALSE /v1/shops/:id/status should return 200 ',function(done){
     request(app)
       .post('/v1/shops/un-autre-shop/status')
       .set('cookie', cookie)
       .send({status:false})
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.status.should.equal(false)
+        res.body.status.should.not.equal(true)
+        //res.body.status.should.be.an.instanceOf(Date)
         done();        
       });
-    });
+  });
 
   it('shops.list anonymous /v1/shops should return 200 (0 shops)',function(done){
     request(app)
@@ -115,8 +116,51 @@ describe("api.users.valid", function(){
         res.body.length.should.equal(0)        
         done();        
       });
-    });
+  });
 
+  it('shops.post status TRUE /v1/shops/:id/status should return 200 ',function(done){
+    request(app)
+      .post('/v1/shops/un-autre-shop/status')
+      .set('cookie', cookie)
+      .send({status:true})
+      .end(function(err,res){  
+        res.should.have.status(200);
+        res.body.status.should.equal(true)
+        done();        
+      });
+  });
+
+  it('shops.list anonymous /v1/shops should return 200 (1 shops)',function(done){
+    request(app)
+      .get('/v1/shops')
+      .end(function(err,res){  
+        res.should.have.status(200);
+        res.body.length.should.equal(1)        
+        done();        
+      });
+  });
+
+  it('users.post status FALSE /v1/users/:id/status should return 200 ',function(done){
+    request(app)
+      .post('/v1/users/12345/status')
+      .set('cookie', cookie)
+      .send({status:false})
+      .end(function(err,res){  
+        res.should.have.status(200);
+        res.body.status.should.not.equal(true)
+        done();        
+      });
+  });
+
+  it('shops.list anonymous /v1/shops should return 200 (0 shops)',function(done){
+    request(app)
+      .get('/v1/shops')
+      .end(function(err,res){  
+        res.should.have.status(200);
+        res.body.length.should.equal(0)        
+        done();        
+      });
+  });
 
   it.skip('shops.list admin /v1/shops should return 200 (3 shops)',function(done){
     request(app)

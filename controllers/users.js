@@ -177,13 +177,13 @@ exports.status=function(req,res){
 
   try{
     check(req.params.id).isInt();
-    if(!req.body.valid)throw new Error("Invalid request");;
+    if(req.body.status===undefined)throw new Error("Invalid request");;
   }catch(err){
     return res.send(400, err.message);
   }  
       
   
-  db.model('Users').updateStatus({id:req.params.id},req.body.valid,function(err,user){
+  db.model('Users').updateStatus({id:req.params.id},req.body.status,function(err,user){
     if (err){
       return res.json(400,err);    
     }

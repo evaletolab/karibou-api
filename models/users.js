@@ -80,7 +80,7 @@ var extend      = require( 'node.extend' );
     invoices : [{type: Schema.Types.ObjectId, ref : 'Invoice'}],
     
     /* make user valid/invalid */
-    valid:{type:Boolean, default: true},
+    status:{type:Boolean, default: true},
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
@@ -299,7 +299,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 	});
 };
 
-UserSchema.statics.updateStatus=function(id, valid,callback){
+UserSchema.statics.updateStatus=function(id, status,callback){
 	var Users=this.model('Users');	
 
   return Users.findOne(id).populate('shops').exec(function (err, user) {
@@ -309,17 +309,17 @@ UserSchema.statics.updateStatus=function(id, valid,callback){
     if(!user){
       return callback("Utilisateur inconnu");
     }
-    user.valid=valid;
+    user.status=status;
     
     user.save(function (err) {
       //
       // update all shops
       require('async').forEach(user.shops, function(shop,cb){
-          shop.updateStatus(valid,function(err){
+          shop.updateStatus(status,function(err){
             cb(err)
           });        
       },function(err){
-        callback(err);
+        callback(err,user);
       });    
     });
   
@@ -357,7 +357,7 @@ UserSchema.statics.update=function(id, u,callback){
     //
     // DO NOT update the validation here
     // ONLY ADMIN CAN DO THAT
-    if(u.valid!=user.valid){
+    if(u.status!=user.status){
     }
     
     user.save(function (err) {

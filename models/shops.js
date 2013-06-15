@@ -147,7 +147,7 @@ Shops.methods.updateStatus=function(valid,callback){
   //
   // 
   if(valid!==true){
-    this.status=Date.now;
+    this.status=Date.now();
     return this.save(callback)
   }
   

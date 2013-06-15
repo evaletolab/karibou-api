@@ -158,6 +158,30 @@ exports.get=function (req, res) {
   });
 };
 
+exports.status=function(req,res){
+
+  try{
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    if(req.body.status===undefined)throw new Error("Invalid request");;
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+      
+  
+  db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){  
+    if (err){
+      return res.json(400,err);    
+    }
+    if(!shop){
+      return res.json(400,"Cannot find the shop");    
+    }
+    shop.updateStatus(req.body.status,function(err){
+      return res.json(shop);  
+    })
+  });
+
+};
+
 exports.update=function(req,res){
   //
   // check && validate input field

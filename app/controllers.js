@@ -86,7 +86,7 @@ module.exports = function(app) {
 
   app.post('/v1/shops', auth.ensureAuthenticated, auth.ensureUserValid, shops.ensureShopLimit, shops.create);
   app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
-  app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
+  app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.status);
     
   app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, products.create);
 

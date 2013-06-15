@@ -2,7 +2,7 @@ var ObjectId = require('mongodb').BSONNative.ObjectID;
 
 var Users=exports.Users=[{
     _id : ObjectId('515ec12e56a8d5961e000444'), 
-    valid:true,
+    status:true,
     addresses : [], 
     created : new Date("2013-03-27T17:07:34.201Z"), 
     id : 12345, 
@@ -22,7 +22,7 @@ var Users=exports.Users=[{
     password:'password'
   },{
     _id : new ObjectId(), 
-    valid:true,
+    status:true,
     addresses : [], 
     created : new Date("2013-03-27T17:07:34.201Z"), 
     id : 12346, 
@@ -41,7 +41,7 @@ var Users=exports.Users=[{
     password:'password'
   },{
     _id : new ObjectId(), 
-    valid:true,
+    status:true,
     addresses : [], 
     created : new Date("2013-03-27T17:07:34.201Z"), 
     invoices : [], 
