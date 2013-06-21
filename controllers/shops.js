@@ -158,6 +158,55 @@ exports.get=function (req, res) {
   });
 };
 
+exports.askStatus=function(req,res){
+  try{
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){  
+    if (err){
+      return res.send(400,err);    
+    }
+    if(!shop){
+      return res.send(400,"Cette boutique n'existe pas");    
+    }
+
+    if ((typeof shop.status)==='number'){
+      // check the time elapsed from the last askStatus
+      var oneday=1000*60*60*24;
+      var elapsed=Math.round((Date.now()-shop.status)/oneday);
+      // max 1 mail by month
+      if (elapsed<28)
+        return res.send(400,"Une demande d'activiation est déjà en cours");    
+    }
+    
+    shop.status=Date.now();
+    shop.save();
+    
+    var content=req.user;
+    content.shop=shop;
+    //
+    // send email
+    req.sendmail(req.user.email.address, 
+                 "Demande de publication du shop "+shop.name, 
+                 content, 
+                 "shop-status", function(err, status){
+      if(err){
+        console.log(err,status)
+        return res.send(400,err);
+      }      
+                 
+      res.json(200);                 
+    })
+    
+    
+  });
+
+}
+
 exports.status=function(req,res){
 
   try{
@@ -170,10 +219,10 @@ exports.status=function(req,res){
   
   db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){  
     if (err){
-      return res.json(400,err);    
+      return res.send(400,err);    
     }
     if(!shop){
-      return res.json(400,"Cannot find the shop");    
+      return res.send(400,"Cannot find the shop");    
     }
     shop.updateStatus(req.body.status,function(err){
       return res.json(shop);  
@@ -194,13 +243,17 @@ exports.update=function(req,res){
 
 
   //
-  // check admin or owner
-  // delegated 
+  // check for only admin updates
+  if (!req.user.isAdmin()){
+      req.body.status&&delete(req.body.status);
+  }
+  
+
   
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){
     	res.status(400);
-      return res.json(err);    
+      return res.send(err);    
     }
     return res.json(shop);  
   });
@@ -244,8 +297,7 @@ exports.list=function (req, res) {
     
     query.populate('catalog').exec(function (err,shops){
       if (err){
-      	res.status(400);
-        return res.json(err);    
+        return res.send(400,err);    
       }
       //
       // as we dont know how to group by with mongo

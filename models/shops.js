@@ -175,7 +175,6 @@ Shops.statics.update=function(id,s,callback){
     
     s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
     s.owner&&delete(s.owner);
-    s.status&&delete(s.status);
     extend(shop,s);
 
  

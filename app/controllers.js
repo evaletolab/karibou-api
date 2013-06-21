@@ -45,7 +45,7 @@ module.exports = function(app) {
   app.get ('/v1/config', api.config);
   
   //
-  // validation validation
+  // email validation
   app.get ('/v1/validate',auth.ensureAuthenticated, emails.list);
   app.post('/v1/validate/create',auth.ensureAuthenticated, emails.create);
   app.get ('/v1/validate/:uid/:email', emails.validate);
@@ -80,6 +80,7 @@ module.exports = function(app) {
   app.get('/v1/shops', shops.list);
   app.get('/v1/shops/category/:category', shops.list);
   app.get('/v1/shops/:shopname', shops.get);
+  app.get('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.askStatus);
   app.get('/v1/shops/:shopname/products', products.list);
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);

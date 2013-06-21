@@ -21,6 +21,12 @@ function check(req){
 
 exports.create=function (req, res) {
  
+  try{
+    check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 34).isEmail();    
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
 
   db.model('Emails').create(req.user, function(err,validate){
     if(err){

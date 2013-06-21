@@ -38,7 +38,7 @@ module.exports = function(app) {
               from: config.mail.from,
               to: to,
               subject: subject,
-              html: html,
+              _html: html,
               // generateTextFromHTML: true,
               text: text
             }, cb);

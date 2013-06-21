@@ -91,6 +91,7 @@ describe("api.users.status", function(){
       .set('cookie', gluck)
       .end(function(err,res){  
         res.should.have.status(200);
+        res.body.length.should.equal(1)        
         done();        
       });
   });
@@ -103,7 +104,6 @@ describe("api.users.status", function(){
       .end(function(err,res){  
         res.should.have.status(200);
         res.body.status.should.not.equal(true)
-        //res.body.status.should.be.an.instanceOf(Date)
         done();        
       });
   });
