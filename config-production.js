@@ -105,8 +105,9 @@ module.exports = {
   },
   
   mongo:{
-    name:'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/',
-    _name:'mongodb://localhost/karibou',
+    name:process.env.OPENSHIFT_MONGODB_DB_URL,
+    nametest:'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/',    
+    namecf:'mongodb://localhost/karibou',
     ensureIndex:true
   },
 
