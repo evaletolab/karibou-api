@@ -50,7 +50,7 @@ function checkParams(req){
     
     
     if(req.body.details){
-      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 128);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
       req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
       req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
       req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
@@ -103,24 +103,24 @@ exports.create=function (req, res) {
   //
   // check shop owner 
   if(!req.params.shopname){ 
-    return res.json(400,"Vous devez définir une boutique")
+    return res.send(400,"Vous devez définir une boutique")
   }
   Shops.findByUser({id:req.user.id},function (err,shops){
     if (err){
-      return res.json(400, err);    
+      return res.send(400, err);    
     }
     
 
     var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     if (!s){
-      return res.json(400, "Vous devez utiliser une boutique qui vous appartient");    
+      return res.send(400, "Vous devez utiliser une boutique qui vous appartient");    
     }
 
     //
     // ready to create one product
     Products.create(req.body,s, function(err,product){
         if(err){
-          return res.json(400, err);    
+          return res.send(400, err);    
         }
         res.json(product);            
     });
@@ -151,15 +151,24 @@ exports.list=function (req, res) {
   // check inputs
   
   try{
-
+    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").is(/^[a-z0-9-]+$/)
+    req.params.shopname&&check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).is(/^[a-z0-9-]+$/);    
+    req.params.details&&check(req.params.details, "Le format des détails n'est pas valide").len(1, 34).is(/^[a-z0-9-+.]+$/);    
   }catch(e){
-    return res.json(400,e);
+    return res.send(400,e.message);
+  }
+  var query=_.extend(req.query,req.params);
+
+  
+  if(!req.user||!req.user.isAdmin()){
+    req.query.status=true;
+    if(req.user)req.query.status=req.user.shops;
   }
   
   //
-  return Products.findByCriteria(req.params,function (err, products) {
+  return Products.findByCriteria(query,function (err, products) {
     if (err) {
-      return res.json(400,err);
+      return res.send(400,err);
     }
     //
     // as we dont know how to group by with mongo
@@ -180,10 +189,10 @@ exports.list=function (req, res) {
 exports.get=function (req, res) {
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
-      return res.json(400,err);
+      return res.send(400,err);
     }
     if(!product){
-      return res.json(400,"Ce produit n'existe pas");
+      return res.send(400,"Ce produit n'existe pas");
     }
     return res.json(product);
   });
@@ -236,7 +245,7 @@ exports.update=function (req, res) {
   delete(req.body._id);
   Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){
     if (err){
-      return res.json(400,err);    
+      return res.send(400,err);    
     }
     return res.json(product);  
   });

@@ -30,7 +30,7 @@ exports.create=function (req, res) {
 
   db.model('Emails').create(req.user, function(err,validate){
     if(err){
-      return res.json(400,err);
+      return res.send(400,err);
     }      
     
     var content=req.user;
@@ -43,7 +43,7 @@ exports.create=function (req, res) {
                  "confirm", function(err, status){
       if(err){
         console.log(err,status)
-        return res.json(400,err);
+        return res.send(400,err);
       }      
                  
       res.json(validate);                 
@@ -65,7 +65,7 @@ exports.validate=function (req, res) {
   Emails.validate(req.params.uid,req.params.email,function (err,user){
 
     if (err){
-      return res.json(400,err);    
+      return res.send(400,err);    
     }
     
 

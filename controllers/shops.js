@@ -165,7 +165,6 @@ exports.askStatus=function(req,res){
   }catch(err){
     return res.send(400, err.message);
   }  
-
   db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){  
     if (err){
       return res.send(400,err);    
@@ -173,12 +172,12 @@ exports.askStatus=function(req,res){
     if(!shop){
       return res.send(400,"Cette boutique n'existe pas");    
     }
-
     if ((typeof shop.status)==='number'){
       // check the time elapsed from the last askStatus
       var oneday=1000*60*60*24;
       var elapsed=Math.round((Date.now()-shop.status)/oneday);
       // max 1 mail by month
+      console.log(elapsed,Date.now(),shop.status, Date.now()-shop.status,oneday)
       if (elapsed<28)
         return res.send(400,"Une demande d'activiation est déjà en cours");    
     }
@@ -188,9 +187,10 @@ exports.askStatus=function(req,res){
     
     var content=req.user;
     content.shop=shop;
+    console.log(config.mail.to)
     //
     // send email
-    req.sendmail(req.user.email.address, 
+    req.sendmail(config.mail.to, 
                  "Demande de publication du shop "+shop.name, 
                  content, 
                  "shop-status", function(err, status){
@@ -288,11 +288,13 @@ exports.list=function (req, res) {
     //
     //FILTER only visible shop are available: 
     //       if (req.user._id == shop.owner || shop.status==true)
-    var filter=[{'status':true}];
-    if(req.user){
-      filter.push({'owner':req.user._id});
-    }    
-    query=query.or(filter);
+    if(!req.user||!req.user.isAdmin()){
+      var filter=[{'status':true}];
+      if(req.user){
+        filter.push({'owner':req.user._id});
+      }    
+      query=query.or(filter);
+    }
     
     
     query.populate('catalog').exec(function (err,shops){

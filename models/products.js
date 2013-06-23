@@ -237,41 +237,83 @@ Product.statics.findByCriteria = function(criteria, callback){
   var Products=this.model('Products'), 
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
+      
+      
   var query=Products.find({});
+  
+
   require('async').waterfall([
     function(cb){
-      if (criteria.shopname){
-        Shops.findOne({urlpath:criteria.shopname},function(err,shop){
-          if(!shop){return cb("La boutique n'existe pas");}
-          return cb(err,shop);
+      //
+      // by available shops
+      if (criteria.status){
+        Shops.find({status:true},function(err,available){
+          if (Array.isArray(criteria.status)){
+            criteria.status.forEach(function(s){
+              available.push(s._id)
+            })            
+          }
+          return cb(err,available);
         });
       }else cb(false,false);
     },
-    function(shop, cb){
+
+    function(available, cb){
+      //
+      // by shop
+      if (criteria.shopname){
+        Shops.findOne({urlpath:criteria.shopname},function(err,shop){
+          if(!shop){return cb("La boutique n'existe pas");}
+          return cb(err,available, shop);
+        });
+      }else cb(false,available, false);
+    },
+    function(available, shop, cb){
+      //
+      // by category
       if (criteria.category){
         Categories.findOne({slug:criteria.category},function(err,category){
           if(!category){return cb("La catégorie n'existe pas");}
-          return cb(err,shop,category);
+          return cb(err,available, shop,category);
         });
-      }else cb(false,shop,false);
+      }else cb(false,available, shop,false);
     }],
-    function(err,shop, category){
+    function(err,available, shop, category){
       if(err) return callback(err);
+
+
+      //
+      // filter with shop status == true
+      if (available.length){
+        query=query.where("vendor").in(available);
+      }
+
+      //
+      // filter by Shop ID
       if(shop){
         query=query.where("vendor",shop._id);
       }  
+      //
+      // filter by Category ID
       if(category){
         query=query.where("categories",category._id);
       }  
 
+      //
+      // filter by geo location 
       if (criteria.location){
       }
+      
+      //
+      // filter by details
       if (criteria.details){
         var details=criteria.details.split(/[+,]/);
         details.forEach(function(detail){
           query=query.where("details."+detail,true);
         });        
       }
+      
+      
       if(callback){
         return query.populate('vendor').exec(callback);
       }

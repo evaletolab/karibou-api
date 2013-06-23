@@ -40,7 +40,6 @@ describe("api.products.find", function(){
   it("GET 200,/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
     request(app)
       .get("/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
-      .expect('Content-Type', /json/)
       .end(function(err, res){
         res.should.have.status(200);
         res.body.length.should.equal(1)
@@ -52,7 +51,6 @@ describe("api.products.find", function(){
   it("GET 400,/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
     request(app)
       .get("/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
-      .expect('Content-Type', /json/)
       .end(function(err, res){
         res.should.have.status(400);
         done();

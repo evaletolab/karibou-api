@@ -33,7 +33,8 @@ describe("api.products", function(){
       .expect('Content-Type', /json/)
       .end(function(err, res){
         res.should.have.status(200);
-        res.body.length.should.equal(3)
+        // 2 shops with shop.status=true, 1 shop.status=false
+        res.body.length.should.equal(2)
         done();
       });
   });

@@ -2,6 +2,10 @@ var ObjectId = require('mongodb').BSONNative.ObjectID;
 var Categories=require('./Categories');
 var data=require('./Users');
 
+// shop[0](status:true, owner:gluck)
+// shop[1](status:false, owner:gmail)
+// shop[2](status:Date.now, owner:gluck)
+
 exports.Shops=[{
     _id:ObjectId('515ec12e56a8d5961e000004'),
     status:true,

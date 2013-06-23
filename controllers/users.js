@@ -65,7 +65,7 @@ exports.recover=function(req,res){
         return res.send(400,err);    
       }
       if(!user){
-        return res.json(400,"Utilisateur inconnu");    
+        return res.send(400,"Utilisateur inconnu");    
       }
   
       //
@@ -84,7 +84,7 @@ exports.recover=function(req,res){
                      "password", function(err, status){
           if(err){
             console.log(err,status)
-            return res.json(400,err);
+            return res.send(400,err);
           }      
                      
           return res.json("Un nouveau mot de passe à été envoyé à votre adresse mail.");  
@@ -113,29 +113,29 @@ exports.password=function(req,res){
   db.model('Users').findOne({'email.address': req.body.email, id:req.params.id},
     function(err,user){
       if (err){
-        return res.json(400,err);    
+        return res.send(400,err);    
       }
       //
       // check user
       if(!user){
-        return res.json(400,stderr);    
+        return res.send(400,stderr);    
       }
       
       //
       // check password
       if(req.user.hash){user.verifyPassword(req.body.current, function(err, passwordCorrect) {
           if (err) {           
-            return res.json(400,err);    
+            return res.send(400,err);    
           }
           if (!passwordCorrect) { 
-            return res.json(400,stderr+" (2)");    
+            return res.send(400,stderr+" (2)");    
           }
           
           //
           // change the password
           user.password=req.body.new;
           user.save(function(err){
-            if(err)return res.json(400,err);    
+            if(err)return res.send(400,err);    
             return res.json({});  
           });
         });
@@ -144,7 +144,7 @@ exports.password=function(req,res){
         // set the password
         user.password=req.body.new;
         user.save(function(err){
-          if(err)return res.json(400,err);    
+          if(err)return res.send(400,err);    
           return res.json({});  
         });
       }
@@ -165,7 +165,7 @@ exports.update=function(req,res){
   
   db.model('Users').update({id:req.params.id},req.body,function(err,user){
     if (err){
-      return res.json(400,err);    
+      return res.send(400,err);    
     }
     return res.json(user);  
   });
@@ -185,7 +185,7 @@ exports.status=function(req,res){
   
   db.model('Users').updateStatus({id:req.params.id},req.body.status,function(err,user){
     if (err){
-      return res.json(400,err);    
+      return res.send(400,err);    
     }
     return res.json(user);  
   });

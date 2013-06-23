@@ -91,7 +91,7 @@ describe("api.users.status", function(){
       .set('cookie', gluck)
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(1)        
+        res.body.length.should.equal(2)        
         done();        
       });
   });

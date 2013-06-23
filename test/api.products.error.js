@@ -46,7 +46,6 @@ describe("api.products.error (with auth)", function(){
   it('GET /v1/products/1000301 should return 400',function(done){
     request(app)
       .get('/v1/products/1000301')
-      .expect('Content-Type', /json/)
       .expect(400)
       .end(function(err, res){
         if (err) throw err;
@@ -64,7 +63,6 @@ describe("api.products.error (with auth)", function(){
     delete(p._id);
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send(p)
       .end(function(err,res){
@@ -85,7 +83,6 @@ describe("api.products.error (with auth)", function(){
     p.title="Test new product";
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send(p)
       .end(function(err,res){
@@ -100,7 +97,6 @@ describe("api.products.error (with auth)", function(){
     // shop must be managed
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send({})
       .end(function(err,res){
@@ -119,7 +115,6 @@ describe("api.products.error (with auth)", function(){
     p.categories=[data.Categories[1]._id];
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send(p)
       .end(function(err,res){
@@ -138,7 +133,6 @@ describe("api.products.error (with auth)", function(){
     p.categories=[data.Categories[1]._id];
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send(p)
       .end(function(err,res){
@@ -156,7 +150,6 @@ describe("api.products.error (with auth)", function(){
     p.categories=[data.Categories[1]._id];
     request(app)
       .post('/v1/shops/un-autre-shop/products')
-      .set('Content-Type','application/json')
       .set('cookie', cookie)
       .send(p)
       .end(function(err,res){
