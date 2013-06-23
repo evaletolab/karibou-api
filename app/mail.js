@@ -34,15 +34,17 @@ module.exports = function(app) {
           if (err) {
             return cb(err);
           } else {
-            transport.sendMail({
+            var options={
               from: config.mail.from,
               to: to,
-              cc: config.mail.to,
               subject: subject,
               _html: html,
               // generateTextFromHTML: true,
               text: text
-            }, cb);
+            };
+            if (to!===config.mail.from)
+              options.cc=config.mail.from;
+            transport.sendMail(options, cb);
           }
         });
       }
