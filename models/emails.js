@@ -92,7 +92,8 @@ Emails.statics.validate=function(uid,email,callback){
     
     //
     // validate check timeout to,leave TTL
-    if (((validate.created-new Date())/1000)>config.validate.email){
+    var oneday=1000*60*60*24;
+    if (((validate.created-Date.now())/oneday)>config.mail.ttl.long){
       // remove this validation process
       validate.remove();
       return callback(("This validation url is no more avaiable (2)"));

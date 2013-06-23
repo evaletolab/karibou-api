@@ -157,11 +157,44 @@ exports.get=function (req, res) {
     return res.json(shop);  
   });
 };
+exports.email=function(req,res){
+  try{
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
+    check(req.body.content,"Le format de votre question n'est pas valide").len(3, 400);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
+    if(!req.user)throw new Error("Vous devez avoir une session ouverte");
+    //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+  
+  
+  var content={};
+  content.user=req.user;
+  content.text=req.body.content;
+  content.site=config.mail.site;
+  //
+  // send email
+  req.sendmail(config.mail.to, 
+               "Un utilisateur à une question pour votre boutique "+req.params.shopname, 
+               content, 
+               "shop-question", function(err, status){
+    if(err){
+      console.log(err,status)
+      return res.send(400,err);
+    }      
+               
+    res.json(200);                 
+  })
+    
+}
 
 exports.askStatus=function(req,res){
   try{
     check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
-    check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
+    if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
+    if(!req.user)throw new Error("Vous devez avoir une session ouverte");
+    //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -178,7 +211,7 @@ exports.askStatus=function(req,res){
       var elapsed=Math.round((Date.now()-shop.status)/oneday);
       // max 1 mail by month
       console.log(elapsed,Date.now(),shop.status, Date.now()-shop.status,oneday)
-      if (elapsed<28)
+      if (elapsed<config.mail.ttl.long)
         return res.send(400,"Une demande d'activiation est déjà en cours");    
     }
     
@@ -187,6 +220,7 @@ exports.askStatus=function(req,res){
     
     var content=req.user;
     content.shop=shop;
+    content.site=config.mail.site;
     console.log(config.mail.to)
     //
     // send email
@@ -199,7 +233,7 @@ exports.askStatus=function(req,res){
         return res.send(400,err);
       }      
                  
-      res.json(200);                 
+      res.json(200,shop);                 
     })
     
     

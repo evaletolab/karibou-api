@@ -12,7 +12,7 @@ var _ = require('underscore'),
 
 exports.ensureAuthenticated=function(req, res, next) {
 	if (!req.isAuthenticated()) { 
-      return res.send(401);	
+      return res.send(401, "Vous devez ouvrir une session");	
 	}
 	
 	//
@@ -25,6 +25,10 @@ exports.ensureAuthenticated=function(req, res, next) {
 }
 
 exports.ensureUserValid=function(req, res, next) {
+	if (!req.isAuthenticated()) { 
+      return res.send(401, "Vous devez ouvrir une session");	
+	}
+	
 	//
 	// admin user doenst depend on valid status
 	if (!req.user.isAdmin()&&!req.user.status) { 

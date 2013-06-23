@@ -77,6 +77,8 @@ module.exports = {
   mail:{
     from:'james@karibou.evaletolab.ch',
     to:'james@karibou.evaletolab.ch',
+    ttl:{long:24,short:1},
+    site:'http://lo.cal:3000',
     default:'mandril',
     mandril:{    
       host:'smtp.mandrillapp.com',
@@ -101,12 +103,6 @@ module.exports = {
     'view engine': 'jade'
   },
   
- /**
-  * Time to validate an email
-  */
-  validate:{
-    email:60*60*24*2
-  },
   
   
   // TODO load by env  

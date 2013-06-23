@@ -1,6 +1,10 @@
 var ObjectId = require('mongodb').BSONNative.ObjectID;
 var data=require('./Categories.js');
 
+// 2products ->shop[0](un-autre-shop, id:0004, status:true, owner:gluck)
+// 1product  ->shop[1](mon-shop, id:0005, status:false, owner:gmail)
+// 0product  ->shop[2](invalid-shop, id:0006, status:Date.now, owner:gluck)
+
 exports.Products=[{
     _id : new ObjectId(), 
      sku:1000001,
@@ -25,6 +29,7 @@ exports.Products=[{
         discount:3.0,
      },
      categories: [data.Categories[1]._id,data.Categories[2]._id],
+     //un-autre-shop, id:0004, status:true, owner:gluck
      vendor:'515ec12e56a8d5961e000004'     
   },{
     _id : new ObjectId(), 
@@ -49,6 +54,7 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: [data.Categories[3]._id],
+     //un-autre-shop, id:0004, status:true, owner:gluck
      vendor:'515ec12e56a8d5961e000004'
   },{
     _id : new ObjectId(), 
@@ -73,6 +79,7 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: [data.Categories[2]._id,data.Categories[3]._id],
+     //mon-shop, id:0005, status:false, owner:gmail
      vendor:'515ec12e56a8d5961e000005'
   }
 ];

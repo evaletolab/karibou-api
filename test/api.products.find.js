@@ -41,6 +41,7 @@ describe("api.products.find", function(){
     request(app)
       .get("/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
       .end(function(err, res){
+        //console.log(res.text)
         res.should.have.status(200);
         res.body.length.should.equal(1)
         res.body[0].sku.should.equal(1000002);

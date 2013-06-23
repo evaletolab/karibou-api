@@ -77,6 +77,8 @@ module.exports = {
   mail:{
     from:'james@karibou.evaletolab.ch',
     to:'james@karibou.evaletolab.ch',
+    ttl:{long:24,short:1},
+    site:'http://karibou.evaletolab.ch',
     default:'mandril',
     mandril:{    
       host:'smtp.mandrillapp.com',

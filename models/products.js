@@ -242,6 +242,8 @@ Product.statics.findByCriteria = function(criteria, callback){
   var query=Products.find({});
   
 
+  //console.log(criteria)
+  
   require('async').waterfall([
     function(cb){
       //
@@ -261,7 +263,7 @@ Product.statics.findByCriteria = function(criteria, callback){
     function(available, cb){
       //
       // by shop
-      if (criteria.shopname){
+      if (criteria.shopname){        
         Shops.findOne({urlpath:criteria.shopname},function(err,shop){
           if(!shop){return cb("La boutique n'existe pas");}
           return cb(err,available, shop);
@@ -283,16 +285,31 @@ Product.statics.findByCriteria = function(criteria, callback){
 
 
       //
-      // filter with shop status == true
-      if (available.length){
+      // !shop && available
+      if (available &&!shop){
         query=query.where("vendor").in(available);
-      }
+      }else
 
       //
-      // filter by Shop ID
-      if(shop){
+      // shop && !available
+      if(shop&&!available){
         query=query.where("vendor",shop._id);
-      }  
+      }else
+      
+      //
+      // shop && available && available.find(shop._id)
+      if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s._id)}))){        
+        query=query.where("vendor",shop._id);
+      }else 
+      
+      //
+      // shop && available && !available.find(shop._id)
+      if(shop&&available){
+        return query.where("status",'abcd01234').exec(callback);
+        //return callback(false,[])
+      }
+      
+
       //
       // filter by Category ID
       if(category){

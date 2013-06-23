@@ -207,6 +207,7 @@ Shops.statics.findOneShop=function(s,callback){
     });
 };
 
+
 Shops.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Shops', Shops);
 
