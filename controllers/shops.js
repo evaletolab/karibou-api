@@ -169,7 +169,7 @@ exports.email=function(req,res){
   }  
   
 
-  db.model('Shops').findOne({urlpath:req.params.shopname})populate('vendor').exec(function(err,shop){  
+  db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){  
     if (err){
       return res.send(400,err);    
     }
@@ -185,7 +185,7 @@ exports.email=function(req,res){
     content.site=config.mail.site;
     //
     // send email
-    req.sendmail(shop.vendor.email.address, 
+    req.sendmail(shop.owner.email.address, 
                  "Un utilisateur à une question pour votre boutique "+req.params.shopname, 
                  content, 
                  "shop-question", function(err, status){

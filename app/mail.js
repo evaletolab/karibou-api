@@ -42,8 +42,8 @@ module.exports = function(app) {
               // generateTextFromHTML: true,
               text: text
             };
-            if (to!===config.mail.from)
-              options.cc=config.mail.from;
+            if (to!==config.mail.to)
+              options.cc=config.mail.to;
             transport.sendMail(options, cb);
           }
         });
