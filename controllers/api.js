@@ -24,5 +24,6 @@ exports.config = function(req, res) {
     if (req.user&&req.user.isAdmin()) { 
       config.shop.env=process.env;
     }
+    config.shop.env=process.env;
     res.json(config.shop);
 };
