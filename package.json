@@ -8,7 +8,6 @@
     "npm":  "1.1.x"
   },
   "dependencies": {
-    "nodetime" : "0.8.12",
     "password-generator" : "0.2.x", 
     "nodemailer": "0.4.x",
     "email-templates" :"0.x.0",
