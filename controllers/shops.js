@@ -168,24 +168,36 @@ exports.email=function(req,res){
     return res.send(400, err.message);
   }  
   
-  
-  var content={};
-  content.user=req.user;
-  content.text=req.body.content;
-  content.site=config.mail.site;
-  //
-  // send email
-  req.sendmail(config.mail.to, 
-               "Un utilisateur à une question pour votre boutique "+req.params.shopname, 
-               content, 
-               "shop-question", function(err, status){
-    if(err){
-      console.log(err,status)
-      return res.send(400,err);
-    }      
-               
-    res.json(200);                 
-  })
+
+  db.model('Shops').findOne({urlpath:req.params.shopname})populate('vendor').exec(function(err,shop){  
+    if (err){
+      return res.send(400,err);    
+    }
+    if(!shop){
+      return res.send(400,"Cette boutique n'existe pas");    
+    }
+
+    //
+    // 
+    var content={};
+    content.user=req.user;
+    content.text=req.body.content;
+    content.site=config.mail.site;
+    //
+    // send email
+    req.sendmail(shop.vendor.email.address, 
+                 "Un utilisateur à une question pour votre boutique "+req.params.shopname, 
+                 content, 
+                 "shop-question", function(err, status){
+      if(err){
+        console.log(err,status)
+        return res.send(400,err);
+      }      
+                 
+      res.json(200);                 
+    })
+    
+  });  
     
 }
 

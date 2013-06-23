@@ -37,6 +37,7 @@ module.exports = function(app) {
             transport.sendMail({
               from: config.mail.from,
               to: to,
+              cc: config.mail.to,
               subject: subject,
               _html: html,
               // generateTextFromHTML: true,
