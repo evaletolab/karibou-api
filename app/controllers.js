@@ -33,7 +33,7 @@ module.exports = function(app) {
   app.post('/v1/users/:id', users.ensureMe,users.update);
   app.post('/v1/users/:id/status', auth.ensureAdmin,users.status);
   app.post('/v1/users/:id/password',users.ensureMe, users.password);
-  app.post('/v1/recover/token/:email/password', users.recover);
+  app.post('/v1/recover/:token/:email/password', users.recover);
   
 	//
 	// home
