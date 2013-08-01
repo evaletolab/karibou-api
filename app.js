@@ -8,6 +8,9 @@
 // http://stackoverflow.com/questions/6331776/accessing-express-js-req-or-session-from-jade-template
 // http://stackoverflow.com/questions/11580796/migrating-express-js-2-to-3-specifically-app-dynamichelpers-to-app-locals-use
 
+//
+// start newrelic logs here
+require('newrelic');
 
 //var pkgname = require('./package').name;
 
