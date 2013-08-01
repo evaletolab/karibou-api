@@ -52,6 +52,9 @@ if (config.redis){
 	app.redis = app.redisCreateClient();
 }
 
+//
+// enable JSONP
+server.enable("jsonp callback");
 
 
 for (var name in config.express) {
