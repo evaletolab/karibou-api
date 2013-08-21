@@ -27,7 +27,7 @@
     "debug": "0.x",
     "jade": "0.x",
     "newrelic": "0.9.x",
-    "nodetime": "0.8.x"
+    "nodetime": "0.x.x"
   },
   "devDependencies" : {
     "mocha": "1.x",
