@@ -99,13 +99,14 @@ module.exports = {
   },
   
   express: {
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 8080,
     views: PATH('views'),
     'view engine': 'jade'
   },
   
   mongo:{
-    name:process.env.OPENSHIFT_MONGODB_DB_URL,
+    name:'mongodb://nodejitsu_evaleto:k36eqvl8rjh7mvij6675n2cmqf@ds039267.mongolab.com:39267/nodejitsu_evaleto_nodejitsudb6170858328',
+    name_openshift:process.env.OPENSHIFT_MONGODB_DB_URL,
     nametest:'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/',    
     namecf:'mongodb://localhost/karibou',
     ensureIndex:true
