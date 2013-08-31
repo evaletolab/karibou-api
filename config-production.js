@@ -105,7 +105,8 @@ module.exports = {
   },
   
   mongo:{
-    name:'mongodb://karibou-api:1k_karibou-api@ds043158.mongolab.com:43158/af_karibou-api-evaleto',
+    name:process.env.MONGOLAB_URI,
+    nameaf:'mongodb://karibou-api:1k_karibou-api@ds043158.mongolab.com:43158/af_karibou-api-evaleto',
     namejitsu:'mongodb://nodejitsu_evaleto:k36eqvl8rjh7mvij6675n2cmqf@ds039267.mongolab.com:39267/nodejitsu_evaleto_nodejitsudb6170858328',
     name_openshift:process.env.OPENSHIFT_MONGODB_DB_URL,
     nametest:'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/',    
