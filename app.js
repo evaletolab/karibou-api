@@ -40,7 +40,9 @@ if (process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT){
     port=process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT;
 }
 
-
+if (process.env.VCAP_APP_PORT){
+  port=process.env.VCAP_APP_PORT;
+}
 /**
  *  Setup termination handlers (for exit and a list of signals).
  */

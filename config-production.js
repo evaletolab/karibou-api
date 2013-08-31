@@ -99,7 +99,7 @@ module.exports = {
   },
   
   express: {
-    port: process.env.PORT || 8080,
+    port: process.env.PORT || 3000,
     views: PATH('views'),
     'view engine': 'jade'
   },
