@@ -136,16 +136,18 @@ module.exports = function(app, express) {
 	// connect to Mongo when the app initializes
 	mongoose.connect(config.mongo.name,function(e){  
 	    //double check for database drop
+	    console.log("db :",mongoose.connection.db.databaseName)
+	    console.log("db name:",config.mongo.name)
+	    console.log("db env:",process.env.NODE_ENV)
+	    //config.shop.status={db:mongoose.connection.db.databaseName};
+	    
+
     	if(config.dropdb && process.env.NODE_ENV==='test'){
     	  mongoose.connection.db.dropDatabase(function(err,done){
     	  });
     	}
 	});
 
-  // Check connection to mongoDB
-  mongoose.connection.on('open', function() {
-    //debug('We have connected to mongodb');
-  });
 
 	if(config.auth.twit){
     app.get('/auth/twitter', passport.authenticate('twitter'));
