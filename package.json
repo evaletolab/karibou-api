@@ -1,7 +1,7 @@
 {
   "name": "karibou-api",
   "description": "commerce api test app",
-  "version": "0.0.2-5",
+  "version": "0.0.2-6",
   "private": true,
   "engines": {
     "node": "0.10.x",
