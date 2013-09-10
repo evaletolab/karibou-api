@@ -13,9 +13,11 @@ var Categories = new Schema({
     name: {type:String, unique:true, index:true},
     slug: {type:String, unique:true, index:true},
     description:{type:String, unique:false},
+    weight:{type:Number, min:0},
     group:{type:String, unique:false},
     image:{type:String, unique:false},
     color:{type:String, unique:false},    
+    weight:{type:Number, min:0},    
     type:{type:String, unique:false, default:"Category",enum:config.shop.category.types}
 });
 

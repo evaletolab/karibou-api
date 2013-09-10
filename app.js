@@ -12,18 +12,17 @@
 // start newrelic logs here
 //require('newrelic');
 
-//var pkgname = require('./package').name;
-
-var nodetime=require('nodetime').profile({
-    accountKey:'f39e0560aedf625a03b0b06dbcb015907c1a3736', 
-    appName: 'Karibou'
-});
+if(process.env.NODETIME_KEY){
+  var nodetime=require('nodetime').profile({
+      accountKey:process.env.NODETIME_KEY, 
+      appName: process.env.NODETIME_APP
+  });
+}
   
 var debug = require('debug')('app');
 var app = require('./app/index');
 
-// update the db if necessary
-//require('./app/db.maintain').update();
+
 
 var port = (process.env.VMC_APP_PORT || process.env.C9_PORT || config.express.port);
 var host = (process.env.VMC_APP_HOST || 'localhost');

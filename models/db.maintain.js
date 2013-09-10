@@ -5,7 +5,7 @@ var mongoose = require('mongoose')
 
 
 var DbMaintain = new Schema({
-	version: { type: Number, required: false},
+	version: { type: Number, required: false, unique:true},
   log: { type: String, required: false},
   date: {type:Date, default: Date.now}
 });
@@ -36,5 +36,5 @@ DbMaintain.statics.findLatestVersion = function(callback){
     });
 };
 
-
+DbMaintain.set('autoIndex', config.mongo.ensureIndex);
 module.exports = mongoose.model('DbMaintain', DbMaintain);

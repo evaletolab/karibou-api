@@ -1,4 +1,4 @@
-exports.execute = function(callback){
+exports.execute = function(mongo, callback){
 	console.log("execute dummy-script 0001");
 	return callback(null, "0001 was done");
 }

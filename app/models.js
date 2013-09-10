@@ -5,7 +5,7 @@ module.exports = function(app, express) {
 	// Module dependencies
 	var mongoose = require('mongoose');
 	var	Schema = mongoose.Schema;
-  var mongoStore = require('connect-mongodb');
+
   
 	// dependencies for authentication
 	var passport = require('passport'),

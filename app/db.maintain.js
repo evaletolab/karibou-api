@@ -24,46 +24,57 @@ var async     = require("async");
  */
 
 
-exports.update = function(app){
-	// get async list of scripts
-	var mongo_scripts = fs.readdirSync('./db_maintain');
+exports.update = function(db, callback){
+	// get sync list of scripts
+	var scripts = fs.readdirSync('./db_maintain');
 
 	var versionDone;
 
-			// current version in db
-			DbMaintain.findLatestVersion(function(err, ver){
-			versionDone = ver;
 
-			mongo_scripts.forEach(function(script, callback){
-				// version of the script
-				var versionScript = parseInt(script.match(new RegExp(/.+_(\d+).+/))[1]);
 
-					// update if there are more recent scripts
-					if(versionDone < versionScript){
-						versionDone ++;
+	// current version in db
+	DbMaintain.findLatestVersion(function(err, ver){
+	
+	  if(err){
+	    return callback(err);
+	  }
+		versionDone = ver;
+    var logs=[];		
 
-						async.waterfall([
-						function(cb){			
-							// execute the scripts in db_maintain
-							require('../db_maintain/' + script).execute(function(err, log){							
-								return cb(err, log);
-							})
-						},
-						function(logMessage, cb){
-							// save script-info in db
-							DbMaintain.save({version: versionScript, log: logMessage}, function(err, log){
-								return cb(err, log);
-							})
-						},
-						],
-						function(cb){
-							return cb;
-						});
-					}
-					return callback;
-				});
-				return err, ver;
-			});
+
+    require('async').forEach(scripts, function(script, eachcb){
+		  //
+		  // get version of the script
+		  var versionScript = parseInt(script.match(new RegExp(/.+_(\d+).+/))[1]);
+
+      //
+			// continue if there are no more recent scripts
+			if(versionDone >= versionScript){
+        console.log("skeeping script ", script)
+			  return eachcb();
+			}
+			versionDone++;
+      console.log("loading script ", script)
+      
+      
+	    require('../db_maintain/' + script).execute(db, function(err, log){							
+	      //
+        // not save on error		    
+	      if(err){
+	        return eachcb(err);				        
+	      }
+		    // save script-info in db
+		    DbMaintain.save({version: versionScript, log: log}, function(err, log){
+          logs.push(log);
+          eachcb(err);				        
+		    });
+	    });
+    
+    },function(err){
+      callback(err, logs);
+    });        
+    
+	});
 
 };
 
