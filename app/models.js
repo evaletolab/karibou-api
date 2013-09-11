@@ -73,6 +73,12 @@ module.exports = function(app, express) {
 	// deserialize user on logout
 	passport.deserializeUser(function(id, done) {
 		Users.findById(id).populate('shops').exec(function (err, user) {
+      if(!user){
+        //session invalidate
+        //https://github.com/jaredhanson/passport/issues/6
+        return done(null,false);        
+      }
+
 		  //
 		  // don't serialise the private hash, but confirm the password existance
 		  if (user.hash) {
