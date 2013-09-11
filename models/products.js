@@ -62,9 +62,11 @@ var Product = new Schema({
       discount:{type:Number, min:0, requiered:true},
    },
 
-   photo: {
-     url:{type:String}
-   },
+   photo:{type:String},
+
+//   photo: {
+//     url:{type:String}
+//   },
    created: { type: Date, default: Date.now },
 
    // Relations  (manufacturer should NOT BE MANDATORY)
@@ -334,7 +336,10 @@ Product.statics.findByCriteria = function(criteria, callback){
       
       
       if(callback){
-        return query.populate('vendor').exec(callback);
+        //.populate({path:'categories',select:'weight name'})
+        return query.populate('vendor')
+               .populate('categories')
+               .populate({path:'categories',select:'weight name'}).exec(callback);
       }
     }
   );

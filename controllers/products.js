@@ -167,19 +167,49 @@ exports.list=function (req, res) {
   
   //
   return Products.findByCriteria(query,function (err, products) {
+    var results=products;
     if (err) {
       return res.send(400,err);
     }
+    
     //
-    // as we dont know how to group by with mongo
-    if (req.query.group){
-      grouped=_.groupBy(products,function(product){
-        return product.categories.length&&product.categories[0];
+    // sort=categories.weight
+    // as we dont know how to sort cross-documents with mongo
+    if (req.query.sort){    
+      var sort=req.query.sort.split('.'); 
+      //console.log(req.query.sort, sort)
+      results=_.sortBy(results,function(product){
+          if(sort.length==1){
+            return product[sort[0]];
+          }else if(sort.length==2){
+            if(Array.isArray(product[sort[0]]))
+              return product[sort[0]][0][sort[1]];
+            return product[sort[0]][sort[1]];
+          }else if(sort.length==3){
+            return product[sort[0]][sort[1]][sort[2]];
+          }
       });
-      return res.json(grouped);
+    }
+
+    //
+    // group=categories.name
+    // as we dont know how to group cross-documents with mongo
+    if (req.query.group){   
+      var group=req.query.group.split('.'); 
+      results=_.groupBy(results,function(product){
+          if(group.length==1){
+            return product[group[0]];
+          }else if(group.length==2){
+            if(Array.isArray(product[group[0]]))
+              return product[group[0]][0][group[1]];
+            return product[group[0]][group[1]];            
+          }else if(group.length==3){
+            return product[group[0]][group[1]][group[2]];
+          }
+      });
     }
     
-    return res.json(products);
+    return res.json(results);
   });
 };
 

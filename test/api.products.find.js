@@ -71,10 +71,8 @@ describe("api.products.find", function(){
         done();
       });
 
-
   });
   
-
   
 });
 
