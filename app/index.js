@@ -54,7 +54,7 @@ if (config.redis){
 
 //
 // enable JSONP
-app.enable("jsonp callback");
+//app.enable("jsonp callback");
 
 
 for (var name in config.express) {
@@ -82,7 +82,8 @@ var CORS = function(req, res, next) {
 // config
 // TODO check error handling options http://expressjs.com/guide.html#error-handling
 app.configure(function () {
-  app.use(express.bodyParser());
+  app.use(express.urlencoded())
+  app.use(express.json())
   app.use(express.methodOverride());
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
   

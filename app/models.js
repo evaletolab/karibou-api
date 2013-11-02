@@ -4,6 +4,7 @@ module.exports = function(app, express) {
 
 	// Module dependencies
 	var mongoose = require('mongoose');
+		
 	var	Schema = mongoose.Schema;
 
   
@@ -54,6 +55,7 @@ module.exports = function(app, express) {
 		},
 		function(email, password, done) {
 		  if(isNaN(email)){
+		  
 		  }
 		  
 		  Users.authenticate(email, password, function(err, user) {
@@ -65,8 +67,7 @@ module.exports = function(app, express) {
 	));
 		    
 	// serialize user on login
-	passport.serializeUser(function(user, done) {
-	  
+	passport.serializeUser(function(user, done) {	  
 		done(null, user._id);
 	});
 
@@ -100,41 +101,63 @@ module.exports = function(app, express) {
 		});
 	});
 	
-	function SSO(req, res, next){
-	  next();
-	}
-	
+
 	//
 	// manaing session
 	// http://stackoverflow.com/questions/8749907/what-is-a-good-session-store-for-a-single-host-node-js-production-app
 	app.configure(function () {
 	  
+	  //app.use(express.session({ secret: 'keyboard cat' }));
+
+    //
+    // cookie session
+    
 	  app.use(express.cookieSession({
       secret: config.middleware.session.secret,
       cookie: config.middleware.cookie
     }));
-/**		
+    
+    //
+    // persistent session between server restart
+    /*
+  	// persistent sessions
+	  // https://github.com/kcbanner/connect-mongo
+	  var MongoStore = require('connect-mongo')(express);
+
     app.use(express.session({
-        store: mongoStore(config.mongo)
-      , secret: config.session.secret
-      }, function() {
-        app.use(app.router);
+        secret:config.middleware.session.secret,
+        maxAge: new Date(Date.now() + 3600000),
+        store: new MongoStore(
+            {
+              url:config.mongo.name,
+              collection:'sessions'
+            },
+            function(err){
+                console.log(err || 'connect-mongodb setup ok');
+            })
     }));
-**/
+    */
+    //  exposing data
+    // https://github.com/yahoo/express-state
+	  app.use(function(req,res,next){
+	    //console.log("1-isAuthenticated", req.isAuthenticated(),req.session.passport)
+	    return next();
+    });
+    
 		app.use(passport.initialize());
 		app.use(passport.session());  
 	  app.use(function(req,res,next){
+	    //console.log("2-isAuthenticated", req._passport, req.session.passport)
       if( req.method.toLowerCase() !== "get" ) {
         return next();
       }
 	    
 	    //
 	    // simple checker that should be replaced by an API-KEY
-	    var d=moment().format('DDMMYYYYHH');
-	    res.header('X-token', new Buffer(d+'kb').toString('base64'));
-	    next();
+	    //var d=moment().format('DDMMYYYYHH');
+	    //res.header('X-token', new Buffer(d+'kb').toString('base64'));
+	    return next();
 	  })
-		
 		app.use(app.router);
 		
 	});
@@ -160,6 +183,8 @@ module.exports = function(app, express) {
     app.get('/auth/twitter/callback', 
       passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' })
     );
+    
+    
 /**
  This is usefull for debug twitter auth
     app.get('/auth/twitter/callback', function(req, res, next) {
