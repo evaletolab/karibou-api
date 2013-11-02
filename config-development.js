@@ -162,7 +162,7 @@ module.exports = {
        *              (via "x-forwarded-proto")
       */
 
-  		secret:'cp3a2v0elt955h9uqhgmskplhg85ljjm',
+  		secret:'cp3a2v0elt955h8uqhgmskplhg85ljjm',
       key: 'sid',
       cookie: {
         path: '/',
