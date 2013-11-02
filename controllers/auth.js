@@ -82,13 +82,14 @@ exports.login_post=function(req, res, next) {
   
   //res.json({info:"hello"});
   passport.authenticate('local', function(err, user, info) {
-     if (err) { 
-       return res.send(400,err); 
-     }
-     if (!user) { 
-       info=(info)?info:'Bad user credential';
-       return res.send(400,info); 
-     }
+
+      if (err) { 
+        return res.send(400,err); 
+      }
+      if (!user) { 
+        info=(info)?info:"Ooops, votre compte n'exist pas";
+        return res.send(400,info); 
+      }
 
       // CUSTOM USER CONTENT
 		  //
@@ -110,12 +111,13 @@ exports.login_post=function(req, res, next) {
 	    if (!user.isAdmin() && !user.status){
 	      return res.send(401,"Votre compte est désactivé");
 	    }
-     
-     
-     req.logIn(user, function(err) {
-       if (err) { return res.send(403,err); }
-       return res.json(req.user);
-     });
+      
+      req.logIn(user, function(err) {
+ 	      //console.log("login ------------ isAuthenticated", req.isAuthenticated(), req.session)
+
+        if (err) { return res.send(403,err); }
+        return res.json(req.user);
+      });
 
    })(req, res, next);
 
@@ -123,10 +125,6 @@ exports.login_post=function(req, res, next) {
 
 
 exports.login= function(req, res) {
-    //return res.json(req.user);
-    //db.model('Users').findOne({ id: req.param('email').hash() }).populate('shops').exec(function(err,user){
-    //  res.json([err,user]);
-    //});
     res.render('login');
 };
 
