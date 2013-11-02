@@ -1,5 +1,5 @@
 
-var app = require("../app/index");
+var app = require("../app");
 var db      = require("mongoose");
 var should  = require("should");
 

@@ -57,10 +57,5 @@ module.exports = function(app) {
     }
   }
 
-  app.configure(function() {
-    app.use(function(req, res, next){
-        req.sendmail=sendmail;
-      next();
-    });
-  });
+  return sendmail;
 }

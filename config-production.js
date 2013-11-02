@@ -101,7 +101,8 @@ module.exports = {
   express: {
     port: process.env.PORT || 3000,
     views: PATH('views'),
-    'view engine': 'jade'
+    'view engine': 'jade',
+    mongoSession:true
   },
   
   mongo:{
@@ -148,6 +149,7 @@ module.exports = {
 
 	// TODO auto load middleware?
   middleware: {
+    showStackError: true,
     responseTime: true,
 
     favicon: PATH('static/favicon.ico'),

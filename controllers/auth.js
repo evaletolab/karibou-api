@@ -87,7 +87,7 @@ exports.login_post=function(req, res, next) {
         return res.send(400,err); 
       }
       if (!user) { 
-        info=(info)?info:"Ooops, votre compte n'exist pas";
+        info="Votre compte n'exist pas";
         return res.send(400,info); 
       }
 
@@ -113,8 +113,6 @@ exports.login_post=function(req, res, next) {
 	    }
       
       req.logIn(user, function(err) {
- 	      //console.log("login ------------ isAuthenticated", req.isAuthenticated(), req.session)
-
         if (err) { return res.send(403,err); }
         return res.json(req.user);
       });

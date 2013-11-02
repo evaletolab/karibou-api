@@ -1,5 +1,5 @@
 // Use a different DB for tests
-var app = require("../app/index");
+var app = require("../app");
 
 
 var db = require('mongoose');
@@ -141,7 +141,7 @@ describe("api.validate", function(){
     request(app)
       .get('/v1/validate/'+uid+'/evaleto@gluck.com')
       .end(function(err,res){
-        res.should.have.status(200);
+        res.should.have.status(200);        
         done()
       });
   });

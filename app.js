@@ -18,30 +18,69 @@ if(process.env.NODETIME_KEY){
       appName: process.env.NODETIME_APP
   });
 }
+
+//
+// load env
+var express = require('express')
+  , fs = require('fs')
+  , passport = require('passport')
+
+  , env = process.env.NODE_ENV || 'development'
+  , config = require('./app/config')
+  , mongoose = require('mongoose')
+
+
+//
+// open database
+mongoose.connect(config.mongo.name,function(e){  
+    //double check for database drop
+    console.log("db :",mongoose.connection.db.databaseName)
+    console.log("db name:",config.mongo.name)
+    console.log("db env:",process.env.NODE_ENV)
+    //config.shop.status={db:mongoose.connection.db.databaseName};
+    
+
+    if(config.dropdb && process.env.NODE_ENV==='test'){
+      mongoose.connection.db.dropDatabase(function(err,done){
+      });
+    }
+});
+
+// load models
+files = require("fs").readdirSync( './models' );
+for(var i in files) {
+  if(/\.js$/.test(files[i])) require('./models/'+files[i]);
+}
+
+var app = express()
+
+// mailer
+var sendmail=require('./app/mail')(app);
   
-var debug = require('debug')('app');
-var app = require('./app/index');
+// bootstrap passport config
+require('./app/passport')(app, config, passport)
+
+// express settings
+require('./app/express')(app, config, passport, sendmail)
+
+// Bootstrap routes
+require('./app/routes')(app, config, passport)
 
 
 
-var port = (process.env.VMC_APP_PORT || process.env.C9_PORT || config.express.port);
-var host = (process.env.VMC_APP_HOST || 'localhost');
+
+
+//
+//
+// start the server
+var port = (process.env.VMC_APP_PORT || process.env.VCAP_APP_PORT || process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
+var host = (process.env.VMC_APP_HOST || process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || 'localhost');
 
 // manage c9 env
 if (process.env.C9_PORT ){
     host='0.0.0.0';
 }
 
-if (process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP){
-    host=process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
-}
-if (process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT){
-    port=process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT;
-}
-
-if (process.env.VCAP_APP_PORT){
-  port=process.env.VCAP_APP_PORT;
-}
 /**
  *  Setup termination handlers (for exit and a list of signals).
  */
@@ -63,6 +102,8 @@ var setupTerminationHandlers = function(){
 };
 app.listen(port,host);
 
+// expose app
+exports = module.exports = app
 
 
 

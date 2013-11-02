@@ -1,6 +1,6 @@
 // Use a different DB for tests
 // Use a different DB for tests
-var app = require("../app/index");
+var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
