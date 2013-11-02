@@ -90,7 +90,6 @@ describe("api.users", function(){
         res.body.hash.should.equal('true');
         res.body.salt.should.equal('true');
         cookie = res.headers['set-cookie'];
-        
         //res.headers.location.should.equal('/');
         done();        
       });

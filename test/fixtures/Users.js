@@ -1,4 +1,4 @@
-var ObjectId = require('mongodb').BSONNative.ObjectID;
+var ObjectId = require('mongodb').ObjectID;
 
 var Users=exports.Users=[{
     _id : ObjectId('515ec12e56a8d5961e000444'), 
