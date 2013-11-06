@@ -75,7 +75,6 @@ module.exports = function (app, config, passport, sendmail) {
     app.use(express.methodOverride())
 
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));  
-    app.use(CORS);  
 
 
     //
@@ -119,6 +118,10 @@ module.exports = function (app, config, passport, sendmail) {
         next()
       })
     }
+
+    //
+    // use cors
+    app.use(CORS);  
 
     app.use(function(req, res, next){
       req.sendmail=sendmail;
