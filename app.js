@@ -36,7 +36,16 @@ var express = require('express')
 mongoose.connect(config.mongo.name,function(e){  
     //double check for database drop
     console.log("info :",mongoose.connection.db.databaseName, config.mongo.name)
-    
+
+    if(process.env.NODE_ENV!=='test'){
+      console.time("running db maintain")
+      require('./app/db.maintain').update(mongoose.connection.db,function(err,log){
+        if(err){
+          console.log("ERROR",err)
+        }
+        console.timeEnd("running db maintain")
+      });            
+    }
 
     if(config.dropdb && process.env.NODE_ENV==='test'){
       mongoose.connection.db.dropDatabase(function(err,done){
@@ -70,8 +79,9 @@ require('./app/routes')(app, config, passport)
 
 
 
-
-
+//
+// maintain db
+//
 //
 //
 // start the server
@@ -83,26 +93,10 @@ if (process.env.C9_PORT ){
     host='0.0.0.0';
 }
 
-/**
- *  Setup termination handlers (for exit and a list of signals).
- */
-var setupTerminationHandlers = function(){
-    //  Process on exit and signals.
-    process.on('exit', function() {  
-      // send mail on exit?
-    });
-
-    // Removed 'SIGPIPE' from the list - bugz 852598.
-    ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-     'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-    ].forEach(function(element, index, array) {
-        process.on(element, function() { 
-          // soft terminate
-          // process.exit(1);
-        });
-    });
-};
 app.listen(port,host);
+
+
+
 
 // expose app
 exports = module.exports = app
