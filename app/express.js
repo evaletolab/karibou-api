@@ -121,7 +121,9 @@ module.exports = function (app, config, passport, sendmail) {
     }
 
     app.use(function(req, res, next){
-        req.sendmail=sendmail;
+      req.sendmail=sendmail;
+      console.log("cookies",req.cookies)
+//      console.log("session",req.session)
       next();
     });
 

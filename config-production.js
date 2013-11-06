@@ -116,10 +116,6 @@ module.exports = {
     ensureIndex:true
   },
 
-	nodetime:{
-	  apikey:'f39e0560aedf625a03b0b06dbcb015907c1a3736'
-	},
-	
  /**
   * Time to validate an email
   */
@@ -179,7 +175,7 @@ module.exports = {
       cookie: {
         path: '/',
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 60 // = 60 days (in miliseconds)
+        maxAge: 1000 * 60 * 60 * 24 * 10 // = 60 days (in miliseconds)
       }
     },
 
