@@ -115,15 +115,15 @@ describe("Shops", function(){
         bg:"bg",
         fg:"fg"
       },
-      options:{
+      details:{
         bio:"hello",
         avoid:"hello"
       }
     
     };
     Shops.update({name:s.name},s,function(err,shop){
-        shop.options.bio.should.be.true;
-        shop.options.should.not.have.property('avoid');
+        shop.details.bio.should.be.true;
+        shop.details.should.not.have.property('avoid');
         done();
     });
 

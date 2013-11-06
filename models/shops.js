@@ -25,7 +25,7 @@ var Shops = new Schema({
       fg:{ type: String, required: false }
     },
     
-    options:{
+    details:{
       bio:{type: Boolean,default:false},
       gluten:{type: Boolean,default:false},
       lactose:{type: Boolean,default:false},

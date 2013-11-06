@@ -31,6 +31,20 @@ exports.list=function (req, res) {
   var query=Categories.find(type);
 
   //
+  // get categories details
+  db.model('Products').aggregate(
+    {$project : { name : 1, categories : 1 }},
+    {$unwind:'$categories'}, 
+    {$group:{_id:"$categories", names:{$addToSet:"$name"}}},
+    function(err, result){
+      console.log("group by" ,err,result)
+    } 
+  );
+  db.model('Products').find({}, "count", {'group': 'categories'}, function(err, c) { 
+    console.log("group by",c)
+  }); 
+
+  //
   // filter
   if (req.query.group){
     query=query.where("group",new RegExp(req.query.group, "i"))

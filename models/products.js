@@ -62,7 +62,9 @@ var Product = new Schema({
       discount:{type:Number, min:0, requiered:true},
    },
 
-   photo:{type:String},
+   photo:{
+    url:{type:String}
+  },
 
 //   photo: {
 //     url:{type:String}

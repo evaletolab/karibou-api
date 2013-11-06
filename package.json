@@ -17,7 +17,7 @@
     "express": "3.x",
     "validator": "0.4.x",
     "mongodb": "1.x",
-    "mongoose": "3.5.9",
+    "mongoose": "x",
     "mongoose-validate": "x",
     "connect-mongodb": "1.x",
     "passport": "0.x",

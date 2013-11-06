@@ -1,7 +1,8 @@
 #!/bin/env node
 //
 // check links
-// https://github.com/datapimp/backbone-express-mongoose-socketio
+// https://github.com/madhums/node-express-mongoose-demo
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
 // mongo/express sample 
 // https://gist.github.com/1025038
 // dynamic helpers
@@ -34,10 +35,7 @@ var express = require('express')
 // open database
 mongoose.connect(config.mongo.name,function(e){  
     //double check for database drop
-    console.log("db :",mongoose.connection.db.databaseName)
-    console.log("db name:",config.mongo.name)
-    console.log("db env:",process.env.NODE_ENV)
-    //config.shop.status={db:mongoose.connection.db.databaseName};
+    console.log("info :",mongoose.connection.db.databaseName, config.mongo.name)
     
 
     if(config.dropdb && process.env.NODE_ENV==='test'){
@@ -53,6 +51,10 @@ for(var i in files) {
 }
 
 var app = express()
+
+
+// utils 
+require('./app/utils')(app);
 
 // mailer
 var sendmail=require('./app/mail')(app);

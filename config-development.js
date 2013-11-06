@@ -100,7 +100,9 @@ module.exports = {
   express: {
     port: process.env.PORT || 4000,
     views: PATH('views'),
-    'view engine': 'jade'
+    'view engine': 'jade',
+    csrf:false,
+    mongoSession:true    
   },
   
   

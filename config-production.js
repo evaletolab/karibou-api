@@ -102,6 +102,7 @@ module.exports = {
     port: process.env.PORT || 3000,
     views: PATH('views'),
     'view engine': 'jade',
+    csrf:false,
     mongoSession:true
   },
   

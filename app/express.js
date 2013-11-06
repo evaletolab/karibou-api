@@ -8,24 +8,15 @@ var express = require('express')
 //  , helpers = require('view-helpers')
   , pkg = require('../package.json')
 
+//
+// extend express state
+// https://github.com/yahoo/express-state
+if (config.express.state){
+  var expstate = require('express-state')
+  expstate.extend(app);
+}  
+
 module.exports = function (app, config, passport, sendmail) {
-
-
-  // export api
-  // toto move this code from there
-  String.prototype.hash=function hash(){
-    var h=0,i,char;
-    if (this.length===0){
-      return h;
-    }
-    
-    for (i=0;i<this.length;i++){
-      char=this.charCodeAt(i);
-      h=((h<<5)-h)+char;
-      h=h & h;
-    }
-    return h;
-  }   
 
   //
   // CORS middleware
@@ -78,9 +69,8 @@ module.exports = function (app, config, passport, sendmail) {
     app.use(express.cookieParser())
 
     // bodyParser should be above methodOverride
-    app.use(express.bodyParser())
-//  app.use(express.urlencoded())
-//  app.use(express.json())
+    app.use(express.urlencoded())
+    app.use(express.json())
 
     app.use(express.methodOverride())
 

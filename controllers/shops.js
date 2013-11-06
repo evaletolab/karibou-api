@@ -66,11 +66,11 @@ function checkParams(req){
       req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
     }
     
-    if (req.body.options){
-      req.body.options.bio && check(req.body.options.bio).is(/^(true|false)$/);
-      req.body.options.gluten && check(req.body.options.gluten).is(/^(true|false)$/);
-      req.body.options.lactose && check(req.body.options.lactose).is(/^(true|false)$/);
-      req.body.options.local && check(req.body.options.local).is(/^(true|false)$/);
+    if (req.body.details){
+      req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
+      req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
+      req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
+      req.body.details.local && check(req.body.details.local).is(/^(true|false)$/);
     }
     
     for (var i in req.body.faq){      
