@@ -63,7 +63,8 @@ describe("Users", function(){
 
     it("validation for wrong provider", function(done){
    		db.model('Users').findOrCreate({ id:12345678, provider:'toto', photo:'olivier.jpg' }, function (err, user) {
-    		err.errors.provider.message.should.equal('Validator "enum" failed for path provider');
+        err.errors.provider.path.should.equal('provider');
+        err.errors.provider.value.should.equal('toto');
     		return done();
   		});      
     });

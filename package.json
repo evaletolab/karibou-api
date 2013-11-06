@@ -35,7 +35,8 @@
     "pow-mongoose-fixtures": "x"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "maintain": "node maintain.js"
   },
   "main": "app.js",
   "subdomain": "karibou-api"

@@ -5,7 +5,7 @@ require('../app/config');
 var db          = require('mongoose');
 var Categories  = db.model('Categories');
 var assert      = require("assert");
-var extend      = require( 'node.extend' );
+var extend      = require('util')._extend;
 var _           =require('underscore');
 var check       = require('validator').check,
     sanitize    = require('validator').sanitize;
@@ -30,28 +30,29 @@ exports.list=function (req, res) {
   //if (req.query.type==='*')type={};
   var query=Categories.find(type);
 
-  //
-  // get categories details
-  db.model('Products').aggregate(
-    {$project : { name : 1, categories : 1 }},
-    {$unwind:'$categories'}, 
-    {$group:{_id:"$categories", names:{$addToSet:"$name"}}},
-    function(err, result){
-      console.log("group by" ,err,result)
-    } 
-  );
-  db.model('Products').find({}, "count", {'group': 'categories'}, function(err, c) { 
-    console.log("group by",c)
-  }); 
+
 
   //
-  // filter
+  // count sku by category
+  if (req.query.stats){
+    var stats=db.model('Products').aggregate(
+      {$project : { sku : 1, categories : 1 }},
+      {$unwind:'$categories'}, 
+      {
+        $group:{
+          _id:"$categories", 
+          sku:{$addToSet:"$sku"}
+        }
+    });
+  }
+  //
+  // filter by group name
   if (req.query.group){
     query=query.where("group",new RegExp(req.query.group, "i"))
   }
   
   //
-  // filter
+  // filter by name
   if (req.query.name){
     query=query.where("name",new RegExp(req.query.name, "i"))
   }
@@ -59,6 +60,23 @@ exports.list=function (req, res) {
   query.exec(function(err,cats){
     if(err){
       return res.send(400,err);
+    }
+
+    //
+    // merge aggregate with categories to obtains :
+    // the products by category
+    if (stats){
+      stats.exec(function(err,result){
+        if(err){
+          return res.send(400,err);
+        }
+        cats.forEach(function(cat){
+          var stat=_.find(result,function(s){return s._id.toString()==cat._id.toString()});          
+          cat._doc.usedBy=(stat)?stat.sku:[];
+        })
+        return res.json(cats);
+      });
+      return;
     }
     
     return res.json(cats);

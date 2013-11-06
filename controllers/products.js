@@ -191,6 +191,7 @@ exports.list=function (req, res) {
       });
     }
 
+
     //
     // group=categories.name
     // as we dont know how to group cross-documents with mongo
