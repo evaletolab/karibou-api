@@ -93,7 +93,7 @@ module.exports = {
   },
 
   cors:{
-    allowedDomains:['http://karibou.evaletolab.ch'],
+    allowedDomains:['http://karibou.evaletolab.ch','http://kariboo.evaletolab.ch','http://logistic.evaletolab.ch'],
     credentials:true,
     age:3600
   },
@@ -111,8 +111,6 @@ module.exports = {
     nameaf:'mongodb://karibou-api:1k_karibou-api@ds043158.mongolab.com:43158/af_karibou-api-evaleto',
     namejitsu:'mongodb://nodejitsu_evaleto:k36eqvl8rjh7mvij6675n2cmqf@ds039267.mongolab.com:39267/nodejitsu_evaleto_nodejitsudb6170858328',
     name_openshift:process.env.OPENSHIFT_MONGODB_DB_URL,
-    nametest:'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/',    
-    namecf:'mongodb://localhost/karibou',
     ensureIndex:true
   },
 

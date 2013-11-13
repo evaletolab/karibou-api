@@ -23,9 +23,9 @@ module.exports = function (app, config, passport, sendmail) {
   // Allow cross-domain 
   var CORS = function(req, res, next) {
       res.header('Access-Control-Allow-Credentials', config.cors.credentials);
-      if(Array.isArray(config.cors.allowedDomains))config.cors.allowedDomains.forEach(function(domain){
-        res.header('Access-Control-Allow-Origin', domain);
-      });
+      if (config.cors.allowedDomains.indexOf(req.header('Origin')) !== -1) {
+        res.header('Access-Control-Allow-Origin', req.header('Origin'));
+      }
       res.header('Access-Control-Max-Age', config.cors.age);
       res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -38,13 +38,17 @@ module.exports = function (app, config, passport, sendmail) {
 
   app.set('showStackError', true)
 
-  // should be placed before express.static
+  // should be placed before express.static 
   app.use(express.compress({
     filter: function (req, res) {
       return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
     },
     level: 9
   }))
+
+  //
+  // use cors
+  app.use(CORS);  
 
   app.use(express.favicon())
   app.use(express.static(config.root + '/public'))
@@ -119,9 +123,6 @@ module.exports = function (app, config, passport, sendmail) {
       })
     }
 
-    //
-    // use cors
-    app.use(CORS);  
 
     app.use(function(req, res, next){
       req.sendmail=sendmail;
