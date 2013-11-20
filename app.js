@@ -35,7 +35,7 @@ var express = require('express')
 // open database
 mongoose.connect(config.mongo.name,function(e){  
     //double check for database drop
-    console.log("info :",mongoose.connection.db.databaseName, config.mongo.name)
+    console.log("boot[",new Date(),"] :",mongoose.connection.db.databaseName, config.mongo.name)
 
     if(process.env.NODE_ENV!=='test'){
       console.time("running db maintain")

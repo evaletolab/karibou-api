@@ -26,11 +26,13 @@ module.exports = function (app, config, passport, sendmail) {
       if (config.cors.allowedDomains.indexOf(req.header('Origin')) !== -1) {
         res.header('Access-Control-Allow-Origin', req.header('Origin'));
       }
-      res.header('Access-Control-Max-Age', config.cors.age);
-      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+//      res.header('Access-Control-Max-Age', config.cors.age);
+      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag');
       if( req.method.toLowerCase() === "options" ) {
-          return res.send( 200 );
+          res.writeHead(204);
+          return res.end();        
       }
       next();
   }
@@ -46,17 +48,8 @@ module.exports = function (app, config, passport, sendmail) {
     level: 9
   }))
 
-  //
-  // use cors
-  app.use(CORS);  
 
-  app.use(express.favicon())
-  app.use(express.static(config.root + '/public'))
 
-  // don't use logger for test env
-  if (process.env.NODE_ENV !== 'test') {
-    app.use(express.logger('dev'))
-  }
 
   // set views path, template engine and default layout
   app.set('views', config.express.views)
@@ -68,6 +61,20 @@ module.exports = function (app, config, passport, sendmail) {
       res.locals.pkg = pkg
       next()
     })
+
+    //
+    // use cors
+    app.use(CORS);  
+
+
+    app.use(express.favicon())
+    app.use(express.static(config.root + '/public'))
+
+    // don't use logger for test env
+    if (process.env.NODE_ENV !== 'test') {
+      app.use(express.logger('short'))
+    }
+
 
     // cookieParser should be above session
     app.use(express.cookieParser())
@@ -98,13 +105,17 @@ module.exports = function (app, config, passport, sendmail) {
         store: new mongoStore({
           url: config.mongo.name,
           collection : 'sessions'
-        })
+        }),
+        cookie: config.middleware.cookie
       }))
     }
+
+
 
     // use passport session
     app.use(passport.initialize())
     app.use(passport.session())
+
 
     // connect flash for flash messages - should be declared after sessions
     // app.use(flash())
@@ -123,16 +134,18 @@ module.exports = function (app, config, passport, sendmail) {
       })
     }
 
-
     app.use(function(req, res, next){
       req.sendmail=sendmail;
       console.log("cookies",req.cookies)
-//      console.log("session",req.session)
+      console.log("session.passport",req.session.passport)
       next();
     });
 
+
+
     // routes should be at the last
     app.use(app.router)
+
 
 
     // assume "not found" in the error msgs

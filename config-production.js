@@ -172,7 +172,7 @@ module.exports = {
       key: 'sid',
       cookie: {
         path: '/',
-        httpOnly: true,
+        httpOnly: false,
         maxAge: 1000 * 60 * 60 * 24 * 10 // = 60 days (in miliseconds)
       }
     },

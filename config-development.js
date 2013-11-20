@@ -92,7 +92,7 @@ module.exports = {
   },
   
   cors:{
-    allowedDomains:['http://lo.cal:3000'],
+    allowedDomains:['http://lo.cal:3000','http://192.168.1.35:3000'],
     credentials:true,
     age:3600
   },
@@ -168,7 +168,7 @@ module.exports = {
       key: 'sid',
       cookie: {
         path: '/',
-        httpOnly: true,
+        httpOnly: false,
         maxAge: 1000 * 60 * 30 * 24 * 60 // = 60 days (in miliseconds)
       }
     },

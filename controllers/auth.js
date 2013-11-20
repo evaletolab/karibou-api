@@ -56,7 +56,7 @@ exports.ensureAdmin=function(req, res, next) {
 
 exports.logout = function (req, res) {
       req.logout();      
-      res.clearCookie('connect.sid', { path: '/' });
+      //res.clearCookie('connect.sid', { path: '/' });
       if (req.param('redirect')){
         var redirect=req.param('redirect')
         return res.redirect('/');

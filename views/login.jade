@@ -9,9 +9,10 @@ div
     form(action='/login', method='POST')
       #login.center
         label(for='email') Email:
-        input(type='text', name='id', placeholder='email@email.com')
+        input(type='text', name='email', placeholder='email@email.com')
       #password.center
         label(for='password') Password:
         input(type='password', name='password', placeholder='password')
+        input(type='hidden', name='provider', value='local')
       #submit.button
         input(type='submit', value='Log Me In!') Login
