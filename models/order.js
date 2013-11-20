@@ -36,15 +36,17 @@ var Orders = new Schema({
    
    /* customer email */
    email:{type: String},
-   created: { type: Date, default: Date.now },
+   created:{type: Date, default: Date.now },
+   closed:{type: Date, default: Date.now },
    
    /* full customer details */
    customer:{type: Schema.Types.Mixed, required:true},
    
    /* order canceled reason and dates */
-   cancel_reason:{type:String, enum:EnumCancelReason},
-   cancelled_at:{type: Date},
-   closed_at:{type: String},
+   cancel:{
+      reason:{type:String, enum:EnumCancelReason},
+      when:{type: Date},
+   }
    
    /* discount_code:{type: String}, */   
    /* cart_token:{type: String}, */
@@ -52,37 +54,56 @@ var Orders = new Schema({
    financial_status:{type:String, enum:EnumFinancialStatus},
 
    fulfillments:{
-     status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
+     status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},     
    },
 
    items:[{
       sku:{type:Number, min:10000, requiered:true}, 
       name:{type:String, required:true},
-      vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+      category:{type:String, required:true},
+      vendor:{
+        ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+        slug:{type:String, required:true},
+        name:{type:String, required:true},
+        fullName:{type:String, required:true},
+        address:{type:String, required:true},
+      },
       quantity:{type:Number, min:1, max:100, requiered:true}, 
-      price:{type:Number, min:0, max:1000, requiered:true},
-      /* new price is maximum +/- 10% of price */
-      finalprice:{type:Number, min:0, max:1000, requiered:true},
-      note:{type:String, required:false},    
-      variant_id:{type:String, required:false},  
-      variant_name:{type:String, required:false},      
+
+
+      //
+      // product variation is not yet implemented
+      variant:{
+        id:{type:String, required:false},  
+        name:{type:String, required:false}
+      },
       
       /* where is the product now? */      
-      fulfillment_status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
-      fulfillment_note:{type: String, required: true},
+      fulfillment:{
+        status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
+        note:{type: String, required: false},
+        shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}
+      },
       
-      /* fulfillment_service:{}, */
-      requires_shipping:{type:String,enum:EnumShippingMode, required:true},      
-      landing:{type:Schema.Types.Mixed}
+      // given price
+      price:{type:Number, min:0, max:2000, requiered:true},      
+      // real price, maximum +/- 10% of given price 
+      finalprice:{type:Number, min:0, max:1000, requiered:true},
+      // customer note
+      note:{type:String, required:false}, 
+      
    }],
    
    
    shipping:{
       when:{type:Date, required:true},
-      address:{type:Schema.Types.Mixed,required:true}
+      address:{type:String,required:true}
+      fullName:{type:String, required:true},
+      postal:{type:String, required:true},
+      code:{type:String, required:true},
+      floor:{type:String, required:true}
    },
    
-   billing_address:{type:Schema.Types.Mixed, required:true},
    
    payment:{
       gateway:{type:String,enum: EnumOrderGateway, required:true}
@@ -105,7 +126,7 @@ Orders.statics.create = function(p,s,callback){
   assert(s);
   assert(callback);
   var db=this;
-	var Products=this.model('Products');
+  var Products=this.model('Products');
 
 
   //TODO findNextSKU
@@ -231,9 +252,9 @@ Orders.statics.findByCriteria = function(criteria, callback){
 //
 // update shop content
 Orders.statics.update=function(id,p,callback){
-	var Products=this.model('Products');	
-	
-	if (!Object.keys(id).length) return callback("You have to define one product for update");
+  var Products=this.model('Products');  
+  
+  if (!Object.keys(id).length) return callback("You have to define one product for update");
 
   //findOneAndUpdate(conditions, update) 
   return Products.findOne(id).populate('vendor').exec(function (err, product) {
