@@ -19,3 +19,7 @@ exports.index = function(app){
     res.render('home',  model);
   }
 };
+
+exports.acceptcookie = function(req,res){
+    res.render('cookie');
+};

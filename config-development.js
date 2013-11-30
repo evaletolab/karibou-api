@@ -70,7 +70,7 @@ module.exports = {
       cancelreason:["customer", "fraud", "inventory", "other"],
       status:["created","partial","fulfilled", "failure"],
       gateway:[ "postfinance", "paypal"],
-      shippingmode:["karibou", "none"]
+      shippingmode:["grouped", "none"]
     }
   },
 

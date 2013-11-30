@@ -31,9 +31,28 @@ var Shops = new Schema({
       lactose:{type: Boolean,default:false},
       local:{type: Boolean,default:false}      
     },
+
+    //
+    // define where this shop is available (geneva/lausanne/...)
     marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
-    location: {type: String, required: false, enum: EnumLocation},
     
+    //
+    // where to pickup items
+    address:{
+          name: { type: String, trim: true },
+          floor: { type: String, trim: true },
+          streetAdress: { type: String, lowercase: true, trim: true },
+          location: { type: String, trim: true, enum: EnumLocation},
+          region: { type: String, trim: true, default:"GE" },
+          postalCode: { type: String },
+          geo:{
+            lat:{type:Number},
+            lng:{type:Number}
+          }
+    },    
+
+    //
+    // this shop belongsTo a category
     catalog:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
     
     faq:[{

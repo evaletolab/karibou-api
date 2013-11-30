@@ -3,9 +3,12 @@
  * Users API
  */
 var db = require('mongoose'),
+    Users= db.model('Users'),
     password = require('password-generator'),
     check = require('validator').check,
-    sanitize = require('validator').sanitize;
+    sanitize = require('validator').sanitize,
+    errorHelper = require('mongoose-error-helper').errorHelper;
+;
 
 function check(req){
     if(req.body.email.address) check(req.body.email.address).len(6, 64).isEmail();
@@ -35,15 +38,19 @@ exports.ensureMe=function(req, res, next) {
 
 exports.me = function (req, res, next)  {
   res.json(req.user);
+  // Users.findOne({_id:req.user._id}).
+  //   populate('shops','likes').exec(function(err,user){
+  //     res.json(user);
+  // });
 };
 
 
 exports.list = function (req, res, next)  {
   //
   // TODO add criteria
-  db.model('Users').find({},function(err,users){
+  Users.find({}).populate('vendor','likes').exec(function(err,users){
       if (err){
-        return res.send(400,err);    
+        return res.send(400,errorHelper(err));    
       }
       users.forEach(function(user){
         if( user.email&&user.email.address && config.admin.emails.indexOf(user.email.address)!=-1){
@@ -63,7 +70,7 @@ exports.recover=function(req,res){
   }  
 
 
-  db.model('Users').findOne({'email.address': req.params.email},
+  Users.findOne({'email.address': req.params.email},
     function(err,user){
       
       if (err){
@@ -88,7 +95,6 @@ exports.recover=function(req,res){
                      content, 
                      "password", function(err, status){
           if(err){
-            console.log(err,status)
             return res.send(400,err);
           }      
                      
@@ -115,7 +121,7 @@ exports.password=function(req,res){
       
   var stderr="L' utilisateur "+req.body.email+"@"+req.params.id+" n'existe pas ou son mot de passe est incorrect";
   
-  db.model('Users').findOne({'email.address': req.body.email, id:req.params.id},
+  Users.findOne({'email.address': req.body.email, id:req.params.id},
     function(err,user){
       if (err){
         return res.send(400,err);    
@@ -167,10 +173,45 @@ exports.update=function(req,res){
     return res.send(400, err.message);
   }  
       
-  
-  db.model('Users').update({id:req.params.id},req.body,function(err,user){
+
+  Users.update({id:req.params.id},req.body,function(err,user){
     if (err){
-      return res.send(400,err);    
+      return res.send(400,errorHelper(err));    
+    }
+    return res.json(user);  
+  });
+
+};
+
+exports.unlike=function(req,res){
+
+  try{
+    check(req.params.id).isInt();
+    check(req.params.sku).isInt();
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+      
+  Users.unlike(req.params.id,params.sku,function(err,user){
+    if (err){
+      return res.send(400,errorHelper(err));    
+    }
+    return res.json(user);  
+  });
+
+};
+
+exports.like=function(req,res){
+
+  try{
+    check(req.params.sku).isInt();
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+      
+  Users.like(req.user.id, req.params.sku,function(err,user){
+    if (err){
+      return res.send(400,errorHelper(err));    
     }
     return res.json(user);  
   });
@@ -187,10 +228,9 @@ exports.status=function(req,res){
     return res.send(400, err.message);
   }  
       
-  
-  db.model('Users').updateStatus({id:req.params.id},req.body.status,function(err,user){
+  Users.updateStatus({id:req.params.id},req.body.status,function(err,user){
     if (err){
-      return res.send(400,err);    
+      return res.send(400,errorHelper(err));    
     }
     return res.json(user);  
   });

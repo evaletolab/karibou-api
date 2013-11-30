@@ -26,7 +26,8 @@
     "moment": "2.0.0",
     "debug": "0.x",
     "jade": "0.x",
-    "nodetime": "0.x.x"
+    "nodetime": "0.x.x",
+    "mongoose-error-helper": "0.0.2"
   },
   "devDependencies": {
     "mocha": "1.x",

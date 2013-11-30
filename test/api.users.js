@@ -60,12 +60,13 @@ describe("api.users", function(){
       });
   });
 
-  it('POST /login wrong data should return 500',function(done){  
+  it('POST /login wrong data should return 400',function(done){  
     request(app)
       .post('/login')
       .send({ email:'oo@oo.com',provider:'local', password:'ppppp' })
       .end(function(err,res){
-        res.should.have.status(500);
+        res.should.have.status(400);
+        res.body.should.be.a.string;        
         done();        
       });
   });
@@ -79,6 +80,7 @@ describe("api.users", function(){
       });
   });
 
+  var user;
 
   it('POST /login should return 200',function(done){  
     request(app)
@@ -90,6 +92,7 @@ describe("api.users", function(){
         res.body.hash.should.equal('true');
         res.body.salt.should.equal('true');
         cookie = res.headers['set-cookie'];
+        user=res.body;
         //res.headers.location.should.equal('/');
         done();        
       });
@@ -100,7 +103,11 @@ describe("api.users", function(){
     request(app)
       .get('/v1/users/me')
       .set('cookie', cookie)
-      .expect(200,done);
+      .end(function(err,res){
+        res.should.have.status(200);
+        res.body.id.should.equal(user.id)
+        done()
+      });
 
   });
       

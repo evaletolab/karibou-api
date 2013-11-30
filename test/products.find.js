@@ -31,6 +31,32 @@ describe("products.find:", function(){
     })
   });
 
+  it("Find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002],function(err,products){
+      products.length.should.equal(2)  
+      products[0].sku.should.equal(1000001)
+      products[0].vendor.should.be.instanceOf(Object).and.have.property('name')
+//      products[0].vendor.owner.should.be.instanceOf(Object).and.have.property('displayName')
+      done();
+    });
+  });
+
+  it("Find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002],function(err,products){
+      products.length.should.equal(2)      
+      products[0].sku.should.equal(1000001)
+      done();
+    });
+  });
+
+  it("Build query to find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002]).exec(function(err,products){
+      products.length.should.equal(2)      
+      products[0].sku.should.equal(1000001)
+      done();
+    });
+  });
+
     
   it("Find products by Shop", function(done){
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){

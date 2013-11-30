@@ -30,7 +30,7 @@ exports.Products=[{
      },
      categories: [],
      //un-autre-shop, status:true, owner:gluck     
-     vendor:'515ec12e56a8d5961e000004'  
+     vendor:ObjectId('515ec12e56a8d5961e000004')  
   },{
     _id : new ObjectId(), 
      sku:12346,

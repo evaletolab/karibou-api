@@ -88,10 +88,8 @@ exports.login_post=function(req, res, next) {
         return res.send(400,err); 
       }
       if (!user) { 
-        info="Votre compte n'exist pas";
-        return res.send(400,info); 
+        return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
       }
-
       // CUSTOM USER CONTENT
 		  //
 		  // don't serialise the private hash/salt, but confirm the password existance

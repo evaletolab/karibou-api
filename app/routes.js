@@ -14,8 +14,15 @@ module.exports = function(app, config, passport) {
   var _         = require('underscore');
 
 
-	
+	function cachedShort(req, res, next) {
+    res.setHeader('Cache-Control', 'public, max-age=60000');
+    return next();
+  }
 
+  function cachedLong(req, res, next) {
+    res.setHeader('Cache-Control', 'public, max-age=1200000');
+    return next();
+  }
 	
 	
   //
@@ -31,6 +38,8 @@ module.exports = function(app, config, passport) {
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
   app.get('/v1/users', auth.ensureAdmin, users.list);
   app.post('/v1/users/:id', users.ensureMe,users.update);
+  app.post('/v1/users/:id/like/:sku', users.ensureMe,users.like);
+  app.post('/v1/users/:id/unlike/:sku', users.ensureMe,users.unlike);
   app.post('/v1/users/:id/status', auth.ensureAdmin,users.status);
   app.post('/v1/users/:id/password',users.ensureMe, users.password);
   app.post('/v1/recover/:token/:email/password', users.recover);
@@ -38,11 +47,12 @@ module.exports = function(app, config, passport) {
 	//
 	// home
   app.get ('/', home.index(app));
+  app.get ('/acceptcookie', home.acceptcookie);
   app.get ('/v1', api.index(app));
 
   //
   //config
-  app.get ('/v1/config', api.config);
+  app.get ('/v1/config', cachedLong, api.config);
   
   //
   // email validation
@@ -52,7 +62,7 @@ module.exports = function(app, config, passport) {
   
   //
   // category
-  app.get ('/v1/category', categories.list);
+  app.get ('/v1/category', cachedLong, categories.list);
   app.get ('/v1/category/:category', categories.get);
   app.post('/v1/category', auth.ensureAdmin, categories.create);
   app.post('/v1/category/:category', auth.ensureAdmin, categories.update);

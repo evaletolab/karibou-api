@@ -42,6 +42,11 @@ Sequences.statics.nextSku = function( callback){
   this.model('Sequences').next("sku",callback);
 };
 
+// simple wrapper for Order ID
+Sequences.statics.nextOrder = function( callback){
+  this.model('Sequences').next("oid",callback);
+};
+
 Sequences.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Sequences', Sequences);
 

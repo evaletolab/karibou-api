@@ -70,7 +70,7 @@ module.exports = {
       cancelreason:["customer", "fraud", "inventory", "other"],
       status:["created","partial","fulfilled", "failure"],
       gateway:[ "postfinance", "paypal"],
-      shippingmode:["karibou", "none"]
+      shippingmode:["grouped", "none"]
     }
 
   },
@@ -103,13 +103,12 @@ module.exports = {
     views: PATH('views'),
     'view engine': 'jade',
     csrf:false,
-    mongoSession:true
+    mongoSession:true,
+    proxy:false
   },
   
   mongo:{
     name:process.env.MONGOLAB_URI,
-    nameaf:'mongodb://karibou-api:1k_karibou-api@ds043158.mongolab.com:43158/af_karibou-api-evaleto',
-    namejitsu:'mongodb://nodejitsu_evaleto:k36eqvl8rjh7mvij6675n2cmqf@ds039267.mongolab.com:39267/nodejitsu_evaleto_nodejitsudb6170858328',
     name_openshift:process.env.OPENSHIFT_MONGODB_DB_URL,
     ensureIndex:true
   },
@@ -155,7 +154,7 @@ module.exports = {
 
     methodOverride: '_method',
 
-    cookieParser: 'ogXMXgRbnInguKYYx9Pm',
+    cookieParser: process.env.COOKIE_PARSER||'ogXMXgRbnInguKYYx9Pm',
 
     session: {
       /*
@@ -168,7 +167,7 @@ module.exports = {
        *              (via "x-forwarded-proto")
       */
 
-  		secret:'cp3a2v0elt955h9uqhgmskplhg85ljjm',
+  		secret:process.env.SESSION_SECRET||'cp3a2v0elt955h9uqhgmskplhg85ljjm',
       key: 'sid',
       cookie: {
         path: '/',

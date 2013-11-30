@@ -85,8 +85,8 @@ require('./app/routes')(app, config, passport)
 //
 //
 // start the server
-var port = (process.env.VMC_APP_PORT || process.env.VCAP_APP_PORT || process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
-var host = (process.env.VMC_APP_HOST || process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || 'localhost');
+var port = (process.env.VCAP_APP_PORT || process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
+var host = (process.env.VCAP_APP_HOST || process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || 'localhost');
 
 // manage c9 env
 if (process.env.C9_PORT ){

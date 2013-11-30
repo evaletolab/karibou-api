@@ -216,6 +216,21 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
+Product.statics.findBySkus = function(skus, callback){
+  var cb=function(err, products){
+    callback(err,products);
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
+  var query=this.model('Products').find({sku:{
+    $in:skus
+  }}).populate('vendor').populate('vendor.owner').populate('categories');
+
+  if (cb) return query.exec(cb)
+  return query;
+
+};
 
 Product.statics.findOneBySku = function(sku, callback){
   var cb=function(err, products){

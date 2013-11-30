@@ -16,6 +16,7 @@ if (config.express.state){
   expstate.extend(app);
 }  
 
+  
 module.exports = function (app, config, passport, sendmail) {
 
   //
@@ -29,7 +30,8 @@ module.exports = function (app, config, passport, sendmail) {
 
 //      res.header('Access-Control-Max-Age', config.cors.age);
       res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag,Referer,Set-Cookie,X-Token');
+//      res.header('Access-Control-Expose-Headers','Content-Type,Accept,X-Requested-With,ETag, Set-Cookie, X-Token');
       if( req.method.toLowerCase() === "options" ) {
           res.writeHead(204);
           return res.end();        
@@ -40,16 +42,10 @@ module.exports = function (app, config, passport, sendmail) {
 
   app.set('showStackError', true)
 
-  // should be placed before express.static 
-  app.use(express.compress({
-    filter: function (req, res) {
-      return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
-    },
-    level: 9
-  }))
 
-
-
+  if (config.express.proxy) {
+    app.enable('trust proxy')
+  };
 
   // set views path, template engine and default layout
   app.set('views', config.express.views)
@@ -61,6 +57,15 @@ module.exports = function (app, config, passport, sendmail) {
       res.locals.pkg = pkg
       next()
     })
+
+
+    // should be placed before express.static 
+    app.use(express.compress({
+      filter: function (req, res) {
+        return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
+      },
+      level: 9
+    }))
 
     //
     // use cors
@@ -106,10 +111,9 @@ module.exports = function (app, config, passport, sendmail) {
           url: config.mongo.name,
           collection : 'sessions'
         }),
-        cookie: config.middleware.cookie
+        cookie: config.middleware.session.cookie
       }))
     }
-
 
 
     // use passport session
@@ -136,8 +140,11 @@ module.exports = function (app, config, passport, sendmail) {
 
     app.use(function(req, res, next){
       req.sendmail=sendmail;
-      console.log("cookies",req.cookies)
-      console.log("session.passport",req.session.passport)
+
+      if (process.env.NODE_ENV !== 'test') {
+        console.log("cookie:",req.header('Cookie'), "Sid:",req.sessionID)
+        console.log("cookies",req.cookies, req.session.passport)
+      }
       next();
     });
 
@@ -152,13 +159,17 @@ module.exports = function (app, config, passport, sendmail) {
     // is a 404. this is somewhat silly, but
     // valid, you can do whatever you like, set
     // properties, use instanceof etc.
-    /**
     app.use(function(err, req, res, next){
       // treat as 404
       if (err.message
         && (~err.message.indexOf('not found')
         || (~err.message.indexOf('Cast to ObjectId failed')))) {
         return next()
+      }
+
+
+      if (typeof err==='string'){
+        return res.send(400,err); 
       }
 
       // log it
@@ -171,6 +182,7 @@ module.exports = function (app, config, passport, sendmail) {
 
 
     // assume 404 since no middleware responded
+/*    
     app.use(function(req, res, next){
       res.status(404).render('404', {
         url: req.originalUrl,
