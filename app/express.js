@@ -40,6 +40,34 @@ module.exports = function (app, config, passport, sendmail) {
   }
 
 
+
+// Use the authorization hook to attach the session to the socket
+// handshake by reading the token and loading the session when a
+// socket connects. Using the authorization hook means that we can
+// deny access to socket connections that arrive without a session - i.e.
+// where the user didn't load a site page through Express.js first.
+//
+// https://github.com/jaredhanson/passport-http-bearer
+/*
+var tokenSession=function (req, res, next) {
+  if (!req.params.token){
+    next();
+  }
+  if (!req.cookie){
+  }
+
+  var sessionId = someDecryptionFunction(data.query.token);
+  sessionStore.get(sessionId, function (error, session) {
+    // Add the sessionId. This will show up in
+    // socket.handshake.sessionId.
+    //
+    // It's useful to set the ID and session separately because of
+    // those fun times when you have an ID but no session - it makes
+    // debugging that much easier.
+
+}; */
+
+
   app.set('showStackError', true)
 
 
@@ -95,7 +123,7 @@ module.exports = function (app, config, passport, sendmail) {
 
     //
     // cookie session
-    if (!config.express.mongoSession){
+    if (!config.express.cookieSession){
       app.use(express.cookieSession({
         secret: config.middleware.session.secret,
         cookie: config.middleware.cookie

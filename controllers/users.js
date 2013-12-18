@@ -48,7 +48,7 @@ exports.me = function (req, res, next)  {
 exports.list = function (req, res, next)  {
   //
   // TODO add criteria
-  Users.find({}).populate('vendor','likes').exec(function(err,users){
+  Users.find({}).populate('shops','likes').exec(function(err,users){
       if (err){
         return res.send(400,errorHelper(err));    
       }
@@ -213,6 +213,7 @@ exports.like=function(req,res){
     if (err){
       return res.send(400,errorHelper(err));    
     }
+    req.user.likes=user.likes;
     return res.json(user);  
   });
 
