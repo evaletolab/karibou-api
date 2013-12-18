@@ -150,7 +150,7 @@ UserSchema.post('save', function () {
 });
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-  return this.model('Users').findOne({'email.address':email}).populate('shops likes').exec(function(err,user){
+  return this.model('Users').findOne({'email.address':email}).populate('shops').populate('likes').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -160,7 +160,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-  return this.model('Users').findOne({provider:token}).populate('shops likes').exec(function(err,user){
+  return this.model('Users').findOne({provider:token}).populate('shops').populate('likes').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -251,7 +251,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 UserSchema.statics.authenticate=function(email, password, callback) {
 
-  return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
+  return this.model('Users').findOne({ 'email.address': email }).populate('shops').populate('likes').exec(function(err,user){
       if (err) { return callback(err); }
 
       // on user is Null
@@ -309,7 +309,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 UserSchema.statics.updateStatus=function(id, status,callback){
 	var Users=this.model('Users');	
 
-  return Users.findOne(id).populate('shops').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
     if(err){
       return callback(err);
     }
@@ -392,7 +392,7 @@ UserSchema.statics.unlike=function(id,sku,callback){
 UserSchema.statics.update=function(id, u,callback){
 	var Users=this.model('Users');	
 
-  return Users.findOne(id).populate('shops').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
     if(err){
       return callback(err);
     }
