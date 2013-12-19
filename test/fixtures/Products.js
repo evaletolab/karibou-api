@@ -50,7 +50,6 @@ exports.Products=[{
      pricing: {
         stock:10, 
         price:3.80,
-        discount:3.0,
         part:'100gr'
      },
      categories: [],

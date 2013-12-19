@@ -27,6 +27,7 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         discount:3.0,
+        part:'100gr'        
      },
      /* weight:0,1 */
      categories: [data.Categories[1]._id,data.Categories[2]._id],
@@ -51,7 +52,6 @@ exports.Products=[{
      pricing: {
         stock:10, 
         price:3.80,
-        discount:3.0,
         part:'0.75L'
      },
      /* weight:2 */

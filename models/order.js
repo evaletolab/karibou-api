@@ -89,6 +89,7 @@ var Orders = new Schema({
       
       // given price
       price:{type:Number, min:0, max:2000, requiered:true},      
+      part:{type: String, required: true},
       // real price, maximum +/- 10% of given price 
       finalprice:{type:Number, min:0, max:1000, requiered:true},
       // customer note
@@ -138,6 +139,7 @@ Orders.statics.prepare=function(product, quantity, note){
 
   copy.quantity=quantity;
   copy.price=(product.pricing.discount)?product.pricing.discount*quantity:product.pricing.price*quantity
+  copy.part=product.pricing.part;
   copy.note=note;
   copy.finalprice=copy.price;
   return copy;
@@ -154,7 +156,8 @@ Orders.statics.prepare=function(product, quantity, note){
 Orders.statics.checkItem=function(item, product, cb){
   var msg1="Ooops, votre article est incomplet. Les données de votre panier ne sont plus valables "
     , msg2="Votre produit n'est malheureusement plus disponible "
-    , msg3="Le prix de votre produit a été modifié par le vendeur ";
+    , msg3="Le prix de votre produit a été modifié par le vendeur "
+    , msg4="La quantité d'achat minimum est de 1 ";
 
   assert(item.sku==product.sku)
 
@@ -193,15 +196,22 @@ Orders.statics.checkItem=function(item, product, cb){
     return cb(msg2)
   }
 
+  // check if item.quantity <1
+  if(item.quantity<1){
+    return cb(msg4)    
+  }
+
   //
   // check item is still available in stock
   if(item.quantity>product.pricing.stock){
     return cb(msg2)
   }
 
+
   //
   // check item is correct
   // Math.round(value*100)/100
+  // if prodduct has discount, price should be computed with
   var price=(product.pricing.discount)?product.pricing.discount*item.quantity:product.pricing.price*item.quantity
   if(item.price.toFixed(1)!=price.toFixed(1)){
     return cb(msg3)

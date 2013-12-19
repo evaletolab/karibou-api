@@ -235,20 +235,38 @@ describe("orders.create", function(){
       , payment="postfinance";
 
 
-    data.Products.forEach(function(product){
-      //
-      // prepare is a private helper function for testing purpose
-      var e=Orders.prepare(product, 3, "");
-      items.push(e)
-    });
+    items.push(Orders.prepare(data.Products[0], 1, ""))
+    items.push(Orders.prepare(data.Products[1], 2, ""))
+    items.push(Orders.prepare(data.Products[2], 3, ""))
 
 
     //
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      //console.log(err)
+      //console.log(order.items[0])
       should.not.exist(err)
+
+      //
+      // check fullfillments after creation
+      order.fulfillments.status.should.equal('created')
+
+      //
+      // check financial status after creation
+      should.not.exist(order.financial_status)
+
+      //
+      // check items fields, price and finalprice
+      should.exist(order.items[0].part)
+      //
+      // checking discount price
+      order.items[0].quantity.should.equal(1)
+      order.items[0].price.should.equal(data.Products[0].pricing.discount)
+
+      //
+      // checking normal price
+      order.items[1].quantity.should.equal(2)
+      order.items[1].price.should.equal(data.Products[0].pricing.price*2)
       done();          
     });
   });     
