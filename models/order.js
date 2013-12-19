@@ -7,7 +7,9 @@ var _=require('underscore');
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('./validate')
-  , ObjectId = Schema.Types.ObjectId;
+  , ObjectId = Schema.Types.ObjectId
+  , errorHelper = require('mongoose-error-helper').errorHelper;
+
   
 
 //
@@ -35,7 +37,7 @@ var Orders = new Schema({
    oid: { type: Number, required: true, unique:true },
    
    /* customer email */
-   email:{type: String},
+   email:{type: String, required:true},
    created:{type: Date, default: Date.now },
    closed:{type: Date, default: Date.now },
    
@@ -97,11 +99,16 @@ var Orders = new Schema({
    
    shipping:{
       when:{type:Date, required:true},
-      address:{type:String,required:true},
-      fullName:{type:String, required:true},
-      postal:{type:String, required:true},
-      code:{type:String, required:true},
-      floor:{type:String, required:true}
+      name:{type:String, required:true},
+      note:{type:String},
+      streetAdress:{type:String,required:true},
+      floor:{type:String, required:true},
+      postalCode:{type:String, required:true},
+      region:{type:String, required:true},      
+      geo:{
+        lat:{type:Number, required: true},
+        lng:{type:Number, required: true}
+      }      
    },
    
    
@@ -138,6 +145,12 @@ Orders.statics.prepare=function(product, quantity, note){
 
 //
 // check item
+//  if item or product are !Nill
+//  if item.category is !Nill
+//  if item.vendor is !Nill and vendor==product.ID
+//  if product is available
+//  if item.quantity>product.pricing.stock
+//  if item price is still correct
 Orders.statics.checkItem=function(item, product, cb){
   var msg1="Ooops, votre article est incomplet. Les données de votre panier ne sont plus valables "
     , msg2="Votre produit n'est malheureusement plus disponible "
@@ -202,13 +215,12 @@ Orders.statics.checkItem=function(item, product, cb){
 
 }
 
-//db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
 
 
 //
-Orders.statics.create = function(items, customer, shipping, callback){
+// create a new order
+Orders.statics.create = function(items, customer, shipping, payment, callback){
   assert(items);
-  assert(items.length);
   assert(customer);
   assert(shipping);
   assert(callback);
@@ -218,12 +230,15 @@ Orders.statics.create = function(items, customer, shipping, callback){
     , order={};
 
 
+  if(!items.length){
+    return callback("items are required.")
+  }
 
   //
   // get unique Order identifier
   db.model('Sequences').nextOrder(function(err,oid){
     if(err){
-      callback(err);
+      callback(errorHelper(err));
       return;
     }
     //
@@ -255,12 +270,32 @@ Orders.statics.create = function(items, customer, shipping, callback){
         }
       };
 
-          
+      //
+      // adding customer email (check validity)
+      if(!customer.email||customer.email.status!==true){
+        return callback('valid email is required.')
+      }
+      order.customer=customer;
+      order.email=customer.email.address;
+
+      //
+      // adding shipping address (minimum 3 fields 
+      // for general error msg)
+      if (!shipping||Object.keys(shipping).length<3){
+        return callback('shipping address is required.')
+      }
+      order.shipping=shipping;
+
+      //
+      // adding payment
+      order.payment={gateway:payment};
+
       //
       // ready to create one order
       var dborder =new  Orders(order);
       return dborder.save(function (err) {
-        callback(err,dborder);
+        if(err) return callback(errorHelper(err));
+        callback(null,dborder);
       });
     });
   

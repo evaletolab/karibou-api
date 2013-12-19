@@ -28,7 +28,6 @@
 
 
 exports.execute = function(db, script, callback){
-	console.log(script,"Convert all user.location to shop.address.location");
   var logs="", count=0;
   var users=db.collection('users');
 
