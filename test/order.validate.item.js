@@ -67,7 +67,7 @@ describe("orders.create", function(){
   });
 
 
-  it("Error:selected shipping date (sunday) is not a shippable day", function(done){
+  it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
 
     shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
     items=[]
