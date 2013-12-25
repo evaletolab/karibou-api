@@ -4,7 +4,7 @@ var app = require("../app");
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.more.js","Shops.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Products.order.js","Shops.order.js"]);
 
 var Products=db.model('Products'), 
     Orders=db.model('Orders');
@@ -14,7 +14,7 @@ describe("orders.create", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js","../fixtures/Products.more.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.order.js","../fixtures/Products.order.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -37,7 +37,7 @@ describe("orders.create", function(){
    var items=[]
       , customer=data.Users[0]
       , shipping={
-          when:Date.now()
+          when:new Date()
         }
       , payment="postfinance";
 
@@ -214,7 +214,7 @@ describe("orders.create", function(){
     });
   });    
 
-  it("Checking status after creating a new order ", function(done){
+  it.skip("Checking status after creating a new order ", function(done){
     var items=[]
       , customer=data.Users[1]
       , shipping={
@@ -230,14 +230,13 @@ describe("orders.create", function(){
             },
             primary: true,
             region: "GE",
-            when:Date.now()
+            when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
         }
       , payment="postfinance";
 
+    //console.log(shipping.when.getDay(),config.shop.order.weekdays[0])  
 
     items.push(Orders.prepare(data.Products[0], 1, ""))
-    items.push(Orders.prepare(data.Products[1], 2, ""))
-    items.push(Orders.prepare(data.Products[2], 3, ""))
 
 
     //

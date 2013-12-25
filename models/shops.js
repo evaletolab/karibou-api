@@ -5,9 +5,9 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
-  , ObjectId = Schema.ObjectId;
+  , ObjectId = Schema.ObjectId
+  , _ = require('underscore');
   
-var extend      = require( 'node.extend' );
 
 var EnumPlace=config.shop.marketplace.list;
 var EnumLocation=config.shop.location.list;
@@ -194,7 +194,7 @@ Shops.statics.update=function(id,s,callback){
     
     s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
     s.owner&&delete(s.owner);
-    extend(shop,s);
+    _.extend(shop,s);
 
  
     return shop.save(function (err) {    

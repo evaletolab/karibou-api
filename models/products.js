@@ -145,6 +145,12 @@ Product.methods.removeCategories=function(cats,callback){
 };
 
 
+Product.methods.getPrice=function(){
+  if(this.attributes.discount && this.pricing.discount)
+    return this.pricing.discount;
+  return this.pricing.price;
+};
+
 //
 // create a new product 'p' for the shop 's'
 Product.statics.create = function(p,s,callback){
@@ -380,8 +386,7 @@ Product.statics.update=function(id,p,callback){
     if (!product){
       return callback("Could not find product for update "+JSON.stringify(id))
     }
-    extend(product,s);
-    console.log(s)
+    _.extend(product,s);
 
  
     return product.save(function (err) {

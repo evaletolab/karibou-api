@@ -63,15 +63,18 @@ var Orders = new Schema({
       sku:{type:Number, min:10000, requiered:true}, 
       title:{type:String, required:true},
       category:{type:String, required:true},
-      vendor:{
-        ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
-        slug:{type:String, required:true},
-        name:{type:String, required:true},
-        fullName:{type:String, required:true},
-        address:{type:String, required:true},
-      },
-      quantity:{type:Number, min:1, max:100, requiered:true}, 
 
+      // customer quantity
+      quantity:{type:Number, min:1, max:100, requiered:true}, 
+      // given price
+      price:{type:Number, min:0, max:2000, requiered:true},      
+      part:{type: String, required: true},
+
+      // real price, maximum +/- 10% of given price 
+      finalprice:{type:Number, min:0, max:1000, requiered:true},
+
+      // customer note
+      note:{type:String, required:false}, 
 
       //
       // product variation is not yet implemented
@@ -86,15 +89,14 @@ var Orders = new Schema({
         note:{type: String, required: false},
         shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}
       },
-      
-      // given price
-      price:{type:Number, min:0, max:2000, requiered:true},      
-      part:{type: String, required: true},
-      // real price, maximum +/- 10% of given price 
-      finalprice:{type:Number, min:0, max:1000, requiered:true},
-      // customer note
-      note:{type:String, required:false}, 
-      
+
+      vendor:{
+        ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+        slug:{type:String, required:true},
+        name:{type:String, required:true},
+        fullName:{type:String, required:true},
+        address:{type:String, required:true},
+      }          
    }],
    
    
@@ -127,9 +129,13 @@ var Orders = new Schema({
 // prepare one product as order item
 Orders.statics.prepare=function(product, quantity, note){
   var copy={}, keys=['sku','title','categories','vendor'];
+  function getPrice(p){
+    if(p.attributes.discount && p.pricing.discount)
+      return p.pricing.discount;
+    return p.pricing.price;    
+  }
 
   assert(product)
-  assert(quantity)
   assert(product.vendor)
   // check(product.attributes.available)
 
@@ -138,7 +144,7 @@ Orders.statics.prepare=function(product, quantity, note){
   })
 
   copy.quantity=quantity;
-  copy.price=(product.pricing.discount)?product.pricing.discount*quantity:product.pricing.price*quantity
+  copy.price=getPrice(product)*quantity
   copy.part=product.pricing.part;
   copy.note=note;
   copy.finalprice=copy.price;
@@ -155,28 +161,44 @@ Orders.statics.prepare=function(product, quantity, note){
 //  if item price is still correct
 Orders.statics.checkItem=function(item, product, cb){
   var msg1="Ooops, votre article est incomplet. Les données de votre panier ne sont plus valables "
-    , msg2="Votre produit n'est malheureusement plus disponible "
+    , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
-    , msg4="La quantité d'achat minimum est de 1 ";
+    , msg4="La quantité d'achat minimum est de 1 "
+    , msg5="Ce produit n'est pas disponible car la boutique a été désactivé par l'équipe Kariboo"
+    , msg6="Ce produit n'est pas disponible car la boutique est momentanément fermée"
+    , msg7="La quantité souhaitée n'est pas disponible "
+
 
   assert(item.sku==product.sku)
 
   //
   // check item and product exists
-  if(!item || !product){
+  if(!item || !product || item.sku!==product.sku){
     return cb(msg1)
   }
 
   //
-  // check item.categories
+  // add item.categories
   if(!item.category){
     item.category=product.categories[0].name
   }
+
+
+
+
 
   //
   // check item.vendor
   if(!item.vendor ){
     return cb(msg1)
+  }
+
+  if(product.vendor.status!==true){
+    return cb(msg5)
+  }
+
+  if(product.vendor.available.active!==true){
+    return cb(msg6)
   }
 
   if((typeof item.vendor) !=='object' ){
@@ -204,7 +226,7 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // check item is still available in stock
   if(item.quantity>product.pricing.stock){
-    return cb(msg2)
+    return cb(msg7)
   }
 
 
@@ -212,7 +234,7 @@ Orders.statics.checkItem=function(item, product, cb){
   // check item is correct
   // Math.round(value*100)/100
   // if prodduct has discount, price should be computed with
-  var price=(product.pricing.discount)?product.pricing.discount*item.quantity:product.pricing.price*item.quantity
+  var price=product.getPrice()*item.quantity;
   if(item.price.toFixed(1)!=price.toFixed(1)){
     return cb(msg3)
   }
@@ -225,6 +247,13 @@ Orders.statics.checkItem=function(item, product, cb){
 
 }
 
+Orders.statics.jumpToNextWeekDay=function(date, jump) {
+  // 86400000[ms] = 24 * 60² * 1000
+  var nextday=((jump-date.getDay())%7)
+  var week=(nextday>=0)?0:7*86400000;
+  return new Date(+date.getTime()+nextday*86400000+week);
+
+}
 
 
 //
@@ -240,10 +269,33 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     , order={};
 
 
+  //
+  // simple items check
   if(!items.length){
     return callback("items are required.")
   }
 
+  //
+  // check the shipping day
+  if(!shipping.when){
+    return callback("shipping date is required.")
+  }
+  // be sure that is a Date object
+  shipping.when=new Date(shipping.when)
+
+  // 
+  // check that shipping day is available on: config.shop.order.shippingdays
+  var days=Object.keys(config.shop.order.shippingdays);
+  if (!config.shop.order.shippingdays[days[shipping.when.getDay()]].active){
+    return callback("selected shipping day is not available.")
+  }
+
+   // console.log(Math.abs((Date.now()-shipping.when.getTime())/3600000))
+   // console.log(new Date(),shipping.when)
+
+  if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
+    return callback("selected shipping day is to short.")    
+  }
   //
   // get unique Order identifier
   db.model('Sequences').nextOrder(function(err,oid){
@@ -255,7 +307,6 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     // get products by sku and check 
     var skus=_.collect(items,function(item){return item.sku});
     Products.findBySkus(skus).exec(function(err,products){
-
       assert(skus.length===products.length)
       // the unique identifier
       order.oid=oid;

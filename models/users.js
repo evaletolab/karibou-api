@@ -7,7 +7,6 @@ var mongoose = require('mongoose')
   , _ = require('underscore');
 	
 //var	bcrypt = require('bcrypt');
-var extend      = require( 'node.extend' );
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');

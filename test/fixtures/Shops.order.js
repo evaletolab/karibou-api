@@ -1,0 +1,73 @@
+var ObjectId = require('mongodb').ObjectID;
+var Categories=require('./Categories');
+var data=require('./Users');
+
+// shop[0](id:0004, status:true, owner:gluck)
+// shop[1](id:0005, status:false, owner:gmail)
+// shop[2](id:0006, status:Date.now, owner:gluck)
+
+exports.Shops=[{
+    _id:ObjectId('515ec12e56a8d5961e000004'),
+    status:true,
+    name: "Un autre shop",
+    description:"cool ce shop",
+    urlpath:"un-autre-shop",
+    catalog:Categories.Categories[0]._id,
+    owner:data.Users[0]._id,
+    photo:{ 
+      bg:"http://image.truc.io/bg-01123.jp",
+      fg:"http://image.truc.io/fg-01123.jp"      
+    },
+    available:{
+      active:true
+    }
+  },{
+    _id:ObjectId('515ec12e56a8d5961e000005'),
+    status:false,
+    name: "mon shop",
+    description:"cool ce shop",
+    urlpath:"mon-shop",
+    catalog:Categories.Categories[0]._id,
+    owner:data.Users[1]._id,
+    photo:{ 
+      bg:"http://image.truc.io/bg-01123.jp",
+      fg:"http://image.truc.io/fg-01123.jp"      
+    },
+    available:{
+      active:true
+    }
+  },{
+    _id:ObjectId('515ec12e56a8d5961e000006'),
+    status:Date.now,
+    name: "invalid shop",
+    description:"invalid shop",
+    urlpath:"invalid-shop",
+    catalog:Categories.Categories[0]._id,
+    owner:data.Users[0]._id,    
+    available:{
+      active:true
+    },
+    photo:{ 
+      bg:"http://image.truc.io/bg-01123.jp",
+      fg:"http://image.truc.io/fg-01123.jp"      
+    }
+  },{
+    _id:ObjectId('515ec12e56a8d5961e000017'),
+    status:true,
+    name: "not available",
+    description:"cool ce shop",
+    urlpath:"not-available",
+    catalog:Categories.Categories[0]._id,
+    owner:data.Users[1]._id,
+    photo:{ 
+      bg:"http://image.truc.io/bg-01123.jp",
+      fg:"http://image.truc.io/fg-01123.jp"      
+    },
+    available:{
+      active:false
+    }
+  }
+];
+
+
+
