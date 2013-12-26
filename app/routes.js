@@ -8,7 +8,8 @@ module.exports = function(app, config, passport) {
   var home 			= require(path+'home');
   var products 	= require(path+'products');
   var users 	  = require(path+'users');
-  var shops 	  = require(path+'shops');
+  var shops     = require(path+'shops');
+  var orders    = require(path+'orders');
   var emails 	  = require(path+'emails');
   var categories= require(path+'categories');
   var _         = require('underscore');
@@ -85,7 +86,8 @@ module.exports = function(app, config, passport) {
   app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  products.remove);
   //app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
 
-  
+
+  //  
   // shop 
   app.get('/v1/shops', shops.list);
   app.get('/v1/shops/category/:category', shops.list);
@@ -104,6 +106,12 @@ module.exports = function(app, config, passport) {
 
   app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.remove);
 
+
+  //
+  // orders
+  app.get('/v1/orders', auth.ensureAdmin, orders.list);
+  app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.list);
+  app.get('/v1/users/:id/orders', users.ensureMe, orders.list);
 
   //
   // bridge authentification  
