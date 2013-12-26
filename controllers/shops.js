@@ -3,13 +3,12 @@
  * home
  */
 
-var app=require('../app/config');
-var _=require('underscore');
-var assert = require("assert");
-
-var db = require('mongoose');
-var Shops = db.model('Shops');
-var ObjectId = db.Types.ObjectId;
+var app=require('../app/config'),
+    bus=require('../app/bus')
+    _=require('underscore'),
+    db = require('mongoose'),
+    Shops = db.model('Shops'),
+    ObjectId = db.Types.ObjectId;
 
 
 var check = require('validator').check,
@@ -185,7 +184,7 @@ exports.email=function(req,res){
     content.site=config.mail.site;
     //
     // send email
-    req.sendmail(shop.owner.email.address, 
+    bus.emit('sendmail',shop.owner.email.address, 
                  "Un utilisateur à une question pour votre boutique "+req.params.shopname, 
                  content, 
                  "shop-question", function(err, status){
@@ -236,7 +235,7 @@ exports.askStatus=function(req,res){
     console.log(config.mail.to)
     //
     // send email
-    req.sendmail(config.mail.to, 
+    bus.emit('sendmail',config.mail.to, 
                  "Demande de publication du shop "+shop.name, 
                  content, 
                  "shop-status", function(err, status){

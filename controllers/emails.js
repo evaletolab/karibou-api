@@ -3,15 +3,14 @@
  * home
  */
 
-var db=require('../app/config');
-var _=require('underscore');
-var assert = require("assert");
 
 var db = require('mongoose');
 var Emails = db.model('Emails');
 
 var check = require('validator').check,
-    sanitize = require('validator').sanitize;
+    sanitize = require('validator').sanitize,
+    bus=require('../app/bus'),
+    _=require('underscore');
 
 
 function check(req){
@@ -37,7 +36,7 @@ exports.create=function (req, res) {
     content.validate=validate;
     //
     // send email
-    req.sendmail(req.user.email.address, 
+    bus.emit('sendmail',req.user.email.address, 
                  "Confirmation de votre adresse e-mail", 
                  content, 
                  "confirm", function(err, status){

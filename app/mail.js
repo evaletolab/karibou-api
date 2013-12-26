@@ -1,4 +1,4 @@
-module.exports = function(app) {
+module.exports = function(app,bus) {
   var path           = require('path')
     , templatesDir   = path.resolve(__dirname, '..', 'emails')
     , emailTemplates = require('email-templates')
@@ -56,6 +56,12 @@ module.exports = function(app) {
       cb(null,"test is running")
     }
   }
+
+  bus.on('sendmail',function(to, subject, content, template, cb){
+    // console.log("---------------------------EMAIL:",to,subject)
+    sendmail(to, subject, content, template, cb);
+  }); 
+
 
   return sendmail;
 }

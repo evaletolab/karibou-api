@@ -3,6 +3,7 @@
  * Users API
  */
 var db = require('mongoose'),
+    bus=require('../app/bus')
     Users= db.model('Users'),
     password = require('password-generator'),
     check = require('validator').check,
@@ -90,7 +91,7 @@ exports.recover=function(req,res){
 
         //
         // send email
-        req.sendmail(user.email.address, 
+        bus.emit('sendmail',user.email.address, 
                      "Vous avez un nouveau mot de passe", 
                      content, 
                      "password", function(err, status){

@@ -9,20 +9,22 @@ var data = dbtools.fixtures(["Users.js","Categories.js","Products.order.js","Sho
 var Products=db.model('Products')
   , Orders=db.model('Orders')
   , today=new Date()
-  , nextOrderDay
   , toshortDay
   , okDay;
 
 function prepareOrderDates(){
   var today=new Date();
   // sunday is not a shipping day
-  if (today.getDay()==0||today.getDay()==6){
-    nextOrderDay=Orders.jumpToNextWeekDay(today,2);
+  if (today.getDay()==0){
     toshortDay=Orders.jumpToNextWeekDay(today,1);
     okDay=Orders.jumpToNextWeekDay(today,3);
     return
   } 
-  nextOrderDay=Orders.jumpToNextWeekDay(today,today.getDay()+2);
+  if (today.getDay()==4){
+    toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
+    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+4);
+    return
+  } 
   toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
   okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
 }
@@ -210,6 +212,7 @@ describe("orders.create", function(){
     });
   });    
 
+
   it("Checking status after creating a new order ", function(done){
 
     shipping.when=okDay
@@ -249,5 +252,11 @@ describe("orders.create", function(){
       done();          
     });
   });     
+
+  it.skip("Error:an order with status created is no more available after a timeout", function(done){
+    shipping.when=okDay
+
+  });    
+
 });
 

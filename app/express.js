@@ -166,15 +166,15 @@ var tokenSession=function (req, res, next) {
       })
     }
 
-    app.use(function(req, res, next){
-      req.sendmail=sendmail;
+    // app.use(function(req, res, next){
+    //   req.sendmail=sendmail;
 
-      if (process.env.NODE_ENV !== 'test') {
-        console.log("cookie:",req.header('Cookie'), "Sid:",req.sessionID)
-        console.log("cookies",req.cookies, req.session.passport)
-      }
-      next();
-    });
+    //   if (process.env.NODE_ENV !== 'test') {
+    //     console.log("cookie:",req.header('Cookie'), "Sid:",req.sessionID)
+    //     console.log("cookies",req.cookies, req.session.passport)
+    //   }
+    //   next();
+    // });
 
 
 

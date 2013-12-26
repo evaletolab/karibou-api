@@ -65,8 +65,11 @@ var app = express()
 // utils 
 require('./app/utils')(app);
 
+// Events Bus
+var bus=require('./app/bus');
+
 // mailer
-var sendmail=require('./app/mail')(app);
+var sendmail=require('./app/mail')(app,bus);
   
 // bootstrap passport config
 require('./app/passport')(app, config, passport)
@@ -76,6 +79,7 @@ require('./app/express')(app, config, passport, sendmail)
 
 // Bootstrap routes
 require('./app/routes')(app, config, passport)
+
 
 
 

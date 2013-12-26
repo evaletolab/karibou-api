@@ -135,7 +135,8 @@ exports.remove=function (req, res) {
   }catch(err){
     return res.send(400, err.message);
   } 
-  
+  //
+  // todo, do not remove category if product are still assigned
   Categories.remove({slug:req.params.category},function(err){
     if (err){
     	res.status(400);
