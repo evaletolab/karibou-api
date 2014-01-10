@@ -113,6 +113,8 @@ module.exports = function(app, config, passport) {
   app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.list);
   app.get('/v1/users/:id/orders', users.ensureMe, orders.list);
 
+  app.post('/v1/orders/verify/cart', auth.ensureAdmin, orders.verify);
+
   //
   // bridge authentification  
   if(config.auth.twit){

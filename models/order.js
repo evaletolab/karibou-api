@@ -254,6 +254,34 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
   return new Date(+date.getTime()+nextday*86400000+week);
 
 }
+//
+// check items a new order
+Orders.statics.checkItems = function(items, callback){
+  assert(items);
+  assert(callback);
+  var db=this
+    , Orders=db.model('Orders')
+    , Products=db.model('Products')
+
+  var skus=_.collect(items,function(item){return item.sku});
+  Products.findBySkus(skus).exec(function(err,products){
+    assert(skus.length===products.length)
+
+    var i=-1;require('async').each(items, function(item, cb) {
+      i++;//get the iterator
+      //
+      // check an item
+      Orders.checkItem(items[i],products[i],function(err,item){
+        cb(err);
+      })
+    },function(err){
+      //
+      // this checking generate a list of products
+      callback(err,products)
+    });
+
+  });
+}
 
 
 //
@@ -304,32 +332,16 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       return;
     }
     //
-    // get products by sku and check 
-    var skus=_.collect(items,function(item){return item.sku});
-    Products.findBySkus(skus).exec(function(err,products){
-      assert(skus.length===products.length)
-      // the unique identifier
-      order.oid=oid;
-      order.items=[];
-
-      for (var i=0;i<items.length;i++) {
-        var item=items[i], looperr;
-
-        //
-        // check an item
-        Orders.checkItem(item,products[i],function(err,item){
-          if(err){
-            looperr=err;return
-          }
-          order.items.push(item)
-        })
-
-        //
-        // manage err callback outside a checkItem
-        if(looperr){
-          return callback(looperr);
-        }
-      };
+    // set oid
+    order.oid=oid;
+    
+    Orders.checkItems(items,function(err, products){
+      if(err){
+        return callback(err)
+      }
+      //
+      // attache items on success,
+      order.items=items;
 
       //
       // adding customer email (check validity)
@@ -357,10 +369,8 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       return dborder.save(function (err) {
         if(err) return callback(errorHelper(err));
         callback(null,dborder);
-      });
-    });
-  
-
+      });      
+    });  
     
   });
   
