@@ -3,6 +3,9 @@ Karibou is an open-source project aim to help the creation of an
 online community marketplace. Our goal is to allow local food producers, artisans and artists 
 to sell their products locally. There is alpha frontend available here http://karibou.evaletolab.ch/
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/evaletolab/karibou-api/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
 
