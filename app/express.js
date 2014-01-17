@@ -28,10 +28,10 @@ module.exports = function (app, config, passport, sendmail) {
         res.header('Access-Control-Allow-Origin', req.header('Origin'));
       }
 
-//      res.header('Access-Control-Max-Age', config.cors.age);
+      res.header('Access-Control-Max-Age', config.cors.age);
       res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE, OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag,Referer,Set-Cookie,X-Token');
-//      res.header('Access-Control-Expose-Headers','Content-Type,Accept,X-Requested-With,ETag, Set-Cookie, X-Token');
+      res.header('Access-Control-Expose-Headers','Content-Type,Accept,X-Requested-With,ETag, Set-Cookie, X-Token');
       if( req.method.toLowerCase() === "options" ) {
           res.writeHead(204);
           return res.end();        
