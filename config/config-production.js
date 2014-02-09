@@ -35,7 +35,7 @@ module.exports = {
     'view engine': 'jade',
     csrf:false,
     mongoSession:true,
-    proxy:false
+    proxy:true
   },
   
   mongo:{
