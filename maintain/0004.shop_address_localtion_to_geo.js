@@ -30,7 +30,7 @@
 exports.execute = function(db, script, callback){
   var logs="", count=0;
   var users=db.collection('users');
-
+  callback(null,"nothing todo")
   // users.find( {'address.location':{$type:3 } }).toArray(function (err,s) {
 	 //  if (!s.length){
 	 //    return callback(null, "0 shop have been updated")

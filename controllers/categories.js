@@ -37,7 +37,7 @@ exports.list=function (req, res) {
   if (req.query.stats){
     var stats=db.model('Products').aggregate(
       {$project : { sku : 1, categories : 1 }},
-      {$unwind:'$categories'}, 
+    /*{$unwind:'$categories'},   // for array field */
       {
         $group:{
           _id:"$categories", 
@@ -70,8 +70,9 @@ exports.list=function (req, res) {
         if(err){
           return res.send(400,err);
         }
+        // console.log(result, cats)
         cats.forEach(function(cat){
-          var stat=_.find(result,function(s){return s._id.toString()==cat._id.toString()});          
+          var stat=_.find(result,function(s){return s._id&&s._id.toString()==cat._id.toString()});          
           cat._doc.usedBy=(stat)?stat.sku:[];
         })
         return res.json(cats);

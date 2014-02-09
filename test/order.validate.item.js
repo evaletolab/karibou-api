@@ -30,7 +30,7 @@ function prepareOrderDates(){
 }
 prepareOrderDates()
 
-describe("orders.create", function(){
+describe("orders.validate.item", function(){
   var _ = require("underscore");
 
   var items=[]
@@ -249,6 +249,7 @@ describe("orders.create", function(){
       // checking normal price
       order.items[1].quantity.should.equal(2)
       order.items[1].price.should.equal(data.Products[0].pricing.price*2)
+      console.log(JSON.stringify(order))
       done();          
     });
   });     

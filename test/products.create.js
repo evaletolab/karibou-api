@@ -61,7 +61,7 @@ describe("products.create", function(){
 
     it("First OTHER shoud equals 100000", function(done){
       db.model('Sequences').next('other',function(err,sku){
-        sku.should.equal(100000);
+        sku.should.equal(1000000);
         done();
       });
     });
@@ -74,7 +74,7 @@ describe("products.create", function(){
     p.title="test wrong product"
     delete(p.sku);
     delete(p._id);
-    p.categories[data.Categories[2]._id];
+    p.categories=data.Categories[2]._id;
     Products.create(p,data.Shops[0],function(err,product){
       err.should.equal("cannot associate product and catalog");
       done();          
@@ -101,6 +101,17 @@ describe("products.create", function(){
     });
   });
 
+  it("Error on creation of a new product with an array of categories", function(done){
+    var p=_.clone(data.Products[0]);
+    delete(p._id);
+    p.categories=[data.Categories[2]];
+    Products.create(p,data.Shops[0],function(err,product){
+      //console.log(err)
+      err.should.equal("la catégorie doit être unique");
+      done();          
+    });
+  });
+
   it("Create a new product X", function(done){
 
     //
@@ -108,7 +119,7 @@ describe("products.create", function(){
     //p.manufacturer=maker;
     var p=_.clone(data.Products[1]);
     delete(p._id);
-    p.categories=[data.Categories[2]];
+    p.categories=data.Categories[2];
     Products.create(p,data.Shops[0],function(err,product){
       should.not.exist(err);
       should.exist(product);
@@ -124,7 +135,7 @@ describe("products.create", function(){
     // set the manfacturer
     //p.manufacturer=maker;
     var p=_.clone(data.Products[1]);
-    p.categories=[data.Categories[2]];
+    p.categories=data.Categories[2];
     Products.create(p,data.Shops[0],function(err,product){
       should.not.exist(err);
       should.exist(product);

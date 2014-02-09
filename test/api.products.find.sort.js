@@ -36,8 +36,8 @@ describe("api.products.find", function(){
         res.should.have.status(200);
         var w=-1;
         res.body.forEach(function(p){
-          p.categories[0].weight.should.be.above(w)
-          w=p.categories[0].weight;
+          p.categories.weight.should.be.above(w)
+          w=p.categories.weight;
         });
         done();
       });
@@ -51,8 +51,8 @@ describe("api.products.find", function(){
         res.should.have.status(200);
         n='';
         res.body.forEach(function(p){
-          p.categories[0].name.should.be.above(n)
-          n=p.categories[0].name;
+          p.categories.name.should.be.above(n)
+          n=p.categories.name;
         });
         done();
       });

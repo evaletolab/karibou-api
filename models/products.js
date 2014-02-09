@@ -73,7 +73,7 @@ var Product = new Schema({
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
-   categories: [{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true}],
+   categories:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
    vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true}  
 });
 
@@ -116,6 +116,7 @@ Manufacturer.statics.map = function(values, callback){
 };
 
 //db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
+/** NO MORE AVAILABE
 Product.methods.addCategories=function(cats,callback){
   var p=this;
   if(Array.isArray(cats)){
@@ -144,6 +145,7 @@ Product.methods.removeCategories=function(cats,callback){
   });
 };
 
+*/
 
 Product.methods.getPrice=function(){
   if(this.attributes.discount && this.pricing.discount)
@@ -192,10 +194,20 @@ Product.statics.create = function(p,s,callback){
       function(cb){
         //
         // set category (NOT MANDATORY)
-        if(!p.categories||!p.categories.length){
-          cb("Il manque la catégorie")
-          return;
+        if(!p.categories){          
+          return cb("Il manque la catégorie");
         }
+        if(Array.isArray(p.categories)){
+          return cb("la catégorie doit être unique");
+        }
+        db.model('Categories').findOne(p.categories,function(err,categories){
+          if(err){
+            return cb(err);
+          }  
+          p.categories=categories;        
+          cb();
+        })
+        /**
         db.model('Categories').map(p.categories, function(err,categories){
           // FIXME
           //check category is well typed 'category'
@@ -205,6 +217,7 @@ Product.statics.create = function(p,s,callback){
           p.categories=_.collect(categories,function(m){return m._id});;
           cb();
         });
+        */
       }],
       function(err){
         if (err){

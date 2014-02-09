@@ -3,7 +3,7 @@
  * orders
  */
 
-var db=require('../app/config'),
+var db=require('mongoose'),
     _=require('underscore');
 
 

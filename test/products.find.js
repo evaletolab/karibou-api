@@ -83,7 +83,7 @@ describe("products.find:", function(){
   });
 
   it("Find products by Category object  ", function(done){
-    Products.find({categories:data.Categories[2]._id},function(err,products){
+    Products.find({categories:data.Categories[1]._id},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(2)
@@ -96,7 +96,7 @@ describe("products.find:", function(){
   
   it("Find products by slug Category  ", function(done){
 
-    Products.findByCriteria({category:data.Categories[2].slug},function(err,products){
+    Products.findByCriteria({category:data.Categories[1].slug},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(2)
@@ -115,7 +115,7 @@ describe("products.find:", function(){
   });
 
   it("Find products by Category and details(bio=true) ", function(done){
-    Products.findByCriteria({category:data.Categories[2].slug,details:'bio'},function(err,products){
+    Products.findByCriteria({category:data.Categories[1].slug,details:'bio'},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(1)

@@ -1,5 +1,5 @@
 var ObjectId = require('mongodb').ObjectID;
-var Categories=require('./Categories');
+var d=require('./Categories');
 
 // shop[0](un-autre-shop, id:0004, status:true, owner:gluck)
 // shop[1](mon-shop, id:0005, status:false, owner:gmail)
@@ -28,7 +28,6 @@ exports.Products=[{
         discount:3.0,
         part:'100gr'
      },
-     categories: [],
      //un-autre-shop, status:true, owner:gluck     
      vendor:ObjectId('515ec12e56a8d5961e000004')  
   },{
@@ -52,7 +51,7 @@ exports.Products=[{
         price:3.80,
         part:'100gr'
      },
-     categories: [],
+     categories: d.Categories[3]._id ,
      //un-autre-shop, status:true, owner:gluck     
      vendor:'515ec12e56a8d5961e000004'
   },{
@@ -77,7 +76,7 @@ exports.Products=[{
         discount:3.0,
         part:'100gr'
      },
-     categories: [],
+     categories: d.Categories[3]._id ,
      //mon-shop, id:0005, status:false, owner:gmail
      vendor:'515ec12e56a8d5961e000005'
   }

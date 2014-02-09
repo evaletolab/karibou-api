@@ -39,8 +39,8 @@ var Orders = new Schema({
    /* customer email */
    email:{type: String, required:true},
    created:{type: Date, default: Date.now },
-   closed:{type: Date, default: Date.now },
-   
+   closed:{type: Date},
+
    /* full customer details */
    customer:{type: Schema.Types.Mixed, required:true},
    
@@ -90,15 +90,16 @@ var Orders = new Schema({
         shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}
       },
 
-      vendor:{
-        ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
-        slug:{type:String, required:true},
-        name:{type:String, required:true},
-        fullName:{type:String, required:true},
-        address:{type:String, required:true},
-      }          
+      vendor:{type:String, required:true}          
    }],
    
+   vendors:[{
+    ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+    slug:{type:String, required:true},
+    name:{type:String, required:true},
+    fullName:{type:String, required:false},
+    address:{type:String, required:true},
+   }],        
    
    shipping:{
       when:{type:Date, required:true},
@@ -171,6 +172,9 @@ Orders.statics.checkItem=function(item, product, cb){
 
   assert(item.sku==product.sku)
 
+
+  var vendor={};
+
   //
   // check item and product exists
   if(!item || !product || item.sku!==product.sku){
@@ -180,7 +184,7 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // add item.categories
   if(!item.category){
-    item.category=product.categories[0].name
+    item.category=product.categories.name
   }
 
 
@@ -203,14 +207,16 @@ Orders.statics.checkItem=function(item, product, cb){
 
   if((typeof item.vendor) !=='object' ){
     assert(product.vendor._id.toString()===item.vendor.toString())
-    item.vendor={
+    item.vendor=product.vendor.urlpath;
+
+    vendor={
         ref:product.vendor._id,
         slug:product.vendor.urlpath,
         name:product.vendor.name,
-        fullName:product.vendor.owner,
         address:"TODO"
-    }
+    };
   }
+
   
   //
   // check item is still available in stock
@@ -240,13 +246,15 @@ Orders.statics.checkItem=function(item, product, cb){
   }
 
 
-  return cb(null,item)
+  return cb(null,item,vendor)
 
   // mongoose.model('Products').findOneBySku(item.sku,function(err,product){    
   // })
 
 }
 
+/* jump to the next day in week
+ */
 Orders.statics.jumpToNextWeekDay=function(date, jump) {
   // 86400000[ms] = 24 * 60² * 1000
   var nextday=((jump-date.getDay())%7)
@@ -254,6 +262,16 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
   return new Date(+date.getTime()+nextday*86400000+week);
 
 }
+
+/* return the next shipping day */
+Orders.statics.findNextShippingDay=function(){
+  var next=new Date(Date.now()+config.shop.order.timelimit*3600000);
+  while(!config.shop.order.weekdays.contains(next.getDay())){
+    next=new Date(next.getTime()+86400000)
+  }
+  return next;
+}
+
 //
 // check items a new order
 Orders.statics.checkItems = function(items, callback){
@@ -267,17 +285,21 @@ Orders.statics.checkItems = function(items, callback){
   Products.findBySkus(skus).exec(function(err,products){
     assert(skus.length===products.length)
 
+    var vendors=[];
+
     var i=-1;require('async').each(items, function(item, cb) {
       i++;//get the iterator
+
       //
       // check an item
-      Orders.checkItem(items[i],products[i],function(err,item){
+      Orders.checkItem(items[i],products[i],function(err,item, vendor){
+        vendors.push(vendor)
         cb(err);
       })
     },function(err){
       //
       // this checking generate a list of products
-      callback(err,products)
+      callback(err,products,vendors)
     });
 
   });
@@ -335,13 +357,14 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     // set oid
     order.oid=oid;
     
-    Orders.checkItems(items,function(err, products){
+    Orders.checkItems(items,function(err, products,vendors){
       if(err){
         return callback(err)
       }
       //
       // attache items on success,
       order.items=items;
+      order.vendors=_.uniq(vendors,false,function(a,b){return a.slug===b.slug;});
 
       //
       // adding customer email (check validity)
@@ -376,6 +399,35 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   
 
 }; 
+
+//
+// find the last order for a shop
+Orders.statics.findByCriteria = function(criteria, callback){
+  assert(shop);
+  assert(callback);
+  var db=this
+    , Orders=db.model('Orders')
+    , Products=db.model('Products');
+
+  var q={};
+  //
+  // filter by shop
+  if(criteria.shop){
+    q["items.vendor.slug"]=criteria.shop;
+  }
+
+  //
+  // filter by date (24h = today up to tonight)
+  if(criteria.when){
+    var sd=new Date(criteria.when.getYear(), criteria.when.getDay(), criteria.when.getMonth()),
+        ed=new Date(sd.getTime()+86400000);
+    q["shipping.when"]={"$gte": sd, "$lt": ed};
+  }
+
+  Orders.find(q).sort({created: -1}).exec(function(err,order){
+    callback(err,order)
+  })
+}
 
 
 Orders.set('autoIndex', config.mongo.ensureIndex);

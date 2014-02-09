@@ -3,19 +3,15 @@
 module.exports = function (app) {
 
   // export api
-  // toto move this code from there
+  // djb2 algo
+  // http://erlycoder.com/49/javascript-hash-functions-to-convert-string-into-integer-hash-
   String.prototype.hash=function hash(){
-    var h=0,i,char;
-    if (this.length===0){
-      return h;
+    var hash = 5381;
+    for (i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash << 5) + hash) + char; /* hash * 33 + c */
     }
-    
-    for (i=0;i<this.length;i++){
-      char=this.charCodeAt(i);
-      h=((h<<5)-h)+char;
-      h=h & h;
-    }
-    return h;
+    return hash;
   }   
 
   String.prototype.slug=function () {
