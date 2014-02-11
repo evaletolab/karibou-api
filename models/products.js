@@ -200,6 +200,7 @@ Product.statics.create = function(p,s,callback){
         if(Array.isArray(p.categories)){
           return cb("la catégorie doit être unique");
         }
+        if(!p.categories._id)p.categories={_id:p.categories}
         db.model('Categories').findOne(p.categories,function(err,categories){
           if(err){
             return cb(err);
