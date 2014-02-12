@@ -200,7 +200,9 @@ Product.statics.create = function(p,s,callback){
         if(Array.isArray(p.categories)){
           return cb("la catégorie doit être unique");
         }
+
         if(!p.categories._id)p.categories={_id:p.categories}
+
         db.model('Categories').findOne(p.categories,function(err,categories){
           if(err){
             return cb(err);
@@ -224,11 +226,16 @@ Product.statics.create = function(p,s,callback){
         if (err){
           return callback(err);
         }
+
         //
         // ready to create one product
         var product =new  Products(p);
         product.save(function (err) {
-          callback(err,product);
+          Products.findOne({_id:product._id})
+                 .populate('vendor')
+                 .populate('categories').exec(callback)
+
+          // callback(err,product);
         });
       });
   });

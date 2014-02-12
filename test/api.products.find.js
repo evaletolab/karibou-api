@@ -33,6 +33,8 @@ describe("api.products.find", function(){
       .expect('Content-Type', /json/)
       .end(function(err, res){
         res.should.have.status(200);
+        should.exist(res.body.vendor)
+        res.body.vendor.should.be.an.instanceOf(Object)
         done();
       });
   });
@@ -45,6 +47,7 @@ describe("api.products.find", function(){
         res.should.have.status(200);
         res.body.length.should.equal(1)
         res.body[0].sku.should.equal(1000002);
+        res.body[0].vendor.should.be.an.instanceOf(Object)
         done();
       });
   });  
@@ -68,6 +71,7 @@ describe("api.products.find", function(){
         res.should.have.status(200);
         res.body.length.should.equal(1)
         res.body[0].sku.should.equal(1000002);
+        res.body[0].vendor.should.be.an.instanceOf(Object)
         done();
       });
 

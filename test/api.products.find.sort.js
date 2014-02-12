@@ -35,6 +35,7 @@ describe("api.products.find", function(){
       .end(function(err, res){
         res.should.have.status(200);
         var w=-1;
+        res.body[0].vendor.should.be.an.instanceOf(Object)
         res.body.forEach(function(p){
           p.categories.weight.should.be.above(w)
           w=p.categories.weight;
@@ -50,6 +51,7 @@ describe("api.products.find", function(){
       .end(function(err, res){
         res.should.have.status(200);
         n='';
+        res.body[0].vendor.should.be.an.instanceOf(Object)
         res.body.forEach(function(p){
           p.categories.name.should.be.above(n)
           n=p.categories.name;
