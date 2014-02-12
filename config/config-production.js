@@ -59,7 +59,7 @@ module.exports = {
   , twit: {
         consumerKey: 'PzDBUUZoU5hVtigzAz73w'
       , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
-		  , cb: "http://karibou-api.cloudfoundry.com/auth/twitter/callback"
+		  , cb: "http://karibou-api.evaletolab.ch/auth/twitter/callback"
     }
   , github: {
         appId: '11932f2b6d05d2a5fa18'
