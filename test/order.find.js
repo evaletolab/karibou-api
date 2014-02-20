@@ -140,6 +140,37 @@ describe("orders.find", function(){
     });
   });
 
+  it("find open orders (1) for next day filter by shop name 'Super shop'", function(done){
+    var criteria={
+      shop:"super-shop",  /*super-shop*/
+      nextShippingDay:true,
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(1)
+      done();
+    });
+  });
+
+        
+  it("find open orders (0) for next monday filter by shop name 'Super shop'", function(done){
+    var criteria={
+      shop:"super-shop",  /*super-shop*/
+      when:Orders.jumpToNextWeekDay(new Date(),1),
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(0)
+      done();
+    });
+  });
+
+
+
   it.skip("find open orders for one shop with the shipping.when value == today", function(done){
     var criteria={
       shop:"un-shop",
