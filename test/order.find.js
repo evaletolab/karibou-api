@@ -12,23 +12,13 @@ var Products=db.model('Products')
   , toshortDay
   , okDay;
 
-function prepareOrderDates(){
-  var today=new Date();
-  // sunday is not a shipping day
-  if (today.getDay()==0){
-    toshortDay=Orders.jumpToNextWeekDay(today,1);
-    okDay=Orders.jumpToNextWeekDay(today,3);
-    return
-  } 
-  if (today.getDay()==4){
-    toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+4);
-    return
-  } 
-  toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-  okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
-}
-prepareOrderDates()
+
+/**
+ * find order with criteria:
+ *  - closed(all or with date), open
+ *  - filter by shipping date
+ *  - filter by shop slug
+ */
 
 describe("orders.find", function(){
   var _ = require("underscore");
@@ -169,18 +159,6 @@ describe("orders.find", function(){
     });
   });
 
-
-
-  it.skip("find open orders for one shop with the shipping.when value == today", function(done){
-    var criteria={
-      shop:"un-shop",
-      when:new Date()
-    }
-    db.model('Orders').findByCriteria(criteria, function(err,order){
-      // console.log(err,order)
-      done();
-    });
-  });
 
 });
 
