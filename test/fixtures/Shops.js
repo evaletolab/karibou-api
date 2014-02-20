@@ -48,7 +48,7 @@ exports.Shops=[{
   },
   {
     /* shop available !=true */
-    _id:ObjectId('515ec12e56a8d5961e000006'),
+    _id:ObjectId('515ec12e56a8d5961e000007'),
     status:true,
     name: "shop not available",
     description:"invalid shop",
@@ -57,7 +57,7 @@ exports.Shops=[{
     owner:data.Users[0]._id,    
     available:{
       active:false
-    }
+    },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      

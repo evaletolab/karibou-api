@@ -63,7 +63,7 @@ describe("mongoose.fixtures", function(){
     dbtools.load(['../fixtures/Shops.js'],db, function(err,d,c){
       should.not.exist(err)
       db.model('Shops').find({},function(e,docs){
-        docs.length.should.equal(3);
+        docs.length.should.equal(4);
         done();
       });
     });

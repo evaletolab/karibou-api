@@ -75,23 +75,23 @@ describe("api.users.status", function(){
       });
     });
 
-  it('shops.list anonymous /v1/shops should return 200 (1 shops)',function(done){
+  it('shops.list anonymous /v1/shops should return 200 (2 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(1)        
+        res.body.length.should.equal(2)        
         done();        
       });
     });
 
-  it('shops.list user gluck /v1/shops should return 200 (1 shops)',function(done){
+  it('shops.list user gluck /v1/shops should return 200 (3 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .set('cookie', gluck)
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(2)        
+        res.body.length.should.equal(3)        
         done();        
       });
   });
@@ -108,12 +108,12 @@ describe("api.users.status", function(){
       });
   });
 
-  it('shops.list anonymous /v1/shops should return 200 (0 shops)',function(done){
+  it('shops.list anonymous /v1/shops should return 200 (1 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(0)        
+        res.body.length.should.equal(1)        
         done();        
       });
   });
@@ -130,12 +130,12 @@ describe("api.users.status", function(){
       });
   });
 
-  it('shops.list anonymous /v1/shops should return 200 (1 shops)',function(done){
+  it('shops.list anonymous /v1/shops should return 200 (2 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(1)        
+        res.body.length.should.equal(2)        
         done();        
       });
   });
@@ -152,23 +152,23 @@ describe("api.users.status", function(){
       });
   });
 
-  it('shops.list anonymous /v1/shops should return 200 (0 shops)',function(done){
+  it('shops.list anonymous /v1/shops should return 200 (1 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(0)        
+        res.body.length.should.equal(1)        
         done();        
       });
   });
 
-  it.skip('shops.list admin /v1/shops should return 200 (3 shops)',function(done){
+  it('shops.list admin /v1/shops should return 200 (4 shops)',function(done){
     request(app)
       .get('/v1/shops')
       .set('cookie', cookie)
       .end(function(err,res){  
         res.should.have.status(200);
-        res.body.length.should.equal(3)        
+        res.body.length.should.equal(4)        
         done();        
       });
     });
