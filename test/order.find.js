@@ -79,7 +79,7 @@ describe("orders.find", function(){
     });
   });
 
-  it("find open orders for next shipping day", function(done){
+  it("find open orders (1) for next shipping day", function(done){
     var criteria={
       nextShippingDay:true,
       closed:null
