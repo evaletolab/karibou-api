@@ -50,33 +50,103 @@ describe("orders.find", function(){
     });    
   });
 
+  it("find all  orders", function(done){
+
+    var criteria={      
+    }
+
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(3)
+      done();
+    });
+  });
+
   it("find all open orders", function(done){
     var criteria={
-      shop:"un-autre-shop",
-      status:""
+      closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(2)
+      // console.log(order[0].shipping.when)
+      // console.log(order[1].shipping.when)
       done();
     });
   });
 
-  it("find open orders for one shop with the shipping.when value == the nextShippingDay ", function(done){
+  it("find all closed (1) orders", function(done){
+    var monday=Orders.jumpToNextWeekDay(new Date(),1);
+
     var criteria={
-      shop:"un-autre-shop"
+      closed:new Date(monday.getTime()-86400000*7)
     }
+
     db.model('Orders').findByCriteria(criteria, function(err,order){
-      console.log(err,order)
+      should.not.exist(err)
+      order.length.should.equal(1)
       done();
     });
   });
 
-  it("find open orders for one shop with the shipping.when value == today", function(done){
+  it("find open orders for next shipping day", function(done){
     var criteria={
-      shop:"un-autre-shop",
+      nextShippingDay:true,
+      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(1)
+      done();
+    });
+  });
+
+  it("find open orders (1) for next monday", function(done){
+    var criteria={
+      when:Orders.jumpToNextWeekDay(new Date(),1),
+      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(1)
+      done();
+    });
+  });
+
+
+  it("find open orders (1) filter by shop name 'Super shop'", function(done){
+    var criteria={
+      shop:"super-shop",  /*super-shop*/
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(1)
+      done();
+    });
+  });
+
+  it("find open orders (2) filter by shop name 'Un autre shop'", function(done){
+    var criteria={
+      shop:"un-autre-shop",  /*super-shop*/
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(2)
+      done();
+    });
+  });
+
+  it.skip("find open orders for one shop with the shipping.when value == today", function(done){
+    var criteria={
+      shop:"un-shop",
       when:new Date()
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
-      console.log(err,order)
+      // console.log(err,order)
       done();
     });
   });

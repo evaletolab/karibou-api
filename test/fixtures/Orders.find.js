@@ -1,97 +1,108 @@
 var ObjectId = require('mongodb').ObjectID;
 var c=require('./Categories');
 var u=require('./Users');
+var orders = require('mongoose').model('Orders');
 
+// this fixture focus on order with 
+//  - different dates (today, next shipping day, next week), 
+//  - config.shop.financialstatus  ("pending","authorized","partially_paid","paid", "partially_refunded" ...)
+//  - config.shop.cancelreason ("customer", "fraud", "inventory", "other")
+//  - config.shop.status ("created","partial","fulfilled", "shipped","failure")
+//
+// build orders with
+//  - 2 users
+//  - all products, stock, shop, user ... are available
+//  -
+
+var nextday=orders.findNextShippingDay();
+var monday=orders.jumpToNextWeekDay(new Date(),1);
+var passedday=new Date(monday.getTime()-86400000*7)
 
 exports.Orders=[
     {
-        "_id": ObjectId("52f12f09a328f285313bda00"),
-        "oid": 2000006,
+        _id: ObjectId("52f12f09a328f285313bda10"),
+        oid: 2000000,
         /* customer */
-        "customer": {
-            "password": "password",
-            "tags": [],
-            "shops": [],
-            "roles": [],
-            "provider": "local",
-            "photo": "jpg",
-            "phoneNumbers": [
-                {
-                    "what": "principal",
-                    "number": "076 3787968"
-                }
-            ],
-            "addresses": [
-                {
-                    "region": "GE",
-                    "primary": true,
-                    "geo": {
-                        "lng": 6.1692497,
-                        "lat": 46.1997473
-                    },
-                    "postalCode": "1208",
-                    "location": "Genève-Ville",
-                    "floor": "2",
-                    "streetAdress": "route de chêne 34",
-                    "note": "123456",
-                    "name": "famille olivier evalet"
-                }
-            ],
-            "email": {
-                "status": true,
-                "address": "evaleto@gmail.com"
-            },
-            "displayName": "olvier pluck",
-            "likes": [],
-            "invoices": [],
-            "id": 12346,
-            "created": "2013-03-27T17:07:34.201Z",
-            "status": true,
-        },
+        customer: u.Users[1],
 
         /* email customer */
-        "email": "evaleto@gmail.com",
+        email: "evaleto@gmail.com",
 
         /* payment */
-        "payment": {
-            "gateway": "postfinance"
+        payment: {
+            gateway: "postfinance",
+            status:"pending"
         },
 
-        /* shipping */
-        "shipping": {
-            "name": "famille olivier evalet",
-            "note": "123456",
-            "streetAdress": "route de chêne 34",
-            "floor": "2",
-            "postalCode": "1208",
-            "region": "GE",
-            "when": "2014-02-07T18:18:49.100Z",
-            "geo": {
-                "lat": 46.1997473,
-                "lng": 6.1692497
+
+        /* shipping adresse*/
+        shipping: {
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            region: "GE",
+            when: nextday,
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            }
+        },
+
+
+        fulfillments: {
+            status: "created"
+        },
+
+        created: new Date(),
+        closed:passedday      
+    },
+    {
+        _id: ObjectId("52f12f09a328f285313bda00"),
+        oid: 2000006,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            gateway: "postfinance",
+            status:"pending"
+        },
+
+
+        /* shipping adresse*/
+        shipping: {
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            region: "GE",
+            when: nextday,
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
             }
         },
 
         /* vendors */
         vendors: [
             {
-                ref: ObjectId('515ec12e56a8d5961e000004'),
-                slug: "un-autre-shop",
-                name: "Un autre shop",
-                address: "TODO",
-            },
-            {
                 /*shop status !=true */
-                ref: ObjectId('515ec12e56a8d5961e000005'),
-                slug: "mon-shop",
-                name: "mon shop",
+                ref: ObjectId('515ec12e56a8d5961e000006'),
+                slug: "super-shop",
+                name: "super shop",
                 address: "TODO",
             },
             {
                 /* shop available !=true */
-                ref: ObjectId('515ec12e56a8d5961e000007'),
-                slug: "shop-not-available",
-                name: "shop not available",
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "un autre shop",
                 address: "TODO",
             }
         ],
@@ -106,7 +117,7 @@ exports.Orders=[
                 note: "",
                 finalprice: 2.5,
                 category: "Viande",
-                vendor:"un-shop",
+                vendor:"super-shop",
                 fulfillment: {
                     shipping: "grouped",
                     status: "created"
@@ -149,11 +160,114 @@ exports.Orders=[
         },
 
         created: new Date()
+    },{
+
+        _id: ObjectId("52f12f09a328f285313bda01"),
+        oid: 2000007,
+        /* customer */
+        customer: u.Users[2],
+
+        /* email customer */
+        email: "delphine@gmail.com",
+
+        /* payment */
+        payment: {
+            gateway: "postfinance",
+            status:"pending"
+        },
+
+        /* shipping adresse*/
+        shipping: {
+            region: "GE",
+            when: monday,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            location: "Genève-Ville",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet"
+        },
+
+        /* vendors */
+        vendors: [
+            {
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "Un autre shop",
+                address: "TODO",
+            },
+            {
+                /*shop status !=true */
+                ref: ObjectId('515ec12e56a8d5961e000005'),
+                slug: "mon-shop",
+                name: "mon shop",
+                address: "TODO",
+            }
+        ],
+        /* items */
+        items: [
+            {
+                sku: 1000004,
+                title: "Product 4 with cat",
+                quantity: 1,
+                price: 2.5,
+                part: "1pce",
+                note: "",
+                finalprice: 2.5,
+                category: "Viande",
+                vendor:"mon-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 3,
+                price: 3,
+                part: "100gr",
+                note: "",
+                finalprice: 3,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000003,
+                title: "Product 3 with cat",
+                quantity: 2,
+                price: 7.6,
+                part: "0.75L",
+                note: "",
+                finalprice: 7.6,
+                category: "Poissons",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            }
+        ],
+
+        fulfillments: {
+            status: "created"
+        },
+
+        created: new Date()
+
     }
 ];
 
 //
-// ------------------------ ORDERS --------------------------
+// ------------------------ SHOPS --------------------------
 //
 
 exports.Shops=[{
@@ -173,7 +287,7 @@ exports.Shops=[{
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000005'),
-    status:false,
+    status:true,
     name: "mon shop",
     description:"cool ce shop",
     urlpath:"mon-shop",
@@ -188,10 +302,10 @@ exports.Shops=[{
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
-    status:Date.now,
-    name: "invalid shop",
-    description:"invalid shop",
-    urlpath:"invalid-shop",
+    status:true,
+    name: "super shop",
+    description:"super shop",
+    urlpath:"super-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
     available:{
@@ -204,9 +318,9 @@ exports.Shops=[{
   },{
     _id:ObjectId('515ec12e56a8d5961e000017'),
     status:true,
-    name: "not available",
+    name: "un shop",
     description:"cool ce shop",
-    urlpath:"not-available",
+    urlpath:"un-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[1]._id,
     photo:{ 
@@ -214,7 +328,7 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:true
     }
   }
 ];
@@ -226,7 +340,7 @@ exports.Shops=[{
 exports.Products=[{
     _id : new ObjectId(), 
      sku:1000001,
-     title: "Product 1 with cat",     
+     title: "Product 2 with cat",     
      details:{
         description:"description",
         comment:"Temps de cuisson : 16 minutes",
@@ -250,11 +364,11 @@ exports.Products=[{
      /* weight:0,1 */
      categories: c.Categories[1]._id,
      //un-autre-shop, id:0004, status:true, owner:gluck
-     vendor:'515ec12e56a8d5961e000004'     
+     vendor:'515ec12e56a8d5961e000006'     
   },{
     _id : new ObjectId(), 
      sku:1000002,
-     title: "Product with shop disabled by kariboo",     
+     title: "Product 2 with cat",     
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
@@ -275,11 +389,11 @@ exports.Products=[{
      /* weight:2 */
      categories: c.Categories[3]._id,
      //shop available==true, status!=true
-     vendor:'515ec12e56a8d5961e000006'
+     vendor:'515ec12e56a8d5961e000004'
   },{
     _id : new ObjectId(), 
      sku:1000003,
-     title: "Product with shop disabled",     
+     title: "Product 3 with cat",     
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
@@ -288,7 +402,7 @@ exports.Products=[{
         bio:true, 
      },  
      attributes:{
-        available:false,
+        available:true,
         comment:false, 
         discount:false
      },
@@ -299,12 +413,11 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: c.Categories[2]._id,
-     //shop available !=true, status=true
-     vendor:'515ec12e56a8d5961e000006'
+     vendor:'515ec12e56a8d5961e000004'
   },{
     _id : new ObjectId(), 
      sku:1000004,
-     title: "Product disabled",     
+     title: "Product 4 with cat",     
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
@@ -313,7 +426,7 @@ exports.Products=[{
         bio:true, 
      },  
      attributes:{
-        available:false,
+        available:true,
         comment:false, 
         discount:false
      },
@@ -324,8 +437,7 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: c.Categories[2]._id,
-     // status:true, available==true
-     vendor:'515ec12e56a8d5961e000004'
+     vendor:'515ec12e56a8d5961e000005'
   },{
     _id : new ObjectId(), 
      sku:1000005,
@@ -338,7 +450,7 @@ exports.Products=[{
         bio:true, 
      },  
      attributes:{
-        available:false,
+        available:true,
         comment:false, 
         discount:false
      },
@@ -349,7 +461,6 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: c.Categories[2]._id,
-     // status:true available:false
      vendor:'515ec12e56a8d5961e000004'
   }  
 ];

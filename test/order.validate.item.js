@@ -122,6 +122,24 @@ describe("orders.validate.item", function(){
     });
   });    
 
+  it("Error:order with any product out of stock", function(done){
+    shipping.when=okDay
+
+    items=[]
+    items.push(Orders.prepare(data.Products[5], 1, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.exist(err)
+      err.should.include('est plus en stock')
+      done();          
+    });
+  });
+
+
   it("Error:item quantity in cart is no more available in shop", function(done){
     shipping.when=okDay
 

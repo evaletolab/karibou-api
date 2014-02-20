@@ -214,17 +214,7 @@ describe("orders.create", function(){
     });
   });    
 
- it.skip("Error: order with any product out of stock", function(done){
- });
 
- it.skip("Error: order with any product not available", function(done){
- });
-
- it.skip("Error: order with any product.vendor not available", function(done){
- });
-
- it.skip("Error: order with any product.vendor closed", function(done){
- });
 
 });
 

@@ -350,9 +350,34 @@ exports.Products=[{
         part:'0.75L'
      },
      categories: c.Categories[2]._id,
-     // status:true available:false
+     //status:true, active:true
      vendor:'515ec12e56a8d5961e000004'
-  }  
+  },{
+    _id : new ObjectId(), 
+     sku:1000006,
+     title: "Product not in stock",     
+     details:{
+        description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
+        comment:"Temps de cuisson : 16 minutes",
+        gluten:true, 
+        ogm:false,
+        bio:true, 
+     },  
+     attributes:{
+        available:true,
+        comment:false, 
+        discount:false
+     },
+     pricing: {
+        stock:0,        /*NO STOCK */
+        price:3.80,
+        discount:3.0,
+        part:'0.75L'
+     },
+     categories: c.Categories[2]._id,
+     //status:true, active:true
+     vendor:'515ec12e56a8d5961e000004'
+  }   
 ];
 
 

@@ -52,8 +52,12 @@ var Orders = new Schema({
    
    /* discount_code:{type: String}, */   
    /* cart_token:{type: String}, */
+
+   payment:{
+      gateway:{type:String,enum: EnumOrderGateway, required:true},
+      status:{type:String, enum:EnumFinancialStatus, default:'pending'}
+   },
    
-   financial_status:{type:String, enum:EnumFinancialStatus},
 
    fulfillments:{
      status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},     
@@ -113,13 +117,9 @@ var Orders = new Schema({
         lat:{type:Number, required: true},
         lng:{type:Number, required: true}
       }      
-   },
-   
-   
-   payment:{
-      gateway:{type:String,enum: EnumOrderGateway, required:true}
    }   
    
+
 });
 
 //
@@ -161,13 +161,14 @@ Orders.statics.prepare=function(product, quantity, note){
 //  if item.quantity>product.pricing.stock
 //  if item price is still correct
 Orders.statics.checkItem=function(item, product, cb){
-  var msg1="Ooops, votre article est incomplet. Les données de votre panier ne sont plus valables "
+  var msg1="Votre article est incomplet. Les données dans votre panier ne sont plus valables "
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
     , msg4="La quantité d'achat minimum est de 1 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivé par l'équipe Kariboo"
     , msg6="Ce produit n'est pas disponible car la boutique est momentanément fermée"
     , msg7="La quantité souhaitée n'est pas disponible "
+    , msg8="Ce produit n'est plus en stock "
 
 
   assert(item.sku==product.sku)
@@ -231,6 +232,10 @@ Orders.statics.checkItem=function(item, product, cb){
 
   //
   // check item is still available in stock
+  if(product.pricing.stock==0){
+    return cb(msg8)
+  }
+
   if(item.quantity>product.pricing.stock){
     return cb(msg7)
   }
@@ -253,7 +258,8 @@ Orders.statics.checkItem=function(item, product, cb){
 
 }
 
-/* jump to the next day in week
+/* jump the N day in week (0=sunday,1=monday, ...)
+ * if next N day is before today then jump next week
  */
 Orders.statics.jumpToNextWeekDay=function(date, jump) {
   // 86400000[ms] = 24 * 60² * 1000
@@ -266,7 +272,7 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
 /* return the next shipping day */
 Orders.statics.findNextShippingDay=function(){
   var next=new Date(Date.now()+config.shop.order.timelimit*3600000);
-  while(!config.shop.order.weekdays.contains(next.getDay())){
+  while(config.shop.order.weekdays.indexOf(next.getDay())<0){
     next=new Date(next.getTime()+86400000)
   }
   return next;
@@ -378,10 +384,25 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       //
       // adding shipping address (minimum 3 fields 
       // for general error msg)
-      if (!shipping||Object.keys(shipping).length<3){
-        return callback('shipping address is required.')
+      if (!shipping ||Object.keys(shipping).length<3
+                    ||!shipping.name
+                    ||!shipping.note
+                    ||!shipping.streetAdress
+                    ||!shipping.floor
+                    ||!shipping.postalCode
+                    ||!shipping.region
+                    ||!shipping.geo){
+        return callback('shipping address is missing or imcomplet.')
       }
-      order.shipping=shipping;
+      order.shipping={
+        name:shipping.name,
+        note:shipping.note,
+        streetAdress:shipping.streetAdress,
+        floor:shipping.floor,
+        postalCode:shipping.postalCode,
+        region:shipping.region,
+        geo:shipping.geo
+      };
 
       //
       // adding payment
@@ -414,13 +435,33 @@ Orders.statics.findByCriteria = function(criteria, callback){
   //
   // filter by shop
   if(criteria.shop){
-    q["items.vendor.slug"]=criteria.shop;
+    q["items.vendor"]=criteria.shop;
   }
 
   //
+  // filter by closed date
+  if(criteria.closed && criteria.closed!=null){
+    var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
+        ed=new Date(sd.getTime()+86400000);
+    q["closed"]={"$gte": sd, "$lt": ed};
+  }
+  if(criteria.closed===null){
+    q["closed"]=null; 
+  }
+
+
+  //
+  // filter by next shipping date
+  if(criteria.nextShippingDay){
+    var next=this.findNextShippingDay();
+    var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
+        ed=new Date(sd.getTime()+86400000);
+    q["shipping.when"]={"$gte": sd, "$lt": ed};
+  }
+  //
   // filter by date (24h = today up to tonight)
   if(criteria.when){
-    var sd=new Date(criteria.when.getYear(), criteria.when.getDay(), criteria.when.getMonth()),
+    var sd=new Date(criteria.when.getFullYear(), criteria.when.getUTCMonth(), criteria.when.getUTCDate()),
         ed=new Date(sd.getTime()+86400000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
