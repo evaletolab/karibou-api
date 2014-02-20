@@ -154,6 +154,23 @@ Product.methods.getPrice=function(){
 };
 
 //
+// product is available for order only if
+// - vendor is populated,
+// - attributes.available is true
+// - vendor.status is true
+// - vendor.available.active is true
+Product.methods.isAvailableForOrder=function(){
+  if(!this.vendor||!this.vendor._id){
+    // vendor must be populated
+    return false;
+  }
+  return (this.attributes.available && 
+          this.vendor.status===true &&
+          !this.vendor.available.active)
+};
+
+
+//
 // create a new product 'p' for the shop 's'
 Product.statics.create = function(p,s,callback){
   assert(p);

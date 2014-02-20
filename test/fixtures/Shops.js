@@ -7,6 +7,7 @@ var data=require('./Users');
 // shop[2](id:0006, status:Date.now, owner:gluck)
 
 exports.Shops=[{
+    /*shop status ==true */  
     _id:ObjectId('515ec12e56a8d5961e000004'),
     status:true,
     name: "Un autre shop",
@@ -19,6 +20,7 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     }
   },{
+    /*shop status !=true */
     _id:ObjectId('515ec12e56a8d5961e000005'),
     name: "mon shop",
     description:"cool ce shop",
@@ -31,6 +33,7 @@ exports.Shops=[{
     }
   },
   {
+    /*shop status !=true */
     _id:ObjectId('515ec12e56a8d5961e000006'),
     status:Date.now,
     name: "invalid shop",
@@ -38,6 +41,23 @@ exports.Shops=[{
     urlpath:"invalid-shop",
     catalog:Categories.Categories[0]._id,
     owner:data.Users[0]._id,    
+    photo:{ 
+      bg:"http://image.truc.io/bg-01123.jp",
+      fg:"http://image.truc.io/fg-01123.jp"      
+    }
+  },
+  {
+    /* shop available !=true */
+    _id:ObjectId('515ec12e56a8d5961e000006'),
+    status:true,
+    name: "shop not available",
+    description:"invalid shop",
+    urlpath:"shop-not-available",
+    catalog:Categories.Categories[0]._id,
+    owner:data.Users[0]._id,    
+    available:{
+      active:false
+    }
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      

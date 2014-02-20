@@ -4,7 +4,7 @@ var app = require("../app");
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.order.js","Shops.order.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
 var Products=db.model('Products'), 
     Orders=db.model('Orders');
@@ -14,7 +14,7 @@ describe("orders.create", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.order.js","../fixtures/Products.order.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -213,6 +213,18 @@ describe("orders.create", function(){
       done();          
     });
   });    
+
+ it.skip("Error: order with any product out of stock", function(done){
+ });
+
+ it.skip("Error: order with any product not available", function(done){
+ });
+
+ it.skip("Error: order with any product.vendor not available", function(done){
+ });
+
+ it.skip("Error: order with any product.vendor closed", function(done){
+ });
 
 });
 

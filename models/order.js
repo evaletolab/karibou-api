@@ -403,7 +403,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 //
 // find the last order for a shop
 Orders.statics.findByCriteria = function(criteria, callback){
-  assert(shop);
+  assert(criteria);
   assert(callback);
   var db=this
     , Orders=db.model('Orders')

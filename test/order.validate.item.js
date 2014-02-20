@@ -4,7 +4,7 @@ var app = require("../app");
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.order.js","Shops.order.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Orders.validate.js"]);
 
 var Products=db.model('Products')
   , Orders=db.model('Orders')
@@ -54,7 +54,7 @@ describe("orders.validate.item", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.order.js","../fixtures/Products.order.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -249,7 +249,7 @@ describe("orders.validate.item", function(){
       // checking normal price
       order.items[1].quantity.should.equal(2)
       order.items[1].price.should.equal(data.Products[0].pricing.price*2)
-      console.log(JSON.stringify(order))
+      // console.log(JSON.stringify(order))
       done();          
     });
   });     

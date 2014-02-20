@@ -4,7 +4,7 @@ var app = require("../app");
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
 var should = require("should");
-var data = dbtools.fixtures(["Users.js","Categories.js","Products.order.js","Order.find.js"]);
+var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
 
 var Products=db.model('Products')
   , Orders=db.model('Orders')
@@ -36,7 +36,7 @@ describe("orders.find", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Order.find.js","../fixtures/Products.order.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -48,6 +48,16 @@ describe("orders.find", function(){
     dbtools.clean(function(){    
       done();
     });    
+  });
+
+  it("find all open orders", function(done){
+    var criteria={
+      shop:"un-autre-shop",
+      status:""
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      done();
+    });
   });
 
   it("find open orders for one shop with the shipping.when value == the nextShippingDay ", function(done){
