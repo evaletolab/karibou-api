@@ -290,6 +290,7 @@ Orders.statics.checkItems = function(items, callback){
     var i=-1;require('async').each(items, function(item, cb) {
       i++;//get the iterator
 
+
       //
       // check an item
       Orders.checkItem(items[i],products[i],function(err,item, vendor){

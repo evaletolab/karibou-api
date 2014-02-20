@@ -163,7 +163,7 @@ describe("orders.validate.item", function(){
     shipping.when=okDay
 
     items=[]
-    items.push(Orders.prepare(data.Products[3], 1, ""))
+    items.push(Orders.prepare(data.Products[1], 1, ""))
 
 
     //
@@ -180,7 +180,7 @@ describe("orders.validate.item", function(){
     shipping.when=okDay
 
     items=[]
-    items.push(Orders.prepare(data.Products[4], 1, ""))
+    items.push(Orders.prepare(data.Products[2], 1, ""))
 
 
     //
@@ -198,7 +198,7 @@ describe("orders.validate.item", function(){
     shipping.when=okDay
 
     items=[]
-    items.push(Orders.prepare(data.Products[2], 1, ""))
+    items.push(Orders.prepare(data.Products[3], 1, ""))
 
 
     //
@@ -213,7 +213,7 @@ describe("orders.validate.item", function(){
   });    
 
 
-  it("Checking status after creating a new order ", function(done){
+  it.skip("Checking status after creating a new order ", function(done){
 
     shipping.when=okDay
 

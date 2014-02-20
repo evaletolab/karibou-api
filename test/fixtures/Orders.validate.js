@@ -75,6 +75,7 @@ exports.Orders=[
         /* vendors */
         vendors: [
             {
+                /* shop status=available=true */
                 ref: ObjectId('515ec12e56a8d5961e000004'),
                 slug: "un-autre-shop",
                 name: "Un autre shop",
@@ -249,7 +250,7 @@ exports.Products=[{
      },
      /* weight:0,1 */
      categories: c.Categories[1]._id,
-     //un-autre-shop, id:0004, status:true, owner:gluck
+     //status:true, active:true
      vendor:'515ec12e56a8d5961e000004'     
   },{
     _id : new ObjectId(), 
@@ -300,7 +301,7 @@ exports.Products=[{
      },
      categories: c.Categories[2]._id,
      //shop available !=true, status=true
-     vendor:'515ec12e56a8d5961e000006'
+     vendor:'515ec12e56a8d5961e000017'
   },{
     _id : new ObjectId(), 
      sku:1000004,
