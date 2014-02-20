@@ -130,7 +130,7 @@ describe("orders.find", function(){
     });
   });
 
-  it("find open orders (1) for next day filter by shop name 'Super shop'", function(done){
+  it("find open orders (1) for next shipping day filter by shop name 'Super shop'", function(done){
     var criteria={
       shop:"super-shop",  /*super-shop*/
       nextShippingDay:true,
