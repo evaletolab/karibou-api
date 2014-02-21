@@ -125,6 +125,15 @@ var Orders = new Schema({
 //
 // API
 
+Orders.method.getTotalPrice=function(){
+  var total=0.0;
+  this.items.forEach(function(item){
+    total+=item.finalprice*item.quantity;
+  });
+  
+  return total;
+}
+
 
 //
 // prepare one product as order item
@@ -483,9 +492,61 @@ Orders.statics.findByCriteria = function(criteria, callback){
 
 
   Orders.find(q).sort({created: -1}).exec(function(err,order){
+    //
+    //
     callback(err,order)
   })
 }
+
+//
+// only finalprice and note can be modified for an item
+Orders.statics.updateItem = function(oid,items, callback){
+  assert(oid);
+  assert(items);
+  db.model('Orders').findOne({oid:oid},function(err,order){
+    if(err){
+      return callback(err)
+    }
+    if(!order){
+      return callback("Impossible de trouver la commande: "+oid);
+    }
+
+    var itemId=[];
+    items.forEach(function(item){
+      assert(item.sku)
+      for(var i in order.items){
+        if(order.items[i].sku===item.sku){
+          if(item.finalprice) order.items[i].finalprice=item.finalprice;
+          if(item.note)       order.items[i].note=item.note;
+          if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
+          itemId.push(order.items[i].sku);
+          break;
+        }
+      }
+    })
+    if(itemId.length!==items.length){
+      return callback("Impossible de modifer tous les articles. Les articles modifiés : "+itemId.join(', '));      
+    }
+    
+    order.save(callback)
+    // DONT KNOW WHY THE UPDATE IS NOT WORKING!!!
+    // order.update({'items.id': itemId.id}, {'$set': {
+    //     'items.$.finalprice': item.finalprice,
+    //     'items.$.note': item.note,
+    //     'items.$.fulfillment.status':item.fulfillment.status,
+    //     'items.$.sku':itemId.sku,
+    //     'items.$.title':itemId.title,
+    //     'items.$.quantity':itemId.quantity,
+    //     'items.$.price':itemId.price,
+    //     'items.$.part':itemId.part,
+    //     'items.$.category':itemId.category,
+    //     'items.$.vendor':itemId.vendor,
+    //     'items.$.fulfillment.shipping':itemId.fulfillment.shipping
+    // }}, callback);
+
+  });
+}
+
 
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
