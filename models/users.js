@@ -85,7 +85,8 @@ var mongoose = require('mongoose')
     created:{type:Date, default: Date.now},
 		salt: { type: String, required: false },
 		hash: { type: String, required: false },   
-		roles: Array
+		roles: Array,
+    rank: String
 });
 
 /**

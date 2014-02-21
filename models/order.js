@@ -466,6 +466,22 @@ Orders.statics.findByCriteria = function(criteria, callback){
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
 
+  //
+  // filter by user
+  if(criteria.user){
+    // q["email"]=criteria.user
+    q["customer.id"]=criteria.user;
+  }
+
+  //
+  // filter by user
+  if(criteria.payment){
+    // q["email"]=criteria.user
+    q["payment.status"]=criteria.payment;
+  }
+
+
+
   Orders.find(q).sort({created: -1}).exec(function(err,order){
     callback(err,order)
   })

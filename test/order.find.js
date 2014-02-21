@@ -23,6 +23,13 @@ var Products=db.model('Products')
 describe("orders.find", function(){
   var _ = require("underscore");
 
+  var nextday=Orders.findNextShippingDay();
+  var monday=Orders.jumpToNextWeekDay(new Date(),1);
+
+  // on friday next shipping day equal monday
+  // If days equal , orders count are different
+  var dateEqual=(monday.getDay()==nextday.getDay())
+
 
   before(function(done){
     dbtools.clean(function(e){
@@ -40,7 +47,7 @@ describe("orders.find", function(){
     });    
   });
 
-  it("find all  orders", function(done){
+  it("find all orders (3)", function(done){
 
     var criteria={      
     }
@@ -52,19 +59,28 @@ describe("orders.find", function(){
     });
   });
 
-  it("find all open orders", function(done){
+  it("find all open orders (2)", function(done){
     var criteria={
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
       order.length.should.equal(2)
-      // console.log(order[0].shipping.when)
-      // console.log(order[1].shipping.when)
       done();
     });
   });
 
+  it("find all open orders that are paid (0)", function(done){
+    var criteria={
+      payment:"paid",
+      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(0)
+      done();
+    });
+  });
   it("find all closed (1) orders", function(done){
     var monday=Orders.jumpToNextWeekDay(new Date(),1);
 
@@ -86,7 +102,7 @@ describe("orders.find", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(1)
+      order.length.should.equal(dateEqual?2:1)
       done();
     });
   });
@@ -98,7 +114,7 @@ describe("orders.find", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(1)
+      order.length.should.equal(dateEqual?2:1)
       done();
     });
   });
@@ -154,7 +170,32 @@ describe("orders.find", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(0)
+      order.length.should.equal(dateEqual?1:0)
+      done();
+    });
+  });
+
+  it("find all orders (2) for user evaleto", function(done){
+    var criteria={
+      user: 12346,
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(2)
+      order[0].customer.id.should.equal(12346)
+      done();
+    });
+  });
+
+  it("find open orders (1) for user evaleto", function(done){
+    var criteria={
+      user: 12346,
+      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order[0].customer.id.should.equal(12346)
+      order.length.should.equal(1)
       done();
     });
   });
