@@ -12,10 +12,12 @@ var Products=db.model('Products')
   , toshortDay
   , okDay;
 
+//
+// check times in config.shop.order.timelimit
 function prepareOrderDates(){
   var today=new Date();
-  // sunday is not a shipping day
-  if (today.getDay()==0){
+  // saturday or sunday are not a shipping day
+  if (today.getDay()==0||today.getDay()==6){
     toshortDay=Orders.jumpToNextWeekDay(today,1);
     okDay=Orders.jumpToNextWeekDay(today,3);
     return

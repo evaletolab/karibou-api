@@ -112,11 +112,16 @@ describe("orders.create.success", function(){
     });
   });     
 
-  it.skip("Error:an order with status created and not paid is no more available after a timeout", function(done){
-    shipping.when=okDay
-
+  //
+  // order is in timaout if payment status != 'paid' and created<1s (timeoutAndNotPaid) 
+  // for testing timeout = 100[ms]
+  it("Error:an order with status created and not paid is no more available after a timeout", function(done){
+    Orders.findByTimeoutAndNotPaid(function(err,orders){
+      orders.length.should.equal(1)
+      orders[0].oid.should.equal(2000006)
+      done();
+    })
   }); 
-  
 
 });
 

@@ -77,7 +77,7 @@ describe("orders.find", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(0)
+      order.length.should.equal(1)
       done();
     });
   });
