@@ -112,7 +112,7 @@ describe("orders.create.success", function(){
     });
   });     
 
-  it.skip("Error:an order with status created is no more available after a timeout", function(done){
+  it.skip("Error:an order with status created and not paid is no more available after a timeout", function(done){
     shipping.when=okDay
 
   }); 
