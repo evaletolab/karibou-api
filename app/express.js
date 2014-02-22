@@ -106,7 +106,7 @@ var tokenSession=function (req, res, next) {
 
     // don't use logger for test env
     if (process.env.NODE_ENV !== 'test') {
-      app.use(express.logger('short'))
+      app.use(express.logger(':remote-addr - :date - :method :url :status :res[content-length] - :response-time ms'))
     }
 
 
