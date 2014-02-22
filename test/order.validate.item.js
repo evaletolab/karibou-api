@@ -231,51 +231,7 @@ describe("orders.validate.item", function(){
   });    
 
 
-  it.skip("Checking status after creating a new order ", function(done){
-
-    shipping.when=okDay
-
-    items=[]
-    items.push(Orders.prepare(data.Products[0], 1, ""))
-    items.push(Orders.prepare(data.Products[1], 2, ""))
-
-
-    //
-    // starting process of order,
-    //  - items, customer, shipping
-    Orders.create(items, customer, shipping, payment, function(err,order){
-      //console.log(order.items[0])
-      should.not.exist(err)
-
-      //
-      // check fullfillments after creation
-      order.fulfillments.status.should.equal('created')
-
-      //
-      // check financial status after creation
-      should.not.exist(order.financial_status)
-
-      //
-      // check items fields, price and finalprice
-      should.exist(order.items[0].part)
-      //
-      // checking discount price
-      order.items[0].quantity.should.equal(1)
-      order.items[0].price.should.equal(data.Products[0].pricing.discount)
-
-      //
-      // checking normal price
-      order.items[1].quantity.should.equal(2)
-      order.items[1].price.should.equal(data.Products[0].pricing.price*2)
-      // console.log(JSON.stringify(order))
-      done();          
-    });
-  });     
-
-  it.skip("Error:an order with status created is no more available after a timeout", function(done){
-    shipping.when=okDay
-
-  });    
+   
 
 });
 

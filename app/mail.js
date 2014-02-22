@@ -25,14 +25,14 @@ module.exports = function(app,bus) {
     emailTemplates(templatesDir, function(err, t) {
 
       if (err) {
-        return cb(err);
+        return cb && cb(err);
       } else {
 
 
         // Send a single email
         t(template, content, function(err, html, text) {
           if (err) {
-            return cb(err);
+            return cb && cb(err);
           } else {
             var options={
               from: config.mail.from,

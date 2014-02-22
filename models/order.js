@@ -130,7 +130,7 @@ Orders.method.getTotalPrice=function(){
   this.items.forEach(function(item){
     total+=item.finalprice*item.quantity;
   });
-  
+
   return total;
 }
 
@@ -410,7 +410,8 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
         floor:shipping.floor,
         postalCode:shipping.postalCode,
         region:shipping.region,
-        geo:shipping.geo
+        geo:shipping.geo,
+        when:shipping.when
       };
 
       //

@@ -15,7 +15,7 @@ module.exports = {
       host:'smtp.mandrillapp.com',
       port:587,
       user:'evaleto@gmail.com',
-      code:'Y6UqPC6BpB9YZFX-Wv2yyw'
+      code:process.env.MANDRIL ||'Y6UqPC6BpB9YZFX-Wv2yyw'
     }
   },
   admin:{
@@ -30,7 +30,7 @@ module.exports = {
 
   express: {
     port: process.env.PORT || 4000,
-    views: PATH('views'),
+    views: '/views',
     'view engine': 'jade',
     csrf:false,
     mongoSession:true    

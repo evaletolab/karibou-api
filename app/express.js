@@ -4,6 +4,7 @@
 
 var express = require('express')
   , mongoStore = require('connect-mongo')(express)
+  , bus = require('../app/bus')
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
   , pkg = require('../package.json')
@@ -76,7 +77,7 @@ var tokenSession=function (req, res, next) {
   };
 
   // set views path, template engine and default layout
-  app.set('views', config.express.views)
+  app.set('views', config.root+config.express.views)
   app.set('view engine', config.express['view engine'])
 
   app.configure(function () {
@@ -189,23 +190,29 @@ var tokenSession=function (req, res, next) {
     // properties, use instanceof etc.
     app.use(function(err, req, res, next){
       // treat as 404
-      if (err.message
-        && (~err.message.indexOf('not found')
-        || (~err.message.indexOf('Cast to ObjectId failed')))) {
-        return next()
+      // if (err.message
+      //   && (~err.message.indexOf('not found')
+      //   || (~err.message.indexOf('Cast to ObjectId failed')))) {
+      //   return next()
+      // }
+  
+      //send emails if you want
+      if(process.env.NODE_ENV==='production'){
+        var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
+        bus.emit("sendmail", "evaleto@gmail.com","[kariboo] : "+err.toString(), 
+            {content:msg}, "simple",function(err,status){
+              console.log(err,status)
+        });
       }
-
 
       if (typeof err==='string'){
         return res.send(400,err); 
       }
 
-      // log it
-      // send emails if you want
-      console.error(err)
 
       // error page
       res.status(500).render('500', { error: err.stack })
+      console.error(err.stack)
     })
 
 

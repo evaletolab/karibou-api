@@ -101,6 +101,18 @@ app.listen(port,host);
 
 
 
+//
+// manage unmanaged exception
+process.on('uncaughtException', function(err) {
+  var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
+  sendmail("evaleto@gmail.com","[kariboo] uncaughtException : "+err.toString(), {content:msg}, "simple",function(err,status){
+    console.log(err,status)
+    process.exit(1)
+  })
+  console.log("uncaughtException",err.stack);
+});
+
+
 
 // expose app
 exports = module.exports = app
