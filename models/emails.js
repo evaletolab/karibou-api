@@ -8,12 +8,13 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
   
 
-
+// one day in ms
+// 86400000[ms] = 24 * 60² * 1000
 var Emails = new Schema({
     uid:{ type: String, required: true, unique:true },
     email: { type: String, required: true, unique:true },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
-    created:{type:Date, default: Date.now}
+    created:{type:Date, default: Date.now, expires: (config.mail.ttl.long+2)*3600}
 });
 
 
