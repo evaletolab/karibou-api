@@ -433,6 +433,22 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 }; 
 
 //
+// find open orders with financial status not paid 
+Orders.statics.findByTimeoutAndNotPaid = function(callback){
+  var q={
+    closed:null,
+    "payment.status":{'$ne':'paid'},
+    created:{"$lte": new Date(new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000)}
+  }
+
+  var query=db.model('Orders').find(q).sort({created: -1});
+  if (callback)
+    return query.exec(callback);
+
+  return query;  
+}
+
+//
 // find the last order for a shop
 Orders.statics.findByCriteria = function(criteria, callback){
   assert(criteria);
@@ -490,13 +506,10 @@ Orders.statics.findByCriteria = function(criteria, callback){
     q["payment.status"]=criteria.payment;
   }
 
-
-
-  Orders.find(q).sort({created: -1}).exec(function(err,order){
-    //
-    //
-    callback(err,order)
-  })
+  var query=Orders.find(q).sort({created: -1});
+  if (callback)
+    return query.exec(callback);
+  return query;
 }
 
 //

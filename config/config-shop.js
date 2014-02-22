@@ -67,9 +67,15 @@ module.exports = {
       status:["created","partial","fulfilled", "failure"],
       gateway:[ "postfinance", "paypal"],
 
-      /* */
+      /* order is in timaout if payment status != 'paid' and created<15m (timeoutAndNotPaid)*/
+      timeoutAndNotPaid:900,
+
+      /* in production 36 hours is the time limit between order and delivry*/
       timelimit:36,
+
+      /* currently only grouped is available */
       shippingmode:["grouped", "none"],
+
       //
       // Dimanche, Lundi, Mardi, Mercredi(1), Jeudi, Vendredi, Samedi(1)
       weekdays:[3,6],      

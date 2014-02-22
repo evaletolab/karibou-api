@@ -73,6 +73,9 @@ exports.Orders=[
             status:"pending"
         },
 
+        fulfillments: {
+            status: "created"
+        },
 
         /* shipping adresse*/
         shipping: {
@@ -155,9 +158,6 @@ exports.Orders=[
             }
         ],
 
-        fulfillments: {
-            status: "created"
-        },
 
         created: new Date()
     },{
@@ -173,7 +173,11 @@ exports.Orders=[
         /* payment */
         payment: {
             gateway: "postfinance",
-            status:"pending"
+            status:"paid"
+        },
+
+        fulfillments: {
+            status: "created"
         },
 
         /* shipping adresse*/
@@ -257,9 +261,6 @@ exports.Orders=[
             }
         ],
 
-        fulfillments: {
-            status: "created"
-        },
 
         created: new Date()
 
