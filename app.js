@@ -20,6 +20,11 @@ if(process.env.NODETIME_KEY){
   });
 }
 
+
+if(process.env.VCAP_SERVICES){
+    //var vcap = JSON.parse(process.env.VCAP_SERVICES);
+}
+
 //
 // load env
 var express = require('express')

@@ -411,27 +411,27 @@ Product.statics.findByCriteria = function(criteria, callback){
 
 //
 // update shop content
-Product.statics.update=function(id,p,callback){
-	var Products=this.model('Products');	
+// Product.statics.update=function(id,p,callback){
+// 	var Products=this.model('Products');	
 	
-	if (!Object.keys(id).length) return callback("You have to define one product for update");
+// 	if (!Object.keys(id).length) return callback("You have to define one product for update");
 
-  //findOneAndUpdate(conditions, update) 
-  return Products.findOne(id).populate('vendor').exec(function (err, product) {
-    //
-    // other fields are not managed by update
-    //console.log(product)
-    if (!product){
-      return callback("Could not find product for update "+JSON.stringify(id))
-    }
-    _.extend(product,s);
+//   //findOneAndUpdate(conditions, update) 
+//   return Products.findOne(id).populate('vendor').exec(function (err, product) {
+//     //
+//     // other fields are not managed by update
+//     //console.log(product)
+//     if (!product){
+//       return callback("Could not find product for update "+JSON.stringify(id))
+//     }
+//     _.extend(product,s);
 
  
-    return product.save(function (err) {
-      return callback(err,product);
-    });
-  });
-};
+//     return product.save(function (err) {
+//       return callback(err,product);
+//     });
+//   });
+// };
 
 Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);

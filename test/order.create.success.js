@@ -89,7 +89,7 @@ describe("orders.create.success", function(){
 
       //
       // check fullfillments after creation
-      order.fulfillments.status.should.equal('created')
+      order.fulfillments.status.should.equal('partial')
 
       //
       // check financial status after creation
@@ -110,10 +110,65 @@ describe("orders.create.success", function(){
       // console.log(JSON.stringify(order))
       done();          
     });
-  });     
+  });   
+
+  it("Checking product stock after creating a new order ", function(done){
+    var customer=data.Users[1];
+    var shipping=customer.addresses[0];
+    var payment="postfinance"
+    var items=[];
+    items.push(Orders.prepare(data.Products[0], 2, ""))
+    items.push(Orders.prepare(data.Products[1], 3, ""))
+    items.push(Orders.prepare(data.Products[3], 3, ""))
+
+    shipping.when=okDay
+    // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
+
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      //console.log(order.items[0])
+      should.not.exist(err)
+
+      //
+      // check fullfillments after creation
+      order.fulfillments.status.should.equal('partial')
+
+      //
+      // check financial status after creation
+      should.not.exist(order.financial_status)
+
+
+      //
+      // verify items quantity and product stock
+      var skus=_.collect(items,function(item){return item.sku});
+      Products.findBySkus(skus).exec(function(err,products){
+        products.every(function(product, i){
+            // console.log(data.Products[i].sku,items[i].sku,product.sku)
+            items[i].sku.should.equal(product.sku)
+
+            //
+            // this is the updated stock value
+            var stock=data.Products[i].pricing.stock-items[i].quantity
+            console.log("test",data.Products[i].pricing.stock, stock, product.pricing.stock)
+            product.pricing.stock.should.equal(stock)
+            (stock>0).should.be.true;
+            return true;
+        })
+        done();          
+      });
+
+      // checking discount price
+      order.items[0].quantity.should.equal(2)
+      order.items[1].quantity.should.equal(3)
+    });
+  }); 
 
   //
-  // order is in timaout if payment status != 'paid' and created<1s (timeoutAndNotPaid) 
+  // order is in timeout if payment status != 'paid' and created<1s (timeoutAndNotPaid) 
   // for testing timeout = 100[ms]
   it("Error:an order with status created and not paid is no more available after a timeout", function(done){
     Orders.findByTimeoutAndNotPaid(function(err,orders){
@@ -123,5 +178,8 @@ describe("orders.create.success", function(){
     })
   }); 
 
+  it.skip("you can rollback an order only if fulfillments=='partial' and payment!=='paid'",function(done){
+    done();
+  })
 });
 

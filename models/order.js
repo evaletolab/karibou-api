@@ -125,7 +125,7 @@ var Orders = new Schema({
 //
 // API
 
-Orders.method.getTotalPrice=function(){
+Orders.methods.getTotalPrice=function(){
   var total=0.0;
   this.items.forEach(function(item){
     total+=item.finalprice*item.quantity;
@@ -322,6 +322,38 @@ Orders.statics.checkItems = function(items, callback){
 }
 
 
+Orders.methods.updateProductQuantity=function(callback){
+  assert(callback)
+  var order=this;
+
+  require('async').each(this.items, function(item, cb) {
+    db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true }, cb)
+  },function(err){
+    //
+    // if catching an error durring the update, roolback
+    callback(err)
+  });
+}
+
+Orders.methods.rollbackProductQuantity=function(callback){
+  assert(callback)
+
+  //
+  // you can rollback an order only if fulfillments=="partial" and payment!=="paid"
+  if(this.fulfillments.status !=="partial" || this.payment.status==="paid"){
+    callback("")
+  }
+
+  require('async').each(this.items, function(item, cb) {
+    db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
+  },function(err){
+    //
+    // this checking generate a list of products
+    callback(err)
+  });
+}
+
+
 //
 // create a new order
 Orders.statics.create = function(items, customer, shipping, payment, callback){
@@ -372,8 +404,30 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     //
     // set oid
     order.oid=oid;
+
+    //
+    // checking customer data
+    if(!customer.email||customer.email.status!==true){
+      return callback('valid email is required.')
+    }
+
+    //
+    // checking shipping data
+    if (!shipping ||Object.keys(shipping).length<3
+                  ||!shipping.name
+                  ||!shipping.note
+                  ||!shipping.streetAdress
+                  ||!shipping.floor
+                  ||!shipping.postalCode
+                  ||!shipping.region
+                  ||!shipping.geo){
+      return callback('shipping address is missing or imcomplet.')
+    }
+
     
     Orders.checkItems(items,function(err, products,vendors){
+      //
+      // items issue?
       if(err){
         return callback(err)
       }
@@ -384,25 +438,12 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
       //
       // adding customer email (check validity)
-      if(!customer.email||customer.email.status!==true){
-        return callback('valid email is required.')
-      }
       order.customer=customer;
       order.email=customer.email.address;
 
       //
       // adding shipping address (minimum 3 fields 
       // for general error msg)
-      if (!shipping ||Object.keys(shipping).length<3
-                    ||!shipping.name
-                    ||!shipping.note
-                    ||!shipping.streetAdress
-                    ||!shipping.floor
-                    ||!shipping.postalCode
-                    ||!shipping.region
-                    ||!shipping.geo){
-        return callback('shipping address is missing or imcomplet.')
-      }
       order.shipping={
         name:shipping.name,
         note:shipping.note,
@@ -420,11 +461,22 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
       //
       // ready to create one order
-      var dborder =new  Orders(order);
-      return dborder.save(function (err) {
-        if(err) return callback(errorHelper(err));
-        callback(null,dborder);
-      });      
+      var dborder =new Orders(order);
+      //
+      // update product stock
+      dborder.updateProductQuantity(function(err){
+        //
+        //in case of error, rollback the product    
+        if(err){
+          console.log(err)
+          throw new Error("rollback not implemented")
+        }
+        dborder.fulfillments.status="partial";
+        return dborder.save(callback);      
+      })
+
+
+
     });  
     
   });
