@@ -49,6 +49,34 @@ All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
 ```
 **Example:** http://karibou-api.evaletolab.ch/v1/users/me
 
+#### Get product data
+  app.get('/v1/products/:sku',products.get);
+  app.get('/v1/products',products.list);
+  app.get('/v1/products/category/:category',products.list);
+  app.get('/v1/products/location/:location',products.list);
+  app.get('/v1/products/category/:category/details/:details',products.list);
+  app.get('/v1/products/location/:location/category/:category',products.list);
+  app.get('/v1/products/location/:location/category/:category/details/:details',products.list);
+  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, auth.ensureUserValid, products.update);
+  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  products.remove);
+
+#### Get shop data
+  app.get('/v1/shops', shops.list);
+  app.get('/v1/shops/category/:category', shops.list);
+  app.get('/v1/shops/:shopname', shops.get);
+  app.get('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.askStatus);
+  app.get('/v1/shops/:shopname/products', products.list);
+  app.get('/v1/shops/:shopname/products/category/:category', products.list);
+  app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);
+  app.post('/v1/shops', auth.ensureAuthenticated, auth.ensureUserValid, shops.ensureShopLimit, shops.create);
+  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
+  app.post('/v1/shops/:shopname/ask', auth.ensureUserValid, shops.email);
+  app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.status);
+  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, products.create);
+  app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.remove);
+
+
+
 
 ## License
 The MIT License (MIT)
