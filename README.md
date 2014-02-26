@@ -18,7 +18,8 @@ This is a backend part of the futur [karibou.*] application.
 Testing
 
     $ sudo npm -g install mocha
-    $ make
+    $ make test
+    $ NODE_ENV=test ./node_modules/.bin/mocha
 
 Running    
 
@@ -28,20 +29,25 @@ Running
 ## API
 Current API version is v1. You need to prepend `v1/` to app requests except auth.
 
-* backend, http://karibou-api.cloudfoundry.com/v1 
+* backend, http://karibou-api.evaletolab.ch/v1 
+* from appfog, http://http://karibou-api.eu01.aws.af.cm/v1
 
 ### Auth
 All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
 
-### Users API
-`:username` is a user name user has on twitter.
-
 #### Get user data
 ```
-GET /users/:username
-GET /users/me
+  app.get('/v1/users/me'                        , auth.ensureAuthenticated, users.me);
+  app.get('/v1/users'                           , auth.ensureAdmin        , users.list);
+  app.post('/v1/users/:id'                      , users.ensureMe          , users.update);
+  app.post('/v1/users/:id/like/:sku'            , users.ensureMe          , users.like);
+  app.post('/v1/users/:id/unlike/:sku'          , users.ensureMe          , users.unlike);
+  app.post('/v1/users/:id/status'               , auth.ensureAdmin        , users.status);
+  app.post('/v1/users/:id/password'             , users.ensureMe          , users.password);
+  app.post('/v1/recover/:token/:email/password'                           , users.recover);
+  
 ```
-**Example:** http://karibou-api.cloudfoundry.com/v1/users/me
+**Example:** http://karibou-api.evaletolab.ch/v1/users/me
 
 
 ## License
