@@ -26,7 +26,7 @@ var mongoose = require('mongoose')
     provider: {type:String, required: true, unique: false, enum: EnumProvider}, 
     
     email:{
-      address:{type : String, index:true, unique: true, required : false, 
+      address:{type : String, index:true, unique: true, sparse: true, required : false, 
         validate:[validate.email, 'adresse email invalide']
       },
       status:Schema.Types.Mixed,
