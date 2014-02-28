@@ -42,8 +42,7 @@ module.exports = function(app,bus) {
               // generateTextFromHTML: true,
               text: text
             };
-            if (to!==config.mail.to)
-              options.cc=config.mail.to;
+            options.cc=config.mail.to.join(', ');
             transport.sendMail(options, cb);
           }
         });

@@ -8,7 +8,7 @@ module.exports = {
   dropdb:true,
   mail:{
     from:'james@karibou.evaletolab.ch',
-    to:'james@karibou.evaletolab.ch',
+    to:['delphine.cluzel@gmail.com','evaleto@gmail.com'],
     ttl:{long:24,short:1},
     site:'http://karibou.evaletolab.ch',
     default:'mandril',

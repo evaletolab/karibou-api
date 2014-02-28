@@ -7,7 +7,7 @@ var PATH = function(p) {
 module.exports = {
   mail:{
     from:'james@karibou.evaletolab.ch',
-    to:'james@karibou.evaletolab.ch',
+    to:['delphine.cluzel@gmail.com','evaleto@gmail.com'],
     ttl:{long:24,short:1},
     site:'http://lo.cal:3000',
     default:'mandril',
