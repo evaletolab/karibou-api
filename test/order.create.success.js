@@ -107,8 +107,11 @@ describe("orders.create.success", function(){
       // checking normal price
       order.items[1].quantity.should.equal(3)
       order.items[1].price.should.equal(data.Products[0].pricing.price*3)
+      order.rollbackProductQuantityAndSave(function(err,order){
+        console.log(err)
+        done();                  
+      })
       // console.log(JSON.stringify(order))
-      done();          
     });
   });   
 
@@ -153,9 +156,9 @@ describe("orders.create.success", function(){
             //
             // this is the updated stock value
             var stock=data.Products[i].pricing.stock-items[i].quantity
-            console.log("test",data.Products[i].pricing.stock, stock, product.pricing.stock)
+            // console.log("test",data.Products[i].pricing.stock, stock, product.pricing.stock)
             product.pricing.stock.should.equal(stock)
-            (stock>0).should.be.true;
+            true.should.equal(stock>0);
             return true;
         })
         done();          

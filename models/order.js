@@ -180,6 +180,7 @@ Orders.statics.checkItem=function(item, product, cb){
     , msg8="Ce produit n'est plus en stock "
 
 
+  console.log("TODO item.sku==product.sku is not always true")
   assert(item.sku==product.sku)
 
 
@@ -322,34 +323,60 @@ Orders.statics.checkItems = function(items, callback){
 }
 
 
-Orders.methods.updateProductQuantity=function(callback){
+Orders.methods.updateProductQuantityAndSave=function(callback){
   assert(callback)
+
   var order=this;
+  var msg1="Could not update product quantity for paid or partialy fulfilled order";
+
+
+  if(this.fulfillments.status ==="partial" || this.payment.status==="paid"){
+    callback(msg1)
+  }
 
   require('async').each(this.items, function(item, cb) {
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true }, cb)
   },function(err){
     //
     // if catching an error durring the update, roolback
-    callback(err)
+    // which product must be rollback????
+    if(err){
+      callback(err);
+      throw new Error("rollback not implemented: "+(err.message||err));
+    }
+    //
+    order.fulfillments.status="partial";
+    return order.save(callback)
   });
 }
 
-Orders.methods.rollbackProductQuantity=function(callback){
+Orders.methods.rollbackProductQuantityAndSave=function(callback){
   assert(callback)
+
+  var msg1="Could not rollback product quantity for paid order", 
+      msg2="Rollback product quantity is possible only for partialy fulfilled order";
+
+  var order=this;
 
   //
   // you can rollback an order only if fulfillments=="partial" and payment!=="paid"
-  if(this.fulfillments.status !=="partial" || this.payment.status==="paid"){
-    callback("")
+  if(this.payment.status==="paid"){
+    callback(msg1)
+  }
+  if(this.fulfillments.status !=="partial"){
+    callback(msg2)
   }
 
   require('async').each(this.items, function(item, cb) {
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
   },function(err){
+    if(err){
+      callback(err);
+      throw new Error("rollback: "+(err.message||err));
+    }
     //
     // this checking generate a list of products
-    callback(err)
+    return order.save(callback)
   });
 }
 
@@ -464,16 +491,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       var dborder =new Orders(order);
       //
       // update product stock
-      dborder.updateProductQuantity(function(err){
-        //
-        //in case of error, rollback the product    
-        if(err){
-          console.log(err)
-          throw new Error("rollback not implemented")
-        }
-        dborder.fulfillments.status="partial";
-        return dborder.save(callback);      
-      })
+      return dborder.updateProductQuantityAndSave(callback)
 
 
 
