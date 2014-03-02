@@ -1,4 +1,4 @@
-module.exports = function(app) {
+module.exports = function(app,bus) {
   var path           = require('path')
     , templatesDir   = path.resolve(__dirname, '..', 'emails')
     , emailTemplates = require('email-templates')
@@ -25,14 +25,14 @@ module.exports = function(app) {
     emailTemplates(templatesDir, function(err, t) {
 
       if (err) {
-        return cb(err);
+        return cb && cb(err);
       } else {
 
 
         // Send a single email
         t(template, content, function(err, html, text) {
           if (err) {
-            return cb(err);
+            return cb && cb(err);
           } else {
             var options={
               from: config.mail.from,
@@ -42,8 +42,7 @@ module.exports = function(app) {
               // generateTextFromHTML: true,
               text: text
             };
-            if (to!==config.mail.to)
-              options.cc=config.mail.to;
+            options.cc=config.mail.to.join(', ');
             transport.sendMail(options, cb);
           }
         });
@@ -56,6 +55,12 @@ module.exports = function(app) {
       cb(null,"test is running")
     }
   }
+
+  bus.on('sendmail',function(to, subject, content, template, cb){
+    // console.log("---------------------------EMAIL:",to,subject)
+    sendmail(to, subject, content, template, cb);
+  }); 
+
 
   return sendmail;
 }

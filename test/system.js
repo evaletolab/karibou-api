@@ -39,6 +39,25 @@ describe("system", function(){
   
  
   describe("System notifications", function(){
+    it("Basic testing of the Bus", function(done){
+        var bus=require('../app/bus'), em=0;
+        bus.on('test',function(a,cb){
+            cb(a+'-1')
+        })
+        bus.on('test',function(a,cb){
+            cb(a+'-2')
+        })
+
+        //
+        // this emiter will receive multiple callback 
+        // and this is an issue because only one done is permitted
+        bus.emit('test','msg',function(out){
+
+            //console.log(out,bus.listeners('test').length)            
+            if(++em===2)done()
+        })
+    });
+
     it.skip("Customers read all notifications", function(done){
     });
     

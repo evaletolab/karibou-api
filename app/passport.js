@@ -19,7 +19,7 @@ module.exports = function (app, config, passport) {
 
   // deserialize user on logout
   passport.deserializeUser(function(id, done) {
-    Users.findById(id).populate('shops').exec(function (err, user) {
+    Users.findById(id).populate('shops').populate('likes').exec(function (err, user) {
       if(!user){
         //session invalidate
         //https://github.com/jaredhanson/passport/issues/6

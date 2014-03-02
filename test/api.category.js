@@ -139,6 +139,15 @@ describe("api.categories", function(){
       });
   });
 
+  it.skip('DEL /v1/category/category-not-alone  return 400 when products are associated  ',function(done){
+    request(app)
+      .del('/v1/category/category-legal')
+      .set('cookie', cookie)
+      .end(function(err, res){
+        res.should.have.status(200);
+        done();
+      });
+  });
   
   it('DEL /v1/category/category-legal  when signed and admin must return 200  ',function(done){
     request(app)
@@ -159,6 +168,6 @@ describe("api.categories", function(){
         done();
       });
   });
-    
+     
 });
 

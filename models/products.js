@@ -73,7 +73,7 @@ var Product = new Schema({
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
-   categories: [{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true}],
+   categories:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
    vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true}  
 });
 
@@ -116,6 +116,7 @@ Manufacturer.statics.map = function(values, callback){
 };
 
 //db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
+/** NO MORE AVAILABE
 Product.methods.addCategories=function(cats,callback){
   var p=this;
   if(Array.isArray(cats)){
@@ -142,6 +143,30 @@ Product.methods.removeCategories=function(cats,callback){
   p.save(function(err){
     if(err)callback(err);
   });
+};
+
+*/
+
+Product.methods.getPrice=function(){
+  if(this.attributes.discount && this.pricing.discount)
+    return this.pricing.discount;
+  return this.pricing.price;
+};
+
+//
+// product is available for order only if
+// - vendor is populated,
+// - attributes.available is true
+// - vendor.status is true
+// - vendor.available.active is true
+Product.methods.isAvailableForOrder=function(){
+  if(!this.vendor||!this.vendor._id){
+    // vendor must be populated
+    return false;
+  }
+  return (this.attributes.available && 
+          this.vendor.status===true &&
+          !this.vendor.available.active)
 };
 
 
@@ -186,10 +211,23 @@ Product.statics.create = function(p,s,callback){
       function(cb){
         //
         // set category (NOT MANDATORY)
-        if(!p.categories||!p.categories.length){
-          cb("Il manque la catégorie")
-          return;
+        if(!p.categories){          
+          return cb("Il manque la catégorie");
         }
+        if(Array.isArray(p.categories)){
+          return cb("la catégorie doit être unique");
+        }
+
+        if(!p.categories._id)p.categories={_id:p.categories}
+
+        db.model('Categories').findOne(p.categories,function(err,categories){
+          if(err){
+            return cb(err);
+          }  
+          p.categories=categories;        
+          cb();
+        })
+        /**
         db.model('Categories').map(p.categories, function(err,categories){
           // FIXME
           //check category is well typed 'category'
@@ -199,16 +237,22 @@ Product.statics.create = function(p,s,callback){
           p.categories=_.collect(categories,function(m){return m._id});;
           cb();
         });
+        */
       }],
       function(err){
         if (err){
           return callback(err);
         }
+
         //
         // ready to create one product
         var product =new  Products(p);
         product.save(function (err) {
-          callback(err,product);
+          Products.findOne({_id:product._id})
+                 .populate('vendor')
+                 .populate('categories').exec(callback)
+
+          // callback(err,product);
         });
       });
   });
@@ -216,6 +260,21 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
+Product.statics.findBySkus = function(skus, callback){
+  var cb=function(err, products){
+    callback(err,products);
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
+  var query=this.model('Products').find({sku:{
+    $in:skus
+  }}).populate('vendor').populate('vendor.owner').populate('categories');
+
+  if (cb) return query.exec(cb)
+  return query;
+
+};
 
 Product.statics.findOneBySku = function(sku, callback){
   var cb=function(err, products){
@@ -352,28 +411,27 @@ Product.statics.findByCriteria = function(criteria, callback){
 
 //
 // update shop content
-Product.statics.update=function(id,p,callback){
-	var Products=this.model('Products');	
+// Product.statics.update=function(id,p,callback){
+// 	var Products=this.model('Products');	
 	
-	if (!Object.keys(id).length) return callback("You have to define one product for update");
+// 	if (!Object.keys(id).length) return callback("You have to define one product for update");
 
-  //findOneAndUpdate(conditions, update) 
-  return Products.findOne(id).populate('vendor').exec(function (err, product) {
-    //
-    // other fields are not managed by update
-    //console.log(product)
-    if (!product){
-      return callback("Could not find product for update "+JSON.stringify(id))
-    }
-    extend(product,s);
-    console.log(s)
+//   //findOneAndUpdate(conditions, update) 
+//   return Products.findOne(id).populate('vendor').exec(function (err, product) {
+//     //
+//     // other fields are not managed by update
+//     //console.log(product)
+//     if (!product){
+//       return callback("Could not find product for update "+JSON.stringify(id))
+//     }
+//     _.extend(product,s);
 
  
-    return product.save(function (err) {
-      return callback(err,product);
-    });
-  });
-};
+//     return product.save(function (err) {
+//       return callback(err,product);
+//     });
+//   });
+// };
 
 Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);

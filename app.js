@@ -20,6 +20,11 @@ if(process.env.NODETIME_KEY){
   });
 }
 
+
+if(process.env.VCAP_SERVICES){
+    //var vcap = JSON.parse(process.env.VCAP_SERVICES);
+}
+
 //
 // load env
 var express = require('express')
@@ -65,8 +70,11 @@ var app = express()
 // utils 
 require('./app/utils')(app);
 
+// Events Bus
+var bus=require('./app/bus');
+
 // mailer
-var sendmail=require('./app/mail')(app);
+var sendmail=require('./app/mail')(app,bus);
   
 // bootstrap passport config
 require('./app/passport')(app, config, passport)
@@ -79,14 +87,15 @@ require('./app/routes')(app, config, passport)
 
 
 
+
 //
 // maintain db
 //
 //
 //
 // start the server
-var port = (process.env.VMC_APP_PORT || process.env.VCAP_APP_PORT || process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
-var host = (process.env.VMC_APP_HOST || process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || 'localhost');
+var port = (process.env.VCAP_APP_PORT || process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
+var host = (process.env.VCAP_APP_HOST || process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || 'localhost');
 
 // manage c9 env
 if (process.env.C9_PORT ){
@@ -95,6 +104,21 @@ if (process.env.C9_PORT ){
 
 app.listen(port,host);
 
+
+
+//
+// manage unmanaged exception
+process.on('uncaughtException', function(err) {
+
+  if(process.env.NODE_ENV==='production'){
+    var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
+    sendmail("evaleto@gmail.com","[kariboo] uncaughtException : "+err.toString(), {content:msg}, "simple",function(err,status){
+      console.log(err,status)
+      process.exit(1)
+    })
+  }
+  console.log("uncaughtException",err.stack);
+});
 
 
 

@@ -8,7 +8,8 @@ var Products = db.model('Products');
 var _=require('underscore');
 
 var check = require('validator').check,
-    sanitize = require('validator').sanitize;
+    sanitize = require('validator').sanitize,
+    errorHelper = require('mongoose-error-helper').errorHelper;
 
 function isUserAdminOrWithRole(req, res, next, checkRole){
   //
@@ -74,6 +75,8 @@ function checkParams(req){
       req.body.photo.bg && check(req.body.photo.bg).len(6, 164).isUrl();
       req.body.photo.fg && check(req.body.photo.fg).len(6, 164).isUrl();
       req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
+    }else{
+      throw new Error("Vous devez définir une photo");      
     }
         
     
@@ -107,7 +110,7 @@ exports.create=function (req, res) {
   }
   Shops.findByUser({id:req.user.id},function (err,shops){
     if (err){
-      return res.send(400, err);    
+      return res.send(400, errorHelper(err));    
     }
     
 
@@ -120,7 +123,7 @@ exports.create=function (req, res) {
     // ready to create one product
     Products.create(req.body,s, function(err,product){
         if(err){
-          return res.send(400, err);    
+          return res.send(400, errorHelper(err));    
         }
         res.json(product);            
     });

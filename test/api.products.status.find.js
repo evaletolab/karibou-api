@@ -43,7 +43,7 @@ describe("api.products.find", function(){
       });
   });
 
-  it('users.post status FALSE /v1/users/:id/status should return 200 ',function(done){
+  it('Change user status to FALSE /v1/users/:id/status should return 200 for admin only',function(done){
     request(app)
       .post('/v1/users/12345/status')
       .set('cookie', admin)
@@ -55,7 +55,7 @@ describe("api.products.find", function(){
       });
   });
 
-  it("GET 200,/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
+  it("GET 200,/v1/shops/un-autre-shop/products/what-ever-filters should return 0 product", function(done){
     request(app)
       .get("/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
       .end(function(err, res){
@@ -66,7 +66,7 @@ describe("api.products.find", function(){
       });
   });  
 
-  it("GET 200,/v1/shops/un-autre-shop/products", function(done){
+  it("GET 200,/v1/shops/un-autre-shop/products should return 0 product", function(done){
     request(app)
       .get("/v1/shops/un-autre-shop/products")
       .end(function(err, res){
@@ -78,21 +78,6 @@ describe("api.products.find", function(){
       });
   });  
 
-
-
-
-  it("GET 200,/v1/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
-    request(app)
-      .get("/v1/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
-      .end(function(err, res){
-        //console.log(res.text)
-        res.should.have.status(200);
-        res.body.length.should.equal(0)
-        done();
-      });
-
-
-  });
   
   it('users.post status FALSE /v1/users/:id/status should return 200 ',function(done){
     request(app)

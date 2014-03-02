@@ -31,6 +31,32 @@ describe("products.find:", function(){
     })
   });
 
+  it("Find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002],function(err,products){
+      products.length.should.equal(2)  
+      products[0].sku.should.equal(1000001)
+      products[0].vendor.should.be.instanceOf(Object).and.have.property('name')
+//      products[0].vendor.owner.should.be.instanceOf(Object).and.have.property('displayName')
+      done();
+    });
+  });
+
+  it("Find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002],function(err,products){
+      products.length.should.equal(2)      
+      products[0].sku.should.equal(1000001)
+      done();
+    });
+  });
+
+  it("Build query to find products by SKU", function(done){
+    Products.findBySkus([1000001,1000002]).exec(function(err,products){
+      products.length.should.equal(2)      
+      products[0].sku.should.equal(1000001)
+      done();
+    });
+  });
+
     
   it("Find products by Shop", function(done){
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
@@ -57,7 +83,7 @@ describe("products.find:", function(){
   });
 
   it("Find products by Category object  ", function(done){
-    Products.find({categories:data.Categories[2]._id},function(err,products){
+    Products.find({categories:data.Categories[1]._id},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(2)
@@ -70,7 +96,7 @@ describe("products.find:", function(){
   
   it("Find products by slug Category  ", function(done){
 
-    Products.findByCriteria({category:data.Categories[2].slug},function(err,products){
+    Products.findByCriteria({category:data.Categories[1].slug},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(2)
@@ -89,7 +115,7 @@ describe("products.find:", function(){
   });
 
   it("Find products by Category and details(bio=true) ", function(done){
-    Products.findByCriteria({category:data.Categories[2].slug,details:'bio'},function(err,products){
+    Products.findByCriteria({category:data.Categories[1].slug,details:'bio'},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(1)

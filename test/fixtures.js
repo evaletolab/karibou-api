@@ -35,7 +35,7 @@ describe("mongoose.fixtures", function(){
     dbtools.load(["../fixtures/Users.js"],db, function(err){
       should.not.exist(err)
       db.model('Users').find({},function(e,users){
-        users.length.should.equal(3);
+        users.length.should.equal(4);
         done();
       });
     });
@@ -63,7 +63,7 @@ describe("mongoose.fixtures", function(){
     dbtools.load(['../fixtures/Shops.js'],db, function(err,d,c){
       should.not.exist(err)
       db.model('Shops').find({},function(e,docs){
-        docs.length.should.equal(3);
+        docs.length.should.equal(4);
         done();
       });
     });

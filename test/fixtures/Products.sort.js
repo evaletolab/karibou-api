@@ -29,7 +29,7 @@ exports.Products=[{
         discount:3.0,
      },
      /* weight:0,1 */
-     categories: [data.Categories[1]._id],
+     categories: data.Categories[1]._id,
      //un-autre-shop, id:0004, status:true, owner:gluck
      vendor:'515ec12e56a8d5961e000004'     
   },{
@@ -55,7 +55,7 @@ exports.Products=[{
         part:'0.75L'
      },
      /* weight:2 */
-     categories: [data.Categories[3]._id],
+     categories: data.Categories[3]._id,
      //un-autre-shop, id:0004, status:true, owner:gluck
      vendor:'515ec12e56a8d5961e000004'
   },{
@@ -80,7 +80,7 @@ exports.Products=[{
         discount:3.0,
         part:'0.75L'
      },
-     categories: [data.Categories[2]._id,data.Categories[3]._id],
+     categories: data.Categories[2]._id,
      //mon-shop, id:0005, status:false, owner:gmail
      vendor:'515ec12e56a8d5961e000004'
   }

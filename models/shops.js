@@ -5,9 +5,9 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
-  , ObjectId = Schema.ObjectId;
+  , ObjectId = Schema.ObjectId
+  , _ = require('underscore');
   
-var extend      = require( 'node.extend' );
 
 var EnumPlace=config.shop.marketplace.list;
 var EnumLocation=config.shop.location.list;
@@ -31,9 +31,28 @@ var Shops = new Schema({
       lactose:{type: Boolean,default:false},
       local:{type: Boolean,default:false}      
     },
+
+    //
+    // define where this shop is available (geneva/lausanne/...)
     marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
-    location: {type: String, required: false, enum: EnumLocation},
     
+    //
+    // where to pickup items
+    address:{
+          name: { type: String, trim: true },
+          floor: { type: String, trim: true },
+          streetAdress: { type: String, lowercase: true, trim: true },
+          location: { type: String, trim: true, enum: EnumLocation},
+          region: { type: String, trim: true, default:"GE" },
+          postalCode: { type: String },
+          geo:{
+            lat:{type:Number},
+            lng:{type:Number}
+          }
+    },    
+
+    //
+    // this shop belongsTo a category
     catalog:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
     
     faq:[{
@@ -60,26 +79,7 @@ var Shops = new Schema({
 });
 
 
-//
-// API
-function name_to_slug(str) {
-  str = str.replace(/^\s+|\s+$/g, ''); // trim
-  str = str.toLowerCase();
-  
-  // remove accents, swap ñ for n, etc
-  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-  var to   = "aaaaeeeeiiiioooouuuunc------";
-  for (var i=0, l=from.length ; i<l ; i++) {
-    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-  }
 
-  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-    .replace(/\s+/g, '-') // collapse whitespace and replace by -
-    .replace(/-+/g, '-'); // collapse dashes
-
-  return str;
-}
-Shops.statics.slug = name_to_slug;
 Shops.statics.create = function(shop,user, callback){
   assert(shop);
   assert(user);
@@ -101,7 +101,7 @@ Shops.statics.create = function(shop,user, callback){
   
   // if !urlpath => convert name to slug 
   if(!s.urlpath){
-    s.urlpath=name_to_slug(s.name);
+    s.urlpath=s.name.slug();
   }
   
   s.save(function (err) {
@@ -175,7 +175,7 @@ Shops.statics.update=function(id,s,callback){
     
     s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
     s.owner&&delete(s.owner);
-    extend(shop,s);
+    _.extend(shop,s);
 
  
     return shop.save(function (err) {    

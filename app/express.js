@@ -4,6 +4,7 @@
 
 var express = require('express')
   , mongoStore = require('connect-mongo')(express)
+  , bus = require('../app/bus')
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
   , pkg = require('../package.json')
@@ -16,6 +17,7 @@ if (config.express.state){
   expstate.extend(app);
 }  
 
+  
 module.exports = function (app, config, passport, sendmail) {
 
   //
@@ -27,9 +29,10 @@ module.exports = function (app, config, passport, sendmail) {
         res.header('Access-Control-Allow-Origin', req.header('Origin'));
       }
 
-//      res.header('Access-Control-Max-Age', config.cors.age);
+      res.header('Access-Control-Max-Age', config.cors.age);
       res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Accept,X-Requested-With,ETag,Referer,Set-Cookie,X-Token');
+      res.header('Access-Control-Expose-Headers','Content-Type,Accept,X-Requested-With,ETag, Set-Cookie, X-Token');
       if( req.method.toLowerCase() === "options" ) {
           res.writeHead(204);
           return res.end();        
@@ -38,21 +41,43 @@ module.exports = function (app, config, passport, sendmail) {
   }
 
 
+
+// Use the authorization hook to attach the session to the socket
+// handshake by reading the token and loading the session when a
+// socket connects. Using the authorization hook means that we can
+// deny access to socket connections that arrive without a session - i.e.
+// where the user didn't load a site page through Express.js first.
+//
+// https://github.com/jaredhanson/passport-http-bearer
+/*
+var tokenSession=function (req, res, next) {
+  if (!req.params.token){
+    next();
+  }
+  if (!req.cookie){
+  }
+
+  var sessionId = someDecryptionFunction(data.query.token);
+  sessionStore.get(sessionId, function (error, session) {
+    // Add the sessionId. This will show up in
+    // socket.handshake.sessionId.
+    //
+    // It's useful to set the ID and session separately because of
+    // those fun times when you have an ID but no session - it makes
+    // debugging that much easier.
+
+}; */
+
+
   app.set('showStackError', true)
 
-  // should be placed before express.static 
-  app.use(express.compress({
-    filter: function (req, res) {
-      return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
-    },
-    level: 9
-  }))
 
-
-
+  if (config.express.proxy) {
+    app.enable('trust proxy')
+  };
 
   // set views path, template engine and default layout
-  app.set('views', config.express.views)
+  app.set('views', config.root+config.express.views)
   app.set('view engine', config.express['view engine'])
 
   app.configure(function () {
@@ -61,6 +86,15 @@ module.exports = function (app, config, passport, sendmail) {
       res.locals.pkg = pkg
       next()
     })
+
+
+    // should be placed before express.static 
+    app.use(express.compress({
+      filter: function (req, res) {
+        return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
+      },
+      level: 9
+    }))
 
     //
     // use cors
@@ -72,7 +106,7 @@ module.exports = function (app, config, passport, sendmail) {
 
     // don't use logger for test env
     if (process.env.NODE_ENV !== 'test') {
-      app.use(express.logger('short'))
+      app.use(express.logger(':remote-addr - :date - :method :url :status :res[content-length] - :response-time ms'))
     }
 
 
@@ -90,7 +124,7 @@ module.exports = function (app, config, passport, sendmail) {
 
     //
     // cookie session
-    if (!config.express.mongoSession){
+    if (!config.express.cookieSession){
       app.use(express.cookieSession({
         secret: config.middleware.session.secret,
         cookie: config.middleware.cookie
@@ -106,10 +140,9 @@ module.exports = function (app, config, passport, sendmail) {
           url: config.mongo.name,
           collection : 'sessions'
         }),
-        cookie: config.middleware.cookie
+        cookie: config.middleware.session.cookie
       }))
     }
-
 
 
     // use passport session
@@ -134,12 +167,15 @@ module.exports = function (app, config, passport, sendmail) {
       })
     }
 
-    app.use(function(req, res, next){
-      req.sendmail=sendmail;
-      console.log("cookies",req.cookies)
-      console.log("session.passport",req.session.passport)
-      next();
-    });
+    // app.use(function(req, res, next){
+    //   req.sendmail=sendmail;
+
+    //   if (process.env.NODE_ENV !== 'test') {
+    //     console.log("cookie:",req.header('Cookie'), "Sid:",req.sessionID)
+    //     console.log("cookies",req.cookies, req.session.passport)
+    //   }
+    //   next();
+    // });
 
 
 
@@ -152,25 +188,36 @@ module.exports = function (app, config, passport, sendmail) {
     // is a 404. this is somewhat silly, but
     // valid, you can do whatever you like, set
     // properties, use instanceof etc.
-    /**
     app.use(function(err, req, res, next){
       // treat as 404
-      if (err.message
-        && (~err.message.indexOf('not found')
-        || (~err.message.indexOf('Cast to ObjectId failed')))) {
-        return next()
+      // if (err.message
+      //   && (~err.message.indexOf('not found')
+      //   || (~err.message.indexOf('Cast to ObjectId failed')))) {
+      //   return next()
+      // }
+  
+      //send emails if you want
+      if(process.env.NODE_ENV==='production'){
+        var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
+        bus.emit("sendmail", "evaleto@gmail.com","[kariboo] : "+err.toString(), 
+            {content:msg}, "simple",function(err,status){
+              console.log(err,status)
+        });
       }
 
-      // log it
-      // send emails if you want
-      console.error(err)
+      if (typeof err==='string'){
+        return res.send(400,err); 
+      }
+
 
       // error page
       res.status(500).render('500', { error: err.stack })
+      console.error(err.stack)
     })
 
 
     // assume 404 since no middleware responded
+/*    
     app.use(function(req, res, next){
       res.status(404).render('404', {
         url: req.originalUrl,

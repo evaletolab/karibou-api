@@ -3,10 +3,10 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
   , validate = require('./validate')
-	, passport = require('passport');
+	, passport = require('passport')
+  , _ = require('underscore');
 	
 //var	bcrypt = require('bcrypt');
-var extend      = require( 'node.extend' );
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
@@ -26,7 +26,7 @@ var extend      = require( 'node.extend' );
     provider: {type:String, required: true, unique: false, enum: EnumProvider}, 
     
     email:{
-      address:{type : String, index:true, unique: true, required : false, 
+      address:{type : String, index:true, unique: true, sparse: true, required : false, 
         validate:[validate.email, 'adresse email invalide']
       },
       status:Schema.Types.Mixed,
@@ -45,25 +45,24 @@ var extend      = require( 'node.extend' );
     url:{type:String, validate:[validate.url,'Invalide URL format or lenght']},
     
     phoneNumbers: [{
-          value: String,
-          type: String
+        number:{ type: String },
+        what:{ type: String }
     }],
     
     photo: String,
     
     addresses: [{
-          type: { type: String, required : true, lowercase: true, trim: true },
+          name: { type: String, required : true, lowercase: true, trim: true },
           note: { type: String, trim: true },
+          floor: { type: String, trim: true, required : true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
-          locality: { type: String, required : true, trim: true /**,
-            validate:[validate.alpha, 'Invalide locality'] **/
-          },
+          location: { type: String, required : true, trim: true },
           region: { type: String, required : true, trim: true, default:"GE" },
           postalCode: { type: String, required : false /**,
             validate:[validate.postal,'Invalide postal code'] **/
           },
           primary:{ type: Boolean, required : true, default:false},
-          location:{
+          geo:{
             lat:{type:Number, required: true},
             lng:{type:Number, required: true}
           }
@@ -86,7 +85,8 @@ var extend      = require( 'node.extend' );
     created:{type:Date, default: Date.now},
 		salt: { type: String, required: false },
 		hash: { type: String, required: false },   
-		roles: Array
+		roles: Array,
+    rank: String
 });
 
 /**
@@ -144,8 +144,13 @@ UserSchema.statics.findOrCreate=function(u,callback){
 };
 
 
+UserSchema.post('save', function () {
+  // if (this._wasNew) console.error('new!');
+  // else console.error('updated!');
+});
+
 UserSchema.statics.findByEmail = function(email, success, fail){
-  return this.model('Users').findOne({'email.address':email}).populate('shops').exec(function(err,user){
+  return this.model('Users').findOne({'email.address':email}).populate('shops').populate('likes').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -155,7 +160,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-  return this.model('Users').findOne({provider:token}).populate('shops').exec(function(err,user){
+  return this.model('Users').findOne({provider:token}).populate('shops').populate('likes').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -182,16 +187,18 @@ UserSchema.methods.hasRole = function (role) {
 };
 
 UserSchema.methods.addLikes = function(product, callback){
-  this.likes.push(product._id);
-  this.save(function(err){
-    callback(err);
+  var u=this;
+  u.likes.push(product._id);
+  u.save(function(err){
+    callback(err, u);
   });
 };
 
 UserSchema.methods.removeLikes = function(product, callback){
-  this.likes.pop(product._id);
-  this.save(function(err){
-    callback(err);
+  var u=this;
+  u.likes.pop(product._id);
+  u.save(function(err){
+    callback(err,u);
   });
 };
 
@@ -244,7 +251,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 UserSchema.statics.authenticate=function(email, password, callback) {
 
-  return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
+  return this.model('Users').findOne({ 'email.address': email }).populate('shops').populate('likes').exec(function(err,user){
       if (err) { return callback(err); }
 
       // on user is Null
@@ -302,7 +309,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
 UserSchema.statics.updateStatus=function(id, status,callback){
 	var Users=this.model('Users');	
 
-  return Users.findOne(id).populate('shops').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
     if(err){
       return callback(err);
     }
@@ -327,11 +334,65 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 }
 
 //
+// like product
+UserSchema.statics.like=function(id,sku,callback){
+  var Users=this.model('Users'), Products=this.model('Products');  
+
+  return Users.findOne({id:id}).populate('likes').exec(function (err, user) {
+
+    if(err){
+      return callback(err);
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
+
+    Products.findOneBySku(sku,function(err,product){
+
+      if(!product){
+        return callback("Produit inconnu");
+      }
+      if (_.find(user.likes, function(p){return p.sku==product.sku})){
+        user.removeLikes(product,function(err, u){
+          return callback(err, u)
+        })        
+      }else{
+        user.addLikes(product,function(err, u){
+          return callback(err, u)
+        })        
+      }
+    });
+
+  });
+};
+
+//
+// unlike product
+UserSchema.statics.unlike=function(id,sku,callback){
+  var Users=this.model('Users'), Products=this.model('Products');  
+
+  return Users.findOne(id).exec(function (err, user) {
+    if(err){
+      return callback(err);
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
+    Products.findOneBySku(sku,function(err,product){
+      user.removeLikes(product,function(err){
+        return callback(err)
+      })
+    });
+
+  });
+};
+
+//
 // update shop content
 UserSchema.statics.update=function(id, u,callback){
 	var Users=this.model('Users');	
 
-  return Users.findOne(id).populate('shops').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
     if(err){
       return callback(err);
     }
@@ -352,8 +413,28 @@ UserSchema.statics.update=function(id, u,callback){
     }
     //
     // update the adress
-    if (u.addresses) user.addresses=u.addresses;
+    var primary=0;
+    if (u.addresses) {
+      user.addresses=[]
+      u.addresses.forEach(function(address){
+        if(address.primary)primary++;
+        user.addresses.push(address)
+      });
+    }
     
+    if(primary>1){
+      return callback("Il ne peut pas y avoir deux adresses principales");
+    }
+
+    //
+    // update the phones
+    if (u.phoneNumbers) {
+      user.phoneNumbers=[]
+      u.phoneNumbers.forEach(function(phone){
+        user.phoneNumbers.push(phone)
+      });
+    }
+
     //
     // DO NOT update the validation here
     // ONLY ADMIN CAN DO THAT
@@ -362,7 +443,8 @@ UserSchema.statics.update=function(id, u,callback){
     
     user.save(function (err) {
       //if ( err && err.code === 11000 )
-      callback(err,user);
+        
+      return callback(err,user);
     });
   });
 };
