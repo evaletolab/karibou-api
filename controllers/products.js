@@ -223,7 +223,7 @@ exports.list=function (req, res) {
 exports.get=function (req, res) {
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
-      return res.send(400,err);
+      return res.send(400,errorHelper(err));
     }
     if(!product){
       return res.send(400,"Ce produit n'existe pas");
@@ -272,14 +272,19 @@ exports.update=function (req, res) {
   }catch(err){
     return res.send(400, err.message);
   }  
-
+  function normalizeRef(field){
+    return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
+  }
+  
   //
   //normalize ref
-  req.body.vendor=(req.body.vendor&&req.body.vendor._id)?req.body.vendor._id:req.body.vendor;
+  req.body.vendor=normalizeRef('vendor');
+  req.body.categories=normalizeRef('categories');
+
   delete(req.body._id);
   Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){
     if (err){
-      return res.send(400,err);    
+      return res.send(400,errorHelper(err));    
     }
     return res.json(product);  
   });
