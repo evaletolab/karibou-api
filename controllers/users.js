@@ -166,8 +166,6 @@ exports.update=function(req,res){
     validate.check(req.params.id).isInt();
     validate.user(req);
   }catch(err){
-    console.log(err.stack)
-    process.exit()
     return res.send(400, err.message);
   }  
       

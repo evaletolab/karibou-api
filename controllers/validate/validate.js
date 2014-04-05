@@ -7,6 +7,42 @@ var db = require('mongoose'),
 exports.check   = check;
 exports.ifCheck = ifCheck;
 
+var user_address = exports.address =  function(address){
+      ifCheck(address.region,    "Votre adresse n'est pas valide").isText().len(10, 30)
+      ifCheck(address.primary,   "Votre adresse n'est pas valide").isBoolean()
+      check(address.geo.lng,     "Votre adresse n'est pas valide").isFloat()
+      check(address.geo.lat,     "Votre adresse n'est pas valide").isFloat()
+      check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
+      ifCheck(address.floor,     "Votre numéro postal n'est pas valide").isAlphanumeric()
+      check(address.streetAdress,"Votre adresse n'est pas valide").isText().len(10, 30)
+      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(10, 30)
+      check(address.name,        "Votre nom d'adresse n'est pas valide").isText().len(10, 30)
+}
+
+/**
+ *
+ */
+var user= exports.user = function(req){
+    if(req.body.email){
+      ifCheck(req.body.email.address,   "Votre adresse email n'est pas valide").len(6, 64).isEmail();
+    }
+
+    if(req.body.name){
+      ifCheck(req.body.name.familyName, "Votre nom de famille n'est pas valide").len(2, 64).isText();
+      ifCheck(req.body.name.givenName,  "Votre prénom n'est pas valide").len(2, 64).isText();
+    }
+
+
+    for( var i in req.body.phoneNumbers){ 
+      ifCheck(req.body.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(10, 30)
+      ifCheck(req.body.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
+    }
+
+    for( var i in req.body.addresses){
+      user_address(req.body.addresses[i])
+    }
+}
+
 /**
  *
  */
@@ -28,47 +64,15 @@ exports.order = function(req){
 
 
     if(req.body.customer){
-      
+      user(req.body.customer)
     }
 
     if(req.body.shipping){
-      
+      user_address(req.body.shipping)
     }
 
     if(req.body.payment){
-      
+      // TODO check payment gateway for later
     }   
-}
-
-/**
- *
- */
-exports.user = function(req){
-    if(req.body.email){
-      ifCheck(req.body.email.address,   "Votre adresse email n'est pas valide").len(6, 64).isEmail();
-    }
-
-    if(req.body.name){
-      ifCheck(req.body.name.familyName, "Votre nom de famille n'est pas valide").len(2, 64).isText();
-      ifCheck(req.body.name.givenName,  "Votre prénom n'est pas valide").len(2, 64).isText();
-    }
-
-
-    for( var i in req.body.phoneNumbers){ 
-      ifCheck(req.body.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(10, 30)
-      ifCheck(req.body.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
-    }
-
-    for( var i in req.body.addresses){
-      ifCheck(req.body.addresses[i].region,    "Votre adresse n'est pas valide").isText().len(10, 30)
-      ifCheck(req.body.addresses[i].primary,   "Votre adresse n'est pas valide").isBoolean()
-      check(req.body.addresses[i].geo.lng,     "Votre adresse n'est pas valide").isFloat()
-      check(req.body.addresses[i].geo.lat,     "Votre adresse n'est pas valide").isFloat()
-      check(req.body.addresses[i].postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
-      ifCheck(req.body.addresses[i].floor,     "Votre numéro postal n'est pas valide").isAlphanumeric()
-      check(req.body.addresses[i].streetAdress,"Votre adresse n'est pas valide").isText().len(10, 30)
-      ifCheck(req.body.addresses[i].note,        "Votre note n'est pas valide").isText().len(10, 30)
-      check(req.body.addresses[i].name,        "Votre nom d'adresse n'est pas valide").isText().len(10, 30)
-    }
 }
 
