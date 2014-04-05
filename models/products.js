@@ -13,7 +13,6 @@ var _=require('underscore');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
-  , validate = require('./validate')
   , ObjectId = Schema.Types.ObjectId;
   
 
@@ -66,10 +65,16 @@ var Product = new Schema({
     url:{type:String}
   },
 
-//   photo: {
-//     url:{type:String}
-//   },
-   created: { type: Date, default: Date.now },
+  //
+  // answer question about your product
+  faq:[{
+    q:{type: String, required: true},
+    a:{type: String, required: true},
+    updated:{type:Date, default: Date.now}
+  }],
+
+
+  created: { type: Date, default: Date.now },
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 

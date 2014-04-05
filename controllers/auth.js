@@ -7,8 +7,10 @@ var app = require('../app/config');
 var db  = require('mongoose');
 var passport = require('passport');
 var _ = require('underscore'),
-    check = require('validator').check,
-    sanitize = require('validator').sanitize;
+    validator = require('../app/validator'),
+    check = validator.check,
+    sanitize = validator.sanitize;
+
 
 exports.ensureAuthenticated=function(req, res, next) {
 	if (!req.isAuthenticated()) { 
@@ -78,6 +80,7 @@ exports.login_post=function(req, res, next) {
     check(req.body.provider).len(3, 64);
     check(req.body.password).len(4, 64);
   }catch(err){  
+    // console.log(err.stack)    
     return res.send(400, err.message);
   }  
   

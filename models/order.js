@@ -5,8 +5,8 @@ var assert = require("assert");
 var _=require('underscore');
 
 var mongoose = require('mongoose')
+  , bus = require('../app/bus')
   , Schema = mongoose.Schema
-  , validate = require('./validate')
   , ObjectId = Schema.Types.ObjectId
   , errorHelper = require('mongoose-error-helper').errorHelper;
 
@@ -180,7 +180,6 @@ Orders.statics.checkItem=function(item, product, cb){
     , msg8="Ce produit n'est plus en stock "
 
 
-  console.log("TODO item.sku==product.sku is not always true")
   assert(item.sku==product.sku)
 
 
@@ -263,7 +262,7 @@ Orders.statics.checkItem=function(item, product, cb){
 
   return cb(null,item,vendor)
 
-  // mongoose.model('Products').findOneBySku(item.sku,function(err,product){    
+  // mongoose.model('Products').findOneBySku(itecreatem.sku,function(err,product){    
   // })
 
 }
@@ -354,7 +353,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
   assert(callback)
 
   var msg1="Could not rollback product quantity for paid order", 
-      msg2="Rollback product quantity is possible only for partialy fulfilled order";
+      msg2="Rollback product quantity is possible when there is a fulfilled item in the order";
 
   var order=this;
 
@@ -380,6 +379,20 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
   });
 }
 
+//
+// find open orders with financial status not paid 
+Orders.statics.findByTimeoutAndNotPaid = function(callback){
+  var q={
+    closed:null,
+    "payment.status":{'$ne':'paid'},
+    created:{"$lte": new Date(new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000)}
+  }
+
+  var query=db.model('Orders').find(q).sort({created: -1});
+  if (callback) return query.exec(callback);
+
+  return query;  
+}
 
 //
 // create a new order
@@ -502,21 +515,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
 }; 
 
-//
-// find open orders with financial status not paid 
-Orders.statics.findByTimeoutAndNotPaid = function(callback){
-  var q={
-    closed:null,
-    "payment.status":{'$ne':'paid'},
-    created:{"$lte": new Date(new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000)}
-  }
 
-  var query=db.model('Orders').find(q).sort({created: -1});
-  if (callback)
-    return query.exec(callback);
-
-  return query;  
-}
 
 //
 // find the last order for a shop
@@ -611,9 +610,14 @@ Orders.statics.updateItem = function(oid,items, callback){
     if(itemId.length!==items.length){
       return callback("Impossible de modifer tous les articles. Les articles modifiés : "+itemId.join(', '));      
     }
-    
+
+    //
+    // notify this order has been successfully modified
+    bus.emit('order.update',null,order,items)
+
+
     order.save(callback)
-    // DONT KNOW WHY THE UPDATE IS NOT WORKING!!!
+    // I DONT KNOW WHY THE NATIVE UPDATE IS NOT WORKING!!!
     // order.update({'items.id': itemId.id}, {'$set': {
     //     'items.$.finalprice': item.finalprice,
     //     'items.$.note': item.note,

@@ -55,6 +55,8 @@ var Shops = new Schema({
     // this shop belongsTo a category
     catalog:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
     
+    //
+    // answer question about your shop
     faq:[{
       q:{type: String, required: true},
       a:{type: String, required: true},
@@ -173,7 +175,8 @@ Shops.statics.update=function(id,s,callback){
       return callback("Could not find shop for update "+JSON.stringify(id))
     }
     
-    s.catalog=(s.catalog&&s.catalog._id)?s.catalog._id:s.catalog;
+    //
+    // get catalog from object._id or _id
     s.owner&&delete(s.owner);
     _.extend(shop,s);
 

@@ -3,7 +3,6 @@ var debug = require('debug')('sequences');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
-  , validate = require('./validate')
   , ObjectId = Schema.ObjectId;
   
 

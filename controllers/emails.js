@@ -7,8 +7,8 @@
 var db = require('mongoose');
 var Emails = db.model('Emails');
 
-var check = require('validator').check,
-    sanitize = require('validator').sanitize,
+var check = require('../app/validator').check,
+    sanitize = require('../app/validator').sanitize,
     bus=require('../app/bus'),
     _=require('underscore');
 

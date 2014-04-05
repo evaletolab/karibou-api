@@ -7,8 +7,8 @@ var Shops = db.model('Shops');
 var Products = db.model('Products');
 var _=require('underscore');
 
-var check = require('validator').check,
-    sanitize = require('validator').sanitize,
+var check = require('../app/validator').check,
+    sanitize = require('../app/validator').sanitize,
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 function isUserAdminOrWithRole(req, res, next, checkRole){
@@ -47,15 +47,15 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 function checkParams(req){
     if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64).isText();
     
     
     if(req.body.details){
-      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
-      req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
-      req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
-      req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
-      req.body.details.local && check(req.body.details.local).is(/^(true|false)$/);
+      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300).isText();
+      req.body.details.bio && check(req.body.details.bio).isBoolean();
+      req.body.details.gluten && check(req.body.details.gluten).isBoolean();
+      req.body.details.lactose && check(req.body.details.lactose).isBoolean();
+      req.body.details.local && check(req.body.details.local).isBoolean();
 
     }else{
       throw new Error("Vous devez définir une description");
@@ -81,15 +81,19 @@ function checkParams(req){
         
     
     if (req.body.available){
-      req.body.available.active && check(req.body.available.active).is(/^(true|false)$/);
-      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.available.active && check(req.body.available.active).isBoolean();
+      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").isText();
     }
 
     if (req.body.info){
-      req.body.info.active && check(req.body.info.active).is(/^(true|false)$/);
-      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.info.active && check(req.body.info.active).isBoolean();
+      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
     }
-      
+
+    for (var i in req.body.faq){      
+      check(req.body.faq[i].q,"La question n'est pas valide ou trop longue").len(3, 128).isText();
+      check(req.body.faq[i].a,"La réponse n'est pas valide ou trop longue").len(3, 400).isText()
+    }      
     
 }
 
@@ -154,8 +158,8 @@ exports.list=function (req, res) {
   // check inputs
   
   try{
-    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").is(/^[a-z0-9-]+$/)
-    req.params.shopname&&check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).is(/^[a-z0-9-]+$/);    
+    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").isSlug()
+    req.params.shopname&&check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();    
     req.params.details&&check(req.params.details, "Le format des détails n'est pas valide").len(1, 34).is(/^[a-z0-9-+.]+$/);    
   }catch(e){
     return res.send(400,e.message);
@@ -236,6 +240,7 @@ exports.get=function (req, res) {
 // PUT to UPDATE
 
 // Bulk update
+/*
 exports.massUpdate= function (req, res) {
     var i, len = 0;
     console.log("is Array req.body.products");
@@ -260,7 +265,7 @@ exports.massUpdate= function (req, res) {
         });
     }
     return res.send(req.body.products);
-};
+}; */
 
 // Single update
 exports.update=function (req, res) {
@@ -272,6 +277,8 @@ exports.update=function (req, res) {
   }catch(err){
     return res.send(400, err.message);
   }  
+  //
+  // with angular in UI we got some issue with the _id value
   function normalizeRef(field){
     return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
   }

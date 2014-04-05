@@ -7,22 +7,22 @@ var Categories  = db.model('Categories');
 var assert      = require("assert");
 var extend      = require('util')._extend;
 var _           =require('underscore');
-var check       = require('validator').check,
-    sanitize    = require('validator').sanitize;
+var check       = require('../app/validator').check,
+    sanitize    = require('../app/validator').sanitize;
 
 function checkParams(req){
-  req.body.name&&check(req.body.name, "Le format du nom est invalide").len(2, 45);
-  req.body.description && check(req.body.description, "Le format de la description est invalide").len(3, 400);
-  req.body.image && check(req.body.image, "Le format de l'image est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);
-  req.body.color && check(req.body.color, "Le format de la couleur est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9-]+$/);
-  req.body.group && check(req.body.group, "Le format du group est invalide").len(2, 45).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
+  req.body.name&&check(req.body.name, "Le format du nom est invalide").len(2, 45).isText();
+  req.body.description && check(req.body.description, "Le format de la description est invalide").len(3, 400).isText();
+  req.body.image && check(req.body.image, "Le format de l'image est invalide").len(2, 45).isText();
+  req.body.color && check(req.body.color, "Le format de la couleur est invalide").len(2, 45).isText();
+  req.body.group && check(req.body.group, "Le format du group est invalide").len(2, 45).isText();
 }
 
 exports.list=function (req, res) {
   try{
-    req.query.group&&check(req.query.group, "Le groupe du filtre est invalide").len(2, 32).isAlphanumeric();
-    req.query.name&&check(req.query.name, "Le nom du filtre est invalide").len(2, 32).is(/^[a-zA-ZÀ-ÿ0-9]+$/);
-    req.query.type&&check(req.query.type, "Le type de catégorie est invalide").len(1, 32).is(/^[a-zA-ZÀ-ÿ0-9-*]+$/);
+    req.query.group&&check(req.query.group, "Le groupe du filtre est invalide").len(2, 32).isText();
+    req.query.name&&check(req.query.name, "Le nom du filtre est invalide").len(2, 32).isText();
+    req.query.type&&check(req.query.type, "Le type de catégorie est invalide").len(1, 32).isText();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -86,7 +86,7 @@ exports.list=function (req, res) {
 
 exports.get=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -107,7 +107,7 @@ exports.get=function (req, res) {
 
 exports.update=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
     checkParams(req);
   }catch(err){
     return res.send(400, err.message);
@@ -132,7 +132,7 @@ exports.update=function (req, res) {
 
 exports.remove=function (req, res) {
   try{
-    check(req.params.category, "Invalid characters for category name").len(2, 64).is(/^[a-z0-9-]+$/);    
+    check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
     return res.send(400, err.message);
   } 

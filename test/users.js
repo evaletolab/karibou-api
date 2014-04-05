@@ -13,17 +13,19 @@ var data = dbtools.fixtures(["Users.js","Categories.js"]);
 describe("Users", function(){
 
   before(function(done){
-    dbtools.load(["../fixtures/Users.js"],db, function(err){
-      should.not.exist(err)      
-      done();
-    });
-    
-  });
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js"],db,function(err){
+        should.not.exist(err);
+        done();
+      });
+    });      
+  });  
 
   after(function(done){
-    done();
+    dbtools.clean(function(){
+      done();
+    });      
   });
-  
 
   describe("login",function(){
     

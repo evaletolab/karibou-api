@@ -2,7 +2,7 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
-  , validate = require('./validate')
+  , validate = require('mongoose-validate')
 	, passport = require('passport')
   , _ = require('underscore');
 	
@@ -13,6 +13,25 @@ var mongoose = require('mongoose')
  var EnumProvider="twitter facebook goolge local".split(' ');
 
 
+// validate URL
+validate.url = function (value) {
+  try {
+   check(value).len(10, 200).regex(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/);
+  } catch(err) {
+   return false;
+  }
+  return true;
+};
+
+// validate postal code
+validate.postal = function (value) {
+  try {
+   check(value).isAlpha();   
+  } catch(err) {
+   return false;
+  }
+  return true;
+};
  
 
  // Normalized profile information conforms to the contact schema established by Portable Contacts.

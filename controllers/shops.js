@@ -11,8 +11,7 @@ var app=require('../app/config'),
     ObjectId = db.Types.ObjectId;
 
 
-var check = require('validator').check,
-    sanitize = require('validator').sanitize;
+var check = require('../app/validator').check;
 
 exports.ensureShopLimit=function(req, res, next) {
   if (!req.user.isAdmin() && req.user.shops.length>0){
@@ -51,10 +50,11 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 function checkParams(req){
     if (!req.body)return;
 
-    if(req.body.name) check(req.body.name,"Le nom n'est pas valide ou trop long").len(3, 48);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+    if(req.body.name) check(req.body.name,"Le nom n'est pas valide ou trop long").len(3, 48).isText()
     if(req.body.description){
-      check(req.body.description,"La description n'est pas valide ou trop longue").len(3, 400);
-      req.body.description=sanitize(req.body.description,"La description n'est pas valide").xss();
+      check(req.body.description,"La description n'est pas valide ou trop longue").len(3, 400).isText()
+      console.log("FIXME sanitize")
+      // req.body.description=sanitize(req.body.description,"La description n'est pas valide").xss();
     }
     
     if(req.body.url) check(req.body.url).len(6, 164).isUrl();
@@ -66,25 +66,25 @@ function checkParams(req){
     }
     
     if (req.body.details){
-      req.body.details.bio && check(req.body.details.bio).is(/^(true|false)$/);
-      req.body.details.gluten && check(req.body.details.gluten).is(/^(true|false)$/);
-      req.body.details.lactose && check(req.body.details.lactose).is(/^(true|false)$/);
-      req.body.details.local && check(req.body.details.local).is(/^(true|false)$/);
+      req.body.details.bio && check(req.body.details.bio).isBoolean();
+      req.body.details.gluten && check(req.body.details.gluten).isBoolean();
+      req.body.details.lactose && check(req.body.details.lactose).isBoolean();
+      req.body.details.local && check(req.body.details.local).isBoolean();
     }
     
     for (var i in req.body.faq){      
-      check(req.body.faq[i].q,"La question n'est pas valide ou trop longue").len(3, 128);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=? ]+$/);
-      check(req.body.faq[i].a,"La réponse n'est pas valide ou trop longue").len(3, 400);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
+      check(req.body.faq[i].q,"La question n'est pas valide, trop courte ou trop longue").len(3, 128).isText();
+      check(req.body.faq[i].a,"La réponse n'est pas valide, trop courte ou trop longue").len(3, 400).isText();
     }
     
     if (req.body.available){
-      req.body.available.active && check(req.body.available.active).is(/^(true|false)$/);
-      req.body.available.comment && check(req.body.available.comment,"Le commentaire n'est pas valide ou trop long").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.available.active && check(req.body.available.active).isBoolean();
+      req.body.available.comment && check(req.body.available.comment,"Le commentaire n'est pas valide ou trop long").len(6, 264).isText();
     }
 
     if (req.body.info){
-      req.body.info.active && check(req.body.info.active).is(/^(true|false)$/);
-      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?`{}\[\] ]+$/);
+      req.body.info.active && check(req.body.info.active).isBoolean();
+      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
     }
       
     //marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
@@ -113,7 +113,7 @@ exports.create=function (req, res) {
 exports.remove=function (req, res) {
 
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();    
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -137,7 +137,7 @@ exports.get=function (req, res) {
   //
   // check shop owner 
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();    
   }catch(err){
     return res.send(400, err.message);
   }
@@ -158,9 +158,9 @@ exports.get=function (req, res) {
 };
 exports.email=function(req,res){
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();    
     if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
-    check(req.body.content,"Le format de votre question n'est pas valide").len(3, 400);//.is(/^[a-zA-ZÀ-ÿ0-9',:;.!?$"*ç%&\/\(\)=?` ]+$/);
+    check(req.body.content,"Le format de votre question n'est pas valide").len(3, 400).isText();
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
     //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
   }catch(err){
@@ -202,7 +202,7 @@ exports.email=function(req,res){
 
 exports.askStatus=function(req,res){
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();    
     if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
     //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();    
@@ -255,9 +255,11 @@ exports.askStatus=function(req,res){
 exports.status=function(req,res){
 
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").isSlug().len(3, 34);    
     if(req.body.status===undefined)throw new Error("Invalid request");;
   }catch(err){
+    console.log(err.stack)
+    process.exit()
     return res.send(400, err.message);
   }  
       
@@ -280,7 +282,7 @@ exports.update=function(req,res){
   //
   // check && validate input field
   try{
-    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).is(/^[a-z0-9-]+$/);    
+    check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();    
     checkParams(req);
   }catch(err){
     return res.send(400, err.message);
@@ -292,8 +294,14 @@ exports.update=function(req,res){
   if (!req.user.isAdmin()){
       req.body.status&&delete(req.body.status);
   }
-  
 
+  //
+  // with angular in UI we got some issue with the _id value
+  function normalizeRef(field){
+    return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
+  }  
+  req.body.catalog=normalizeRef('catalog');
+  
   
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){
@@ -309,7 +317,7 @@ exports.list=function (req, res) {
   //
   // check && validate input field
   try{
-    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").is(/^[a-z0-9-]+$/)
+    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").isSlug()
     req.query.valid&&check(req.query.valid, "Le format de validation n'est pas valide").is(/^(true|false|yes|no)$/);    
     req.query.group&&check(req.query.group, "Le format de groupe n'est pas valide").len(1, 34).is(/^[a-z0-9-.]+$/);    
   }catch(err){

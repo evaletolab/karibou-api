@@ -63,7 +63,7 @@ describe("orders.update", function(){
     });
   });
 
-  it("update finalprice, note, fulfillment for items sku:1000001,1000002 ", function(done){
+  it("update finalprice, note, fulfillment and get notified", function(done){
     var oid=2000006;
     var items=[{      
           sku:1000001,
@@ -82,15 +82,54 @@ describe("orders.update", function(){
       should.not.exist(err)
       order.items[0].note.should.equal(items[0].note)
       order.items[0].fulfillment.status.should.equal(items[0].fulfillment.status)
+      // check price
+      order.items[0].finalprice.should.not.equal(order.items[0].price)
 
       order.items[1].note.should.equal(items[1].note)
       order.items[1].fulfillment.status.should.equal(items[1].fulfillment.status)
+      // check price
+      order.items[1].finalprice.should.not.equal(order.items[1].price)
 
-      done();
+      // check price and finalprice
+      order.items[2].finalprice.should.equal(order.items[2].price)
+
     });
+
+    require('../app/bus').on('order.update',function(err, order, items){
+      //
+      // this is a test behavior, because the event will catch actions to the next test
+      if(items.length!==2)return;
+      should.not.exist(err)
+      should.exist(order)
+      done();
+
+    });
+
   });
 
-  
+  it("get notified when updating order ", function(done){
+    var oid=2000006;
+    var items=[{      
+          sku:1000003,
+          fulfillment:{status:"fulfilled"}
+        }
+    ]
+
+    db.model('Orders').updateItem(oid,items, function(err,order){
+      should.not.exist(err)
+      // check price and finalprice
+      order.items[2].finalprice.should.equal(order.items[2].price)
+
+    });
+
+    require('../app/bus').on('order.update',function(err, order, items){
+      should.not.exist(err)
+      should.exist(order)
+      should.exist(items)
+      done();
+    })
+
+  });  
 
 });
 

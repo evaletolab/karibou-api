@@ -6,16 +6,11 @@ var db = require('mongoose'),
     bus=require('../app/bus')
     Users= db.model('Users'),
     password = require('password-generator'),
-    check = require('validator').check,
-    sanitize = require('validator').sanitize,
+    validate = require('./validate/validate'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 ;
 
-function check(req){
-    if(req.body.email.address) check(req.body.email.address).len(6, 64).isEmail();
-    if(req.body.name.familyName) check(req.body.name.familyName).len(2, 64).isAlphanumeric();
-    if(req.body.name.givenName) check(req.body.name.givenName).len(2, 64).isAlphanumeric();
-}
+
 
 exports.ensureMe=function(req, res, next) {
     
@@ -26,7 +21,7 @@ exports.ensureMe=function(req, res, next) {
 	}
 
   // if not me,  
-  var me=sanitize(req.params.id).toInt()||req.body.id;
+  var me=parseInt(req.params.id)||req.body.id;
   if (req.user.id!==me) { 
       return res.send(401, "Vous n'êtes le propriétaire de ce compte");	
 	}
@@ -65,7 +60,7 @@ exports.list = function (req, res, next)  {
 exports.recover=function(req,res){
   try{
     //check(req.params.token,"token inconnu").isEmail();
-    check(req.params.email,"Utilisateur inconnu").isEmail();
+    validate.check(req.params.email,"Utilisateur inconnu").isEmail();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -111,9 +106,9 @@ exports.recover=function(req,res){
 exports.password=function(req,res){
 
   try{
-    check(req.params.id).isInt();
-    check(req.body.email).isEmail();
-    check(req.body.new,"Votre nouveau password est trop court ou trop long").len(4,32);
+    validate.check(req.params.id).isInt();
+    validate.check(req.body.email).isEmail();
+    validate.check(req.body.new,"Votre nouveau password est trop court ou trop long").len(4,32);
     if(!req.body.current && req.user.hash) throw new Error("Il manque votre password");
   }catch(err){
     return res.send(400, err.message);
@@ -168,9 +163,11 @@ exports.password=function(req,res){
 exports.update=function(req,res){
 
   try{
-    check(req.params.id).isInt();
-    check(req);
+    validate.check(req.params.id).isInt();
+    validate.user(req);
   }catch(err){
+    console.log(err.stack)
+    process.exit()
     return res.send(400, err.message);
   }  
       
@@ -187,8 +184,8 @@ exports.update=function(req,res){
 exports.unlike=function(req,res){
 
   try{
-    check(req.params.id).isInt();
-    check(req.params.sku).isInt();
+    validate.check(req.params.id).isInt();
+    validate.check(req.params.sku).isInt();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -205,7 +202,7 @@ exports.unlike=function(req,res){
 exports.like=function(req,res){
 
   try{
-    check(req.params.sku).isInt();
+    validate.check(req.params.sku).isInt();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -224,7 +221,7 @@ exports.like=function(req,res){
 exports.status=function(req,res){
 
   try{
-    check(req.params.id).isInt();
+    validate.check(req.params.id).isInt();
     if(req.body.status===undefined)throw new Error("Invalid request");;
   }catch(err){
     return res.send(400, err.message);
