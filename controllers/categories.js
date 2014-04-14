@@ -138,13 +138,17 @@ exports.remove=function (req, res) {
   } 
   //
   // todo, do not remove category if product are still assigned
-  Categories.remove({slug:req.params.category},function(err){
-    if (err){
-    	res.status(400);
-      return res.send(err);    
-    }
-    return res.send(200);
-  });
+  db.model('Products').find({"categories.slug":req.params.category},function(err,c){
+    //
+    // checking is category is not linked to product or shop
+    if (err){return res.send(400,err)}
+    if(c.length>0){return res.send(400,"Impossible de supprimer une categorie associée.")}
+
+    Categories.remove({slug:req.params.category},function(err){
+      if (err){return res.send(400,err)}
+      return res.send(200);
+    });
+  })
    
 };
 

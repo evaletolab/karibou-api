@@ -31,9 +31,10 @@ validator.extend('isSlug', function (str) {
     return slug.test(str)
 });
 
-
-
-
+/**
+ * wrapp validator function in object
+ * https://github.com/ctavan/express-validator
+ */
 var Wrapper = function() {}
 
 Wrapper.prototype.check = function(str, fail_msg) {
@@ -55,10 +56,7 @@ Wrapper.prototype.ifCheck = function(str, fail_msg) {
   return this.check(str,fail_msg)  
 }
 
-//Create some aliases - may help code readability
 // check for old version here https://github.com/chriso/validator.js/blob/0c5ced087434ed0b5623700955be18f24980dea0/validator.js
-Wrapper.prototype.validate = Wrapper.prototype.check;
-Wrapper.prototype.assert = Wrapper.prototype.check;
 
 Wrapper.prototype.error = function(msg) {
     throw new Error(msg);
@@ -66,7 +64,11 @@ Wrapper.prototype.error = function(msg) {
 
 constructWrapper=function(name){
   return function(){
-      if (!this.skip&&!validator[name](this.str)) {
+      var args=[this.str];for(var i in arguments){
+        args.push(arguments[i])
+      }
+      // console.log(name,args)
+      if (!this.skip&&!validator[name].apply(this,args)) {
         return this.error(this.msg);
     }
     return this;
@@ -84,19 +86,9 @@ Wrapper.prototype.isBoolean = constructWrapper('isBoolean');
 Wrapper.prototype.isUrl = constructWrapper('isURL');
 Wrapper.prototype.isSlug = constructWrapper('isSlug');
 Wrapper.prototype.isAlphanumeric=constructWrapper('isAlphanumeric');
+Wrapper.prototype.is=constructWrapper('matches');
+Wrapper.prototype.len=constructWrapper('isLength');
 
-Wrapper.prototype.is = function(regex) {
-  if (!this.skip&&!regex.test(this.str))
-      return this.error(this.msg);
-  return this;
-}
-
-Wrapper.prototype.len = function(min, max) {
-  if (!this.skip&&(this.str.length < min)||(typeof max !== undefined && this.str.length > max)){
-      return this.error(this.msg);
-  }
-  return this;
-}
 
 var inline = new Wrapper();
 

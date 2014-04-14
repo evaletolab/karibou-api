@@ -2,13 +2,11 @@
 // http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
 
 require('../app/config');
-var db = require('mongoose');
-var Shops = db.model('Shops');
-var Products = db.model('Products');
-var _=require('underscore');
-
-var check = require('../app/validator').check,
-    sanitize = require('../app/validator').sanitize,
+var db = require('mongoose'),
+    Shops = db.model('Shops'),
+    Products = db.model('Products'),
+    validate = require('./validate/validate'),
+    _=require('underscore'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 function isUserAdminOrWithRole(req, res, next, checkRole){
@@ -45,73 +43,20 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 
 
-function checkParams(req){
-    if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64).isText();
-    
-    
-    if(req.body.details){
-      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300).isText();
-      req.body.details.bio && check(req.body.details.bio).isBoolean();
-      req.body.details.gluten && check(req.body.details.gluten).isBoolean();
-      req.body.details.lactose && check(req.body.details.lactose).isBoolean();
-      req.body.details.local && check(req.body.details.local).isBoolean();
 
-    }else{
-      throw new Error("Vous devez définir une description");
-    }
-    
-    if(req.body.pricing){
-      check(req.body.pricing.price, "La valeur du prix n'est pas correct").isFloat();
-      req.body.pricing.discount&&check(req.body.pricing.discount, "La valeur du discount n'est pas correct").isFloat();
-      
-      check(req.body.pricing.stock, "La valeur du stock n'est pas correct").isInt();
-      check(req.body.pricing.part, "La valeur d'une portion n'est pas correct").len(3, 10);
-    }else{
-      throw new Error("Vous devez définir un prix");
-    }
-
-    if (req.body.photo){
-      req.body.photo.bg && check(req.body.photo.bg).len(6, 164).isUrl();
-      req.body.photo.fg && check(req.body.photo.fg).len(6, 164).isUrl();
-      req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
-    }else{
-      throw new Error("Vous devez définir une photo");      
-    }
-        
-    
-    if (req.body.available){
-      req.body.available.active && check(req.body.available.active).isBoolean();
-      req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").isText();
-    }
-
-    if (req.body.info){
-      req.body.info.active && check(req.body.info.active).isBoolean();
-      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
-    }
-
-    for (var i in req.body.faq){      
-      check(req.body.faq[i].q,"La question n'est pas valide ou trop longue").len(3, 128).isText();
-      check(req.body.faq[i].a,"La réponse n'est pas valide ou trop longue").len(3, 400).isText()
-    }      
-    
-}
 
 exports.create=function (req, res) {
   var product;
 
   try{  
-    checkParams(req,res);
+    validate.check(req.params.shopname, "Vous devez définir une boutique avec un format valide").len(3, 64).isSlug();    
+    validate.product(req,res);
   }catch(err){
     return res.send(400, err.message);
   }  
   
   
-  //
-  // check shop owner 
-  if(!req.params.shopname){ 
-    return res.send(400,"Vous devez définir une boutique")
-  }
+
   Shops.findByUser({id:req.user.id},function (err,shops){
     if (err){
       return res.send(400, errorHelper(err));    
@@ -158,9 +103,9 @@ exports.list=function (req, res) {
   // check inputs
   
   try{
-    req.params.category&&check(req.params.category, "Le format de la catégorie n'est pas valide").isSlug()
-    req.params.shopname&&check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();    
-    req.params.details&&check(req.params.details, "Le format des détails n'est pas valide").len(1, 34).is(/^[a-z0-9-+.]+$/);    
+    validate.ifCheck(req.params.category, "Le format de la catégorie n'est pas valide").isSlug()
+    validate.ifCheck(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();    
+    validate.ifCheck(req.params.details, "Le format des détails n'est pas valide").len(1, 34).is(/^[a-z0-9-+.]+$/);    
   }catch(e){
     return res.send(400,e.message);
   }
@@ -272,8 +217,8 @@ exports.update=function (req, res) {
  //
   // check && validate input field
   try{
-    check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();    
-    checkParams(req);
+    validate.check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();    
+    validate.product(req);
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -302,7 +247,7 @@ exports.update=function (req, res) {
 exports.remove=function (req, res) {
 
   try{
-    check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();
+    validate.check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();
   }catch(err){
     return res.send(400, err.message);
   }  

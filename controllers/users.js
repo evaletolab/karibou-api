@@ -29,6 +29,28 @@ exports.ensureMe=function(req, res, next) {
   return next();
 }
 
+exports.ensureMeOrAdmin=function(req, res, next) {
+    
+  //
+  // ensure auth
+  if (!req.isAuthenticated()) { 
+      return res.send(401); 
+  }
+
+  // ok if admin
+  if (req.user.isAdmin()){
+    return next()
+  }
+
+  // if not me,  
+  var me=parseInt(req.params.id)||req.body.id;
+  if (req.user.id!==me) { 
+      return res.send(401, "Vous n'êtes le propriétaire de ce compte"); 
+  }
+  
+  return next();
+}
+
 
 
 
