@@ -3,6 +3,7 @@
   
 module.exports = function(app, config, passport) {
   var path='../controllers/';
+
   var api 			= require(path+'api');
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
@@ -14,6 +15,16 @@ module.exports = function(app, config, passport) {
   var categories= require(path+'categories');
   var _         = require('underscore');
 
+
+  //
+  // wrap a request to a simple queuing system. 
+  // This should help to avoid race condition on product 
+  var queue=require('../app/queue')(1,true);
+  var queued=function(f){
+    return function(req,res){
+      queue.defer(f,req,res)
+    }
+  }
 
 	function cachedShort(req, res, next) {
     res.setHeader('Cache-Control', 'public, max-age=60000');
@@ -81,9 +92,9 @@ module.exports = function(app, config, passport) {
 
   // not needed for now
   //app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
-  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, auth.ensureUserValid, products.update);
+  app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, auth.ensureUserValid, queued(products.update));
 
-  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  products.remove);
+  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  queued(products.remove));
   //app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
 
 
@@ -98,22 +109,25 @@ module.exports = function(app, config, passport) {
   app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);
 
   app.post('/v1/shops', auth.ensureAuthenticated, auth.ensureUserValid, shops.ensureShopLimit, shops.create);
-  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.update);
+  app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, queued(shops.update));
   app.post('/v1/shops/:shopname/ask', auth.ensureUserValid, shops.email);
   app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.status);
     
-  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, products.create);
+  app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, queued(products.create));
 
   app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.remove);
 
 
   //
   // orders
-  app.get('/v1/orders', auth.ensureAdmin, orders.list);
+  app.get('/v1/orders', users.ensureMe, orders.list);
   app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.list);
-  app.get('/v1/users/:id/orders', users.ensureMe, orders.list);
+  app.get('/v1/users/:id/orders', users.ensureMeOrAdmin, orders.list);
+  app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 
-  app.post('/v1/orders/verify/cart', auth.ensureAdmin, orders.verify);
+  app.post('/v1/orders/items/verify',orders.verifyItems)
+  app.post('/v1/orders', users.ensureMe, queued(orders.create));
+  app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, queued(orders.update));
 
 
 
