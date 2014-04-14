@@ -108,9 +108,9 @@ describe("orders.create.success", function(){
       order.items[1].quantity.should.equal(3)
       order.items[1].price.should.equal(data.Products[0].pricing.price*3)
       order.rollbackProductQuantityAndSave(function(err,order){
-        console.log(err)
         done();                  
       })
+      // console.log(order.oid)
       // console.log(JSON.stringify(order))
     });
   });   
@@ -167,6 +167,9 @@ describe("orders.create.success", function(){
       // checking discount price
       order.items[0].quantity.should.equal(2)
       order.items[1].quantity.should.equal(3)
+
+      // console.log(order.oid)
+
     });
   }); 
 
@@ -174,14 +177,30 @@ describe("orders.create.success", function(){
   // order is in timeout if payment status != 'paid' and created<1s (timeoutAndNotPaid) 
   // for testing timeout = 100[ms]
   it("Error:an order with status created and not paid is no more available after a timeout", function(done){
-    Orders.findByTimeoutAndNotPaid(function(err,orders){
-      orders.length.should.equal(1)
-      orders[0].oid.should.equal(2000006)
-      done();
-    })
+    setTimeout(function(){
+      Orders.findByTimeoutAndNotPaid(function(err,orders){
+        // orders.forEach(function(order){
+        //   console.log(order.oid,new Date(order.created).getTime(),order.payment.status)
+        // })
+        
+        // create on test   2000001 1396791546324 'pending', closed null
+        //                  2000000 1396791546291 'pending', closed null
+        // created on load. 2000006 1396791545738 'pending', closed null
+        orders.length.should.equal(3)
+
+        orders[0].oid.should.equal(2000001)
+        done();
+      })
+    },100)
   }); 
 
-  it.skip("you can rollback an order only if fulfillments=='partial' and payment!=='paid'",function(done){
+  it("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){
+    Orders.findByTimeoutAndNotPaid().where('oid').in([2000001,2000000]).exec(function(err,orders){
+      orders.forEach(function(order){
+        console.log(order.oid,new Date(order.created).getTime(),order.payment.status)
+      })              
+    });
+
     done();
   })
 });

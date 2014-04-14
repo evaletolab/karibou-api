@@ -26,7 +26,8 @@
     "debug": "0.x",
     "jade": "0.x",
     "nodetime": "0.x.x",
-    "mongoose-error-helper": "0.0.2"
+    "mongoose-error-helper": "0.0.2",
+    "queue-async": "~1.0.7"
   },
   "devDependencies": {
     "mocha": "1.x",

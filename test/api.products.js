@@ -139,6 +139,7 @@ describe("api.products", function(){
         .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
+          // console.log(res.text)
           res.should.have.status(200);
           res.body.sku.should.equal(1000000);
           res.body.categories.should.be.an.array;

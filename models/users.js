@@ -94,8 +94,8 @@ validate.postal = function (value) {
     shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
     
     
-    /* */    
-    invoices : [{type: Schema.Types.ObjectId, ref : 'Invoice'}],
+    /* link user and orders */    
+    orders : [{type: String}],
     
     /* make user valid/invalid */
     status:{type:Boolean, default: true},

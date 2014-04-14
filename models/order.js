@@ -188,7 +188,7 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // check item and product exists
   if(!item || !product || item.sku!==product.sku){
-    return cb(msg1)
+    return cb(msg1,item)
   }
 
   //
@@ -204,15 +204,15 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // check item.vendor
   if(!item.vendor ){
-    return cb(msg1)
+    return cb(msg1,item)
   }
 
   if(product.vendor.status!==true){
-    return cb(msg5)
+    return cb(msg5,item)
   }
 
   if(product.vendor.available.active!==true){
-    return cb(msg6)
+    return cb(msg6,item)
   }
 
   if((typeof item.vendor) !=='object' ){
@@ -231,22 +231,22 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // check item is still available in stock
   if(!product.attributes.available){
-    return cb(msg2)
+    return cb(msg2,item)
   }
 
   // check if item.quantity <1
   if(item.quantity<1){
-    return cb(msg4)    
+    return cb(msg4,item)    
   }
 
   //
   // check item is still available in stock
   if(product.pricing.stock==0){
-    return cb(msg8)
+    return cb(msg8,item)
   }
 
   if(item.quantity>product.pricing.stock){
-    return cb(msg7)
+    return cb(msg7,item)
   }
 
 
@@ -256,7 +256,7 @@ Orders.statics.checkItem=function(item, product, cb){
   // if prodduct has discount, price should be computed with
   var price=product.getPrice()*item.quantity;
   if(item.price.toFixed(1)!=price.toFixed(1)){
-    return cb(msg3)
+    return cb(msg3,item)
   }
 
 
@@ -300,7 +300,7 @@ Orders.statics.checkItems = function(items, callback){
   Products.findBySkus(skus).exec(function(err,products){
     assert(skus.length===products.length)
 
-    var vendors=[];
+    var vendors=[], errors=[];
 
     var i=-1;require('async').each(items, function(item, cb) {
       i++;//get the iterator
@@ -309,13 +309,17 @@ Orders.statics.checkItems = function(items, callback){
       //
       // check an item
       Orders.checkItem(items[i],products[i],function(err,item, vendor){
-        vendors.push(vendor)
-        cb(err);
+        vendors.push(vendor);
+        var error={}; error[item.sku]=err;
+        //
+        // collect error by product
+        err&&errors.push(error)
+        cb();
       })
     },function(err){
       //
       // this checking generate a list of products
-      callback(err,products,vendors)
+      callback(err,products,vendors, errors)
     });
 
   });
@@ -385,9 +389,10 @@ Orders.statics.findByTimeoutAndNotPaid = function(callback){
   var q={
     closed:null,
     "payment.status":{'$ne':'paid'},
-    created:{"$lte": new Date(new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000)}
+    created:{"$lte": new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000}
   }
 
+  // console.log(q)
   var query=db.model('Orders').find(q).sort({created: -1});
   if (callback) return query.exec(callback);
 
@@ -465,12 +470,19 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     }
 
     
-    Orders.checkItems(items,function(err, products,vendors){
+    Orders.checkItems(items,function(err, products,vendors, errors){
       //
-      // items issue?
+      // unknow issue?
       if(err){
         return callback(err)
       }
+
+      //
+      // items issue? return the lists of issues 
+      if((errors&&errors.length)){
+        return callback(null,{errors:errors})
+      }
+
       //
       // attache items on success,
       order.items=items;
@@ -502,9 +514,15 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       //
       // ready to create one order
       var dborder =new Orders(order);
-      //
-      // update product stock
-      return dborder.updateProductQuantityAndSave(callback)
+
+      db.model('Users').findOneAndUpdate({id:customer.id}, {$push: {orders: oid}},function(e,u){
+        if(e){return callback(e)}
+
+        //
+        // update product stock
+        return dborder.updateProductQuantityAndSave(callback)
+
+      })
 
 
 
@@ -613,7 +631,7 @@ Orders.statics.updateItem = function(oid,items, callback){
 
     //
     // notify this order has been successfully modified
-    bus.emit('order.update',null,order,items)
+    bus.emit('order.update.items',null,order,items)
 
 
     order.save(callback)

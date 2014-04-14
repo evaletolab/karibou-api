@@ -118,8 +118,8 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      should.exist(err)
-      err.should.include('Le prix de votre produit')
+      should.exist(order.errors)
+      order.errors[0]['1000001'].should.include('Le prix de votre produit')
       done();          
     });
   });    
@@ -135,8 +135,8 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      should.exist(err)
-      err.should.include('est plus en stock')
+      should.exist(order.errors)
+      order.errors[0]['1000006'].should.include('est plus en stock')
       done();          
     });
   });
@@ -154,8 +154,8 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
-      should.exist(err)
-      err.should.include("La quantité souhaitée n'est ")
+      should.exist(order.errors)
+      order.errors[0]['1000001'].should.include("La quantité souhaitée n'est ")
       done();          
     });
 
@@ -173,8 +173,8 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
-      should.exist(err)
-      err.should.include("quantité d'achat minimum est de 1")
+      should.exist(order.errors)
+      order.errors[0]['1000001'].should.include("quantité d'achat minimum est de 1")
       done();          
     });
 
@@ -190,8 +190,8 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      should.exist(err)
-      err.should.include("la boutique a été désactivé")
+      should.exist(order.errors)
+      order.errors[0]['1000002'].should.include("la boutique a été désactivé")
       done();          
     });
   });    
@@ -208,8 +208,8 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
-      should.exist(err)
-      err.should.include("la boutique est momentanément fermée")
+      should.exist(order.errors)
+      order.errors[0]['1000003'].should.include("la boutique est momentanément fermée")
       done();          
     });
   });    
@@ -226,8 +226,8 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
-      should.exist(err)
-      err.should.include("Ce produit n'est plus disponible")
+      should.exist(order.errors)
+      order.errors[0]['1000004'].should.include("Ce produit n'est plus disponible")
       done();          
     });
   });    

@@ -63,7 +63,7 @@ describe("orders.update", function(){
     });
   });
 
-  it("update finalprice, note, fulfillment and get notified", function(done){
+  it("update items finalprice, note, fulfillment and get notified", function(done){
     var oid=2000006;
     var items=[{      
           sku:1000001,
@@ -95,7 +95,7 @@ describe("orders.update", function(){
 
     });
 
-    require('../app/bus').on('order.update',function(err, order, items){
+    require('../app/bus').on('order.update.items',function(err, order, items){
       //
       // this is a test behavior, because the event will catch actions to the next test
       if(items.length!==2)return;
@@ -107,7 +107,7 @@ describe("orders.update", function(){
 
   });
 
-  it("get notified when updating order ", function(done){
+  it("get notified when updating items order ", function(done){
     var oid=2000006;
     var items=[{      
           sku:1000003,
@@ -122,7 +122,7 @@ describe("orders.update", function(){
 
     });
 
-    require('../app/bus').on('order.update',function(err, order, items){
+    require('../app/bus').on('order.update.items',function(err, order, items){
       should.not.exist(err)
       should.exist(order)
       should.exist(items)
