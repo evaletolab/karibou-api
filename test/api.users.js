@@ -118,14 +118,23 @@ describe("api.users", function(){
       .expect(404,done);
   });
 
-  it('user.update(12346) /v1/users/12346 should return 401',function(done){
+  it('POST /v1/users/12346 for update should return 401',function(done){
     request(app)
       .post('/v1/users/12346')      
       .set('cookie', cookie)
       .expect(401,done);
   });
 
-  it('user.update(12345) /v1/users/12345 should return 200',function(done){
+  it('POST /v1/users/12345 for update should return 200',function(done){
+    request(app)
+      .post('/v1/users/12345')      
+      .set('cookie', cookie)
+      .expect(200,done);
+  });
+
+  it.skip('when update user, express session shoud be updated',function(done){
+    var u=data.Users[0];
+    console.log(u)
     request(app)
       .post('/v1/users/12345')      
       .set('cookie', cookie)
