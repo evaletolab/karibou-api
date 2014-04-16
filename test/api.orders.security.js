@@ -15,7 +15,7 @@ describe("api.orders.security", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -50,9 +50,10 @@ describe("api.orders.security", function(){
       .expect(401,done);
   });
 
-  it('GET /v1/shops/un-shop/orders should return 401 for anonymous',function(done){
+  it('GET /v1/orders should return 401 for non admin',function(done){
     request(app)
-      .get('/v1/shops/un-shop/orders')
+      .get('/v1/orders')
+      .set('cookie', cookie)      
       .expect(401,done);
   });
 
@@ -96,34 +97,25 @@ describe("api.orders.security", function(){
       .expect(200,done);
   });
 
-  it.skip("POST /v1/orders ", function(done){
-
-   var items=[]
-      , customer=data.Users[0]
-      , shipping={
-          when:new Date()
-        }
-      , payment="postfinance";
-
-    var order={
-      items:items,
-      customer:customer,
-      shipping:shipping,
-      payment:payment
-    }
-
+  it('GET /v1/shops/un-autre-shop/orders should return 401 for anonymous',function(done){
     request(app)
-      .post('/v1/orders')
-      .set('Content-Type','application/json')
-      .set('cookie', cookie)
-      .send(o)
+      .get('/v1/shops/un-shop/orders')
       .expect(401,done);
-
   });
 
+  it('GET /v1/shops/un-autre-shop/orders should return 200 for owner',function(done){
+    request(app)
+      .get('/v1/shops/un-autre-shop/orders')
+      .set('cookie', cookie)      
+      .expect(200,done);
+  });
 
-
-
+  it('GET /v1/shops/un-shop/orders should return 401 for non owner',function(done){
+    request(app)
+      .get('/v1/shops/un-shop/orders')
+      .set('cookie', cookie)      
+      .expect(401,done);
+  });
 
 });
 

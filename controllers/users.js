@@ -23,7 +23,7 @@ exports.ensureMe=function(req, res, next) {
   // if not me,  
   var me=parseInt(req.params.id)||req.body.id;
   if (req.user.id!==me) { 
-      return res.send(401, "Vous n'êtes le propriétaire de ce compte");	
+      return res.send(401, "Vous n'êtes pas le propriétaire de ce compte");	
 	}
 	
   return next();
@@ -45,7 +45,7 @@ exports.ensureMeOrAdmin=function(req, res, next) {
   // if not me,  
   var me=parseInt(req.params.id)||req.body.id;
   if (req.user.id!==me) { 
-      return res.send(401, "Vous n'êtes le propriétaire de ce compte"); 
+      return res.send(401, "Vous n'êtes pas le propriétaire de ce compte"); 
   }
   
   return next();

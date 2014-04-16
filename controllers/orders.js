@@ -125,7 +125,7 @@ exports.create=function(req,res){
   }    
   
 
-  Orders.create(req.body.items, req.body.customer, req.body.shipping, req.body.payment, 
+  Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment, 
     function(err,order){
     if(err){
       return res.send(400, err);

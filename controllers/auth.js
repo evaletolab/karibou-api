@@ -49,7 +49,7 @@ exports.ensureAdmin=function(req, res, next) {
 
   // if not admin, 
   if (!req.user.isAdmin()) { 
-      return res.send(401);	
+      return res.send(401,"Cette fonctionalité est réservée a un administrateur");	
 	}
 	
   return next();

@@ -108,7 +108,7 @@ module.exports = function(app, config, passport) {
   app.get('/v1/shops/:shopname/products/category/:category', products.list);
   app.get('/v1/shops/:shopname/products/category/:category/details/:details', products.list);
 
-  app.post('/v1/shops', auth.ensureAuthenticated, auth.ensureUserValid, shops.ensureShopLimit, shops.create);
+  app.post('/v1/shops', auth.ensureUserValid, shops.ensureShopLimit, shops.create);
   app.post('/v1/shops/:shopname', shops.ensureOwnerOrAdmin, auth.ensureUserValid, queued(shops.update));
   app.post('/v1/shops/:shopname/ask', auth.ensureUserValid, shops.email);
   app.post('/v1/shops/:shopname/status', shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.status);
@@ -120,13 +120,13 @@ module.exports = function(app, config, passport) {
 
   //
   // orders
-  app.get('/v1/orders', users.ensureMe, orders.list);
+  app.get('/v1/orders', auth.ensureAdmin, orders.list);
   app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.list);
   app.get('/v1/users/:id/orders', users.ensureMeOrAdmin, orders.list);
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 
   app.post('/v1/orders/items/verify',orders.verifyItems)
-  app.post('/v1/orders', users.ensureMe, queued(orders.create));
+  app.post('/v1/orders', auth.ensureUserValid, queued(orders.create));
   app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, queued(orders.update));
 
 

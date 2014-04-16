@@ -10,7 +10,7 @@ var Users=exports.Users=[{
     likes : [], 
     displayName : "olvier e", 
     email : { 
-      address : "evaleto@gluck.com", status : new Date()
+      address : "evaleto@gluck.com", status : true
     },
     phoneNumbers : [], 
     photo : "jpg", 
