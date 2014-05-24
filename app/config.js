@@ -20,7 +20,6 @@ try {
   module.exports=global.config;
   
   debug('environment: ' + env);
-  
 } catch (err) {
   throw new Error('Config: Failed to load \'' + config + '\': ' + err);
 }

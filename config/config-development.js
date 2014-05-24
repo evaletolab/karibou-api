@@ -65,7 +65,11 @@ module.exports = {
   , google: {
         clientId: '224794776836-cp3a2v0elt955h9uqhgmskplhg85ljjm.apps.googleusercontent.com'
       , clientSecret: 'rxGFo1mBG_H3DX2ifDFawiMZ'
+      , cb: 'http://localhost:4000/auth/google/callback'
     }	
+  , persona:{
+      audience:'http://lo.cal:3000'
+    }
 	},
   
 

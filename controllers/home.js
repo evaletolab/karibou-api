@@ -23,3 +23,7 @@ exports.index = function(app){
 exports.acceptcookie = function(req,res){
     res.render('cookie');
 };
+
+exports.welcome = function(req,res){
+    res.render('welcome');
+};

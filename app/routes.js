@@ -26,13 +26,9 @@ module.exports = function(app, config, passport) {
     }
   }
 
-	function cachedShort(req, res, next) {
-    res.setHeader('Cache-Control', 'public, max-age=60000');
-    return next();
-  }
 
-  function cachedLong(req, res, next) {
-    res.setHeader('Cache-Control', 'public, max-age=1200000');
+  function cached(req, res, next) {
+    res.setHeader('Cache-Control', 'public, max-age=120');
     return next();
   }
 	
@@ -60,11 +56,12 @@ module.exports = function(app, config, passport) {
 	// home
   app.get ('/', home.index(app));
   app.get ('/acceptcookie', home.acceptcookie);
+  app.get ('/welcome', home.welcome);
   app.get ('/v1', api.index(app));
 
   //
   //config
-  app.get ('/v1/config', cachedLong, api.config);
+  app.get ('/v1/config', cached, api.config);
   
   //
   // email validation
@@ -74,11 +71,11 @@ module.exports = function(app, config, passport) {
   
   //
   // category
-  app.get ('/v1/category', cachedLong, categories.list);
+  app.get ('/v1/category', cached, categories.list);
   app.get ('/v1/category/:category', categories.get);
   app.post('/v1/category', auth.ensureAdmin, categories.create);
   app.post('/v1/category/:category', auth.ensureAdmin, categories.update);
-  app.delete('/v1/category/:category', auth.ensureAdmin, categories.remove);
+  app.put('/v1/category/:category', auth.ensureAdmin, auth.checkPassword, categories.remove);
   
   
   // global products 
@@ -94,7 +91,7 @@ module.exports = function(app, config, passport) {
   //app.post('/v1/products', products.ensureShopOwnerOrAdmin, products.create);
   app.post('/v1/products/:sku', products.ensureOwnerOrAdmin, auth.ensureUserValid, queued(products.update));
 
-  app.delete('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid,  queued(products.remove));
+  app.put('/v1/products/:sku',products.ensureOwnerOrAdmin, auth.ensureUserValid, auth.checkPassword,  queued(products.remove));
   //app.delete('/v1/products',shops.ensureOwnerOrAdmin, products.massRemove);
 
 
@@ -115,7 +112,7 @@ module.exports = function(app, config, passport) {
     
   app.post('/v1/shops/:shopname/products', shops.ensureOwnerOrAdmin, auth.ensureUserValid, queued(products.create));
 
-  app.delete('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, shops.remove);
+  app.put('/v1/shops/:shopname',shops.ensureOwnerOrAdmin, auth.ensureUserValid, auth.checkPassword, shops.remove);
 
 
   //
@@ -131,14 +128,6 @@ module.exports = function(app, config, passport) {
 
 
 
-  //
-  // bridge authentification  
-  if(config.auth.twit){
-    app.get('/auth/twitter', passport.authenticate('twitter'));
-    app.get('/auth/twitter/callback', 
-      passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/login' })
-    );
-  }
   
   
 };

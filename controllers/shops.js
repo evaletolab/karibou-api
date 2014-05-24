@@ -87,8 +87,21 @@ function checkParams(req){
       req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
     }
       
-    //marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
-    //location: {type: String, required: false, enum: EnumLocation},
+    if(!req.body.address && !req.body.marketplace){
+      throw new Error("Vous devez définir au moins une adresse de collecte");
+    }
+
+    if(req.body.address){
+      check(req.body.address.name,"Votre adresse n'est pas valide").isText().len(4,30)
+      check(req.body.address.floor,"Votre adresse n'est pas valide").isText().len(1,5)
+      check(req.body.address.phone,"Votre adresse n'est pas valide").isText().len(4,30)
+      check(req.body.address.region,"Votre adresse n'est pas valide").isText().len(4,30)
+      check(req.body.address.postalCode,"Votre adresse n'est pas valide").isNumeric()
+    }
+    for (var i in req.body.marketplace){
+      check(req.body.marketplace[i],"Votre point de collect n'est pas valide").isText().len(4,45)
+    }      
+      
     
 }
 

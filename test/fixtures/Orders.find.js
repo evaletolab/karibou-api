@@ -42,7 +42,7 @@ exports.Orders=[
             streetAdress: "route de chêne 34",
             floor: "2",
             postalCode: "1208",
-            region: "GE",
+            region: "Genève",
             when: nextday,
             geo: {
                 lat: 46.1997473,
@@ -84,7 +84,7 @@ exports.Orders=[
             streetAdress: "route de chêne 34",
             floor: "2",
             postalCode: "1208",
-            region: "GE",
+            region: "Genève",
             when: nextday,
             geo: {
                 lat: 46.1997473,
@@ -182,7 +182,7 @@ exports.Orders=[
 
         /* shipping adresse*/
         shipping: {
-            region: "GE",
+            region: "Genève",
             when: monday,
             geo: {
                 lng: 6.1692497,

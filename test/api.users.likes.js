@@ -76,6 +76,7 @@ describe("api.users.likes", function(){
       .end(function(err,res){
         res.should.have.status(200);
         res.body.likes.length.should.equal(1)
+        res.body.likes[0].should.have.property('sku')
         done()
       });
   });
@@ -88,6 +89,7 @@ describe("api.users.likes", function(){
         res.should.have.status(200);
         // console.log(res.body.likes)
         res.body.likes.length.should.equal(1)
+        res.body.likes[0].should.have.property('sku')
         done()
       });
 

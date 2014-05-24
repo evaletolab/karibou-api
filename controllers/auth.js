@@ -55,6 +55,26 @@ exports.ensureAdmin=function(req, res, next) {
   return next();
 }
 
+exports.checkPassword=function(req, res, next) {
+  try{
+    check(req.body.password,"Cette action est protégée par votre mot de passe").len(4, 64);
+  }catch(err){  
+    return res.send(400, err.message);
+  }   
+
+  // verify passwd
+  req.user.verifyPassword(req.body.password, function(err, passwordCorrect) {
+    if (err) { 
+      res.send(400, err)
+    }
+
+    if (!passwordCorrect) { 
+      return res.send(400, "Cette action est protégée. Le mot de passe est incorrect"); 
+    }
+    return next();
+  });  
+}
+
 
 exports.logout = function (req, res) {
       req.logout();      
@@ -149,14 +169,14 @@ exports.register_post= function(req, res) {
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
 		    if (err){
-        	res.status(400);
-          return res.json(err);    
+          return res.json(400,err);    
 		    }
 
         if (!user){
-          res.status(400);
-          return res.json("Unknow error on registration");    
+          return res.json(400,"Unknow error on registration");    
         }
+        //
+        // redirect for non ajax register
         var redirect=req.param('redirect');
         if(redirect){
           return  res.redirect(redirect);

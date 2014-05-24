@@ -10,7 +10,8 @@ var mongoose = require('mongoose')
 
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
- var EnumProvider="twitter facebook goolge local".split(' ');
+ var EnumProvider="twitter facebook goolge persona local".split(' ');
+ var EnumRegion=config.shop.region.list;
 
 
 // validate URL
@@ -76,7 +77,7 @@ validate.postal = function (value) {
           floor: { type: String, trim: true, required : true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
           location: { type: String, required : true, trim: true },
-          region: { type: String, required : true, trim: true, default:"GE" },
+          region: { type: String, required : true, trim: true, default:"Genève", enum: EnumRegion },
           postalCode: { type: String, required : false /**,
             validate:[validate.postal,'Invalide postal code'] **/
           },
@@ -138,18 +139,22 @@ UserSchema.pre("save",function(next, done) {
 
 UserSchema.statics.findOrCreate=function(u,callback){
 	var Users=this.model('Users');
+
+  //TODO this is a simple implementation that auth persona to match local email 
+  if (u.provider==='persona'){
+    var persona= delete u.provider;
+  }
   Users.findOne(u, function(err, user){
     if(!user){
       if (u.provider==='local'){
         return callback("The system can not automaticaly create user for local provider");
       }
       
-//      Users.findOne({'email.address' : u.email.address},function(err, user) {
-//        if(user){
-//          callback("L'address");
-//        }
-//      });
-      
+      if (!u.id && u['email.address']){
+        u.id=u['email.address'].hash()
+        u["email.status"]=true;
+      }
+      if(persona){u['provider']='persona'}
       var newuser=new Users(u);
       newuser.save(function(err){
         //if ( err && err.code === 11000 )
@@ -207,17 +212,40 @@ UserSchema.methods.hasRole = function (role) {
 
 UserSchema.methods.addLikes = function(product, callback){
   var u=this;
-  u.likes.push(product._id);
-  u.save(function(err){
-    callback(err, u);
-  });
+  u.likes.push(product);
+  u.save(callback);
 };
 
 UserSchema.methods.removeLikes = function(product, callback){
   var u=this;
-  u.likes.pop(product._id);
-  u.save(function(err){
-    callback(err,u);
+  u.likes.pop(product);
+  u.save(callback);
+};
+
+//
+// like product
+UserSchema.statics.like=function(id,sku,callback){
+  var Users=this.model('Users'), Products=this.model('Products');  
+
+  return Users.findOne({id:id}).populate('likes').exec(function (err, user) {
+
+    if(err){
+      return callback(err);
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
+
+    // remove like?
+    var product=_.find(user.likes, function(p){return p.sku==sku});
+    if (product){
+        return user.removeLikes(product,callback)        
+    }
+
+    return Products.findOneBySku(sku,function(err,product){
+      return user.addLikes(product,callback)          
+    })
+
   });
 };
 
@@ -263,7 +291,15 @@ UserSchema.virtual('password').set(function (password) {
 UserSchema.method('verifyPassword', function(password, callback) {
   var hash=require('crypto').createHash('sha1').update(password).digest("hex");
 
-  callback(null,hash===this.hash);  
+  //
+  // for security reason password hash is removed from the memory!
+  if(this.hash==="true"){
+    this.model('Users').findOne({ id: this.id }).exec(function(err,user){
+      return   callback(null,hash===user.hash);        
+    })    
+  }else{
+    callback(null,hash===this.hash);    
+  }
 //  bcrypt.compare(password, this.hash, callback);
 });
 
@@ -352,59 +388,9 @@ UserSchema.statics.updateStatus=function(id, status,callback){
   });
 }
 
-//
-// like product
-UserSchema.statics.like=function(id,sku,callback){
-  var Users=this.model('Users'), Products=this.model('Products');  
 
-  return Users.findOne({id:id}).populate('likes').exec(function (err, user) {
 
-    if(err){
-      return callback(err);
-    }
-    if(!user){
-      return callback("Utilisateur inconnu");
-    }
 
-    Products.findOneBySku(sku,function(err,product){
-
-      if(!product){
-        return callback("Produit inconnu");
-      }
-      if (_.find(user.likes, function(p){return p.sku==product.sku})){
-        user.removeLikes(product,function(err, u){
-          return callback(err, u)
-        })        
-      }else{
-        user.addLikes(product,function(err, u){
-          return callback(err, u)
-        })        
-      }
-    });
-
-  });
-};
-
-//
-// unlike product
-UserSchema.statics.unlike=function(id,sku,callback){
-  var Users=this.model('Users'), Products=this.model('Products');  
-
-  return Users.findOne(id).exec(function (err, user) {
-    if(err){
-      return callback(err);
-    }
-    if(!user){
-      return callback("Utilisateur inconnu");
-    }
-    Products.findOneBySku(sku,function(err,product){
-      user.removeLikes(product,function(err){
-        return callback(err)
-      })
-    });
-
-  });
-};
 
 //
 // update shop content

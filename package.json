@@ -27,7 +27,9 @@
     "jade": "0.x",
     "nodetime": "0.x.x",
     "mongoose-error-helper": "0.0.2",
-    "queue-async": "~1.0.7"
+    "queue-async": "~1.0.7",
+    "passport-persona": "~0.1.7",
+    "passport-google-oauth": "~0.1.5"
   },
   "devDependencies": {
     "mocha": "1.x",

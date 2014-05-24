@@ -29,7 +29,8 @@ var mongoose = require('mongoose')
 var EnumOrderStatus    =config.shop.order.status;
 var EnumCancelReason   =config.shop.order.cancelreason;
 var EnumFinancialStatus=config.shop.order.financialstatus;
-var EnumOrderGateway   =config.shop.order.gateway;
+var EnumOrderGateway   =_.map(config.shop.order.gateway,
+                            function(e){return e.label});
 var EnumShippingMode   =config.shop.order.shippingmode;
 
 var Orders = new Schema({

@@ -1,15 +1,19 @@
 var mongoose = require('mongoose')
   , LocalStrategy = require('passport-local').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
+  , PersonaStrategy = require('passport-persona').Strategy
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 //  , GitHubStrategy = require('passport-github').Strategy
 //  , FacebookStrategy = require('passport-facebook').Strategy
-//  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 //  , LinkedinStrategy = require('passport-linkedin').Strategy
   , Users = mongoose.model('Users')
 
 
 module.exports = function (app, config, passport) {
-  // require('./initializer')
+
+
+
+
 
   // serialize sessions
   passport.serializeUser(function(user, done) {
@@ -73,16 +77,67 @@ module.exports = function (app, config, passport) {
         callbackURL: config.auth.twit.cb
       },
       function(token, secret, profile, done) {        
-          Users.findOrCreate({ id: profile.id, provider:profile.provider, photo:profile.photos[0].value }, function (err, user) {
+          Users.findOrCreate({ id: profile.id, provider:profile.provider }, function (err, user) {
               user.token=token;
               return done(err, user);
           });
       }
     ));
 
+    // define route
+    app.get('/auth/twitter', passport.authenticate('twitter'));
+    app.get('/auth/twitter/callback', 
+      passport.authenticate('twitter', { successRedirect: '/welcome', failureRedirect: '/login' })
+    );
+
   }
 
+  if(config.auth.google){
+    // use google strategy
+    passport.use(new GoogleStrategy({
+        clientID: config.auth.google.clientId,
+        clientSecret: config.auth.google.clientSecret,
+        callbackURL: config.auth.google.cb
+      },
+      function(accessToken, refreshToken, profile, done) {
+        var u={id: profile.id, provider:'google' }
+        if(profile.emails[0].value)u['email.address']=profile.emails[0].value
+        Users.findOrCreate(u, function (err, user) {
+            user.token=token;
+            return done(err, user);
+        });
+      }
+    ));
 
+    // define route
+    app.get('/auth/google', passport.authenticate('google'));
+    app.get('/auth/google/callback', 
+      passport.authenticate('google', { successRedirect: '/welcome', failureRedirect: '/login' })
+    );
+
+  }
+
+  if(config.auth.persona){
+    // use google strategy
+    passport.use(new PersonaStrategy({
+        audience: config.auth.persona.audience
+      },
+      function(email, done) {
+        Users.findOrCreate({provider:'persona', "email.address": email }, function (err, user) {
+          return done(err, user);
+        });
+      }
+    ));    
+
+    // define route
+    app.post('/auth/browserid', 
+      passport.authenticate('persona', { failureRedirect:'/login' }),
+      function(req,res){
+        return res.json(req.user)
+      }
+    );
+
+  }
 /***
 
   // use github strategy
@@ -141,32 +196,7 @@ module.exports = function (app, config, passport) {
     }
   ))  
 
-  // use google strategy
-  passport.use(new GoogleStrategy({
-      clientID: config.google.clientID,
-      clientSecret: config.google.clientSecret,
-      callbackURL: config.google.callbackURL
-    },
-    function(accessToken, refreshToken, profile, done) {
-      User.findOne({ 'google.id': profile.id }, function (err, user) {
-        if (!user) {
-          user = new User({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            username: profile.username,
-            provider: 'google',
-            google: profile._json
-          })
-          user.save(function (err) {
-            if (err) console.log(err)
-            return done(err, user)
-          })
-        } else {
-          return done(err, user)
-        }
-      })
-    }
-  ));
+
 
   // use linkedin strategy
   passport.use(new LinkedinStrategy({

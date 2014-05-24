@@ -23,7 +23,7 @@ exports.Orders=[
             ],
             "addresses": [
                 {
-                    "region": "GE",
+                    "region": "Genève",
                     "primary": true,
                     "geo": {
                         "lng": 6.1692497,
@@ -64,7 +64,7 @@ exports.Orders=[
             "streetAdress": "route de chêne 34",
             "floor": "2",
             "postalCode": "1208",
-            "region": "GE",
+            "region": "Genève",
             "when": "2014-02-07T18:18:49.100Z",
             "geo": {
                 "lat": 46.1997473,

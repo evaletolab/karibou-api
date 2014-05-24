@@ -10,7 +10,7 @@ var mongoose = require('mongoose')
   
 
 var EnumPlace=config.shop.marketplace.list;
-var EnumLocation=config.shop.location.list;
+var EnumRegion=config.shop.region.list;
 
 var Shops = new Schema({
     version:{type:Number, default: 1},
@@ -34,17 +34,17 @@ var Shops = new Schema({
 
     //
     // define where this shop is available (geneva/lausanne/...)
-    marketplace: [{type: String, required: false, enum: EnumPlace, default:config.shop.marketplace.default}],
+    marketplace: [{type: String, required: false}],
     
     //
     // where to pickup items
     address:{
           name: { type: String, trim: true },
           floor: { type: String, trim: true },
+          phone: { type: String, trim: true },
           streetAdress: { type: String, lowercase: true, trim: true },
-          location: { type: String, trim: true, enum: EnumLocation},
-          region: { type: String, trim: true, default:"GE" },
-          postalCode: { type: String },
+          region: { type: String, trim: true, default:"Genève", enum: EnumRegion },
+          postalCode: { type: String, trim: true  },
           geo:{
             lat:{type:Number},
             lng:{type:Number}

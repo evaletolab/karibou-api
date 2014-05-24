@@ -76,11 +76,12 @@ var bus=require('./app/bus');
 // mailer
 var sendmail=require('./app/mail')(app,bus);
   
-// bootstrap passport config
-require('./app/passport')(app, config, passport)
 
 // express settings
 require('./app/express')(app, config, passport, sendmail)
+
+// bootstrap passport config
+require('./app/passport')(app, config, passport)
 
 // Bootstrap routes
 require('./app/routes')(app, config, passport)

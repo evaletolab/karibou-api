@@ -41,6 +41,7 @@ var Product = new Schema({
       comment:{type:String, required:false},
       origin:{type:String, required:false},
       gluten:{type:Boolean, default:false}, 
+      cold:{type:Boolean, default:false},
       ogm:{type:Boolean, default:false},
       lactose:{type:Boolean, default:false},
       local:{type:Boolean, default:false},

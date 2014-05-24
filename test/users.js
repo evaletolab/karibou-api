@@ -37,12 +37,22 @@ describe("Users", function(){
       
     });
 
-    it("inexistant 'local' user should not created ", function(done){
+    it("inexistant 'local' user should not automatically created ", function(done){
   		db.model('Users').findOrCreate({ id: 1234, provider:'local' }, function (err, user) {
   		  should.exist(err);
    		  should.not.exist(user);
     		return done();
   		});
+      
+    });
+
+    it("create persona user with email only ", function(done){
+      db.model('Users').findOrCreate({ 'email.address':'test@bo.com', provider:'persona' }, function (err, user) {
+        should.not.exist(err);
+        should.exist(user.id);
+        user.email.status.should.equal(true);
+        return done();
+      });
       
     });
 

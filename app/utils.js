@@ -6,10 +6,10 @@ module.exports = function (app) {
   // djb2 algo
   // http://erlycoder.com/49/javascript-hash-functions-to-convert-string-into-integer-hash-
   String.prototype.hash=function hash(){
-    var hash = 5381;
+    var hash = 0;
     for (i = 0; i < this.length; i++) {
         char = this.charCodeAt(i);
-        hash = ((hash << 5) + hash) + char; /* hash * 33 + c */
+        hash = ((hash << 5) - hash) + char; /* hash * 31 + c */
     }
     return hash;
   }   

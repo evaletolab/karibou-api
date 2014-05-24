@@ -45,7 +45,7 @@ var Users=exports.Users=[{
                 lng: 6.1692497
             },
             primary: true,
-            region: "GE"
+            region: "Genève"
         }
     ],
     phoneNumbers: [
@@ -77,7 +77,7 @@ var Users=exports.Users=[{
     ],
     addresses: [
         {
-            region: "GE",
+            region: "Genève",
             primary: true,
             geo: {
                 lng: 6.1692497,

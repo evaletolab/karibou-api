@@ -139,9 +139,21 @@ describe("api.categories", function(){
       });
   });
 
-  it.skip('DEL /v1/category/category-not-alone  return 400 when products are associated  ',function(done){
+
+  it('DEL /v1/category/category-legal  when signed and admin must return 400 without password  ',function(done){
     request(app)
-      .del('/v1/category/category-legal')
+      .put('/v1/category/category-legal')
+      .set('cookie', cookie)
+      .end(function(err, res){
+        res.should.have.status(400);
+        done();
+      });
+  });  
+
+  it('DEL /v1/category/category-legal  when signed,admin and password must return 200  ',function(done){
+    request(app)
+      .put('/v1/category/category-legal')
+      .send({password:'password'})
       .set('cookie', cookie)
       .end(function(err, res){
         res.should.have.status(200);
@@ -149,16 +161,17 @@ describe("api.categories", function(){
       });
   });
   
-  it('DEL /v1/category/category-legal  when signed and admin must return 200  ',function(done){
+  it.skip('DEL /v1/category/category-not-alone  return 400 when products are associated  ',function(done){
     request(app)
-      .del('/v1/category/category-legal')
+      .put('/v1/category/category-not-alone')
+      .send({password:'password'})
       .set('cookie', cookie)
       .end(function(err, res){
-        res.should.have.status(200);
+        res.should.have.status(400);
         done();
       });
   });
-    
+
   it('GET /v1/category should return 200 and [catalog].len==1',function(done){
     request(app)
       .get('/v1/category')
