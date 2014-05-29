@@ -76,7 +76,6 @@ validate.postal = function (value) {
           note: { type: String, trim: true },
           floor: { type: String, trim: true, required : true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
-          location: { type: String, required : true, trim: true },
           region: { type: String, required : true, trim: true, default:"Genève", enum: EnumRegion },
           postalCode: { type: String, required : false /**,
             validate:[validate.postal,'Invalide postal code'] **/

@@ -26,8 +26,8 @@ module.exports = {
       }
     },
     region:{
-      list:["Genève","Reignier, France"],
-      all:["Aire-la-Ville","Anières","Avully","Avusy","Bardonnex","Bellevue",
+      selection:["Genève","Reignier, France"],
+      list:["Aire-la-Ville","Anières","Avully","Avusy","Bardonnex","Bellevue",
             "Bernex","Carouge","Cartigny","Céligny","Chancy","Chêne-Bougeries",
             "Chêne-Bourg","Choulex","Collex-Bossy","Collonge-Bellerive",
             "Cologny","Confignon","Corsier","Dardagny","Genève",
