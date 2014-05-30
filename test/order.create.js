@@ -111,10 +111,9 @@ describe("orders.create", function(){
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
-            location: "Genève-Ville",
             postalCode: "1208",
             primary: true,
-            region: "GE",
+            region: "Genève",
             when:Date.now()
         }
         , payment="postfinance";
@@ -146,14 +145,13 @@ describe("orders.create", function(){
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
-            location: "Genève-Ville",
             postalCode: "1208",
             geo: {
                 lat: 46.1997473,
                 lng: 6.1692497
             },
             primary: true,
-            region: "GE",
+            region: "Genève",
             when:Date.now()
         }
       , payment;
@@ -184,14 +182,13 @@ describe("orders.create", function(){
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
-            location: "Genève-Ville",
             postalCode: "1208",
             geo: {
                 lat: 46.1997473,
                 lng: 6.1692497
             },
             primary: true,
-            region: "GE",
+            region: "Genève",
             when:Date.now()
         }
       , payment="pooet";

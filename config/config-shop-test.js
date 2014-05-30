@@ -74,7 +74,7 @@ module.exports = {
       ],
       cancelreason:["customer", "fraud", "inventory", "other"],
       status:["created","partial","fulfilled", "failure"],
-      gateway:[ {label:"postfinance",fees:0.03}, {label:"paypal",fees:0.0034}, {label:"bitcoin",fees:0.0}],
+      gateway:[ {label:"postfinance",fees:0.015}, {label:"paypal",fees:0.0017}, {label:"bitcoin",fees:0.0}],
 
       /* for testing 50 hours is the time limit between order and delivry*/
       timelimit:50,
@@ -88,6 +88,7 @@ module.exports = {
       //
       // Dimanche, Lundi, Mardi, Mercredi(1), Jeudi, Vendredi, Samedi(1)
       weekdays:[1,2,3,4,5,6],      
+      shippingtimes:{11:"11:00 à 13:00", 16:"16:00 à 18:00"},    
       shippingdays:{
         'Dimanche':  {active:false},
         'Lundi':     {active:true},

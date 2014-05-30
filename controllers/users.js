@@ -193,7 +193,11 @@ exports.update=function(req,res){
       
 
   Users.update({id:req.params.id},req.body,function(err,user){
+
     if (err){
+      if(err.code==11001){
+        return res.send(400,"Cette adresse email est déjà utilisée");            
+      }
       return res.send(400,errorHelper(err));    
     }
     return res.json(user);  
