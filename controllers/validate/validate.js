@@ -138,3 +138,63 @@ exports.order = function(req){
 
 exports.orderFind = function(req){
 }
+
+exports.shop=function(shop){
+    if (!shop)return;
+
+    if(shop.name) check(shop.name,"Le nom n'est pas valide ou trop long").len(3, 48).isText()
+    if(shop.description){
+      check(shop.description,"La description n'est pas valide ou trop longue").len(3, 400).isText()
+      console.log("FIXME sanitize")
+      // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
+    }
+    
+    if(shop.url) check(shop.url).len(6, 164).isUrl();
+
+    if (shop.photo){
+      shop.photo.bg && check(shop.photo.bg).len(6, 164).isUrl();
+      shop.photo.fg && check(shop.photo.fg).len(6, 164).isUrl();
+      shop.photo.owner && check(shop.photo.owner).len(6, 164).isUrl();
+    }
+    
+    if (shop.details){
+      shop.details.bio && check(shop.details.bio).isBoolean();
+      shop.details.gluten && check(shop.details.gluten).isBoolean();
+      shop.details.lactose && check(shop.details.lactose).isBoolean();
+      shop.details.local && check(shop.details.local).isBoolean();
+    }
+    
+    for (var i in shop.faq){      
+      check(shop.faq[i].q,"La question n'est pas valide, trop courte ou trop longue").len(3, 128).isText();
+      check(shop.faq[i].a,"La réponse n'est pas valide, trop courte ou trop longue").len(3, 400).isText();
+    }
+    
+    if (shop.available){
+      shop.available.active && check(shop.available.active).isBoolean();
+      shop.available.comment && check(shop.available.comment,"Le commentaire n'est pas valide ou trop long").len(6, 264).isText();
+    }
+
+    if (shop.info){
+      shop.info.active && check(shop.info.active).isBoolean();
+      shop.info.comment && check(shop.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
+    }
+      
+    if(!shop.address && !shop.marketplace){
+      throw new Error("Vous devez définir au moins une adresse de collecte");
+    }
+
+    if(shop.address){
+      check(shop.address.name,"Le nom de votre adresse n'est pas valide").isText().len(4,30)
+      check(shop.address.floor,"L'étage de votre adresse n'est pas valide").isText().len(1,5)
+      check(shop.address.phone,"Le téléphone de votre adresse n'est pas valide").isText().len(4,30)
+      check(shop.address.region,"La région de votre adresse n'est pas valide").isText().len(4,30)
+      check(shop.address.postalCode,"Le code postal de votre adresse n'est pas valide").isNumeric()
+    }
+    for (var i in shop.marketplace){
+        check(shop.marketplace[i],"Votre point de collect n'est pas valide").isText().len(4,45)
+    }      
+      
+    
+
+}
+
