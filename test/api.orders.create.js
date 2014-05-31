@@ -117,6 +117,7 @@ describe("api.orders.create", function(){
       var e=Orders.prepare(product, 3, "");
       items.push(e)
     });
+    items=_.sortBy(items,function(i){return i.title});
 
     var order={
       items:items,

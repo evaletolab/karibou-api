@@ -297,8 +297,9 @@ Orders.statics.checkItems = function(items, callback){
     , Orders=db.model('Orders')
     , Products=db.model('Products')
 
+  items=_.sortBy(items,function(i){return i.sku});
   var skus=_.collect(items,function(item){return item.sku});
-  Products.findBySkus(skus).exec(function(err,products){
+  Products.findBySkus(skus).sort("sku").exec(function(err,products){
     assert(skus.length===products.length)
 
     var vendors=[], errors=[];
