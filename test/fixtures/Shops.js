@@ -18,7 +18,20 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
-    }
+    },
+    address:{
+            region: "Genève",
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet",
+            phone:"0123456"
+        }    
   },{
     /*shop status !=true */
     _id:ObjectId('515ec12e56a8d5961e000005'),
@@ -30,7 +43,20 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
-    }
+    },
+    address:{
+            region: "Genève",
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet",
+            phone:"0123456"
+        }  
   },
   {
     /*shop status !=true */
@@ -44,7 +70,20 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
-    }
+    },
+    address:{
+            region: "Genève",
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet",
+            phone:"0123456"
+        }  
   },
   {
     /* shop available !=true */
@@ -61,7 +100,20 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
-    }
+    },
+    address:{
+            region: "Genève",
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet",
+            phone:"0123456"
+        }  
   }
 ];
 

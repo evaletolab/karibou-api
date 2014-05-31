@@ -128,6 +128,7 @@ exports.order = function(req){
 
     if(req.body.shipping){
       user_address(req.body.shipping)
+      check(req.body.shipping.when,"La commande doit contenir une date de livraison").isDate();
     }
 
     if(req.body.payment){

@@ -38,7 +38,6 @@ var Users=exports.Users=[{
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
-            location: "Genève-Ville",
             postalCode: "1208",
             geo: {
                 lat: 46.1997473,
@@ -84,7 +83,6 @@ var Users=exports.Users=[{
                 lat: 46.1997473
             },
             postalCode: "1204",
-            location: "Genève-Ville",
             floor: "1",
             streetAdress: "rue de carouge",
             note: "",

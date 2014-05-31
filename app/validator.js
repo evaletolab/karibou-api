@@ -76,6 +76,7 @@ constructWrapper=function(name){
 }
 
 Wrapper.prototype.isEmail = constructWrapper('isEmail');
+Wrapper.prototype.isDate = constructWrapper('isDate');
 Wrapper.prototype.isText  = constructWrapper('isText');
 Wrapper.prototype.isAlpha = constructWrapper('isAlpha');
 Wrapper.prototype.isHexadecimal = constructWrapper('isHexadecimal');

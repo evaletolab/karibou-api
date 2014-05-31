@@ -89,7 +89,7 @@ describe("api.products", function(){
         .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
-          //console.log(res.text);  
+          res.text.should.include("qui vous appartient")
           res.should.have.status(400);
           done();        
         });
@@ -105,7 +105,20 @@ describe("api.products", function(){
         photo:{ 
           bg:"http://image.truc.io/bg-01123.jp",
           fg:"http://image.truc.io/fg-01123.jp"      
-        }
+        },
+        address:{
+                region: "Genève",
+                geo: {
+                    lng: 6.1692497,
+                    lat: 46.1997473
+                },
+                postalCode: "1204",
+                floor: "1",
+                streetAdress: "rue de carouge",
+                note: "",
+                name: "famille delphine evalet",
+                phone:"0123456"
+            }  
       };
       
       //

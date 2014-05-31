@@ -61,8 +61,10 @@ describe("api.shops", function(){
 
    
   it('POST /v1/shops/un-autre-shop should return 200 (you are admin)',function(done){
+    var s=data.Shops[0]
     request(app)
       .post('/v1/shops/un-autre-shop')
+      .send(s)
       .set('cookie', cookie)
       .end(function(err,res){      
         res.should.have.status(200);

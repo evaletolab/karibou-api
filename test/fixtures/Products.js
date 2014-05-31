@@ -28,6 +28,9 @@ exports.Products=[{
         discount:3.0,
         part:'100gr'
      },
+     photo:{
+        url:"http://photooooz"
+     },
      //un-autre-shop, status:true, owner:gluck     
      vendor:ObjectId('515ec12e56a8d5961e000004')  
   },{
@@ -50,6 +53,9 @@ exports.Products=[{
         stock:10, 
         price:3.80,
         part:'100gr'
+     },
+     photo:{
+        url:"http://photooooz"
      },
      categories: d.Categories[3]._id ,
      //un-autre-shop, status:true, owner:gluck     
@@ -75,6 +81,9 @@ exports.Products=[{
         price:3.80,
         discount:3.0,
         part:'100gr'
+     },
+     photo:{
+        url:"http://photooooz"
      },
      categories: d.Categories[3]._id ,
      //mon-shop, id:0005, status:false, owner:gmail
