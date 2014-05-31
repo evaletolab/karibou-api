@@ -131,7 +131,7 @@ describe("orders.create", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      //console.log(err)
+      // console.log(err)
       should.exist(err)
       done();          
     });

@@ -169,7 +169,7 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:true
+      active:false
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000005'),
@@ -184,7 +184,7 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:true
+      active:false
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
@@ -194,9 +194,6 @@ exports.Shops=[{
     urlpath:"invalid-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
-    available:{
-      active:true
-    },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
@@ -214,7 +211,7 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:true
     }
   }
 ];

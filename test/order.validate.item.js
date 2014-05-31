@@ -119,6 +119,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(order.errors)
+      console.log(order.errors)
       order.errors[0]['1000001'].should.include('Le prix de votre produit')
       done();          
     });
@@ -225,7 +226,6 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      //console.log(err)
       should.exist(order.errors)
       order.errors[0]['1000004'].should.include("Ce produit n'est plus disponible")
       done();          

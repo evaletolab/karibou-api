@@ -212,7 +212,7 @@ Orders.statics.checkItem=function(item, product, cb){
     return cb(msg5,item)
   }
 
-  if(product.vendor.available.active!==true){
+  if(product.vendor.available&&product.vendor.available.active===true){
     return cb(msg6,item)
   }
 
