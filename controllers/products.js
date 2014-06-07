@@ -84,6 +84,15 @@ exports.create=function (req, res) {
 };
 
 
+exports.love=function (req, res) {
+  var skus=_.collect(req.user.likes,function(p){return p.sku;})
+  Products.findBySkus(skus,function(err,products){
+    if (err) {
+      return res.send(400,err);
+    }
+    return res.json(products)    
+  })
+}
 
 
 // GET to READ

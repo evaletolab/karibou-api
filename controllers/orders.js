@@ -142,7 +142,7 @@ exports.create=function(req,res){
     setTimeout(function(){
       order.findByTimeoutAndNotPaid().where('oid').equals(order.oid).exec(function(err,orders){
         if(err){
-          return res.send(400, err);
+          return res.send(400, errorHelper(err));
         }
         order.rollbackProductQuantityAndSave(function(err){
           //

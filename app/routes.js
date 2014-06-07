@@ -79,6 +79,7 @@ module.exports = function(app, config, passport) {
   
   
   // global products 
+  app.get('/v1/products/love',auth.ensureAuthenticated,products.love);
   app.get('/v1/products/:sku',products.get);
   app.get('/v1/products',products.list);
   app.get('/v1/products/category/:category',products.list);

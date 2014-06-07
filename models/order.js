@@ -435,8 +435,6 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     return callback("selected shipping day is not available.")
   }
 
-   // console.log(Math.abs((Date.now()-shipping.when.getTime())/3600000))
-   // console.log(new Date(),shipping.when)
 
   if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
     return callback("selected shipping day is to short.")    
@@ -445,7 +443,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   // get unique Order identifier
   db.model('Sequences').nextOrder(function(err,oid){
     if(err){
-      callback(errorHelper(err));
+      callback((err));
       return;
     }
     //
