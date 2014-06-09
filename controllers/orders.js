@@ -8,6 +8,7 @@ require('../app/config');
 var db = require('mongoose'),
     Orders = db.model('Orders'),
     _=require('underscore'),
+    bus=require('../app/bus'),
     validate = require('./validate/validate'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
@@ -136,18 +137,21 @@ exports.create=function(req,res){
       return res.json(200, order);
     }
 
+    var oid=order.oid;
 
     // order is prepared, now we are waiting for valid payment. 
     // Unless a full payment, order is closed and reserved products are available for everyone
     setTimeout(function(){
-      order.findByTimeoutAndNotPaid().where('oid').equals(order.oid).exec(function(err,orders){
+      //
+      Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
         if(err){
           return res.send(400, errorHelper(err));
         }
-        order.rollbackProductQuantityAndSave(function(err){
+
+        order[0].rollbackProductQuantityAndSave(function(err){
           //
-          // notify this order has been successfully modified
-          bus.emit('order.rollback',null,order,items)
+          // notify this order has been successfully rollbacked
+          bus.emit('order.rollback',null,order)
 
         })
       })

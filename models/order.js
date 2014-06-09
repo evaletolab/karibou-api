@@ -155,10 +155,10 @@ Orders.statics.prepare=function(product, quantity, note){
   })
 
   copy.quantity=quantity;
-  copy.price=getPrice(product)*quantity
+  copy.price=getPrice(product)
   copy.part=product.pricing.part;
   copy.note=note;
-  copy.finalprice=copy.price;
+  copy.finalprice=getPrice(product)*quantity;
   return copy;
 }
 
@@ -255,7 +255,7 @@ Orders.statics.checkItem=function(item, product, cb){
   // check item is correct
   // Math.round(value*100)/100
   // if prodduct has discount, price should be computed with
-  var price=product.getPrice()*item.quantity;
+  var price=product.getPrice();
   if(item.price.toFixed(1)!=price.toFixed(1)){
     return cb(msg3,item)
   }
@@ -379,6 +379,11 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
       callback(err);
       throw new Error("rollback: "+(err.message||err));
     }
+
+    //
+    // after rollback order is no more available
+    order.fulfillments.status="failure";
+
     //
     // this checking generate a list of products
     return order.save(callback)

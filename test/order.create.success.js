@@ -101,12 +101,12 @@ describe("orders.create.success", function(){
       //
       // checking discount price
       order.items[0].quantity.should.equal(2)
-      order.items[0].price.should.equal(data.Products[0].pricing.discount*2)
+      order.items[0].finalprice.should.equal(data.Products[0].pricing.discount*2)
 
       //
       // checking normal price
       order.items[1].quantity.should.equal(3)
-      order.items[1].price.should.equal(data.Products[0].pricing.price*3)
+      order.items[1].finalprice.should.equal(data.Products[0].pricing.price*3)
       order.rollbackProductQuantityAndSave(function(err,order){
         done();                  
       })
@@ -191,7 +191,7 @@ describe("orders.create.success", function(){
         orders[0].oid.should.equal(2000001)
         done();
       })
-    },100)
+    },config.shop.order.timeoutAndNotPaid*1000)
   }); 
 
   it("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){

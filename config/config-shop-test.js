@@ -83,7 +83,7 @@ module.exports = {
       shippingmode:["grouped", "none"],
 
       /* order is in timaout if payment status != 'paid' and created<1s (timeoutAndNotPaid)*/
-      timeoutAndNotPaid:0.1,
+      timeoutAndNotPaid:0.3,
 
       //
       // Dimanche, Lundi, Mardi, Mercredi(1), Jeudi, Vendredi, Samedi(1)

@@ -79,8 +79,8 @@ module.exports = {
       status:["failure","created","partial","fulfilled"],
       gateway:[ {label:"postfinance",fees:0.03}, {label:"paypal",fees:0.034}, {label:"bitcoin",fees:0.0}],
 
-      /* order is in timaout if payment status != 'paid' and created<15m (timeoutAndNotPaid)*/
-      timeoutAndNotPaid:900,
+      /* order is in timeout if payment status != 'paid' and created<15m (timeoutAndNotPaid)*/
+      timeoutAndNotPaid:60,
 
       /* in production 36 hours is the time limit between order and delivry*/
       timelimit:36,
