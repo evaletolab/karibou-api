@@ -23,7 +23,7 @@ module.exports = {
   },
   
   cors:{
-    allowedDomains:['http://lo.cal:3000','http://192.168.1.35:3000'],
+    allowedDomains:['http://lo.cal:3000','http://192.168.1.39:3000'],
     credentials:true,
     age:3600
   },

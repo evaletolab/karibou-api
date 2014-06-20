@@ -119,7 +119,7 @@ module.exports = function(app, config, passport) {
   //
   // orders
   app.get('/v1/orders', auth.ensureAdmin, orders.list);
-  app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.list);
+  app.get('/v1/shops/:shopname/orders', shops.ensureOwnerOrAdmin, orders.listByShop);
   app.get('/v1/users/:id/orders', users.ensureMeOrAdmin, orders.list);
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 

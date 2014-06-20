@@ -160,6 +160,20 @@ describe("orders.find", function(){
     });
   });
 
+  it.skip("find open orders (1) for next shipping day filter by shop name and with status paid+partial", function(done){
+    var criteria={
+      shop:"super-shop",  /*super-shop*/
+      nextShippingDay:true,
+      paid:true,
+      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(1)
+      done();
+    });
+  });  
+
         
   it("find open orders (0) for next monday filter by shop name 'Super shop'", function(done){
     var criteria={

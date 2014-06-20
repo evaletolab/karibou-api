@@ -44,13 +44,14 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
  * - closed order >=Date
  * - nextShippingDate
  * - created orders, when==Date
- * - limited to a shop, shop=slug
- * - limited to a user, id
+ * - limited to a shop, shopname=slug
+ * - limited to a user, uid
  */
 exports.list = function(req,res){    
   try{
-    validate.ifCheck(req.params.uid, "Le format d'utilisateur n'est pas valide").isInt()
+    validate.ifCheck(req.params.id, "Le format d'utilisateur n'est pas valide").isInt()
     validate.ifCheck(req.params.oid, "Le format de la commande n'est pas valide").isInt()
+    validate.ifCheck(req.params.shopname, "Le format de la boutique n'est pas valide").len(3, 34).isSlug()
     validate.orderFind(req);
   }catch(err){
     return res.send(400, err.message);
@@ -59,8 +60,8 @@ exports.list = function(req,res){
 
 
   // restrict to an user
-  if (req.params.uid){
-    criteria.user=req.params.uid
+  if (req.params.id){
+    criteria.user=req.params.id
   }
 
   // restrict to an order
@@ -72,7 +73,48 @@ exports.list = function(req,res){
     if(err){
       return res.send(400,err);
     }
+
     return res.json(orders)
+  });
+};
+
+/**
+ * get orders by shop. This function differ from the previous because for a shop and one date,
+ *   you get a list of order that contains only items concerning the shop
+ * - closed order >=Date
+ * - nextShippingDate
+ * - created orders, when==Date
+ * - limited to a shop, shopname=slug
+ * - limited to a user, uid
+ */
+exports.listByShop = function(req,res){    
+  try{
+    validate.check(req.params.shopname, "Le format de la boutique n'est pas valide").len(3, 34).isSlug()
+    validate.orderFind(req);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+  var criteria={}
+
+
+  // restrict to a shopname
+  criteria.shop=req.params.shopname
+
+  // restrict for available orders
+  criteria.closed=null
+
+  // restrict on nextShipping day 
+  criteria.nextShippingDay=true
+
+  // restrict on nextShipping day 
+  criteria.paid=true
+
+
+  Orders.findByCriteria(criteria, function(err,orders){
+    if(err){
+      return res.send(400,err);
+    }
+    return res.json(Orders.filterByShop(criteria.shopname, orders))
   });
 };
 

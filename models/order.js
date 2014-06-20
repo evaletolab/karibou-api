@@ -162,6 +162,33 @@ Orders.statics.prepare=function(product, quantity, note){
   return copy;
 }
 
+Orders.statics.filterByShop=function(shopname,orders){
+  assert(shopname)
+  assert(orders)
+
+  //
+  // remove exo shops
+  for(var i in orders){
+      for(var j in orders[i].vendors){
+        if(orders[i].vendors[j].slug!==shopname){
+          orders[i].vendors[j].splice(j,1)
+        }
+      }
+  }
+
+  //
+  // remove exo items
+  for(var i in orders){
+      for(var j in orders[i].items){
+        if(orders[i].items[j].vendor!==shopname){
+          orders[i].items[j].splice(j,1)          
+        }
+      }
+  }
+  return orders
+}
+
+
 //
 // check item
 //  if item or product are !Nill
