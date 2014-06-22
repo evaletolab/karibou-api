@@ -165,26 +165,30 @@ Orders.statics.prepare=function(product, quantity, note){
 Orders.statics.filterByShop=function(shopname,orders){
   assert(shopname)
   assert(orders)
+  var i=0;
 
-  //
-  // remove exo shops
-  for(var i in orders){
-      for(var j in orders[i].vendors){
-        if(orders[i].vendors[j].slug!==shopname){
-          orders[i].vendors[j].splice(j,1)
-        }
+  orders.forEach(function(order,j){
+    //
+    // remove exo shops
+    i=order.vendors.length;while (i--){
+      if(order.vendors[i].slug!==shopname){
+          order.vendors.splice(i,1)
       }
-  }
+    }
+  })
 
-  //
-  // remove exo items
-  for(var i in orders){
-      for(var j in orders[i].items){
-        if(orders[i].items[j].vendor!==shopname){
-          orders[i].items[j].splice(j,1)          
-        }
+  orders.forEach(function(order,j){
+    //
+    // remove exo items
+    i=order.items.length;while (i--){
+      if(order.items[i].vendor!==shopname){
+          order.items.splice(i,1)
       }
-  }
+    }
+
+
+  })
+
   return orders
 }
 
@@ -412,6 +416,12 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
     order.fulfillments.status="failure";
 
     //
+    // status is canceled
+    order.cancel.reason='other';
+    order.cancel.when=new Date();
+
+
+    //
     // this checking generate a list of products
     return order.save(callback)
   });
@@ -577,6 +587,17 @@ Orders.statics.findByCriteria = function(criteria, callback){
     , Products=db.model('Products');
 
   var q={};
+
+  // filter by OIDs
+  if(criteria.oid){
+      //
+      // force integers
+      var oids=criteria.oid.split(/[,+]/)
+      oids.forEach(function(x,y,z){ z[y]=x|0 });
+      q['oid']={$in:oids}  
+  }
+
+
   //
   // filter by shop
   if(criteria.shop){
@@ -602,6 +623,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
     var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
         ed=new Date(sd.getTime()+86400000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
+    // console.log("find shipping",q["shipping.when"])
   }
   //
   // filter by date (24h = today up to tonight)
@@ -615,7 +637,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   // filter by user
   if(criteria.user){
     // q["email"]=criteria.user
-    q["customer.id"]=criteria.user;
+    q["customer.id"]=parseInt(criteria.user);
   }
 
   //
@@ -626,6 +648,9 @@ Orders.statics.findByCriteria = function(criteria, callback){
   }
 
   var query=Orders.find(q).sort({created: -1});
+  if(criteria.shop){
+    query=query.lean()
+  }
   if (callback)
     return query.exec(callback);
   return query;

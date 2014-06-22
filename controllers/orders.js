@@ -59,14 +59,19 @@ exports.list = function(req,res){
   var criteria={}
 
 
+  // restrict to next shipping date
+  if (req.params.nextshippingday){
+    criteria.nextShippingDay=true
+  }
+
   // restrict to an user
   if (req.params.id){
-    criteria.user=req.params.id
+    criteria.user=parseInt(req.params.id)
   }
 
   // restrict to an order
   if (req.params.oid){
-    criteria.oid=req.params.oid
+    criteria.oid=parseInt(req.params.oid)
   }
 
   Orders.findByCriteria(criteria, function(err,orders){
@@ -114,7 +119,7 @@ exports.listByShop = function(req,res){
     if(err){
       return res.send(400,err);
     }
-    return res.json(Orders.filterByShop(criteria.shopname, orders))
+    return res.json(Orders.filterByShop(criteria.shop, orders))
   });
 };
 
