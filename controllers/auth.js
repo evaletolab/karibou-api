@@ -163,6 +163,7 @@ exports.register_post= function(req, res) {
       check(req.body.lastname).len(3, 64);
       check(req.body.password).len(3, 64);
     }catch(err){
+      console.log("register",err)
       return res.send(400, err.message);
     }  
   
@@ -170,11 +171,11 @@ exports.register_post= function(req, res) {
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
 		    if (err){
-          return res.json(400,errorHelper(err));    
+          return res.send(400,errorHelper(err));    
 		    }
 
         if (!user){
-          return res.json(400,"Unknow error on registration");    
+          return res.send(400,"Unknow error on registration");    
         }
         //
         // redirect for non ajax register
