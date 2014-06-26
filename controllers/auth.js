@@ -6,6 +6,7 @@
 var app = require('../app/config');
 var db  = require('mongoose');
 var passport = require('passport');
+var errorHelper = require('mongoose-error-helper').errorHelper;
 var _ = require('underscore'),
     validator = require('../app/validator'),
     check = validator.check,
@@ -160,7 +161,7 @@ exports.register_post= function(req, res) {
       check(req.body.email).isEmail();
       check(req.body.firstname).len(3, 64);
       check(req.body.lastname).len(3, 64);
-      check(req.body.password).len(4, 64);
+      check(req.body.password).len(3, 64);
     }catch(err){
       return res.send(400, err.message);
     }  
@@ -169,7 +170,7 @@ exports.register_post= function(req, res) {
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
 		    if (err){
-          return res.json(400,err);    
+          return res.json(400,errorHelper(err));    
 		    }
 
         if (!user){
