@@ -161,7 +161,7 @@ exports.register_post= function(req, res) {
       check(req.body.email,"Le format de l'email est invalide").isEmail();
       check(req.body.firstname,"Le format du nom est invalide").len(3, 64);
       check(req.body.lastname,"Le format de prénom est invalide").len(3, 64);
-      check(req.body.password"Le passowrd est invalide").len(3, 64);
+      check(req.body.password,"Le passowrd est invalide").len(3, 64);
     }catch(err){
       return res.send(400, err.message);
     }  
