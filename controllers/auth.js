@@ -163,7 +163,7 @@ exports.register_post= function(req, res) {
       check(req.body.lastname).len(3, 64);
       check(req.body.password).len(3, 64);
     }catch(err){
-      console.log("register",err)
+      console.log("register",err.message)
       return res.send(400, err.message);
     }  
   
