@@ -13,7 +13,7 @@ var user_address = exports.address =  function(address){
       check(address.geo.lng,     "Votre adresse n'est pas valide").isFloat()
       check(address.geo.lat,     "Votre adresse n'est pas valide").isFloat()
       check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
-      ifCheck(address.floor,     "Votre numéro postal n'est pas valide").isAlphanumeric()
+      ifCheck(address.floor,     "Votre étage n'est pas valide").isText().len(1, 30)
       check(address.streetAdress,"Votre adresse n'est pas valide").isText().len(10, 50)
       ifCheck(address.note,        "Votre note n'est pas valide").isText().len(4, 40)
       check(address.name,        "Votre nom d'adresse n'est pas valide").isText().len(2, 40)
