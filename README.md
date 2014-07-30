@@ -95,7 +95,7 @@ All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
 
 
 ## License
-The MIT License (MIT)
+The API is available under AGPL V3 to protect the long term interests of the community – you are free to use it with no restrictions but if you change the server code, then those code changes must be contributed back.
 
 Copyright (c) 2012 Olivier Evalet (http://evaletolab.ch/)
 
