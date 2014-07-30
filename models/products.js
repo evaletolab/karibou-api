@@ -197,70 +197,45 @@ Product.statics.create = function(p,s,callback){
     p.sku=sku;
         
     //associate product and shop
-    p.vendor=s;
+    p.vendor=(s._id)?s._id:s;
     
-    require('async').waterfall([
-    /*
-      function(cb){
-        //
-        // set manufacturer , not currently needed
-        if(!p.manufacturer){
-          cb(("manufacturer is missing"));
-          return;
-        }
-        db.model('Manufacturers').findOne(p.manufacurer, function(err,m){
-          p.manufacturer=m._id;
-          cb(err);
-        });
-      },
-      */
-      function(cb){
-        //
-        // set category (NOT MANDATORY)
-        if(!p.categories){          
-          return cb("Il manque la catégorie");
-        }
-        if(Array.isArray(p.categories)){
-          return cb("la catégorie doit être unique");
-        }
 
-        if(!p.categories._id)p.categories={_id:p.categories}
+    //
+    // set category (NOT MANDATORY)
+    if(!p.categories){          
+      return callback("Il manque la catégorie");
+    }
+    if(Array.isArray(p.categories)){
+      return callback("la catégorie doit être unique");
+    }
 
-        db.model('Categories').findOne(p.categories,function(err,categories){
-          if(err){
-            return cb(err);
-          }  
-          p.categories=categories;        
-          cb();
-        })
-        /**
-        db.model('Categories').map(p.categories, function(err,categories){
-          // FIXME
-          //check category is well typed 'category'
-          if(err){
-            return cb(err);
-          }
-          p.categories=_.collect(categories,function(m){return m._id});;
-          cb();
-        });
-        */
-      }],
-      function(err){
-        if (err){
-          return callback(err);
+    if(!p.categories._id)p.categories={_id:p.categories}
+
+    db.model('Categories').findOne(p.categories,function(err,categories){
+      if(err){
+        return callback(err);
+      }  
+
+      p.categories=categories;        
+ 
+
+      //
+      // ready to create one product
+      var product =new  Products(p);
+ 
+      product.save(function (err) {
+        if(err){
+          return callback(err)
         }
 
-        //
-        // ready to create one product
-        var product =new  Products(p);
-        product.save(function (err) {
-          Products.findOne({_id:product._id})
-                 .populate('vendor')
-                 .populate('categories').exec(callback)
+        Products.findOne({_id:product._id})
+               .populate('vendor')
+               .populate('categories').exec(callback)
 
-          // callback(err,product);
-        });
       });
+
+    })
+
   });
   
 

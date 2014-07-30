@@ -60,7 +60,7 @@ exports.list = function(req,res){
 
 
   // restrict to next shipping date
-  if (req.params.nextshippingday){
+  if (req.query.nextshippingday){
     criteria.nextShippingDay=true
   }
 
