@@ -29,7 +29,8 @@
     "mongoose-error-helper": "0.0.2",
     "queue-async": "~1.0.7",
     "passport-persona": "~0.1.7",
-    "passport-google-oauth": "~0.1.5"
+    "passport-google-oauth": "~0.1.5",
+    "connect-mongo": "~0.4.1"
   },
   "devDependencies": {
     "mocha": "1.x",
@@ -39,6 +40,7 @@
   },
   "scripts": {
     "start": "node app.js",
+    "test": "./node_modules/.bin/mocha test",
     "maintain": "node maintain.js"
   },
   "main": "app.js",
