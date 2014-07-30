@@ -4,7 +4,7 @@ online community marketplace. Our goal is to allow local food producers, artisan
 to sell their products locally. There is alpha frontend available here http://karibou.evaletolab.ch/
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/evaletolab/karibou-api/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+[![Build Status](https://travis-ci.org/evaletolab/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab/karibou-api)
 
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
