@@ -1,8 +1,8 @@
 {
   "name": "karibou-api",
-  "description": "commerce api test app",
-  "version": "0.0.2-7",
-  "private": true,
+  "description": "Karibou is an opensource project aim to help the creation of an online community marketplace",
+  "version": "0.1.0",
+  "private": false,
   "engines": {
     "node": "0.10.x",
     "npm": "1.2.x"
@@ -10,7 +10,7 @@
   "dependencies": {
     "password-generator": "0.2.x",
     "nodemailer": "0.4.x",
-    "email-templates": "0.x.0",
+    "email-templates": "0.x",
     "async": "0.x",
     "underscore": "1.x",
     "express": "3.x",
@@ -20,13 +20,13 @@
     "mongoose-validate": "x",
     "connect-mongodb": "1.x",
     "passport": "0.x",
-    "passport-local": "0.x",
-    "passport-twitter": "0.x",
-    "moment": "2.0.0",
+    "passport-local": "1.x",
+    "passport-twitter": "1.x",
+    "moment": "2.x",
     "debug": "0.x",
     "jade": "0.x",
-    "nodetime": "0.x.x",
-    "mongoose-error-helper": "0.0.2",
+    "nodetime": "0.x",
+    "mongoose-error-helper": "0.x",
     "queue-async": "~1.0.7",
     "passport-persona": "~0.1.7",
     "passport-google-oauth": "~0.1.5",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "mocha": "1.x",
     "supertest": "0.x",
-    "should": "1.2.1",
+    "should": "1.3.x",
     "pow-mongoose-fixtures": "x"
   },
   "scripts": {
