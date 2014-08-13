@@ -5,13 +5,17 @@ module.exports = function (app) {
   // export api
   // djb2 algo
   // http://erlycoder.com/49/javascript-hash-functions-to-convert-string-into-integer-hash-
-  String.prototype.hash=function hash(){
+  String.prototype.hash=function hash(append){
+    var more=append||''
+    // return require('crypto').createHash('md5').update(this+more).digest("hex")
+
+    var str=this+more
     var hash = 0;
-    for (i = 0; i < this.length; i++) {
-        char = this.charCodeAt(i);
+    for (i = 0; i < str.length; i++) {
+        char = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + char; /* hash * 31 + c */
     }
-    return hash;
+    return hash>>>0;
   }   
 
   String.prototype.slug=function () {

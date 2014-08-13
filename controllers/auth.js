@@ -136,6 +136,7 @@ exports.login_post=function(req, res, next) {
 	    }
       
       req.logIn(user, function(err) {
+
         if (err) { return res.send(403,err); }
         return res.json(req.user);
       });

@@ -30,6 +30,8 @@ module.exports = function (app, config, passport) {
         return done(null,false);        
       }
 
+      user.context={};
+
       //
       // don't serialise the private hash, but confirm the password existance
       if (user.hash) {
@@ -37,6 +39,10 @@ module.exports = function (app, config, passport) {
         user.salt=true;
       }
       
+      if(config.disqus){
+        user.context.disqus=user.getDisquSSO();
+      }
+
       //
       // check the first admin
       config.admin.emails.forEach(function(admin){
@@ -45,8 +51,8 @@ module.exports = function (app, config, passport) {
         }
       });
       //console.log(id,config.admin.emails, user.email)
-
-      
+      // var u= user.toObject()
+      // console.log(u)
       done(err, user);
     });
   });

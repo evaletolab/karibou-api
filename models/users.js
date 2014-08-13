@@ -96,6 +96,9 @@ validate.postal = function (value) {
     
     /* link user and orders */    
     orders : [{type: String}],
+
+    /* disqus sso */
+    context:{type:Schema.Types.Mixed},
     
     /* make user valid/invalid */
     status:{type:Boolean, default: true},
@@ -191,6 +194,45 @@ UserSchema.statics.findByToken = function(token, success, fail){
     }
   });
 };
+
+
+
+UserSchema.methods.getDisquSSO=function(){
+  var DISQUS_SECRET = config.disqus.secret;
+  var DISQUS_PUBLIC = config.disqus.pub;
+
+  var disqusData = {
+    id: this.id,
+    username: this.display(),
+    email: this.email.address
+  };
+
+  var disqusStr = JSON.stringify(disqusData);
+  var timestamp = Math.round(+new Date() / 1000);
+
+  /*
+   * Note that `Buffer` is part of node.js
+   * For pure Javascript or client-side methods of
+   * converting to base64, refer to this link:
+   * http://stackoverflow.com/questions/246801/how-can-you-encode-a-string-to-base64-in-javascript
+   */
+  var message = new Buffer(disqusStr).toString('base64');
+
+  /* 
+   * CryptoJS is required for hashing (included in dir)
+   * https://code.google.com/p/crypto-js/
+   */
+  // var result = CryptoJS.HmacSHA1(message + " " + timestamp, DISQUS_SECRET);
+  // var hexsig = CryptoJS.enc.Hex.stringify(result);
+
+  var hexsig = require('crypto').createHmac('sha1',DISQUS_SECRET).update(message + " " + timestamp).digest("hex");
+
+  return {
+    pubKey: DISQUS_PUBLIC,
+    auth: message + " " + hexsig + " " + timestamp
+  };
+
+}
 
 UserSchema.methods.isAdmin = function () {
   return this.hasRole('admin');
@@ -341,7 +383,7 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
   //FIXME email.hash() should be replaced by (id++)+10000000
 	// create a new customer
 	var user=new Users({
-	    id:email.hash(),
+	    id:email.hash(new Date()),
       displayName:first+" "+last, 
       name: {
           familyName: last,

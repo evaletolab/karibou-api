@@ -37,10 +37,10 @@ module.exports = {
   },
   
  /**
-  * Time to validate an email
+  * Time to validate an email 2 ms
   */
   validate:{
-    email:60*60*24*2
+    email:0.002
   },
   
   
@@ -53,6 +53,10 @@ module.exports = {
 	nodetime:{
 	},
 	
+  disqus:{
+    pub:'123',
+    secret:'456'
+  },
 	
 
 	auth:{

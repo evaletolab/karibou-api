@@ -47,7 +47,20 @@ module.exports = {
 	nodetime:{
 	  apikey:'f39e0560aedf625a03b0b06dbcb015907c1a3736'
 	},
+
+ /**
+  * Time to validate an email 3 minutes
+  */
+  validate:{
+    email:60*3
+  },  
 	
+  // disqus is not available for localhost
+  disqus:{
+    pub:'123',
+    secret:'456'
+  },
+
 	auth:{
     fb: {
         appId: '111565172259433'

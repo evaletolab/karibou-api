@@ -648,6 +648,9 @@ Orders.statics.findByCriteria = function(criteria, callback){
   }
 
   var query=Orders.find(q).sort({created: -1});
+
+  //
+  // get plain javascript object
   if(criteria.shop){
     query=query.lean()
   }

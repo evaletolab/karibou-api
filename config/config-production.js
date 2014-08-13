@@ -45,12 +45,18 @@ module.exports = {
   },
 
  /**
-  * Time to validate an email
+  * Time to validate an email 2 days
   */
   validate:{
     email:60*60*24*2
   },
 	
+  disqus:{
+    pub:process.env.DISQUS_PUBLIC,
+    secret:process.env.DISQUS_SECRET
+  },
+
+
 	auth:{
     fb: {
         appId: '111565172259433'

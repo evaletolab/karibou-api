@@ -140,6 +140,15 @@ describe("api.users", function(){
       .set('cookie', cookie)
       .expect(200,done);
   });
-
+  it('valid user contains DISQUS SSO',function(done){
+    request(app)
+      .get('/v1/users/me')
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(200);
+        console.log(res.body)
+        done()
+      });    
+  })
 });
 
