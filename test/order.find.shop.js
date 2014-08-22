@@ -60,7 +60,7 @@ describe("orders.find.shop", function(){
     });
   });
 
-  it("find open orders (2) filter by shop name 'Un autre shop'", function(done){
+  it("find open orders (4) filter by shop name 'Un autre shop'", function(done){
     var criteria={
       shop:"un-autre-shop",  /*super-shop*/
       closed:null
@@ -68,7 +68,7 @@ describe("orders.find.shop", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(2)
+      order.length.should.equal(4)
       done();
     });
   });

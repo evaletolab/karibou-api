@@ -5,6 +5,8 @@
 var express = require('express')
   , mongoStore = require('connect-mongo')(express)
   , bus = require('../app/bus')
+  , methodOverride = require('method-override')
+
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
   , pkg = require('../package.json')
@@ -80,7 +82,7 @@ var tokenSession=function (req, res, next) {
   app.set('views', config.root+config.express.views)
   app.set('view engine', config.express['view engine'])
 
-  app.configure(function () {
+  // app.configure(function () {
     // expose package.json to views
     app.use(function (req, res, next) {
       res.locals.pkg = pkg
@@ -117,7 +119,7 @@ var tokenSession=function (req, res, next) {
     app.use(express.urlencoded())
     app.use(express.json())
 
-    app.use(express.methodOverride())
+    app.use(methodOverride())
 
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));  
 
@@ -225,10 +227,10 @@ var tokenSession=function (req, res, next) {
       })
     })
 */
-  })
+  // })
 
   // development env config
-  app.configure('development', function () {
+  if(app.get('env')=='development'){
     app.locals.pretty = true
-  })
+  }
 }

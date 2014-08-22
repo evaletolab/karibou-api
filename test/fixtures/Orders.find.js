@@ -15,10 +15,28 @@ var orders = require('mongoose').model('Orders');
 //  -
 
 var nextday=orders.findNextShippingDay();
-var monday=orders.jumpToNextWeekDay(new Date(),1);
+var monday=orders.jumpToNextWeekDay(new Date(),5);
 var passedday=new Date(monday.getTime()-86400000*7)
+var os;
 
-exports.Orders=[
+var $printOrders=function(os){
+    console.log('--- nextday',nextday)
+    console.log('--- monday',monday)
+    console.log("--- orders all    count ", os.length);
+
+    var closed=0;os.forEach(function(o){if(o.closed)closed++})
+    var paid  =0;os.forEach(function(o){if(o.payment.status==='paid')paid++})
+    console.log("--- orders closed count ", closed);
+    console.log("--- orders paid   count ", paid);
+    os.forEach(function(o){
+      console.log("--- oid %s  shipping.when ", o.oid, o.shipping.when);
+      console.log("--- oid     fulfillments  ",  o.fulfillments.status);
+      console.log("--- oid     closed        ",  o.closed);
+      console.log("--- oid     user          ",  o.email);
+    })    
+}
+
+os = exports.Orders=[
     {
         _id: ObjectId("52f12f09a328f285313bda10"),
         oid: 2100000,
@@ -37,7 +55,7 @@ exports.Orders=[
 
         /* shipping adresse*/
         shipping: {
-            name: "famille olivier evalet",
+            name: "famille olivier evalet 1",
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
@@ -79,7 +97,7 @@ exports.Orders=[
 
         /* shipping adresse*/
         shipping: {
-            name: "famille olivier evalet",
+            name: "famille olivier evalet 2",
             note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
@@ -183,6 +201,214 @@ exports.Orders=[
         /* shipping adresse*/
         shipping: {
             region: "Genève",
+            when: nextday,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            location: "Genève-Ville",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet 3"
+        },
+
+        /* vendors */
+        vendors: [
+            {
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "Un autre shop",
+                address: "TODO",
+            },
+            {
+                /*shop status !=true */
+                ref: ObjectId('515ec12e56a8d5961e000005'),
+                slug: "mon-shop",
+                name: "mon shop",
+                address: "TODO",
+            }
+        ],
+        /* items */
+        items: [
+            {
+                sku: 1000004,
+                title: "Product 4 with cat",
+                quantity: 1,
+                price: 2.5,
+                part: "1pce",
+                note: "",
+                finalprice: 2.5,
+                category: "Viande",
+                vendor:"mon-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 3,
+                price: 3,
+                part: "100gr",
+                note: "",
+                finalprice: 3,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000003,
+                title: "Product 3 with cat",
+                quantity: 2,
+                price: 7.6,
+                part: "0.75L",
+                note: "",
+                finalprice: 7.6,
+                category: "Poissons",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            }
+        ],
+
+
+        created: new Date()
+
+    },{
+
+        _id: ObjectId("52f12f09a328f285313bda02"),
+        oid: 2000008,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            gateway: "postfinance",
+            status:"paid"
+        },
+
+        fulfillments: {
+            status: "created"
+        },
+
+        /* shipping adresse*/
+        shipping: {
+            region: "Genève",
+            when: nextday,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            location: "Genève-Ville",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet 4"
+        },
+
+        /* vendors */
+        vendors: [
+            {
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "Un autre shop",
+                address: "TODO",
+            },
+            {
+                /*shop status !=true */
+                ref: ObjectId('515ec12e56a8d5961e000005'),
+                slug: "mon-shop",
+                name: "mon shop",
+                address: "TODO",
+            }
+        ],
+        /* items */
+        items: [
+            {
+                sku: 1000004,
+                title: "Product 4 with cat",
+                quantity: 1,
+                price: 2.5,
+                part: "1pce",
+                note: "",
+                finalprice: 2.5,
+                category: "Viande",
+                vendor:"mon-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 3,
+                price: 3,
+                part: "100gr",
+                note: "",
+                finalprice: 3,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000003,
+                title: "Product 3 with cat",
+                quantity: 2,
+                price: 7.6,
+                part: "0.75L",
+                note: "",
+                finalprice: 7.6,
+                category: "Poissons",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            }
+        ],
+
+
+        created: new Date()
+
+    },{
+
+        _id: ObjectId("52f12f09a328f285313bda03"),
+        oid: 2000009,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            gateway: "postfinance",
+            status:"paid"
+        },
+
+        fulfillments: {
+            status: "created"
+        },
+
+        /* shipping adresse*/
+        shipping: {
+            region: "Genève",
             when: monday,
             geo: {
                 lng: 6.1692497,
@@ -193,7 +419,7 @@ exports.Orders=[
             floor: "1",
             streetAdress: "rue de carouge",
             note: "",
-            name: "famille delphine evalet"
+            name: "famille delphine evalet 4"
         },
 
         /* vendors */

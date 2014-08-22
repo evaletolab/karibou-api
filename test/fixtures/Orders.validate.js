@@ -376,6 +376,31 @@ exports.Products=[{
      categories: c.Categories[2]._id,
      //status:true, active:true
      vendor:'515ec12e56a8d5961e000004'
+  },{
+    _id : new ObjectId(), 
+     sku:1000007,
+     title: "Product available",     
+     details:{
+        description:"la patrie de la pasta. ",
+        comment:"Temps de cuisson : 16 minutes",
+        gluten:true, 
+        ogm:false,
+        bio:true, 
+     },  
+     attributes:{
+        available:true,
+        comment:false, 
+        discount:false
+     },
+     pricing: {
+        stock:5, 
+        price:3.80,
+        discount:3.0,
+        part:'0.75L'
+     },
+     categories: c.Categories[2]._id,
+     //status:true, active:true
+     vendor:'515ec12e56a8d5961e000004'
   }   
 ];
 

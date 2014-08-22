@@ -8,6 +8,21 @@ var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
 var Products=db.model('Products'), 
     Orders=db.model('Orders'),
+    shipping={
+        name: "famille olivier evalet",
+        note: "123456",
+        streetAdress: "route de chêne 34",
+        floor: "2",
+        location: "Genève-Ville",
+        postalCode: "1208",
+        geo: {
+            lat: 46.1997473,
+            lng: 6.1692497
+        },
+        primary: true,
+        region: "GE",
+        when:null
+    },
     okDay;
 
 //
@@ -88,26 +103,9 @@ describe("api.orders.create", function(){
 
   });
 
-   
-
  it("POST /v1/orders create new order with some errors on the product selected", function(done){
     var items=[]
       , customer=data.Users[1]
-      , shipping={
-            name: "famille olivier evalet",
-            note: "123456",
-            streetAdress: "route de chêne 34",
-            floor: "2",
-            location: "Genève-Ville",
-            postalCode: "1208",
-            geo: {
-                lat: 46.1997473,
-                lng: 6.1692497
-            },
-            primary: true,
-            region: "GE",
-            when:okDay
-        }
       , payment="postfinance";
 
 
@@ -118,6 +116,8 @@ describe("api.orders.create", function(){
       items.push(e)
     });
     items=_.sortBy(items,function(i){return i.title});
+
+    shipping.when=okDay;
 
     var order={
       items:items,
@@ -134,6 +134,117 @@ describe("api.orders.create", function(){
         should.not.exist(err)
         should.exist(res.body.errors)
         res.body.errors[0]['1000002'].should.include("la boutique a été désactivé par l'équipe Kariboo")
+        done()
+      });
+  });    
+
+ it("POST /v1/orders create new order with exceed of stock errors ", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , payment="postfinance";
+
+    data.Products.forEach(function(product){
+      //
+      // prepare is a private helper function for testing purpose
+      var e=Orders.prepare(product, 26, "");
+      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
+          items.push(e)
+      }
+    });
+
+    items=_.sortBy(items,function(i){return i.title});
+
+    shipping.when=okDay;
+
+    var order={
+      items:items,
+      shipping:shipping,
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        should.exist(res.body.errors)
+        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
+        done()
+      });
+  });    
+
+ it("POST /v1/orders create new order with exceed of stock errors ", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , payment="postfinance";
+
+    data.Products.forEach(function(product){
+      //
+      // prepare is a private helper function for testing purpose
+      var e=Orders.prepare(product, 60, "");
+      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
+          items.push(e)
+      }
+    });
+
+    items=_.sortBy(items,function(i){return i.title});
+
+    shipping.when=okDay;
+
+    var order={
+      items:items,
+      shipping:shipping,
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        should.exist(res.body.errors)
+        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
+        done()
+      });
+  });    
+
+ it("GET /v1/shops/:shopname/orders?when=next list order for this shop ", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , payment="postfinance";
+
+    data.Products.forEach(function(product){
+      //
+      // prepare is a private helper function for testing purpose
+      var e=Orders.prepare(product, 60, "");
+      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
+          items.push(e)
+      }
+    });
+
+    items=_.sortBy(items,function(i){return i.title});
+
+    shipping.when=okDay;
+
+    var order={
+      items:items,
+      shipping:shipping,
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        should.exist(res.body.errors)
+        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
         done()
       });
   });    

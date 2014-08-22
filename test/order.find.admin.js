@@ -32,9 +32,10 @@ describe("orders.find.admin", function(){
 
 
   before(function(done){
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
-        should.not.exist(err);
+        should.not.exist(err);        
         done();
       });
     });      
@@ -47,14 +48,14 @@ describe("orders.find.admin", function(){
     });    
   });
 
-  it("find all orders (3)", function(done){
+  it("find all orders (5)", function(done){
 
     var criteria={      
     }
 
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(3)
+      order.length.should.equal(5)
       done();
     });
   });
@@ -74,13 +75,13 @@ describe("orders.find.admin", function(){
     });
   });
 
-  it("find all open orders (2)", function(done){
+  it("find all open orders ", function(done){
     var criteria={
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(2)
+      order.length.should.equal(4)
       // order.forEach(function(o){
       //   console.log(o.shipping.when)
       // })
@@ -88,22 +89,22 @@ describe("orders.find.admin", function(){
     });
   });
 
-  it("find all open orders that are paid (0)", function(done){
+  it("find all open orders that are paid ", function(done){
     var criteria={
       payment:"paid",
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(1)
+      order.length.should.equal(3)
       done();
     });
   });
-  it("find all closed (1) orders", function(done){
+  it("find all closed orders", function(done){
     var monday=Orders.jumpToNextWeekDay(new Date(),1);
 
     var criteria={
-      closed:new Date(monday.getTime()-86400000*7)
+      closed:true
     }
 
     db.model('Orders').findByCriteria(criteria, function(err,order){
@@ -113,26 +114,27 @@ describe("orders.find.admin", function(){
     });
   });
 
-  it("find open orders (1) for next shipping day", function(done){
+  it("find open orders for next shipping day", function(done){
     var criteria={
       nextShippingDay:true,
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(dateEqual?2:1)
+      order.length.should.equal(dateEqual?3:2)
       done();
     });
   });
 
-  it("find open orders (1) for next monday", function(done){
+  it("find open orders for next monday", function(done){
     var criteria={
       when:Orders.jumpToNextWeekDay(new Date(),1),
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(dateEqual?2:1)
+      // order.forEach(function(o){console.log(o.oid,o.shipping.when)})
+      order.length.should.equal(dateEqual?3:2)
       done();
     });
   });

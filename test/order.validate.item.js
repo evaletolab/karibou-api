@@ -83,7 +83,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include('shipping day is not available.')
+      err.should.include("La date de livraison n'est pas valable")
 
       done();          
     });
@@ -100,7 +100,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include('selected shipping day is to short')
+      err.should.include("Cette date de livraison n'est plus")
 
       done();          
     });
@@ -119,7 +119,6 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(order.errors)
-      console.log(order.errors)
       order.errors[0]['1000001'].should.include('Le prix de votre produit')
       done();          
     });

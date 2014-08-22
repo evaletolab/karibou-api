@@ -47,19 +47,19 @@ describe("orders.find.user", function(){
     });    
   });
 
-  it("find all orders (2) for user evaleto", function(done){
+  it("find all orders (4) for user evaleto", function(done){
     var criteria={
       user: 12346,
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(2)
+      order.length.should.equal(4)
       order[0].customer.id.should.equal(12346)
       done();
     });
   });
 
-  it("find open orders (1) for user evaleto", function(done){
+  it("find open orders (3) for user evaleto", function(done){
     var criteria={
       user: 12346,
       closed:null
@@ -67,7 +67,7 @@ describe("orders.find.user", function(){
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
       order[0].customer.id.should.equal(12346)
-      order.length.should.equal(1)
+      order.length.should.equal(3)
       done();
     });
   });

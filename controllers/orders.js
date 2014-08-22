@@ -58,9 +58,20 @@ exports.list = function(req,res){
   }  
   var criteria={}
 
+  if (req.query.status=='close'){
+    criteria.closed=true
+  }
 
-  // restrict to next shipping date
-  if (req.query.nextshippingday){
+  if (req.query.status=='paid'){
+    criteria.paid=true
+  }
+
+  if (req.query.status=='fail'){
+    criteria.payment='failure'
+  }
+
+  // get orders for next shipping day
+  if (req.query.when=='next'){
     criteria.nextShippingDay=true
   }
 
@@ -101,20 +112,34 @@ exports.listByShop = function(req,res){
   }  
   var criteria={}
 
+  // restrict for available orders
+  criteria.closed=null
+
+  if (req.query.status=='close'){
+    criteria.closed=true
+  }
+
+  if (req.query.status=='paid'){
+    criteria.paid=true
+  }
+
+  if (req.query.status=='fail'){
+    criteria.payment='failure'
+  }
+
+  // get orders for next shipping day
+  if (req.query.when=='next'){
+    criteria.nextShippingDay=true
+  }
 
   // restrict to a shopname
   criteria.shop=req.params.shopname
 
-  // restrict for available orders
-  criteria.closed=null
-
-  // restrict on nextShipping day 
-  criteria.nextShippingDay=true
-
-  // restrict on nextShipping day 
-  criteria.paid=true
 
 
+
+
+  console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,err);

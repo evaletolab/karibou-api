@@ -277,6 +277,7 @@ Orders.statics.checkItem=function(item, product, cb){
     return cb(msg8,item)
   }
 
+  debug("order: item.quantity>product.pricing.stock %d %d",item.quantity,product.pricing.stock)
   if(item.quantity>product.pricing.stock){
     return cb(msg7,item)
   }
@@ -306,7 +307,9 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
   // 86400000[ms] = 24 * 60² * 1000
   var nextday=((jump-date.getDay())%7)
   var week=(nextday>=0)?0:7*86400000;
-  return new Date(+date.getTime()+nextday*86400000+week);
+  var nextweek=new Date(+date.getTime()+nextday*86400000+week)
+  nextweek.setHours(12,0,0,0)
+  return nextweek;
 
 }
 
@@ -316,6 +319,7 @@ Orders.statics.findNextShippingDay=function(){
   while(config.shop.order.weekdays.indexOf(next.getDay())<0){
     next=new Date(next.getTime()+86400000)
   }
+  next.setHours(12,0,0,0)
   return next;
 }
 
@@ -335,7 +339,7 @@ Orders.statics.checkItems = function(items, callback){
 
     var vendors=[], errors=[];
 
-    var i=-1;require('async').each(items, function(item, cb) {
+    var i=-1;require('async').eachLimit(items,1, function(item, cb) {
       i++;//get the iterator
 
 
@@ -370,7 +374,9 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
     callback(msg1)
   }
 
-  require('async').each(this.items, function(item, cb) {
+
+  require('async').eachLimit(this.items,1, function(item, cb) {
+    debug("order: lock products quantity %s %s",item.sku, -item.quantity)
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true }, cb)
   },function(err){
     //
@@ -403,7 +409,8 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
     callback(msg2)
   }
 
-  require('async').each(this.items, function(item, cb) {
+  require('async').eachLimit(this.items,1, function(item, cb) {
+    debug("order: unlock products quantity %s %d",item.sku, item.quantity)
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
   },function(err){
     if(err){
@@ -465,7 +472,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   //
   // check the shipping day
   if(!shipping.when){
-    return callback("shipping date is required.")
+    return callback("La date de livraison est obligatoire")
   }
   // be sure that is a Date object
   shipping.when=new Date(shipping.when)
@@ -474,12 +481,12 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   // check that shipping day is available on: config.shop.order.shippingdays
   var days=Object.keys(config.shop.order.shippingdays);
   if (!config.shop.order.shippingdays[days[shipping.when.getDay()]].active){
-    return callback("selected shipping day is not available.")
+    return callback("La date de livraison n'est pas valable")
   }
 
 
   if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
-    return callback("selected shipping day is to short.")    
+    return callback("Cette date de livraison n'est plus disponible.")    
   }
   //
   // get unique Order identifier
@@ -525,6 +532,8 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
         return callback(null,{errors:errors})
       }
 
+
+      debug('create new orders for %s on %s with %d items',shipping.name,shipping.when,items.length)
       //
       // attache items on success,
       order.items=items;
@@ -559,6 +568,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
       db.model('Users').findOneAndUpdate({id:customer.id}, {$push: {orders: oid}},function(e,u){
         if(e){return callback(e)}
+
 
         //
         // update product stock
@@ -606,13 +616,19 @@ Orders.statics.findByCriteria = function(criteria, callback){
 
   //
   // filter by closed date
-  if(criteria.closed && criteria.closed!=null){
+  if(criteria.closed === null){
+    q["closed"]=null;     
+  }
+  else if(criteria.closed === true){
+    var sd=new Date('1980'),
+        ed=new Date();
+    q["closed"]={"$gte": sd, "$lt": ed};
+  }
+  else if(criteria.closed ){
+    criteria.closed=new Date(criteria.closed)
     var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
         ed=new Date(sd.getTime()+86400000);
     q["closed"]={"$gte": sd, "$lt": ed};
-  }
-  if(criteria.closed===null){
-    q["closed"]=null; 
   }
 
 
@@ -647,6 +663,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
     q["payment.status"]=criteria.payment;
   }
 
+  debug("find criteria ",q)
   var query=Orders.find(q).sort({created: -1});
 
   //
