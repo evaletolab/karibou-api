@@ -308,7 +308,8 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
   var nextday=((jump-date.getDay())%7)
   var week=(nextday>=0)?0:7*86400000;
   var nextweek=new Date(+date.getTime()+nextday*86400000+week)
-  nextweek.setHours(12,0,0,0)
+  // next date always includes all shipping times: 12:00, 17:00, 19:00
+  nextweek.setHours(23,0,0,0)
   return nextweek;
 
 }
@@ -319,7 +320,8 @@ Orders.statics.findNextShippingDay=function(){
   while(config.shop.order.weekdays.indexOf(next.getDay())<0){
     next=new Date(next.getTime()+86400000)
   }
-  next.setHours(12,0,0,0)
+  // next date always includes all shipping times: 12:00, 17:00, 19:00
+  next.setHours(23,0,0,0)
   return next;
 }
 
