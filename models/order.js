@@ -205,6 +205,7 @@ Orders.statics.checkItem=function(item, product, cb){
   var msg1="Votre article est incomplet. Les données dans votre panier ne sont plus valables "
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
+    , msg31="Le prix final de cet article n'est pas valide "
     , msg4="La quantité d'achat minimum est de 1 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivé par l'équipe Kariboo"
     , msg6="Ce produit n'est pas disponible car la boutique est momentanément fermée"
@@ -290,6 +291,11 @@ Orders.statics.checkItem=function(item, product, cb){
   var price=product.getPrice();
   if(item.price.toFixed(1)!=price.toFixed(1)){
     return cb(msg3,item)
+  }
+
+  var finalprice=product.getPrice()*item.quantity;
+  if(item.finalprice.toFixed(1)!=finalprice.toFixed(1)){
+    return cb(msg31,item)
   }
 
 

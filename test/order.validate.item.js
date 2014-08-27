@@ -179,6 +179,26 @@ describe("orders.validate.item", function(){
     });
 
   });    
+
+  it("Error:item final price is not correct ", function(done){
+    shipping.when=okDay
+
+    items=[]
+    items.push(Orders.prepare(data.Products[0], 2, ""))
+    items[0].finalprice=3;
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      // console.log(err,order)
+      should.exist(order.errors)
+      order.errors[0]['1000001'].should.include("Le prix final")
+      done();          
+    });
+
+  });    
   it("Error:this product is not available because the shop is closed by kariboo", function(done){
     shipping.when=okDay
 
