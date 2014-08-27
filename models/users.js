@@ -1,6 +1,6 @@
 
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
+var db = require('mongoose')
+  , Schema   = db.Schema
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
 	, passport = require('passport')
@@ -153,6 +153,11 @@ UserSchema.statics.findOrCreate=function(u,callback){
       }
       
       if (!u.id && u['email.address']){
+        //
+        // this question is essential but it need a promise
+        // db.model('Sequences').nextUser(function(uid){
+        //})
+  
         u.id=u['email.address'].hash()
         u["email.status"]=true;
       }
@@ -226,6 +231,7 @@ UserSchema.methods.getDisquSSO=function(){
   // var hexsig = CryptoJS.enc.Hex.stringify(result);
 
   var hexsig = require('crypto').createHmac('sha1',DISQUS_SECRET).update(message + " " + timestamp).digest("hex");
+
 
   return {
     pubKey: DISQUS_PUBLIC,
@@ -495,7 +501,7 @@ UserSchema.statics.update=function(id, u,callback){
   });
 };
 UserSchema.set('autoIndex', config.mongo.ensureIndex);
-module.exports = mongoose.model('Users', UserSchema);
+module.exports = db.model('Users', UserSchema);
 
 
 

@@ -125,16 +125,15 @@ describe("api.users", function(){
       .expect(401,done);
   });
 
-  it('POST /v1/users/12345 for update should return 200',function(done){
+  it('POST /v1/users/12345 for update should return 400',function(done){
     request(app)
       .post('/v1/users/12345')      
       .set('cookie', cookie)
-      .expect(200,done);
+      .expect(400,done);
   });
 
   it.skip('when update user, express session shoud be updated',function(done){
     var u=data.Users[0];
-    console.log(u)
     request(app)
       .post('/v1/users/12345')      
       .set('cookie', cookie)
@@ -146,7 +145,6 @@ describe("api.users", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(200);
-        console.log(res.body)
         done()
       });    
   })

@@ -52,6 +52,11 @@ Sequences.statics.nextOrder = function( callback){
   this.model('Sequences').next("oid",2000000,callback);
 };
 
+// simple wrapper for Order ID
+Sequences.statics.nextUser = function( callback){
+  this.model('Sequences').next("uid",8000000,callback);
+};
+
 Sequences.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Sequences', Sequences);
 

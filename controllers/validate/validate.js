@@ -34,15 +34,19 @@ var user= exports.user = function(req){
       ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 64).isText();
     }
 
+    if(!u.phoneNumbers.length){
+      throw new Error("Vous devez définir au moins un téléphone");      
+    }
 
     for( var i in u.phoneNumbers){ 
-      ifCheck(u.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(4, 30)
-      ifCheck(u.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
+      check(u.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(4, 30)
+      check(u.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
     }
 
     for( var i in u.addresses){
       user_address(u.addresses[i])
     }
+
 }
 
 /**

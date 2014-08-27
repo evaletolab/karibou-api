@@ -15,10 +15,11 @@ var orders = require('mongoose').model('Orders');
 //  -
 
 var nextday=orders.findNextShippingDay();
-var monday=orders.jumpToNextWeekDay(new Date(),5);
+var monday=orders.jumpToNextWeekDay(nextday,1);
 var passedday=new Date(monday.getTime()-86400000*7)
 var os;
 
+console.log("date for test ===>Next,Mon,Passed: ", nextday,monday,passedday)
 var $printOrders=function(os){
     console.log('--- nextday',nextday)
     console.log('--- monday',monday)

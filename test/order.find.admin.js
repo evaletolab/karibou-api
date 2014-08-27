@@ -33,6 +33,27 @@ describe("orders.find.admin", function(){
 
   before(function(done){
 
+    var $printOrders=function(os,nextday,monday){
+        console.log('--- nextday',nextday)
+        console.log('--- monday',monday)
+        console.log("--- orders all    count ", os.length);
+
+        var closed=0;os.forEach(function(o){if(o.closed)closed++})
+        var paid  =0;os.forEach(function(o){if(o.payment.status==='paid')paid++})
+        console.log("--- orders closed count ", closed);
+        console.log("--- orders paid   count ", paid);
+        os.forEach(function(o){
+          console.log("--- oid %s  shipping.when ", o.oid, o.shipping.when);
+          console.log("--- oid     fulfillments  ",  o.fulfillments.status);
+          console.log("--- oid     closed        ",  o.closed);
+          console.log("--- oid     user          ",  o.email);
+          if(o.vendors)
+          console.log("--- oid     vendors       ",  o.vendors.map(function(o){ return o.slug}).join(','));
+        })    
+    }
+    //$printOrders(data.Orders, nextday)
+
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);        
@@ -121,7 +142,8 @@ describe("orders.find.admin", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(dateEqual?3:2)
+      // order.length.should.equal(dateEqual?3:2)
+      order.length.should.equal(3)
       done();
     });
   });
@@ -134,7 +156,7 @@ describe("orders.find.admin", function(){
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
       // order.forEach(function(o){console.log(o.oid,o.shipping.when)})
-      order.length.should.equal(dateEqual?3:2)
+      order.length.should.equal(1)
       done();
     });
   });

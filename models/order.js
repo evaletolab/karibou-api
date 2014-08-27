@@ -629,7 +629,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   else if(criteria.closed ){
     criteria.closed=new Date(criteria.closed)
     var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000);
+        ed=new Date(sd.getTime()+86400000-60000);
     q["closed"]={"$gte": sd, "$lt": ed};
   }
 
@@ -639,7 +639,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   if(criteria.nextShippingDay){
     var next=this.findNextShippingDay();
     var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000);
+        ed=new Date(sd.getTime()+86400000-60000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
     // console.log("find shipping",q["shipping.when"])
   }
@@ -647,7 +647,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   // filter by date (24h = today up to tonight)
   if(criteria.when){
     var sd=new Date(criteria.when.getFullYear(), criteria.when.getUTCMonth(), criteria.when.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000);
+        ed=new Date(sd.getTime()+86400000-60000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
 

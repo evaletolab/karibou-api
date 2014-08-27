@@ -92,6 +92,7 @@ describe("api.users.addresses", function(){
       streetAdress: "34 route de chene",
       primary:true
     }
+    u.phoneNumbers=[{number:'076.378.89.98',what:'mobile'}]
     u.addresses=[]
     u.addresses.push(address)
     request(app)
@@ -119,6 +120,7 @@ describe("api.users.addresses", function(){
       floor:1,
       primary:true
     }
+    u.phoneNumbers=[{number:'076.378.89.98',what:'mobile'}]
     u.addresses=[]
     u.addresses.push(address)
     u.addresses.push(address)
@@ -129,6 +131,32 @@ describe("api.users.addresses", function(){
       .end(function(err,res){
         res.should.have.status(400);
         //console.log(res.body.addresses[0])
+        done()
+      });
+  });
+
+  it('POST missing phone  /v1/users/<uid> should return 400',function(done){
+    var u=_.clone(user)
+    var address={
+      geo:{
+        lat: 46.1997473,
+        lng: 6.1692497
+      },
+      location: "Genève-Ville",
+      name: "famille olivier evalet",
+      postalCode: "1208",
+      streetAdress: "34 route de chene",
+      floor:1,
+      primary:true
+    }
+    u.addresses=[]
+    u.addresses.push(address)
+    request(app)
+      .post('/v1/users/'+user.id)
+      .send(u)     
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
         done()
       });
   });
@@ -147,6 +175,7 @@ describe("api.users.addresses", function(){
       floor:2,
       primary:true
     }
+    u.phoneNumbers=[{number:'076.378.89.98',what:'mobile'}]
     u.addresses=[]
     u.addresses.push(address)
     request(app)
