@@ -15,7 +15,8 @@ var orders = require('mongoose').model('Orders');
 //  -
 
 var nextday=orders.findNextShippingDay();
-var monday=orders.jumpToNextWeekDay(nextday,1);
+var monday=orders.jumpToNextWeekDay(new Date(),((nextday.getDay()==1)?2:1));
+
 var passedday=new Date(monday.getTime()-86400000*7)
 var os;
 
@@ -196,7 +197,7 @@ os = exports.Orders=[
         },
 
         fulfillments: {
-            status: "created"
+            status: "partial"
         },
 
         /* shipping adresse*/
@@ -300,7 +301,7 @@ os = exports.Orders=[
         },
 
         fulfillments: {
-            status: "created"
+            status: "partial"
         },
 
         /* shipping adresse*/
@@ -404,7 +405,7 @@ os = exports.Orders=[
         },
 
         fulfillments: {
-            status: "created"
+            status: "partial"
         },
 
         /* shipping adresse*/

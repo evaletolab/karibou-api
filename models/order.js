@@ -202,12 +202,12 @@ Orders.statics.filterByShop=function(shopname,orders){
 //  if item.quantity>product.pricing.stock
 //  if item price is still correct
 Orders.statics.checkItem=function(item, product, cb){
-  var msg1="Votre article est incomplet. Les données dans votre panier ne sont plus valables "
+  var msg1="Une erreur c'est produite avec cet article (1)"
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
-    , msg31="Le prix final de cet article n'est pas valide "
+    , msg31="Une erreur c'est produite avec cet article (2)"
     , msg4="La quantité d'achat minimum est de 1 "
-    , msg5="Ce produit n'est pas disponible car la boutique a été désactivé par l'équipe Kariboo"
+    , msg5="Ce produit n'est pas disponible car la boutique a été désactivée"
     , msg6="Ce produit n'est pas disponible car la boutique est momentanément fermée"
     , msg7="La quantité souhaitée n'est pas disponible "
     , msg8="Ce produit n'est plus en stock "
@@ -696,6 +696,27 @@ Orders.statics.updateItem = function(oid,items, callback){
     if(!order){
       return callback("Impossible de trouver la commande: "+oid);
     }
+
+    //
+    // check order status
+    if(order.closed){
+      return callback("Impossible de modifier une commande fermée: "+oid); 
+    }
+
+    // cancelreason:["customer", "fraud", "inventory", "other"],
+    if(order.cancel&&order.cancel.when){
+      return callback("Impossible de modifier une commande annulée: "+oid); 
+    }
+    //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+    if(["authorized","partially_paid","paid"].indexOf(order.payment.status)==-1){
+      return callback("Impossible de modifier une commande en attente de validation financière (1): "+oid); 
+    }
+
+    //["failure","created","partial","fulfilled"]
+    if(order.fulfillments.status!=="partial"){
+      return callback("Impossible de modifier une commande en attente de validation financière (2): "+oid); 
+    }
+
 
     var itemId=[];
     items.forEach(function(item){

@@ -24,7 +24,7 @@ describe("orders.find.admin", function(){
   var _ = require("underscore");
 
   var nextday=Orders.findNextShippingDay();
-  var monday=Orders.jumpToNextWeekDay(new Date(),1);
+  var monday=Orders.jumpToNextWeekDay(new Date(),((nextday.getDay()==1)?2:1));
 
   // on friday next shipping day equal monday
   // If days equal , orders count are different
@@ -51,7 +51,7 @@ describe("orders.find.admin", function(){
           console.log("--- oid     vendors       ",  o.vendors.map(function(o){ return o.slug}).join(','));
         })    
     }
-    //$printOrders(data.Orders, nextday)
+    // $printOrders(data.Orders, nextday,monday)
 
 
     dbtools.clean(function(e){
@@ -122,8 +122,6 @@ describe("orders.find.admin", function(){
     });
   });
   it("find all closed orders", function(done){
-    var monday=Orders.jumpToNextWeekDay(new Date(),1);
-
     var criteria={
       closed:true
     }
@@ -142,7 +140,6 @@ describe("orders.find.admin", function(){
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      // order.length.should.equal(dateEqual?3:2)
       order.length.should.equal(3)
       done();
     });
@@ -150,7 +147,7 @@ describe("orders.find.admin", function(){
 
   it("find open orders for next monday", function(done){
     var criteria={
-      when:Orders.jumpToNextWeekDay(new Date(),1),
+      when:monday,
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){

@@ -46,7 +46,10 @@ describe("orders.update", function(){
     });    
   });
 
-  it("update finalprice, note, fulfillment for item sku:1000001 ", function(done){
+  it("Error when update finalprice on not valid order(paid&&created) ", function(done){
+    // orders 2100000, 2000006 are pending
+    // orders 2100000 is closed
+    // orders 2000007,8,9 are paid, created
     var oid=2000006;
     var item={      
       sku:1000001,
@@ -56,42 +59,57 @@ describe("orders.update", function(){
     }
 
     db.model('Orders').updateItem(oid,[item], function(err,order){
+      should.exist(err)
+      done();
+    });
+  });
+
+  it("update finalprice, note, fulfillment for item sku:1000001 ", function(done){
+    var oid=2000007;
+    var item={      
+      sku:1000002,
+      finalprice:6.0,
+      note:"j'ai mis 2 pièces",
+      fulfillment:{status:"fulfilled"}
+    }
+
+    db.model('Orders').updateItem(oid,[item], function(err,order){
       should.not.exist(err)
-      order.items[0].note.should.equal(item.note)
-      order.items[0].fulfillment.status.should.equal(item.fulfillment.status)
+      order.items[1].note.should.equal(item.note)
+      order.items[1].fulfillment.status.should.equal(item.fulfillment.status)
       done();
     });
   });
 
   it("update items finalprice, note, fulfillment and get notified", function(done){
-    var oid=2000006;
+    var oid=2000007;
     var items=[{      
-          sku:1000001,
-          finalprice:3.0,
-          note:"j'ai mis 2 pièces",
-          fulfillment:{status:"fulfilled"}
-        },{      
           sku:1000002,
           finalprice:30.0,
           note:"nouveau prix",
+          fulfillment:{status:"fulfilled"}
+        },{      
+          sku:1000003,
+          finalprice:8.0,
+          note:"correction poids ",
           fulfillment:{status:"fulfilled"}
         }
     ]
 
     db.model('Orders').updateItem(oid,items, function(err,order){
       should.not.exist(err)
-      order.items[0].note.should.equal(items[0].note)
-      order.items[0].fulfillment.status.should.equal(items[0].fulfillment.status)
-      // check price
-      order.items[0].finalprice.should.not.equal(order.items[0].price)
-
-      order.items[1].note.should.equal(items[1].note)
-      order.items[1].fulfillment.status.should.equal(items[1].fulfillment.status)
+      order.items[1].note.should.equal(items[0].note)
+      order.items[1].fulfillment.status.should.equal(items[0].fulfillment.status)
       // check price
       order.items[1].finalprice.should.not.equal(order.items[1].price)
 
+      order.items[2].note.should.equal(items[1].note)
+      order.items[2].fulfillment.status.should.equal(items[1].fulfillment.status)
+      // check price
+      order.items[2].finalprice.should.not.equal(order.items[2].price)
+
       // check price and finalprice
-      order.items[2].finalprice.should.equal(order.items[2].price)
+      order.items[2].finalprice.should.equal(items[1].finalprice)
 
     });
 
@@ -108,9 +126,9 @@ describe("orders.update", function(){
   });
 
   it("get notified when updating items order ", function(done){
-    var oid=2000006;
+    var oid=2000007;
     var items=[{      
-          sku:1000003,
+          sku:1000004,
           fulfillment:{status:"fulfilled"}
         }
     ]
@@ -118,7 +136,7 @@ describe("orders.update", function(){
     db.model('Orders').updateItem(oid,items, function(err,order){
       should.not.exist(err)
       // check price and finalprice
-      order.items[2].finalprice.should.equal(order.items[2].price)
+      order.items[0].finalprice.should.equal(order.items[0].price*order.items[0].quantity)
 
     });
 

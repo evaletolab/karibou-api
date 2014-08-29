@@ -194,7 +194,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       // console.log(err,order)
       should.exist(order.errors)
-      order.errors[0]['1000001'].should.include("Le prix final")
+      order.errors[0]['1000001'].should.include("cet article (2)")
       done();          
     });
 
