@@ -136,6 +136,22 @@ Orders.methods.getTotalPrice=function(){
 }
 
 
+Orders.methods.print=function(){
+
+  console.log("-- OID %s   ", this.oid);
+  console.log("---      shipping.when ",  this.shipping.when);
+  console.log("---      payment       ",  this.payment.status);
+  console.log("---      fulfillments  ",  this.fulfillments.status);
+  console.log("---      cancel.status ",  this.cancel.reason);
+  console.log("---      cancel.when   ",  this.cancel.when);
+  console.log("---      closed        ",  this.closed);
+  console.log("---      user          ",  this.email);
+  if(this.items)
+  console.log("---      items         ",  this.items.map(function(i){ return i.sku}).join(',')); 
+  if(this.vendors)
+  console.log("---      vendors       ",  this.vendors.map(function(v){ return v.slug}).join(',')); 
+}
+
 //
 // prepare one product as order item
 Orders.statics.prepare=function(product, quantity, note){
@@ -434,6 +450,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
     // status is canceled
     order.cancel.reason='other';
     order.cancel.when=new Date();
+    order.closed=new Date();
 
 
     //

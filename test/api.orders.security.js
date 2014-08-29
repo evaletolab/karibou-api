@@ -57,9 +57,9 @@ describe("api.orders.security", function(){
       .expect(401,done);
   });
 
-  it('GET /v1/users/123456/orders should return 401 for anonymous',function(done){
+  it('GET /v1/orders/users/123456 should return 401 for anonymous',function(done){
     request(app)
-      .get('/v1/users/123456/orders')
+      .get('/v1/orders/users/123456')
       .expect(401,done);
   });
 
@@ -83,36 +83,36 @@ describe("api.orders.security", function(){
       .expect(401,done);
   });
 
-  it('GET /v1/users/123456/orders should return 401 for non owner',function(done){
+  it('GET /v1/orders/users/123456 should return 401 for non owner',function(done){
     request(app)
-      .get('/v1/users/123456/orders')
+      .get('/v1/orders/users/123456')
       .set('cookie', cookie)      
       .expect(401,done);
   });
 
-  it('GET /v1/users/12345/orders should return 200 for owner',function(done){
+  it('GET /v1/orders/users/12345 should return 200 for owner',function(done){
     request(app)
-      .get('/v1/users/12345/orders')
+      .get('/v1/orders/users/12345')
       .set('cookie', cookie)      
       .expect(200,done);
   });
 
-  it('GET /v1/shops/un-autre-shop/orders should return 401 for anonymous',function(done){
+  it('GET /v1/orders/shops/un-autre-shop should return 401 for anonymous',function(done){
     request(app)
-      .get('/v1/shops/un-shop/orders')
+      .get('/v1/orders/shops/un-shop')
       .expect(401,done);
   });
 
-  it('GET /v1/shops/un-autre-shop/orders should return 200 for owner',function(done){
+  it('GET /v1/orders/shops/un-autre-shop should return 200 for owner',function(done){
     request(app)
-      .get('/v1/shops/un-autre-shop/orders')
+      .get('/v1/orders/shops/un-autre-shop')
       .set('cookie', cookie)      
       .expect(200,done);
   });
 
-  it('GET /v1/shops/un-shop/orders should return 401 for non owner',function(done){
+  it('GET /v1/orders/shops/un-shop should return 401 for non owner',function(done){
     request(app)
-      .get('/v1/shops/un-shop/orders')
+      .get('/v1/orders/shops/un-shop')
       .set('cookie', cookie)      
       .expect(401,done);
   });

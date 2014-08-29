@@ -133,7 +133,7 @@ describe("api.orders.create", function(){
       .expect(200,function(err,res){
         should.not.exist(err)
         should.exist(res.body.errors)
-        res.body.errors[0]['1000002'].should.include("la boutique a été désactivé par l'équipe Kariboo")
+        res.body.errors[0]['1000002'].should.include("la boutique a été désactivé")
         done()
       });
   });    

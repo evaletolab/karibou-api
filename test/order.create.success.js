@@ -41,17 +41,20 @@ describe("orders.create.success", function(){
   var _ = require("underscore");
 
   var nextday=Orders.findNextShippingDay();
-  var monday=Orders.jumpToNextWeekDay(new Date(),1);
 
-  // on friday next shipping day equal monday
-  // If days equal , orders count are different
-  var dateEqual=(monday.getDay()==nextday.getDay())
+
 
 
   before(function(done){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){
+        //     o.print();
+        //   })
+        // })
+
         done();
       });
     });      
@@ -186,7 +189,7 @@ describe("orders.create.success", function(){
         // create on test   2000001 1396791546324 'pending', closed null
         //                  2000000 1396791546291 'pending', closed null
         // created on load. 2000006 1396791545738 'pending', closed null
-        orders.length.should.equal(3)
+        orders.length.should.equal(2)
 
         orders[0].oid.should.equal(2000001)
         done();
@@ -195,7 +198,7 @@ describe("orders.create.success", function(){
   }); 
 
   it("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){
-    Orders.findByTimeoutAndNotPaid().where('oid').in([2000001,2000000]).exec(function(err,orders){
+    Orders.findByTimeoutAndNotPaid().where('oid').in([2000006,2000000]).exec(function(err,orders){
       orders.forEach(function(order){
         console.log(order.oid,new Date(order.created).getTime(),order.payment.status)
       })              

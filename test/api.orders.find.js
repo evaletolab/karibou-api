@@ -35,7 +35,7 @@ describe("api.orders.security", function(){
           console.log("--- oid     vendors       ",  o.vendors.map(function(o){ return o.slug}).join(','));
         })    
     }
-    $printOrders(data.Orders, nextShippingDay)
+    //$printOrders(data.Orders, nextShippingDay)
 
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
@@ -90,9 +90,9 @@ describe("api.orders.security", function(){
   // });
 
   // sugls: super-shop, un-autre-shop, mon-shop
-  it('GET /v1/shops/mon-shop/orders?when=next list open orders for next shipping day ',function(done){
+  it('GET /v1/orders/shops/mon-shop?when=next list open orders for next shipping day ',function(done){
     request(app)
-      .get('/v1/shops/mon-shop/orders?when=next')
+      .get('/v1/orders/shops/mon-shop?when=next')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -119,9 +119,9 @@ describe("api.orders.security", function(){
       });  
   });  
 
-  it('GET /v1/shops/mon-shop/orders?status=fail  ',function(done){
+  it('GET /v1/orders/shops/mon-shop?status=fail  ',function(done){
     request(app)
-      .get('/v1/shops/mon-shop/orders?status=fail')
+      .get('/v1/orders/shops/mon-shop?status=fail')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -132,9 +132,9 @@ describe("api.orders.security", function(){
       });  
   });  
 
-  it('GET /v1/shops/mon-shop/orders?status=close  ',function(done){
+  it('GET /v1/orders/shops/mon-shop?status=close  ',function(done){
     request(app)
-      .get('/v1/shops/mon-shop/orders?status=close')
+      .get('/v1/orders/shops/mon-shop?status=close')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -164,9 +164,9 @@ describe("api.orders.security", function(){
   
 
 
-  it('GET /v1/shops/mon-shop/orders list all orders  ',function(done){
+  it('GET /v1/orders/shops/mon-shop list all orders  ',function(done){
     request(app)
-      .get('/v1/shops/mon-shop/orders')
+      .get('/v1/orders/shops/mon-shop')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
