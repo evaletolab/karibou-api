@@ -138,6 +138,12 @@ exports.listByShop = function(req,res){
     criteria.nextShippingDay=true
   }
 
+  // get orders for specific date
+  else if(req.query.when){
+    var when=new Date(req.query.when)
+    if(when!== "Invalid Date") criteria.when=when
+  }
+
   // restrict to a shopname
   criteria.shop=req.params.shopname
 
