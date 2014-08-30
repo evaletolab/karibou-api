@@ -565,8 +565,17 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       order.vendors=_.uniq(vendors,false,function(a,b){return a.slug===b.slug;});
 
       //
-      // adding customer email (check validity)
-      order.customer=customer;
+      // adding customer info and email (check validity)
+      order.customer={
+        id:customer.id,
+        displayName:customer.displayName,
+        created:customer.created,
+        status:customer.status,
+        addresses:customer.addresses,
+        phoneNumbers:customer.phoneNumbers,
+        name:customer.name,
+        email:customer.email
+      }      
       order.email=customer.email.address;
 
       //

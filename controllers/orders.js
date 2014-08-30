@@ -119,7 +119,7 @@ exports.listByShop = function(req,res){
   var criteria={}
 
   // restrict for available orders
-  criteria.closed=null
+  // criteria.closed=null
 
   if (req.query.status=='close'){
     criteria.closed=true
