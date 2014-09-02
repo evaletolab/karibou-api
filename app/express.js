@@ -108,7 +108,15 @@ var tokenSession=function (req, res, next) {
 
     // don't use logger for test env
     if (process.env.NODE_ENV !== 'test') {
-      app.use(express.logger(':remote-addr - :date - :method :url :status :res[content-length] - :response-time ms'))
+      // express.logger.token('msg', function(req, res){ 
+      //   if(res.status>=400){
+      //     console.log(res.text)
+      //     return res.text
+      //   }
+      //   return '' 
+      // })      
+      
+      app.use(express.logger(':remote-addr - :date - :method :url :status :msg - :referrer - :response-time ms'))
     }
 
 
@@ -197,7 +205,8 @@ var tokenSession=function (req, res, next) {
       //   || (~err.message.indexOf('Cast to ObjectId failed')))) {
       //   return next()
       // }
-  
+
+
       //send emails if you want
       if(process.env.NODE_ENV==='production'){
         var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
@@ -206,6 +215,7 @@ var tokenSession=function (req, res, next) {
               console.log(err,status)
         });
       }
+
 
       if (typeof err==='string'){
         return res.send(400,err); 

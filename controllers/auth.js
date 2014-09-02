@@ -164,18 +164,24 @@ exports.register_post= function(req, res) {
       check(req.body.lastname,"Le format de prénom est invalide").len(3, 64);
       check(req.body.password,"Le passowrd est invalide").len(3, 64);
     }catch(err){
+      console.log("[register] ", err.message)
       return res.send(400, err.message);
     }  
   
 		db.model('Users')
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
+        if(err&&err.code==11000){
+          console.log("[register] ", "Cet adresse email est déjà utilisée")
+          return res.send(400,"Cet adresse email est déjà utilisée");    
+        }else
 		    if (err){
           return res.send(400,errorHelper(err));    
 		    }
 
         if (!user){
-          return res.send(400,"Unknow error on registration");    
+          console.log("[register] Ooooppss!!")
+          return res.send(400,"Erreur inconnue lors de la création du compte");    
         }
         //
         // redirect for non ajax register
