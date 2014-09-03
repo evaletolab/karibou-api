@@ -38,14 +38,15 @@ describe("api.users.addresses", function(){
       email:"reg1@test.com",
       firstname:"first",
       lastname:"last",
-      password:"12345",
-      confirm:"12345"
+      password:"123456",
+      confirm:"123456"
     };
   
     request(app)
       .post('/register')
       .send(r)
       .end(function(err,res){      
+        console.log(err)
         res.should.have.status(200);
         done();        
       });
@@ -57,7 +58,7 @@ describe("api.users.addresses", function(){
   it('POST /login return 200',function(done){  
     request(app)
       .post('/login')
-      .send({ email:"reg1@test.com", provider:'local', password:'12345' })
+      .send({ email:"reg1@test.com", provider:'local', password:'123456' })
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("reg1@test.com");

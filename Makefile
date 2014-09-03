@@ -25,5 +25,9 @@ lib-cov:
 	@rm -fr ./$@
 	@jscoverage models $@
 
+coverage:
+	jscoverage --no-highlight lib lib-cov
+	@NODE_ENV=test EXAMPLE_COV=1 ./node_modules/.bin/mocha  -R html-cov > coverage.html
+	rm -rf lib-cov
 
 .PHONY: test-cov test test-all test-unit clean test-cov lib-cov

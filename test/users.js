@@ -46,8 +46,8 @@ describe("Users", function(){
       
     });
 
-    it("create persona user with email only ", function(done){
-      db.model('Users').findOrCreate({ 'email.address':'test@bo.com', provider:'persona' }, function (err, user) {
+    it("create user with new email only ", function(done){
+      db.model('Users').findOrCreate({ 'email.address':'test@persona.com', provider:'persona' }, function (err, user) {
         should.not.exist(err);
         should.exist(user.id);
         user.email.status.should.equal(true);
@@ -56,7 +56,7 @@ describe("Users", function(){
       
     });
 
-    it("inexistant Oauth id should create user 'TODO with a default email????'", function(done){
+    it("valide Oauth id should create new user ", function(done){
   		db.model('Users').findOrCreate({ id: 1234, provider:'twitter', photo:'olivier.jpg' }, function (err, user) {
   		  should.exist(user);
   		  user.id.should.equal(1234);
@@ -65,7 +65,7 @@ describe("Users", function(){
       
     });
 
-    it("validate existant Oauth user", function(done){
+    it("find existant Oauth user", function(done){
   		db.model('Users').findOrCreate({ id: data.Users[0].id }, function (err, user) {
   		  user.email.address.should.equal(data.Users[0].email.address);
     		return done();
@@ -73,7 +73,7 @@ describe("Users", function(){
       
     });
 
-    it("validation for wrong provider", function(done){
+    it("wrong provider generate an error", function(done){
    		db.model('Users').findOrCreate({ id:12345678, provider:'toto', photo:'olivier.jpg' }, function (err, user) {
         err.errors.provider.path.should.equal('provider');
         err.errors.provider.value.should.equal('toto');
@@ -81,15 +81,15 @@ describe("Users", function(){
   		});      
     });
 
-    it("validation for duplicate id", function(done){
+    it("duplicate id, one for local and one for facebook, generate an error", function(done){
       db.model('Users').findOrCreate({ id: 1234, provider:"facebook" }, function (err, user) {
-    		should.exist(err.code);
-    		err.code.should.equal(11000);
-    		return done();
+    		should.exist(err);
+    		err.should.include('utilisé par le provider');
+        done()
   		});      
     });
-    
         
+
     it.skip("validate provider", function(done){
       
     });
@@ -98,28 +98,26 @@ describe("Users", function(){
       
     });
 
-    it("registers a new User", function(done){
-      db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "password", "password", function(err, doc){
-    		should.exist(err.code);
-    		err.code.should.equal(11000);
+    it("registers a new User get duplicate email error", function(done){
+      db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "password", "password", function(err, user){
+    		should.exist(err);
+    		err.should.include('utilisateur existe');
         done();
       });
     });
 
-    it("validation for duplicate email", function(done){
-      db.model('Users').register("test2@test.com", "olivier", "evalet", "password", "password", function(err, doc){
-        
-        doc.email.address.should.equal("test2@test.com");
-        doc.name.familyName.should.equal("evalet");
-        doc.name.givenName.should.equal("olivier");
+    it("duplicate email, one for persona and one for the current registration, generate an error", function(done){
+      db.model('Users').register("test@persona.com", "olivier", "evalet", "password", "password", function(err, doc){
+        should.exist(err);
+        err.should.include('utilisateur existe');
         done();
       });
     });
 
     it("authenticates and returns User with valid login", function(done){
-      db.model('Users').authenticate('test2@test.com', "password", function(err, user){
+      db.model('Users').authenticate('evaleto@gluck.com', "password", function(err, user){
         should.not.exist(err)
-        user.email.address.should.equal("test2@test.com");
+        user.email.address.should.equal("evaleto@gluck.com");
         done();
       });
     });

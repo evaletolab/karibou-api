@@ -44,8 +44,8 @@ describe("api.users.create", function(){
       email:"reg1@test.com",
       firstname:"first",
       lastname:"last",
-      password:"12345",
-      confirm:"12345"
+      password:"123456",
+      confirm:"123456"
     };
   
     request(app)
@@ -62,8 +62,8 @@ describe("api.users.create", function(){
       email:"reg1@test.com",
       firstname:"first",
       lastname:"last",
-      password:"12345",
-      confirm:"12345"
+      password:"123456",
+      confirm:"123456"
     };
   
     request(app)
@@ -75,12 +75,12 @@ describe("api.users.create", function(){
       });
   });
   
-  it('POST /register confirmation password should return 400 ',function(done){
+  it('POST /register with wrong confirmation password should return 400 ',function(done){
     var r={
       email:"reg2@test.com",
       firstname:"first",
       lastname:"last",
-      password:"12345",
+      password:"123456",
       confirm:"123"
     };
   
@@ -93,12 +93,30 @@ describe("api.users.create", function(){
       });
   });
   
-  it('POST /register without mail should return 400 ',function(done){
+  it('POST /register short password should return 400 ',function(done){
     var r={
+      email:"reg2@test.com",
       firstname:"first",
       lastname:"last",
       password:"12345",
       confirm:"12345"
+    };
+  
+    request(app)
+      .post('/register')
+      .send(r)
+      .end(function(err,res){      
+        res.should.have.status(400);
+        done();        
+      });
+  });
+
+  it('POST /register without mail should return 400 ',function(done){
+    var r={
+      firstname:"first",
+      lastname:"last",
+      password:"123456",
+      confirm:"123456"
     };
   
     request(app)
@@ -123,7 +141,7 @@ describe("api.users.create", function(){
   it('POST /login return 200',function(done){  
     request(app)
       .post('/login')
-      .send({ email:"reg1@test.com", provider:'local', password:'12345' })
+      .send({ email:"reg1@test.com", provider:'local', password:'123456' })
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("reg1@test.com");

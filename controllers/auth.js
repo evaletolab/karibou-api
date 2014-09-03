@@ -98,10 +98,10 @@ exports.login_post=function(req, res, next) {
 
   try{
     check(req.body.email,"Le format de l'email est invalide").isEmail();
-    check(req.body.provider).len(3, 64);
-    check(req.body.password).len(4, 64);
+    check(req.body.provider,"Erreur interne de format [provider]").len(3, 64);
+    check(req.body.password,"Le passowrd est invalide").len(6, 64);
   }catch(err){  
-    // console.log(err.stack)    
+    console.log("ERROR",err.message)    
     return res.send(400, err.message);
   }  
   
@@ -109,7 +109,7 @@ exports.login_post=function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
 
       if (err) { 
-        return res.send(400,err); 
+        return res.send(400,errorHelper(err)); 
       }
       if (!user) { 
         return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
@@ -132,6 +132,7 @@ exports.login_post=function(req, res, next) {
 	    
 	    /* account is not valid */
 	    if (!user.isAdmin() && !user.status){
+        console.log("ERROR","Votre compte est désactivé")    
 	      return res.send(401,"Votre compte est désactivé");
 	    }
       
@@ -162,9 +163,9 @@ exports.register_post= function(req, res) {
       check(req.body.email,"Le format de l'email est invalide").isEmail();
       check(req.body.firstname,"Le format du nom est invalide").len(3, 64);
       check(req.body.lastname,"Le format de prénom est invalide").len(3, 64);
-      check(req.body.password,"Le passowrd est invalide").len(3, 64);
+      check(req.body.password,"Le passowrd est invalide").len(6, 64);
     }catch(err){
-      console.log("[register] ", err.message)
+      console.log("ERROR [register] ", err.message)
       return res.send(400, err.message);
     }  
   
@@ -172,15 +173,16 @@ exports.register_post= function(req, res) {
 		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
 		  function(err,user){
         if(err&&err.code==11000){
-          console.log("[register] ", "Cet adresse email est déjà utilisée")
+          console.log("ERROR [register] ", "Cet adresse email est déjà utilisée")
           return res.send(400,"Cet adresse email est déjà utilisée");    
         }else
 		    if (err){
+          console.log("ERROR",errorHelper(err))    
           return res.send(400,errorHelper(err));    
 		    }
 
         if (!user){
-          console.log("[register] Ooooppss!!")
+          console.log("ERROR","[register] Ooooppss!!")
           return res.send(400,"Erreur inconnue lors de la création du compte");    
         }
         //

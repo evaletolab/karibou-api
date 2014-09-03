@@ -140,16 +140,25 @@ UserSchema.pre("save",function(next, done) {
 //}, 'Invalid gender');
 
 UserSchema.statics.findOrCreate=function(u,callback){
-	var Users=this.model('Users');
+	var Users=this.model('Users'),
+      criteria={};
 
-  //TODO this is a simple implementation that auth persona to match local email 
-  if (u.provider==='persona'){
-    var persona= delete u.provider;
+  // find by id
+  if(u.id){
+    criteria.id=u.id
   }
-  Users.findOne(u, function(err, user){
+
+  //find by email
+  if(u['email.address']){
+    criteria['email.address']=u['email.address']
+  }
+
+  Users.findOne(criteria, function(err, user){
     if(!user){
+      //
+      // user should be created
       if (u.provider==='local'){
-        return callback("The system can not automaticaly create user for local provider");
+        return callback("L'utilisateur ne peut pas être créer automatiquement");
       }
       
       if (!u.id && u['email.address']){
@@ -157,17 +166,19 @@ UserSchema.statics.findOrCreate=function(u,callback){
         // this question is essential but it need a promise
         // db.model('Sequences').nextUser(function(uid){
         //})
-  
+
         u.id=u['email.address'].hash()
         u["email.status"]=true;
       }
-      if(persona){u['provider']='persona'}
       var newuser=new Users(u);
       newuser.save(function(err){
         //if ( err && err.code === 11000 )
         callback(err,newuser);
       });
     }else{
+      if(u.provider&&(user.provider!==u.provider)){
+        return callback("L'identifiant est déja utilisé par le provider "+user.provider, null);  
+      }
       callback(err, user);
     }
   });
@@ -373,39 +384,48 @@ UserSchema.statics.authenticate=function(email, password, callback) {
 
 
 UserSchema.statics.register = function(email, first, last, password, confirm, callback){
-	var Users=this.model('Users');
+	var Users=this.model('Users'),
+      uid=email.hash(new Date());
 	//error("TODO, we cannot register a user without matching a common provider (twitter, google, fb, flickr)");
 	
 	if (password !==confirm){
-	  callback(("password confirmation is not identical"));
+	  callback(("la confirmation du mot de passe n'est pas correcte"));
 	  return;
 	}
 	
-	//hash password (see virtual methods )
-	//var pwd=require('crypto').createHash('sha1').update(password).digest("hex");
-	
-    
-  /* The name of this user, suitable for display.*/
-  //FIXME email.hash() should be replaced by (id++)+10000000
-	// create a new customer
-	var user=new Users({
-	    id:email.hash(new Date()),
-      displayName:first+" "+last, 
-      name: {
-          familyName: last,
-          givenName: first
-      },
-      email:{address:email,status:new Date()},
-			provider:"local",
-			password:password,
-			created:new Date()
-	});
+  // verifiy duplicity
+  Users.findOne({'email.address':email}).exec(function(e,u){
+    if(u){
+      return callback("Cet utilisateur existe déjà")
+    }
 
-	//save it
-	user.save(function(err){	  
-	  //FIXME manage the duplicate address ( err && err.code === 11000 )
-		callback(err, user);
-	});
+    //hash password (see virtual methods )
+    //var pwd=require('crypto').createHash('sha1').update(password).digest("hex");
+    
+      
+    /* The name of this user, suitable for display.*/
+    //FIXME email.hash() should be replaced by (id++)+10000000
+    // create a new customer
+    var user=new Users({
+        id:uid,
+        displayName:first+" "+last, 
+        name: {
+            familyName: last,
+            givenName: first
+        },
+        email:{address:email,status:new Date()},
+        provider:"local",
+        password:password,
+        created:new Date()
+    });
+
+    //save it
+    user.save(function(err){    
+      //FIXME manage the duplicate address ( err && err.code === 11000 )
+      callback(err, user);
+    });
+
+  })
 };
 
 UserSchema.statics.updateStatus=function(id, status,callback){
