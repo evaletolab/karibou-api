@@ -12,23 +12,19 @@ var Products=db.model('Products')
   , toshortDay
   , okDay;
 
-//
-// check times in config.shop.order.timelimit
+// available shipping day for testing [1..6]
+// check times in config.shop.order.timelimit (50 for testing)
 function prepareOrderDates(){
   var today=new Date();
-  // saturday or sunday are not a shipping day
-  if (today.getDay()==0||today.getDay()==6){
+  if (today.getDay()==6){
     toshortDay=Orders.jumpToNextWeekDay(today,1);
     okDay=Orders.jumpToNextWeekDay(today,3);
-    return
-  } 
-  if (today.getDay()==4){
-    toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+4);
+    okDay.setHours(11,0,0,0)
     return
   } 
   toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
   okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
+  okDay.setHours(11,0,0,0)
 }
 prepareOrderDates()
 
@@ -69,42 +65,7 @@ describe("orders.validate.item", function(){
       done();
     });    
   });
-
-
-  it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
-
-    shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
-    items=[]
-    items.push(Orders.prepare(data.Products[0], 1, ""))
-
-
-    //
-    // starting process of order,
-    //  - items, customer, shipping
-    Orders.create(items, customer, shipping, payment, function(err,order){
-      should.exist(err)
-      err.should.include("La date de livraison n'est pas valable")
-
-      done();          
-    });
-  });    
-
-  it("Error:selected shipping day is to short to prepare an order (date < config.shop.order.timelimit)", function(done){
-    shipping.when=toshortDay;
-    items=[]
-    items.push(Orders.prepare(data.Products[0], 1, ""))
-
-
-    //
-    // starting process of order,
-    //  - items, customer, shipping
-    Orders.create(items, customer, shipping, payment, function(err,order){
-      should.exist(err)
-      err.should.include("Cette date de livraison n'est plus")
-
-      done();          
-    });
-  });    
+  
 
   it("Error:item (discount) price in cart is no more available in shop", function(done){
     shipping.when=okDay

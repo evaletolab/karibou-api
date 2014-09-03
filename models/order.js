@@ -330,19 +330,30 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
   var nextday=((jump-date.getDay())%7)
   var week=(nextday>=0)?0:7*86400000;
   var nextweek=new Date(+date.getTime()+nextday*86400000+week)
-  // next date always includes all shipping times: 12:00, 17:00, 19:00
+  // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
   nextweek.setHours(23,0,0,0)
   return nextweek;
 
 }
 
-/* return the next shipping day */
+/* return the next shipping day available for customers*/
 Orders.statics.findNextShippingDay=function(){
   var next=new Date(Date.now()+config.shop.order.timelimit*3600000);
   while(config.shop.order.weekdays.indexOf(next.getDay())<0){
     next=new Date(next.getTime()+86400000)
   }
-  // next date always includes all shipping times: 12:00, 17:00, 19:00
+  // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
+  next.setHours(23,0,0,0)
+  return next;
+}
+
+/* return the current shipping day this is for sellers*/
+Orders.statics.findCurrentShippingDay=function(){
+  var next=new Date();
+  while(config.shop.order.weekdays.indexOf(next.getDay())<0){
+    next=new Date(next.getTime()+86400000)
+  }
+  // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
   next.setHours(23,0,0,0)
   return next;
 }
@@ -503,9 +514,8 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   shipping.when=new Date(shipping.when)
 
   // 
-  // check that shipping day is available on: config.shop.order.shippingdays
-  var days=Object.keys(config.shop.order.shippingdays);
-  if (!config.shop.order.shippingdays[days[shipping.when.getDay()]].active){
+  // check that shipping day is available on: config.shop.order.weekdays
+  if (config.shop.order.weekdays.indexOf(shipping.when.getDay())==-1){
     return callback("La date de livraison n'est pas valable")
   }
 
@@ -513,6 +523,16 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
     return callback("Cette date de livraison n'est plus disponible.")    
   }
+
+  //
+  // check time for delivery
+  var times=Object.keys(config.shop.order.shippingtimes)
+  if(times.indexOf(String(shipping.when.getHours()))==-1){
+    return callback("L'heure de livraison n'est pas valable")
+  }
+
+
+
   //
   // get unique Order identifier
   db.model('Sequences').nextOrder(function(err,oid){
@@ -669,7 +689,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   //
   // filter by next shipping date
   if(criteria.nextShippingDay){
-    var next=this.findNextShippingDay();
+    var next=this.findCurrentShippingDay();
     var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
         ed=new Date(sd.getTime()+86400000-60000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};

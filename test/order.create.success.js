@@ -12,22 +12,22 @@ var Products=db.model('Products')
   , toshortDay
   , okDay;
 
-function prepareOrderDates(){
-  var today=new Date();
-  // sunday is not a shipping day
-  if (today.getDay()==0){
-    toshortDay=Orders.jumpToNextWeekDay(today,1);
-    okDay=Orders.jumpToNextWeekDay(today,3);
-    return
-  } 
-  if (today.getDay()==4){
+  // available shipping day for testing [1..6]
+  // check times in config.shop.order.timelimit (50 for testing)
+  function prepareOrderDates(){
+    var today=new Date();
+    if (today.getDay()==6){
+      toshortDay=Orders.jumpToNextWeekDay(today,1);
+      okDay=Orders.jumpToNextWeekDay(today,3);
+      // this not an available delevry time
+      okDay.setHours(11,0,0,0)
+      return
+    } 
     toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+4);
-    return
-  } 
-  toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-  okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
-}
+    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
+    okDay.setHours(11,0,0,0)
+
+  }
 prepareOrderDates()
 
 /**

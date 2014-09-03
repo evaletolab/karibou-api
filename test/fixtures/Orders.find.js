@@ -14,7 +14,7 @@ var orders = require('mongoose').model('Orders');
 //  - all products, stock, shop, user ... are available
 //  -
 
-var nextday=orders.findNextShippingDay();
+var nextday=orders.findCurrentShippingDay();
 var monday=orders.jumpToNextWeekDay(new Date(),((nextday.getDay()==1)?2:1));
 
 var passedday=new Date(monday.getTime()-86400000*7)

@@ -25,20 +25,21 @@ var Products=db.model('Products'),
     },
     okDay;
 
-//
-// check times in config.shop.order.timelimit
+// available shipping day for testing [1..6]
+// check times in config.shop.order.timelimit (50 for testing)
 function prepareOrderDates(){
   var today=new Date();
-  // saturday or sunday are not a shipping day
-  if (today.getDay()==0||today.getDay()==6){
+  if (today.getDay()==6){
+    toshortDay=Orders.jumpToNextWeekDay(today,1);
     okDay=Orders.jumpToNextWeekDay(today,3);
+    // this not an available delevry time
+    okDay.setHours(11,0,0,0)
     return
   } 
-  if (today.getDay()==4){
-    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+4);
-    return
-  } 
+  toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
   okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
+  okDay.setHours(11,0,0,0)
+
 }
 prepareOrderDates();
 
@@ -176,43 +177,6 @@ describe("api.orders.create", function(){
   });    
 
  it("POST /v1/orders create new order with exceed of stock errors ", function(done){
-    var items=[]
-      , customer=data.Users[1]
-      , payment="postfinance";
-
-    data.Products.forEach(function(product){
-      //
-      // prepare is a private helper function for testing purpose
-      var e=Orders.prepare(product, 60, "");
-      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
-          items.push(e)
-      }
-    });
-
-    items=_.sortBy(items,function(i){return i.title});
-
-    shipping.when=okDay;
-
-    var order={
-      items:items,
-      shipping:shipping,
-      payment:payment
-    }
-
-    request(app)
-      .post('/v1/orders')
-      .set('Content-Type','application/json')
-      .send(order)
-      .set('cookie', cookie)
-      .expect(200,function(err,res){
-        should.not.exist(err)
-        should.exist(res.body.errors)
-        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
-        done()
-      });
-  });    
-
- it("GET /v1/shops/:shopname/orders?when=next list order for this shop ", function(done){
     var items=[]
       , customer=data.Users[1]
       , payment="postfinance";

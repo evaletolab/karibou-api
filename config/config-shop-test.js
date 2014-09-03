@@ -86,18 +86,10 @@ module.exports = {
       timeoutAndNotPaid:0.3,
 
       //
-      // Dimanche, Lundi, Mardi, Mercredi(1), Jeudi, Vendredi, Samedi(1)
+      // Dimanche*, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi(
       weekdays:[1,2,3,4,5,6],      
       shippingtimes:{11:"11:00 à 13:00", 16:"16:00 à 18:00"},    
-      shippingdays:{
-        'Dimanche':  {active:false},
-        'Lundi':     {active:true},
-        'Mardi':     {active:true},
-        'Mercredi':  {active:true},
-        'Jeudi':     {active:true},
-        'Vendredi':  {active:true},
-        'Samedi':    {active:true},
-      }      
+      
     }
 
   }

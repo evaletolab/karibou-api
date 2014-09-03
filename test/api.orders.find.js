@@ -12,7 +12,7 @@ var Products=db.model('Products'),
 describe("api.orders.security", function(){
   var request= require('supertest');
   var _ = require("underscore");
-  var nextShippingDay=Orders.findNextShippingDay();
+  var nextShippingDay=Orders.findCurrentShippingDay();
 
 
   before(function(done){
@@ -177,6 +177,7 @@ describe("api.orders.security", function(){
         done()
       });  
   });
+
 
 });
 
