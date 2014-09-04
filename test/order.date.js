@@ -11,6 +11,7 @@ describe("orders.date", function(){
 
   before(function(done){
     //Orders.printInfo()
+    console.log("today it's ",moment(now).format('DDD'))
     done()
   });
 
