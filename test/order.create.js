@@ -50,7 +50,6 @@ describe("orders.create", function(){
   }
   prepareOrderDates()
 
-
   before(function(done){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js"],db,function(err){

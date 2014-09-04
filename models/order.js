@@ -39,7 +39,7 @@ var Orders = new Schema({
    
    /* customer email */
    email:{type: String, required:true},
-   created:{type: Date, default: Date.now },
+   created:{type: Date, default: Date.now() },
    closed:{type: Date},
 
    /* full customer details */
@@ -138,7 +138,7 @@ Orders.methods.getTotalPrice=function(){
 
 Orders.methods.print=function(){
 
-  console.log("-- OID %s   ", this.oid);
+  console.log("-- OID    ", this.oid);
   console.log("---      shipping.when ",  this.shipping.when);
   console.log("---      payment       ",  this.payment.status);
   console.log("---      fulfillments  ",  this.fulfillments.status);
@@ -152,6 +152,16 @@ Orders.methods.print=function(){
   console.log("---      vendors       ",  this.vendors.map(function(v){ return v.slug}).join(',')); 
 }
 
+Orders.statics.printInfo=function(){
+  var now=new Date()
+  console.log("-- now it's   ", now);
+  console.log("-- available shipping days   ", config.shop.order.weekdays.join(','));
+  console.log("-- order payment timelimite (s)   ", config.shop.order.timeoutAndNotPaid);
+  console.log("-- order preparation timelimit (hours)   ", config.shop.order.timelimit);
+  console.log("--    ");
+  console.log("-- next shipping day for customers  ", this.findNextShippingDay());
+  console.log("-- next shipping day for sellers  ", this.findCurrentShippingDay());
+}
 //
 // prepare one product as order item
 Orders.statics.prepare=function(product, quantity, note){
@@ -338,20 +348,33 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
 
 /* return the next shipping day available for customers*/
 Orders.statics.findNextShippingDay=function(){
-  var next=new Date(Date.now()+config.shop.order.timelimit*3600000);
-  while(config.shop.order.weekdays.indexOf(next.getDay())<0){
+  var now=Date.now()
+  var next=new Date(now+config.shop.order.timelimit*3600000);
+
+  //
+  // next is available until time  (timeLimitH)
+  next.setHours(config.shop.order.timelimitH,0,0,0)
+
+  var limit=Math.abs((now-next.getTime())/3600000) 
+  while(config.shop.order.weekdays.indexOf(next.getDay())<0 || limit<config.shop.order.timelimit){
     next=new Date(next.getTime()+86400000)
+    limit=Math.abs((now-next.getTime())/3600000) 
   }
   // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
-  next.setHours(23,0,0,0)
+  //next.setHours(23,0,0,0)
   return next;
 }
 
 /* return the current shipping day this is for sellers*/
 Orders.statics.findCurrentShippingDay=function(){
-  var next=new Date();
-  while(config.shop.order.weekdays.indexOf(next.getDay())<0){
+  var next=new Date(), now=Date.now();
+
+  // if next is today && next hours >= config.shop.order.timelimitH ==> select next day
+  var elpased=Math.abs((now-next.getTime())/3600000) 
+  while((config.shop.order.weekdays.indexOf(next.getDay())<0) || 
+        (elpased<24 && next.getHours()>config.shop.order.timelimitH)){
     next=new Date(next.getTime()+86400000)
+    elpased=Math.abs((now-next.getTime())/3600000)  
   }
   // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
   next.setHours(23,0,0,0)
@@ -520,6 +543,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   }
 
 
+  console.log(Math.abs((Date.now()-shipping.when.getTime())/3600000) , config.shop.order.timelimit)
   if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
     return callback("Cette date de livraison n'est plus disponible.")    
   }

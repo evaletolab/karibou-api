@@ -29,19 +29,14 @@ var Products=db.model('Products'),
 // check times in config.shop.order.timelimit (50 for testing)
 function prepareOrderDates(){
   var today=new Date();
-  if (today.getDay()==6){
-    toshortDay=Orders.jumpToNextWeekDay(today,1);
-    okDay=Orders.jumpToNextWeekDay(today,3);
-    // this not an available delevry time
-    okDay.setHours(11,0,0,0)
-    return
-  } 
+ 
   toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-  okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
+  okDay=Orders.findNextShippingDay();
   okDay.setHours(11,0,0,0)
 
 }
 prepareOrderDates();
+Orders.printInfo()
 
 describe("api.orders.create", function(){
   var request= require('supertest');
@@ -132,6 +127,7 @@ describe("api.orders.create", function(){
       .send(order)
       .set('cookie', cookie)
       .expect(200,function(err,res){
+        console.log("----------------",res.text, okDay)
         should.not.exist(err)
         should.exist(res.body.errors)
         res.body.errors[0]['1000002'].should.include("la boutique a été désactivé")
@@ -176,7 +172,7 @@ describe("api.orders.create", function(){
       });
   });    
 
- it("POST /v1/orders create new order with exceed of stock errors ", function(done){
+ it("POST /v1/orders create new order with wrong date ", function(done){
     var items=[]
       , customer=data.Users[1]
       , payment="postfinance";
@@ -184,7 +180,7 @@ describe("api.orders.create", function(){
     data.Products.forEach(function(product){
       //
       // prepare is a private helper function for testing purpose
-      var e=Orders.prepare(product, 60, "");
+      var e=Orders.prepare(product, 1, "");
       if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
           items.push(e)
       }
@@ -192,7 +188,9 @@ describe("api.orders.create", function(){
 
     items=_.sortBy(items,function(i){return i.title});
 
-    shipping.when=okDay;
+    var when=new Date()
+    when.setHours(0,0,0,0)
+    shipping.when=when;
 
     var order={
       items:items,
@@ -206,9 +204,9 @@ describe("api.orders.create", function(){
       .send(order)
       .set('cookie', cookie)
       .expect(200,function(err,res){
+        console.log(err)
         should.not.exist(err)
         should.exist(res.body.errors)
-        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
         done()
       });
   });    

@@ -76,13 +76,17 @@ module.exports = {
       status:["failure","created","partial","fulfilled"],
       gateway:[ {label:"postfinance",fees:0.015}, {label:"paypal",fees:0.0017}, {label:"bitcoin",fees:0.0}],
 
-      /* for testing 50 hours is the time limit between order and delivry*/
-      timelimit:50,
+      /* for testing 50 hours is the time limit between order and delivery*/
+      /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
+      timelimit:48,
+
+      /* order date range between day1 to day2 max 9:00. Lapse time = timelimit */
+      timelimitH:9,
 
       /* currently only grouped is available */
       shippingmode:["grouped", "none"],
 
-      /* order is in timaout if payment status != 'paid' and created<1s (timeoutAndNotPaid)*/
+      /* order is in timeout if payment status != 'paid' and created<1s (timeoutAndNotPaid)*/
       timeoutAndNotPaid:0.3,
 
       //
