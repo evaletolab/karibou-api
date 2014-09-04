@@ -105,39 +105,15 @@ validate.postal = function (value) {
     
     /* password and creation date (for local session only)*/    
     created:{type:Date, default: Date.now},
+    updated:{type:Date, default: Date.now},
+    logged:{type:Date, default: Date.now},
+
 		salt: { type: String, required: false },
 		hash: { type: String, required: false },   
 		roles: Array,
     rank: String
 });
 
-/**
-UserSchema.pre("save",function(next, done) {
-    var self = this;
-    if (!self.email || true) {
-      done();
-      return next();
-    }
-    this.model("Users").findOne({'email.address' : self.email.address},function(err, user) {
-        if(err) {
-            done(err);
-        } else if(user) {
-            self.invalidate("email.address","L'address email doit être unique");
-            done(new Error("L'address email doit être unique"));
-        } else {
-            done();
-        }
-    });
-    next();
-});
-
-  **/
-/**
- * validation functions
- */
-//UserSchema.path('XYZ').validate(function (value) {
-//  return /male|female|homme|femme/i.test(value);
-//}, 'Invalid gender');
 
 UserSchema.statics.findOrCreate=function(u,callback){
 	var Users=this.model('Users'),
@@ -171,6 +147,8 @@ UserSchema.statics.findOrCreate=function(u,callback){
         u["email.status"]=true;
       }
       var newuser=new Users(u);
+
+
       newuser.save(function(err){
         //if ( err && err.code === 11000 )
         callback(err,newuser);
@@ -179,6 +157,12 @@ UserSchema.statics.findOrCreate=function(u,callback){
       if(u.provider&&(user.provider!==u.provider)){
         return callback("L'identifiant est déja utilisé par le provider "+user.provider, null);  
       }
+
+      //
+      // keep on track login
+      user.logged=new Date()
+      user.save();
+
       callback(err, user);
     }
   });
@@ -376,6 +360,11 @@ UserSchema.statics.authenticate=function(email, password, callback) {
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return callback(err); }
         if (!passwordCorrect) { return callback(null, false); }
+
+        //
+        // keep on track login
+        user.logged=new Date()
+        user.save();
         return callback(null, user);
       });
     });
@@ -439,7 +428,7 @@ UserSchema.statics.updateStatus=function(id, status,callback){
       return callback("Utilisateur inconnu");
     }
     user.status=status;
-    
+    user.updated=Date.now();
     user.save(function (err) {
       //
       // update all shops
@@ -512,6 +501,7 @@ UserSchema.statics.update=function(id, u,callback){
     // ONLY ADMIN CAN DO THAT
     if(u.status!=user.status){
     }
+    user.updated=Date.now();
     
     user.save(function (err) {
       //if ( err && err.code === 11000 )
