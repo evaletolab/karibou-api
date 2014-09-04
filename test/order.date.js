@@ -7,11 +7,12 @@ var Orders=db.model('Orders');
 
 describe("orders.date", function(){
   var _ = require("underscore"),
-      now=Date.now();
+      now=new Date();
 
   before(function(done){
     //Orders.printInfo()
-    console.log("today it's ",moment(now).format('DDD'))
+    var days=['sunday','monday','tuesday', 'wednesday', 'thursday','friday','saturday']
+    console.log("today it's ",days[now.getDay()])
     done()
   });
 
