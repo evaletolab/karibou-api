@@ -360,7 +360,7 @@ Orders.statics.findOneWeekOfShippingDay=function(){
         if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
           all.push(nextDate)
     }else if(day>next.getDay()){
-        nextDate=new Date(day*86400000+next.getTime())
+        nextDate=new Date((day-next.getDay())*86400000+next.getTime())
         if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
           all.push(nextDate)
     }    
