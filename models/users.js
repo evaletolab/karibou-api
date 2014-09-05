@@ -170,10 +170,6 @@ UserSchema.statics.findOrCreate=function(u,callback){
 };
 
 
-UserSchema.post('save', function () {
-  // if (this._wasNew) console.error('new!');
-  // else console.error('updated!');
-});
 
 UserSchema.statics.findByEmail = function(email, success, fail){
   return this.model('Users').findOne({'email.address':email}).populate('shops').populate('likes').exec(function(err,user){
@@ -321,6 +317,7 @@ UserSchema.virtual('password').get(function () {
 
 UserSchema.virtual('password').set(function (password) {
   this._password = password;
+
 // more safe
 //  var salt = this.salt = bcrypt.genSaltSync(10);
 //  this.hash = bcrypt.hashSync(password, salt);
@@ -347,6 +344,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 
 UserSchema.statics.authenticate=function(email, password, callback) {
+  var self=this;
 
   return this.model('Users').findOne({ 'email.address': email }).populate('shops').populate('likes').exec(function(err,user){
       if (err) { return callback(err); }
@@ -362,10 +360,13 @@ UserSchema.statics.authenticate=function(email, password, callback) {
         if (!passwordCorrect) { return callback(null, false); }
 
         //
-        // keep on track login
+        // keep on track login, do not use save it heat the hash
         user.logged=new Date()
-        user.save();
-        return callback(null, user);
+        return user.save(callback)
+
+        //
+        //
+        //return callback(null, user);
       });
     });
 };

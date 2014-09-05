@@ -58,6 +58,7 @@ exports.ensureAdmin=function(req, res, next) {
 
 exports.checkPassword=function(req, res, next) {
   try{
+    console.log(req.body.password)
     check(req.body.password,"Cette action est protégée par votre mot de passe").len(4, 64);
   }catch(err){  
     return res.send(400, err.message);

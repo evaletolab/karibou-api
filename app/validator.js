@@ -67,7 +67,7 @@ constructWrapper=function(name){
       var args=[this.str];for(var i in arguments){
         args.push(arguments[i])
       }
-      // console.log(name,args)
+       // console.log(name,args)
       if (!this.skip&&!validator[name].apply(this,args)) {
         return this.error(this.msg);
     }

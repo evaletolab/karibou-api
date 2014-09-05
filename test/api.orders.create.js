@@ -1,4 +1,3 @@
-// Use a different DB for tests
 var app = require("../app");
 
 var db = require('mongoose');
@@ -23,20 +22,15 @@ var Products=db.model('Products'),
         region: "GE",
         when:null
     },
-    okDay;
+    okDay, toshortDay;
 
-// available shipping day for testing [1..6]
-// check times in config.shop.order.timelimit (50 for testing)
-function prepareOrderDates(){
-  var today=new Date();
- 
-  toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-  okDay=Orders.findNextShippingDay();
-  okDay.setHours(11,0,0,0)
 
-}
-prepareOrderDates();
-Orders.printInfo()
+okDay=Orders.findNextShippingDay();
+toshortDay=Orders.findCurrentShippingDay();
+
+// select a shipping time
+okDay.setHours(11,0,0,0)
+
 
 describe("api.orders.create", function(){
   var request= require('supertest');
@@ -127,7 +121,6 @@ describe("api.orders.create", function(){
       .send(order)
       .set('cookie', cookie)
       .expect(200,function(err,res){
-        console.log("----------------",res.text, okDay)
         should.not.exist(err)
         should.exist(res.body.errors)
         res.body.errors[0]['1000002'].should.include("la boutique a été désactivé")
@@ -172,7 +165,7 @@ describe("api.orders.create", function(){
       });
   });    
 
- it("POST /v1/orders create new order with wrong date ", function(done){
+ it("POST /v1/orders create new order with wrong date return 400", function(done){
     var items=[]
       , customer=data.Users[1]
       , payment="postfinance";
@@ -203,14 +196,50 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(order)
       .set('cookie', cookie)
-      .expect(200,function(err,res){
-        console.log(err)
+      .expect(400,function(err,res){
         should.not.exist(err)
-        should.exist(res.body.errors)
+        res.text.should.include("date de livraison n'est plus disponible")
         done()
       });
   });    
 
+ it("POST /v1/orders create new order with wrong time return 400", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , payment="postfinance";
+
+    data.Products.forEach(function(product){
+      //
+      // prepare is a private helper function for testing purpose
+      var e=Orders.prepare(product, 1, "");
+      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
+          items.push(e)
+      }
+    });
+
+    items=_.sortBy(items,function(i){return i.title});
+
+    var when=new Date(okDay)
+    when.setHours(15,0,0,0)
+    shipping.when=when;
+
+    var order={
+      items:items,
+      shipping:shipping,
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(400,function(err,res){
+        should.not.exist(err)
+        res.text.should.include("livraison n'est pas valable")
+        done()
+      });
+  });    
 
 
 });

@@ -23,12 +23,10 @@ var Products=db.model('Products')
 describe("orders.find.shop", function(){
   var _ = require("underscore");
 
-  var nextday=Orders.findNextShippingDay();
-  var monday=Orders.jumpToNextWeekDay(new Date(),1);
 
-  // on friday next shipping day equal monday
-  // If days equal , orders count are different
-  var dateEqual=(monday.getDay()==nextday.getDay())
+  var oneweek=Orders.findOneWeekOfShippingDay();
+  var sellerDay=Orders.findCurrentShippingDay();
+  var customerDay=oneweek[0];
 
 
   before(function(done){
@@ -124,16 +122,31 @@ describe("orders.find.shop", function(){
   });  
 
         
-  it("find open orders (0) for next monday filter by shop name 'Super shop'", function(done){
+  it("find open orders for next sellerDay filter by shop name 'Super shop'", function(done){
     var criteria={
       shop:"super-shop",  /*super-shop*/
-      when:Orders.jumpToNextWeekDay(new Date(),1),
+      when:sellerDay,
       closed:null
 
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(dateEqual?1:0)
+      order.length.should.equal(1)
+      // order[0].print()
+      done();
+    });
+  });
+
+  it("find open orders for next customerDay filter by shop name 'Super shop'", function(done){
+    var criteria={
+      shop:"super-shop",  /*super-shop*/
+      when:customerDay,
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(0)
       done();
     });
   });

@@ -14,31 +14,14 @@ var orders = require('mongoose').model('Orders');
 //  - all products, stock, shop, user ... are available
 //  -
 
-var nextday=orders.findCurrentShippingDay();
-var monday=orders.jumpToNextWeekDay(new Date(),((nextday.getDay()==1)?2:1));
+var oneweek=orders.findOneWeekOfShippingDay();
+var sellerDay=orders.findCurrentShippingDay();
+var customerDay=oneweek[0];
 
-var passedday=new Date(monday.getTime()-86400000*7)
-var os;
+var passedday=new Date(customerDay.getTime()-86400000*7)
 
-console.log("date for test ===>Next,Mon,Passed: ", nextday,monday,passedday)
-var $printOrders=function(os){
-    console.log('--- nextday',nextday)
-    console.log('--- monday',monday)
-    console.log("--- orders all    count ", os.length);
 
-    var closed=0;os.forEach(function(o){if(o.closed)closed++})
-    var paid  =0;os.forEach(function(o){if(o.payment.status==='paid')paid++})
-    console.log("--- orders closed count ", closed);
-    console.log("--- orders paid   count ", paid);
-    os.forEach(function(o){
-      console.log("--- oid %s  shipping.when ", o.oid, o.shipping.when);
-      console.log("--- oid     fulfillments  ",  o.fulfillments.status);
-      console.log("--- oid     closed        ",  o.closed);
-      console.log("--- oid     user          ",  o.email);
-    })    
-}
-
-os = exports.Orders=[
+exports.Orders=[
     {
         _id: ObjectId("52f12f09a328f285313bda10"),
         oid: 2100000,
@@ -63,7 +46,7 @@ os = exports.Orders=[
             floor: "2",
             postalCode: "1208",
             region: "Genève",
-            when: nextday,
+            when: sellerDay,
             geo: {
                 lat: 46.1997473,
                 lng: 6.1692497
@@ -105,7 +88,7 @@ os = exports.Orders=[
             floor: "2",
             postalCode: "1208",
             region: "Genève",
-            when: nextday,
+            when: sellerDay,
             geo: {
                 lat: 46.1997473,
                 lng: 6.1692497
@@ -203,7 +186,7 @@ os = exports.Orders=[
         /* shipping adresse*/
         shipping: {
             region: "Genève",
-            when: nextday,
+            when: sellerDay,
             geo: {
                 lng: 6.1692497,
                 lat: 46.1997473
@@ -307,7 +290,7 @@ os = exports.Orders=[
         /* shipping adresse*/
         shipping: {
             region: "Genève",
-            when: nextday,
+            when: sellerDay,
             geo: {
                 lng: 6.1692497,
                 lat: 46.1997473
@@ -411,7 +394,7 @@ os = exports.Orders=[
         /* shipping adresse*/
         shipping: {
             region: "Genève",
-            when: monday,
+            when: customerDay,
             geo: {
                 lng: 6.1692497,
                 lat: 46.1997473

@@ -78,7 +78,7 @@ module.exports = {
 
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
-      timelimit:48,
+      timelimit:39,
 
       /* order date range between day1 to day2 max 9:00. Lapse time = timelimit */
       timelimitH:9,
@@ -87,7 +87,7 @@ module.exports = {
       shippingmode:["grouped", "none"],
 
       /* order is in timeout if payment status != 'paid' and created<1s (timeoutAndNotPaid)*/
-      timeoutAndNotPaid:0.3,
+      timeoutAndNotPaid:0.2,
 
       //
       // Dimanche*, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi(

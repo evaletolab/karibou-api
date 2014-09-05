@@ -145,6 +145,7 @@ Orders.methods.print=function(){
   console.log("---      cancel.status ",  this.cancel.reason);
   console.log("---      cancel.when   ",  this.cancel.when);
   console.log("---      closed        ",  this.closed);
+  console.log("---      created       ",  this.created);
   console.log("---      user          ",  this.email);
   if(this.items)
   console.log("---      items         ",  this.items.map(function(i){ return i.sku}).join(',')); 
@@ -346,9 +347,38 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
 
 }
 
+/* return array of one week of shipping days available for customers*/
+Orders.statics.findOneWeekOfShippingDay=function(){
+  var next=this.findNextShippingDay(), all=[next], nextDate
+
+  config.shop.order.weekdays.forEach(function(day){
+    // next = 2
+    // all=[1,2,4]
+    // result =[2,4,1]
+    if(day<next.getDay()){
+        nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
+        if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+          all.push(nextDate)
+    }else if(day>next.getDay()){
+        nextDate=new Date(day*86400000+next.getTime())
+        if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+          all.push(nextDate)
+    }    
+  })
+
+  return all.sort(function(a,b){
+    // Turn your strings into dates, and then subtract them
+    // to get a value that is either negative, positive, or zero.
+    return a.getTime() - b.getTime();
+  });
+}
+
 /* return the next shipping day available for customers*/
 Orders.statics.findNextShippingDay=function(){
-  var now=Date.now()
+  var now=new Date()
+  // computing order start always at 18:00PM
+  //now.setHours(18,0,0,0);
+  now=now.getTime()
   var next=new Date(now+config.shop.order.timelimit*3600000);
 
   //
@@ -360,8 +390,11 @@ Orders.statics.findNextShippingDay=function(){
     next=new Date(next.getTime()+86400000)
     limit=Math.abs((now-next.getTime())/3600000) 
   }
-  // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
-  //next.setHours(23,0,0,0)
+
+  //
+  // we dont care about seconds and ms
+  next.setHours(next.getHours(),next.getMinutes(),0,0)
+  
   return next;
 }
 
@@ -376,8 +409,10 @@ Orders.statics.findCurrentShippingDay=function(){
     next=new Date(next.getTime()+86400000)
     elpased=Math.abs((now-next.getTime())/3600000)  
   }
-  // next date always includes all shipping times: 12:00, 17:00, 19:00 ... <=23h00
-  next.setHours(23,0,0,0)
+
+  //
+  // we dont care about seconds and ms
+  next.setHours(next.getHours(),next.getMinutes(),0,0)
   return next;
 }
 
@@ -542,9 +577,8 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
     return callback("La date de livraison n'est pas valable")
   }
 
-
-  console.log(Math.abs((Date.now()-shipping.when.getTime())/3600000) , config.shop.order.timelimit)
-  if(Math.abs((Date.now()-shipping.when.getTime())/3600000) < config.shop.order.timelimit){
+  var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
+  if(Math.abs((Date.now()-when)/3600000) < config.shop.order.timelimit){
     return callback("Cette date de livraison n'est plus disponible.")    
   }
 

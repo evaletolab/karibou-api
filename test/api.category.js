@@ -156,6 +156,7 @@ describe("api.categories", function(){
       .send({password:'password'})
       .set('cookie', cookie)
       .end(function(err, res){
+        console.log(res.text)
         res.should.have.status(200);
         done();
       });
@@ -167,6 +168,7 @@ describe("api.categories", function(){
       .send({password:'password'})
       .set('cookie', cookie)
       .end(function(err, res){
+        console.log(res.text)
         res.should.have.status(400);
         done();
       });

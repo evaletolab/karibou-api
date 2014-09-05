@@ -12,23 +12,9 @@ var Products=db.model('Products')
   , toshortDay
   , okDay;
 
-  // available shipping day for testing [1..6]
-  // check times in config.shop.order.timelimit (50 for testing)
-  function prepareOrderDates(){
-    var today=new Date();
-    if (today.getDay()==6){
-      toshortDay=Orders.jumpToNextWeekDay(today,1);
-      okDay=Orders.jumpToNextWeekDay(today,3);
-      // this not an available delevry time
-      okDay.setHours(11,0,0,0)
-      return
-    } 
-    toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-    okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
-    okDay.setHours(11,0,0,0)
 
-  }
-prepareOrderDates()
+
+
 
 /**
  * create order successfuly :
@@ -40,7 +26,12 @@ prepareOrderDates()
 describe("orders.create.success", function(){
   var _ = require("underscore");
 
-  var nextday=Orders.findNextShippingDay();
+
+  okDay=Orders.findNextShippingDay();
+  toshortDay=Orders.findCurrentShippingDay();
+
+  // select a shipping time
+  okDay.setHours(11,0,0,0)
 
 
 
@@ -190,8 +181,12 @@ describe("orders.create.success", function(){
         //                  2000000 1396791546291 'pending', closed null
         // created on load. 2000006 1396791545738 'pending', closed null
         orders.length.should.equal(2)
-
-        orders[0].oid.should.equal(2000001)
+        // orders.forEach(function(o){
+        //   o.print()
+        // })
+        var oids=[2000001,2000006];
+        oids.should.include(orders[0].oid)
+        oids.should.include(orders[1].oid)
         done();
       })
     },config.shop.order.timeoutAndNotPaid*1000)

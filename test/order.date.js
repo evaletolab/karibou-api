@@ -21,6 +21,12 @@ describe("orders.date", function(){
     done()
   });
 
+  // Pour préparer une commande il faut X heures (disons 48h) 
+  // Cela veut dire, qu'il faut deux matinées pour préparer la commande sachant 
+  // que la deuxième matinée sera le jour de collecte. Donc limité à 10:00 du matin. 
+  // -> une commande le lundi à 9:00 .... mercredi 10:00 == 49h
+  // -> une commande le lundi à 18:00 .... mercredi 10:00 == 40h
+  // -> une commande le lundi à 20:00 .... mercredi 10:00 == 38h
   
 
 
@@ -130,12 +136,28 @@ describe("orders.date", function(){
 
     //
     // sunday is off 
-    if (today.getDay()==3){
-      nextSeller.getDay().should.equal((today.getDay()+5)%7)      
-    }else{
+    if (today.getDay()==4){
       nextSeller.getDay().should.equal((today.getDay()+4)%7)      
+    }else{
+      nextSeller.getDay().should.equal((today.getDay()+3)%7)      
     }
 
     done();          
   });
+
+  it("[CUSTOMER] one week of shipping days", function(done){
+    config.shop.order.timelimit=24
+    config.shop.order.timelimitH=1
+    var today=new Date(), all=Orders.findOneWeekOfShippingDay()
+
+    config.shop.order.timelimit.should.not.be.above((all[0].getTime()-Date.now())/3600000)
+    all.forEach(function(n){
+      // deprecated use containEql(n.getDay())
+      n.getHours().should.not.be.above(config.shop.order.timelimitH)
+      config.shop.order.weekdays.should.include(n.getDay())
+    })
+    
+
+    done();          
+  });  
 });

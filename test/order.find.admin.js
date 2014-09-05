@@ -23,35 +23,11 @@ var Products=db.model('Products')
 describe("orders.find.admin", function(){
   var _ = require("underscore");
 
-  var nextday=Orders.findNextShippingDay();
-  var monday=Orders.jumpToNextWeekDay(new Date(),((nextday.getDay()==1)?2:1));
-
-  // on friday next shipping day equal monday
-  // If days equal , orders count are different
-  var dateEqual=(monday.getDay()==nextday.getDay())
-
+  var oneweek=Orders.findOneWeekOfShippingDay();
+  var sellerDay=Orders.findCurrentShippingDay();
+  var customerDay=oneweek[0];
 
   before(function(done){
-
-    var $printOrders=function(os,nextday,monday){
-        console.log('--- nextday',nextday)
-        console.log('--- monday',monday)
-        console.log("--- orders all    count ", os.length);
-
-        var closed=0;os.forEach(function(o){if(o.closed)closed++})
-        var paid  =0;os.forEach(function(o){if(o.payment.status==='paid')paid++})
-        console.log("--- orders closed count ", closed);
-        console.log("--- orders paid   count ", paid);
-        os.forEach(function(o){
-          console.log("--- oid %s  shipping.when ", o.oid, o.shipping.when);
-          console.log("--- oid     fulfillments  ",  o.fulfillments.status);
-          console.log("--- oid     closed        ",  o.closed);
-          console.log("--- oid     user          ",  o.email);
-          if(o.vendors)
-          console.log("--- oid     vendors       ",  o.vendors.map(function(o){ return o.slug}).join(','));
-        })    
-    }
-    // $printOrders(data.Orders, nextday,monday)
 
 
     dbtools.clean(function(e){
@@ -147,7 +123,7 @@ describe("orders.find.admin", function(){
 
   it("find open orders for next monday", function(done){
     var criteria={
-      when:monday,
+      when:customerDay,
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){

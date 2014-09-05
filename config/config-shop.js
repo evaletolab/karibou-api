@@ -84,7 +84,11 @@ module.exports = {
 
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
-      timelimit:48,
+
+      // -> une commande le lundi à 9:00 .... mercredi 10:00 == 49h
+      // -> une commande le lundi à 18:00 .... mercredi 10:00 == 40h
+      // -> une commande le lundi à 20:00 .... mercredi 10:00 == 38h* minimum pour deux matinées
+      timelimit:39,
 
       /* order date range between day1 to day2 max 9:00. Lapse time = timelimit */
       timelimitH:9,
