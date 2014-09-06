@@ -29,19 +29,20 @@
 
 
 exports.execute = function(db, script, callback){
-	console.log(script,"drop unknow index ac");
-  var logs="", count=0;
-  var orders=db.collection('orders');
-  // orders.getIndexes(function(e,index){
-  //   console.log(e,index)
-  // })
-  orders.dropIndex({'ac':1},function(e,idx){
-    var err;
-    if(e&&e.errmsg&&e.errmsg.indexOf('find index with key')!=-1){
-      return callback(null,"ok")
+	console.log(script,"Add user activities (date for login and update) on users");
+  var logs="", count=0, date=new Date('1972');
+  var users=db.collection('users');
+
+	
+  users.find({ logged: { $exists: false}}).toArray(function (err,u) {
+    if (!u.length){
+      return callback(null, "0 user have been updated")
     }
-      
-    callback(e,idx)
+    console.log(script,"updating users activity(logged,updated) : "+u.length );
+    users.update({ logged: { $exists: false}} , {$set: {logged:date, updated:date}},function(err){
+      callback(err, u.length+" users have been updated");
+    })
+
   }); 
 
 }
