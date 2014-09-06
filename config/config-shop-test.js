@@ -81,7 +81,7 @@ module.exports = {
       timelimit:39,
 
       /* order date range between day1 to day2 max 9:00. Lapse time = timelimit */
-      timelimitH:9,
+      timelimitH:2,
 
       /* currently only grouped is available */
       shippingmode:["grouped", "none"],
