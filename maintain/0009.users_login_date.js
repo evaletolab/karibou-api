@@ -39,7 +39,7 @@ exports.execute = function(db, script, callback){
       return callback(null, "0 user have been updated")
     }
     console.log(script,"updating users activity(logged,updated) : "+u.length );
-    users.update({ logged: { $exists: false}} , {$set: {logged:date, updated:date}},function(err){
+    users.update({ logged: { $exists: false}} , {$set: {logged:date, updated:date}}, {multi:true},function(err){
       callback(err, u.length+" users have been updated");
     })
 
