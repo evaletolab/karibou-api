@@ -11,8 +11,9 @@ describe("orders.date", function(){
 
   before(function(done){
     //Orders.printInfo()
-    var days=['sunday','monday','tuesday', 'wednesday', 'thursday','friday','saturday']
-    console.log("today it's ",days[now.getDay()])
+    // var days=['sunday','monday','tuesday', 'wednesday', 'thursday','friday','saturday']
+    // console.log("-- today it's ",days[now.getDay()])
+    Orders.printInfo()
     done()
   });
 
@@ -160,4 +161,16 @@ describe("orders.date", function(){
 
     done();          
   });  
+
+  it("[CUSTOMER] preparing the order at sunday, the delivery day is wednesday", function(done){
+    config.shop.order.weekdays=[0,1,2,3,4,5,6]
+    config.shop.order.timelimit=39
+    config.shop.order.timelimitH=1
+    var today=new Date();
+    delete config.shop.order.weekdays[(today.getDay())]
+    Orders.findNextShippingDay().getDay().should.equal((today.getDay()+3)%7)      
+    done();
+  });
+
+
 });
