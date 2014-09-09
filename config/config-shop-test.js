@@ -3,7 +3,8 @@
 module.exports = {
   shop:{
     system:{
-      password:{len:5}
+      password:{len:5},
+      post:{limitMS:10}
     },
     category:{
       types:['Category', 'Catalog']

@@ -105,6 +105,7 @@ exports.recover=function(req,res){
       user.save(function(err){
         if(err)return res.send(400,err);    
         
+        bus.emit('user.send.password',user,res) 
 
         //
         // send email
@@ -130,8 +131,8 @@ exports.password=function(req,res){
   try{
     validate.check(req.params.id).isInt();
     validate.check(req.body.email).isEmail();
-    validate.check(req.body.new,"Votre nouveau password est trop court ou trop long").len(4,32);
-    if(!req.body.current && req.user.hash) throw new Error("Il manque votre password");
+    validate.check(req.body.new,"Votre nouveau mot de passe est trop court ou trop long").len(4,32);
+    if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -260,3 +261,17 @@ exports.status=function(req,res){
 
 };
 
+
+exports.remove= function(req, res) {
+  try{
+    check(req.params.id, "Invalid  identifier for user").isInt();    
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+  
+  db.model('Users').remove({id:req.params.id},function(err){
+    if (err){return res.send(400,err)}
+    return res.send(200);
+  });
+
+};

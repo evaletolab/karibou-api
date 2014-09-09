@@ -37,9 +37,9 @@ module.exports = function(app, config, passport) {
   // auth 
   app.get ('/logout', auth.logout);
  	app.get ('/login', auth.login);
-  app.post('/login', auth.login_post);
+  app.post('/login', queued(auth.login_post));
   app.get ('/register', auth.register);
-  app.post('/register', auth.register_post);
+  app.post('/register', queued(auth.register_post));
   
   //
   // user
@@ -52,6 +52,8 @@ module.exports = function(app, config, passport) {
   app.post('/v1/users/:id/password',users.ensureMe, users.password);
   app.post('/v1/recover/:token/:email/password', users.recover);
   
+  app.put('/v1/users/:id', auth.ensureAdmin, auth.checkPassword, users.remove);
+
 	//
 	// home
   app.get ('/', home.index(app));

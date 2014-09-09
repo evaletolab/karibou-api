@@ -13,6 +13,46 @@ var _ = require('underscore'),
     sanitize = validator.sanitize;
 
 
+var passport_Authenticate=function(req, res, next){
+  return passport.authenticate('local', function(err, user, info) {
+
+    if (err) { 
+      return res.send(400,errorHelper(err)); 
+    }
+    if (!user) { 
+      return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
+    }
+    // CUSTOM USER CONTENT
+    //
+    // don't serialise the private hash/salt, but confirm the password existance
+    if (user.hash){ 
+      user.hash=true;
+      user.salt=true;
+    }
+    
+    //
+    // check the first admin
+    config.admin.emails.forEach(function(admin){
+      if (user&&user.email.address === admin){
+        user.roles.push('admin');
+      }
+    });
+    
+    /* account is not valid */
+    if (!user.isAdmin() && !user.status){
+      console.log("ERROR","Votre compte est désactivé")    
+      return res.send(401,"Votre compte est désactivé");
+    }
+    
+    req.logIn(user, function(err) {
+
+      if (err) { return res.send(403,err); }
+      return res.json(req.user);
+    });
+
+ })(req, res, next);
+}
+
 exports.ensureAuthenticated=function(req, res, next) {
 	if (!req.isAuthenticated()) { 
       return res.send(401, "Vous devez ouvrir une session");	
@@ -107,44 +147,11 @@ exports.login_post=function(req, res, next) {
     return res.send(400, err.message);
   }  
   
-  //res.json({info:"hello"});
-  passport.authenticate('local', function(err, user, info) {
-
-      if (err) { 
-        return res.send(400,errorHelper(err)); 
-      }
-      if (!user) { 
-        return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
-      }
-      // CUSTOM USER CONTENT
-		  //
-		  // don't serialise the private hash/salt, but confirm the password existance
-		  if (user.hash){ 
-		    user.hash=true;
-		    user.salt=true;
-		  }
-		  
-	    //
-	    // check the first admin
-	    config.admin.emails.forEach(function(admin){
-        if (user&&user.email.address === admin){
-          user.roles.push('admin');
-        }
-	    });
-	    
-	    /* account is not valid */
-	    if (!user.isAdmin() && !user.status){
-        console.log("ERROR","Votre compte est désactivé")    
-	      return res.send(401,"Votre compte est désactivé");
-	    }
-      
-      req.logIn(user, function(err) {
-
-        if (err) { return res.send(403,err); }
-        return res.json(req.user);
-      });
-
-   })(req, res, next);
+  //
+  // setup a simple timer to prevent scripted multiple post 
+  setTimeout(function() {
+    passport_Authenticate(req, res, next)
+  }, config.shop.system.post.limitMS);
 
 };
 
@@ -158,8 +165,9 @@ exports.register= function(req, res) {
     res.render('register');
 };
 
+
   // app.post('/register'...)
-exports.register_post= function(req, res) {
+exports.register_post= function(req, res,next) {
 
     try{
       var len=config.shop.system.password.len;
@@ -171,31 +179,35 @@ exports.register_post= function(req, res) {
       console.log("ERROR [register] ", err.message)
       return res.send(400, err.message);
     }  
-  
-		db.model('Users')
-		.register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
-		  function(err,user){
-        if(err&&err.code==11000){
-          console.log("ERROR [register] ", "Cet adresse email est déjà utilisée")
-          return res.send(400,"Cet adresse email est déjà utilisée");    
-        }else
-		    if (err){
-          console.log("ERROR",errorHelper(err))    
-          return res.send(400,errorHelper(err));    
-		    }
+    //
+    // setup a simple timer to prevent scripted multiple post 
+    setTimeout(function() {
+      db.model('Users')
+      .register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
+        function(err,user){
+          if(err&&err.code==11000){
+            console.log("ERROR [register] ", "Cet adresse email est déjà utilisée")
+            return res.send(400,"Cet adresse email est déjà utilisée");    
+          }else
+          if (err){
+            console.log("ERROR",errorHelper(err))    
+            return res.send(400,errorHelper(err));    
+          }
 
-        if (!user){
-          console.log("ERROR","[register] Ooooppss!!")
-          return res.send(400,"Erreur inconnue lors de la création du compte");    
-        }
-        //
-        // redirect for non ajax register
-        var redirect=req.param('redirect');
-        if(redirect){
-          return  res.redirect(redirect);
-        }
-        //else
-        res.json(user)
-		});
+          if (!user){
+            console.log("ERROR","[register] Ooooppss!!")
+            return res.send(400,"Erreur inconnue lors de la création du compte");    
+          }
+          //
+          // redirect for non ajax register
+          var redirect=req.param('redirect');
+          if(redirect){
+            return  res.redirect(redirect);
+          }
+          //else
+          passport_Authenticate(req, res, next)
+      });
+
+    }, config.shop.system.post.limitMS);
 };
 
