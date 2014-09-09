@@ -86,9 +86,10 @@ describe("products.find:", function(){
     Products.find({categories:data.Categories[1]._id},function(err,products){
       should.not.exist(err);
       should.exist(products);
+      var ps=[1000001,1000003]
       products.length.should.equal(2)
-      products[0].sku.should.equal(1000001);
-      products[1].sku.should.equal(1000003);
+      ps.should.include(products[0].sku);
+      ps.should.include(products[1].sku);
       done();
     });  
 
@@ -99,9 +100,10 @@ describe("products.find:", function(){
     Products.findByCriteria({category:data.Categories[1].slug},function(err,products){
       should.not.exist(err);
       should.exist(products);
+      var ps=[1000001,1000003]
       products.length.should.equal(2)
-      products[0].sku.should.equal(1000001);
-      products[1].sku.should.equal(1000003);
+      ps.should.include(products[0].sku);
+      ps.should.include(products[1].sku);
       done();
     });  
 
