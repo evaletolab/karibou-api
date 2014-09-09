@@ -58,8 +58,8 @@ exports.ensureAdmin=function(req, res, next) {
 
 exports.checkPassword=function(req, res, next) {
   try{
-    console.log(req.body.password)
-    check(req.body.password,"Cette action est protégée par votre mot de passe").len(4, 64);
+    var len=config.shop.system.password.len;
+    check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
   }catch(err){  
     return res.send(400, err.message);
   }   
@@ -98,9 +98,10 @@ exports.login_post=function(req, res, next) {
   //  session.access_token=md5
 
   try{
+    var len=config.shop.system.password.len;
+    check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
     check(req.body.email,"Le format de l'email est invalide").isEmail();
     check(req.body.provider,"Erreur interne de format [provider]").len(3, 64);
-    check(req.body.password,"Le passowrd est invalide").len(6, 64);
   }catch(err){  
     console.log("ERROR",err.message)    
     return res.send(400, err.message);
@@ -161,10 +162,11 @@ exports.register= function(req, res) {
 exports.register_post= function(req, res) {
 
     try{
+      var len=config.shop.system.password.len;
+      check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
       check(req.body.email,"Le format de l'email est invalide").isEmail();
       check(req.body.firstname,"Le format du nom est invalide").len(3, 64);
       check(req.body.lastname,"Le format de prénom est invalide").len(3, 64);
-      check(req.body.password,"Le passowrd est invalide").len(6, 64);
     }catch(err){
       console.log("ERROR [register] ", err.message)
       return res.send(400, err.message);

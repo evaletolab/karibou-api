@@ -98,8 +98,8 @@ describe("api.users.create", function(){
       email:"reg2@test.com",
       firstname:"first",
       lastname:"last",
-      password:"12345",
-      confirm:"12345"
+      password:"1234",
+      confirm:"1234"
     };
   
     request(app)

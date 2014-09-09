@@ -2,6 +2,9 @@
 
 module.exports = {
   shop:{
+    system:{
+      password:{len:5}
+    },
     category:{
       types:['Category', 'Catalog']
     },
