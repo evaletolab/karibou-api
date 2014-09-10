@@ -1,0 +1,130 @@
+// Use a different DB for tests
+var app = require("../app");
+
+var db = require('mongoose');
+var dbtools = require("./fixtures/dbtools");
+var should = require("should");
+var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
+
+var Products=db.model('Products')
+  , Orders=db.model('Orders')
+  , today=new Date()
+  , toshortDay
+  , okDay;
+
+
+
+
+
+/**
+ * create order successfuly :
+ *  - avoid multiple user create order in the same time
+ *  - update all product quantity
+ *  - send email
+ */
+
+describe("orders.create.success", function(){
+  var _ = require("underscore");
+
+
+  okDay=Orders.findNextShippingDay();
+  toshortDay=Orders.findCurrentShippingDay();
+
+  // select a shipping time
+  okDay.setHours(11,0,0,0)
+
+
+
+
+  before(function(done){
+    dbtools.clean(function(e){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
+        should.not.exist(err);
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){
+        //     o.print();
+        //   })
+        // })
+
+        //
+        // create race condition by commenting this block
+        db.model('Sequences').nextOrder(function(){
+          done()
+        })
+      });
+    });      
+  });
+
+  
+  after(function(done){
+    dbtools.clean(function(){    
+      done();
+    });    
+  });
+
+
+
+  it("race condition when creating parallel orders ", function(done){
+    var payment="postfinance"
+    // console.log(data.Products)
+    require("async").parallelLimit([
+      function(cb){
+        var shipping=data.Users[1].addresses[0];
+        shipping.when=okDay
+        var items=[];
+        items.push(Orders.prepare(data.Products[0], 2, ""))
+        items.push(Orders.prepare(data.Products[1], 3, ""))
+        items.push(Orders.prepare(data.Products[3], 3, ""))
+        Orders.create(items, data.Users[1], shipping, payment, cb);
+      },
+      function(cb){
+        var shipping=data.Users[0].addresses[0];
+        shipping.when=okDay
+        var items=[];
+        items.push(Orders.prepare(data.Products[0], 1, ""))
+        items.push(Orders.prepare(data.Products[1], 3, ""))
+        items.push(Orders.prepare(data.Products[2], 2, ""))
+        Orders.create(items, data.Users[0], shipping, payment, cb);
+      },
+      function(cb){
+        var shipping=data.Users[0].addresses[0];
+        shipping.when=okDay
+        var items=[];
+        items.push(Orders.prepare(data.Products[1], 3, ""))
+        items.push(Orders.prepare(data.Products[2], 2, ""))
+        Orders.create(items, data.Users[1], shipping, payment, cb);
+      }
+    ],4, function(err,orders){
+      orders.forEach(function(o){})
+
+      setTimeout(function(){
+        Orders.findByTimeoutAndNotPaid(function(err,orders){
+
+          require('async').eachLimit(orders,1,function(o,cb){
+            o.print()
+            o.rollbackProductQuantityAndSave(cb)
+          },function(err){
+            should.not.exist(err)
+
+
+            //
+            // check that product stock are back to original values
+            Products.find({}).exec(function(e,products){
+              products.forEach(function(product){
+                var p=_.find(data.Products,function(p){return p.sku==product.sku;})
+                console.log("product ori/update", p.sku,p.pricing.stock,product.pricing.stock)
+
+              })
+              done();
+            })
+
+          })
+
+        })
+      },config.shop.order.timeoutAndNotPaid*2000)
+    });
+  });   
+
+
+});
+
