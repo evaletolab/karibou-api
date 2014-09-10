@@ -83,7 +83,7 @@ describe("orders.create.success", function(){
 
       //
       // check fullfillments after creation
-      order.fulfillments.status.should.equal('partial')
+      order.fulfillments.status.should.equal('reserved')
 
       //
       // check financial status after creation
@@ -109,6 +109,37 @@ describe("orders.create.success", function(){
     });
   });   
 
+
+  it("Checking token after creating a new order ", function(done){
+    var customer=data.Users[1];
+    var shipping=customer.addresses[0];
+    var payment="postfinance"
+    var items=[];
+    items.push(Orders.prepare(data.Products[4], 3, ""))
+
+    shipping.when=okDay
+    // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
+
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.not.exist(err)
+
+      //
+      // check financial status after creation
+      should.exist(order.token)
+
+      order.verifyToken(function(err,data){
+        should.not.exist(err)
+        data.id.should.equal(order.oid)
+        done()
+      })
+
+    });
+  });  
   it("Checking product stock after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
@@ -132,7 +163,7 @@ describe("orders.create.success", function(){
 
       //
       // check fullfillments after creation
-      order.fulfillments.status.should.equal('partial')
+      order.fulfillments.status.should.equal('reserved')
 
       //
       // check financial status after creation
@@ -180,7 +211,7 @@ describe("orders.create.success", function(){
         // create on test   2000001 1396791546324 'pending', closed null
         //                  2000000 1396791546291 'pending', closed null
         // created on load. 2000006 1396791545738 'pending', closed null
-        orders.length.should.equal(2)
+        orders.length.should.equal(3)
         // orders.forEach(function(o){
         //   o.print()
         // })
@@ -189,7 +220,7 @@ describe("orders.create.success", function(){
         oids.should.include(orders[1].oid)
         done();
       })
-    },config.shop.order.timeoutAndNotPaid*1000)
+    },config.shop.order.timeoutAndNotPaid*1000+10)
   }); 
 
   it("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){

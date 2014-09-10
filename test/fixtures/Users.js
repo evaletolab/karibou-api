@@ -3,7 +3,21 @@ var ObjectId = require('mongodb').ObjectID;
 var Users=exports.Users=[{
     _id : ObjectId('515ec12e56a8d5961e000444'), 
     status:true,
-    addresses : [], 
+    addresses: [
+        {
+            name: "famille Joe Dalton",
+            note: "123456",
+            streetAdress: "route de crouge 11",
+            floor: "1",
+            postalCode: "1205",
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            },
+            primary: true,
+            region: "Genève"
+        }
+    ],
     created : new Date("2013-03-27T17:07:34.201Z"), 
     id : 12345, 
     invoices : [], 

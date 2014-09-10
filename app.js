@@ -87,7 +87,7 @@ require('./app/passport')(app, config, passport)
 require('./app/routes')(app, config, passport)
 
 
-
+console.log("generate random key:",require('crypto').randomBytes(32).toString('base64'))
 
 //
 // maintain db

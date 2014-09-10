@@ -77,7 +77,7 @@ module.exports = {
                        "voided"
       ],
       cancelreason:["customer", "fraud", "inventory", "other"],
-      status:["failure","created","partial","fulfilled"],
+      status:["failure","created","reserved","partial","fulfilled"],
       gateway:[ {label:"postfinance",fees:0.015}, {label:"paypal",fees:0.0017}, {label:"bitcoin",fees:0.0}],
 
       /* for testing 50 hours is the time limit between order and delivery*/

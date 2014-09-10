@@ -6,8 +6,8 @@ var PATH = function(p) {
 
 module.exports = {
   mail:{
-    from:'james@karibou.evaletolab.ch',
-    to:['delphine.cluzel@gmail.com','evaleto@gmail.com'],
+    from:'james@karibou.io',
+    to:['james@karibou.io'],
     ttl:{long:24,short:1},
     site:'http://lo.cal:3000',
     default:'mandril',
@@ -15,11 +15,12 @@ module.exports = {
       host:'smtp.mandrillapp.com',
       port:587,
       user:'evaleto@gmail.com',
-      code:process.env.MANDRIL ||'Y6UqPC6BpB9YZFX-Wv2yyw'
+      code:process.env.MANDRIL ||'xnbFeUU_FJrqaF3U2n8uhg'
     }
   },
   admin:{
-    emails:['evaleto@gmail.com']
+    emails:['evaleto@gmail.com'],
+    secret: process.env.KARIBOO_SECRET ||'t1im5hjyMbW6juAb7W7o6QesrTUKVLe3E0jIlusvDeE='
   },
   
   cors:{

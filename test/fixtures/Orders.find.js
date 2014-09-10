@@ -77,7 +77,7 @@ exports.Orders=[
         },
 
         fulfillments: {
-            status: "created"
+            status: "reserved"
         },
 
         /* shipping adresse*/

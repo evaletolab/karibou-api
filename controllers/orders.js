@@ -151,7 +151,7 @@ exports.listByShop = function(req,res){
 
 
 
-  console.log("find orders",criteria)
+  // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,err);

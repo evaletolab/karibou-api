@@ -6,6 +6,15 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
   
 
+//
+// wrap a request to a simple queuing system. 
+// This should help to avoid race condition on product 
+var queue=require('../app/queue')(1,true);
+var queued=function(f){
+  return function(req,res){
+    queue.defer(f,req,res)
+  }
+}
 
 var Sequences = new Schema({
     name:String,
@@ -13,11 +22,12 @@ var Sequences = new Schema({
 });
 
 
+
 //
 // SEQUENCES API
 
 
-Sequences.statics.next = function(name, start, callback){
+Sequences.statics.next =  function(name, start, callback){
   	var Sequences=this.model('Sequences');
   	var newSeq;
     if(typeof start === 'function'){
@@ -25,22 +35,19 @@ Sequences.statics.next = function(name, start, callback){
       start=1000000;
     }
 
-  	Sequences.findOne({name:name}, function(err, n){
-  	  if (!n){
-    	  n=new Sequences({name:name,seq:start});
-    	  n.save(function(err){
-          debug("get next sequence ("+name+":"+n.seq+") err:"+err );
-      	  callback(err,n.seq);
-    	  });
-  	  }else{
+    // this.collection.findAndModify(query, sort, doc, options, callback);
+    this.collection.findAndModify({name:name}, [], {$inc: {seq:1}}, { new: true }, function(err,counter){
+        if(counter){
+          //console.log("update",counter.seq)      
+          return callback(err,counter.seq);  
+        }
+        new Sequences({name:name,seq:start}).save(function(err,n){
+          callback(err,n.seq);
+        });
 
-  	    n.update({$inc: {seq:1}}, { safe: true }, function(err,inc){
-            debug("get next sequence ("+name+":"+n.seq+inc+") err:"+err );
-         	  callback(err,n.seq+inc);
-  	    });
-  	  }
-  	});  	  	
+    });
 }; 
+
 
 // simple wrapper for SKU
 Sequences.statics.nextSku = function( callback){

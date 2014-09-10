@@ -36,6 +36,7 @@ var EnumShippingMode   =config.shop.order.shippingmode;
 var Orders = new Schema({
    /** order identifier */
    oid: { type: Number, required: true, unique:true },
+   token:{type:String},
    
    /* customer email */
    email:{type: String, required:true},
@@ -136,6 +137,42 @@ Orders.methods.getTotalPrice=function(){
 }
 
 
+Orders.methods.createToken=function(){
+  var tokenData = {
+      id: this.oid,
+      created: this.created,
+      when: this.shipping.when
+    }, 
+    cipher=require('crypto').
+            createCipher('aes-256-cbc',config.admin.secret),
+    tokenStr = JSON.stringify(tokenData);
+
+  if(!config.admin.secret)
+    throw new Error("Oopps, secret key not available")
+
+  this.token = cipher.update(tokenStr, 'utf8', 'base64');
+  this.token+= cipher.final('base64')
+}
+
+Orders.methods.verifyToken=function(callback){
+  var decipher=require('crypto').
+            createDecipher('aes-256-cbc', config.admin.secret), 
+
+      tokenStr=decipher.update(this.token, 'base64', 'utf8');
+      
+      tokenStr+=decipher.final('utf8')
+
+  var tokenData=JSON.parse(tokenStr), now=new Date(), error;
+
+  if(now<tokenData.created || now>tokenData.when){
+    error="Cette commande n'est plus valable"
+  }
+
+  return callback(error,tokenData)
+}
+
+
+
 Orders.methods.print=function(){
 
   console.log("-- OID    ", this.oid);
@@ -149,6 +186,7 @@ Orders.methods.print=function(){
   console.log("---      user          ",  this.email);
   if(this.items)
   console.log("---      items         ",  this.items.map(function(i){ return i.sku}).join(',')); 
+  console.log("---      quantity      ",  this.items.map(function(i){ return i.quantity}).join(',')); 
   if(this.vendors)
   console.log("---      vendors       ",  this.vendors.map(function(v){ return v.slug}).join(',')); 
 }
@@ -314,7 +352,7 @@ Orders.statics.checkItem=function(item, product, cb){
   //
   // check item is correct
   // Math.round(value*100)/100
-  // if prodduct has discount, price should be computed with
+  // if product has discount, price should be computed with
   var price=product.getPrice();
   if(item.price.toFixed(1)!=price.toFixed(1)){
     return cb(msg3,item)
@@ -459,34 +497,39 @@ Orders.statics.checkItems = function(items, callback){
 Orders.methods.updateProductQuantityAndSave=function(callback){
   assert(callback)
 
-  var order=this;
+  var self=this;
   var msg1="Could not update product quantity for paid or partialy fulfilled order";
 
 
-  if(this.fulfillments.status ==="partial" || this.payment.status==="paid"){
+  if(this.fulfillments.status !=="created" || this.payment.status==="paid"){
     callback(msg1)
   }
 
 
   require('async').eachLimit(this.items,1, function(item, cb) {
-    debug("order: lock products quantity %s %s",item.sku, -item.quantity)
+
+    //
+    // rollback item quantity in stock
+    debug("%d lock products quantity %s %s",self.oid, item.sku, -item.quantity)
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true }, cb)
   },function(err){
     //
-    // if catching an error durring the update, roolback
+    // if catching an error durring the update, rollback
     // which product must be rollback????
     if(err){
       callback(err);
       throw new Error("rollback not implemented: "+(err.message||err));
     }
-    //
-    order.fulfillments.status="partial";
-    return order.save(callback)
+
+    // we have to mention this state to avoid two times reservation
+    self.fulfillments.status="reserved";
+    return self.save(callback)
   });
 }
 
 Orders.methods.rollbackProductQuantityAndSave=function(callback){
   assert(callback)
+  var self=this
 
   var msg1="Could not rollback product quantity for paid order", 
       msg2="Rollback product quantity is possible when there is a fulfilled item in the order";
@@ -498,12 +541,12 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
   if(this.payment.status==="paid"){
     callback(msg1)
   }
-  if(this.fulfillments.status !=="partial"){
+  if(this.fulfillments.status !=="reserved"){
     callback(msg2)
   }
 
   require('async').eachLimit(this.items,1, function(item, cb) {
-    debug("order: unlock products quantity %s %d",item.sku, item.quantity)
+    debug("%d unlock products quantity %s %d",self.oid, item.sku, item.quantity)
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
   },function(err){
     if(err){
@@ -677,6 +720,10 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       //
       // ready to create one order
       var dborder =new Orders(order);
+
+      //
+      // this new order as is own token 
+      dborder.createToken()
 
       db.model('Users').findOneAndUpdate({id:customer.id}, {$push: {orders: oid}},function(e,u){
         if(e){return callback(e)}

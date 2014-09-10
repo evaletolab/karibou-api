@@ -81,7 +81,7 @@ module.exports = {
                        "voided"
       ],
       cancelreason:["customer", "fraud", "inventory", "other"],
-      status:["failure","created","partial","fulfilled"],
+      status:["failure","created","reserved","partial","fulfilled"],
       gateway:[ {label:"postfinance",fees:0.03}, {label:"paypal",fees:0.034}, {label:"bitcoin",fees:0.0}],
 
       /* order is in timeout if payment status != 'paid' and created<15m (timeoutAndNotPaid)*/
