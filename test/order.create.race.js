@@ -40,6 +40,10 @@ describe("orders.create.success", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
+        data.Products[0].pricing.stock=11
+        data.Products[1].pricing.stock=13
+        data.Products[2].pricing.stock=12
+
         // Orders.find({}).exec(function(e,os){
         //   os.forEach(function(o){
         //     o.print();
@@ -58,7 +62,10 @@ describe("orders.create.success", function(){
   
   after(function(done){
     dbtools.clean(function(){    
-      done();
+    data.Products[0].pricing.stock=10
+    data.Products[1].pricing.stock=10
+    data.Products[2].pricing.stock=10
+    done();
     });    
   });
 
@@ -93,26 +100,41 @@ describe("orders.create.success", function(){
         items.push(Orders.prepare(data.Products[1], 3, ""))
         items.push(Orders.prepare(data.Products[2], 2, ""))
         Orders.create(items, data.Users[1], shipping, payment, cb);
+      },
+      function(cb){
+        var shipping=data.Users[1].addresses[0];
+        shipping.when=okDay
+        var items=[];
+        items.push(Orders.prepare(data.Products[1], 3, ""))
+        items.push(Orders.prepare(data.Products[2], 2, ""))
+        Orders.create(items, data.Users[1], shipping, payment, cb);
       }
     ],4, function(err,orders){
-      orders.forEach(function(o){})
 
       setTimeout(function(){
         Orders.findByTimeoutAndNotPaid(function(err,orders){
 
           require('async').eachLimit(orders,1,function(o,cb){
-            o.print()
-            o.rollbackProductQuantityAndSave(cb)
-          },function(err){
-            should.not.exist(err)
+            // o.print()
+            o.rollbackProductQuantityAndSave(function(err,o){
 
+              //
+              // after rollback order status is failure
+              o.fulfillments.status.should.equal("failure");
+              cb(err)
+            })
+
+          },function(err,oos){
+            should.not.exist(err)
 
             //
             // check that product stock are back to original values
             Products.find({}).exec(function(e,products){
               products.forEach(function(product){
                 var p=_.find(data.Products,function(p){return p.sku==product.sku;})
-                console.log("product ori/update", p.sku,p.pricing.stock,product.pricing.stock)
+                //
+                // X fingers here
+                p.pricing.stock.should.equal(product.pricing.stock)
 
               })
               done();
@@ -121,7 +143,7 @@ describe("orders.create.success", function(){
           })
 
         })
-      },config.shop.order.timeoutAndNotPaid*2000)
+      },config.shop.order.timeoutAndNotPaid*1500)
     });
   });   
 

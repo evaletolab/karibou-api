@@ -2,20 +2,11 @@
 
 module.exports = function (app) {
 
-  // export api
-  // djb2 algo
-  // http://erlycoder.com/49/javascript-hash-functions-to-convert-string-into-integer-hash-
+  // simple hash function on 64bits
   String.prototype.hash=function hash(append){
     var more=append||''
     // return require('crypto').createHash('md5').update(this+more).digest("hex")
-
-    var str=this+more
-    var hash = 0;
-    for (i = 0; i < str.length; i++) {
-        char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char; /* hash * 31 + c */
-    }
-    return hash>>>0;
+    return require('fnv-plus').hash(this+more, 64).dec()
   }   
 
   String.prototype.slug=function () {

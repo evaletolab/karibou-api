@@ -29,26 +29,18 @@ describe("orders.create", function(){
           when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
       }
     , payment="postfinance",
+    okDay,
     toshortDay,
     okDayBadTime;
 
-  // available shipping day for testing [1..6]
-  // check times in config.shop.order.timelimit (50 for testing)
-  function prepareOrderDates(){
-    var today=new Date();
-    if (today.getDay()==6){
-      toshortDay=Orders.jumpToNextWeekDay(today,1);
-      okDayBadTime=Orders.jumpToNextWeekDay(today,3);
-      // this not an available delevry time
-      okDayBadTime.setHours(23,0,0,0)
-      return
-    } 
-    toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-    okDayBadTime=Orders.jumpToNextWeekDay(today,today.getDay()+3);
-    okDayBadTime.setHours(23,0,0,0)
+  // init dates
+  okDay=Orders.findNextShippingDay();
+  toshortDay=Orders.findCurrentShippingDay();
+  okDayBadTime=new Date(okDay)
 
-  }
-  prepareOrderDates()
+  // select a shipping time
+  okDay.setHours(11,0,0,0)
+  okDayBadTime.setHours(14,0,0,0)
 
   before(function(done){
     dbtools.clean(function(e){
@@ -298,6 +290,24 @@ describe("orders.create", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
       err.should.include("L'heure de livraison n'est pas valable")
+
+      done();          
+    });
+  });  
+
+  it("Error:selected products are not in the database", function(done){
+
+    shipping.when=okDay
+    items=[]
+    items.push(Orders.prepare(data.Products[0], 1, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.exist(err)
+      err.should.include(" produits sélectionnés n'existe pas")
 
       done();          
     });

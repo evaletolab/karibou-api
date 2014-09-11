@@ -466,7 +466,9 @@ Orders.statics.checkItems = function(items, callback){
   items=_.sortBy(items,function(i){return i.sku});
   var skus=_.collect(items,function(item){return item.sku});
   Products.findBySkus(skus).sort("sku").exec(function(err,products){
-    assert(skus.length===products.length)
+    if(skus.length!==products.length){
+      return callback("Certains produits sélectionnés n'existe pas, vérifier votre panier")
+    }
 
     var vendors=[], errors=[];
 

@@ -32,7 +32,8 @@
     "passport-google-oauth": "~0.1.5",
     "connect-mongo": "~0.4.1",
     "method-override": "~2.1.3",
-    "mocha-lcov-reporter": "0.0.1"
+    "mocha-lcov-reporter": "0.0.1",
+    "fnv-plus": "~1.2.9"
   },
   "devDependencies": {
     "mocha": "1.x",

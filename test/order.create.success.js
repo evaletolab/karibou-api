@@ -169,7 +169,6 @@ describe("orders.create.success", function(){
       // check financial status after creation
       should.not.exist(order.financial_status)
 
-
       //
       // verify items quantity and product stock
       var skus=_.collect(items,function(item){return item.sku});
@@ -223,7 +222,7 @@ describe("orders.create.success", function(){
     },config.shop.order.timeoutAndNotPaid*1000+10)
   }); 
 
-  it("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){
+  it.skip("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){
     Orders.findByTimeoutAndNotPaid().where('oid').in([2000006,2000000]).exec(function(err,orders){
       orders.forEach(function(order){
         console.log(order.oid,new Date(order.created).getTime(),order.payment.status)
