@@ -24,6 +24,10 @@ module.exports = {
     secret: process.env.KARIBOO_SECRET 
   },
 
+  payment:{
+    postfinance:{psid:process.env.PFID ,password:process.env.PFSECRET}
+  },
+
   cors:{
     allowedDomains:[
         'http://karibou.evaletolab.ch',

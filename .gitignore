@@ -3,6 +3,8 @@ config-development.js
 node_modules
 tips
 backups
+karibou.sublime-workspace
+config/config-production.js
 
 # Compiled source #
 ###################

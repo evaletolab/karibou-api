@@ -20,6 +20,9 @@ if(process.env.NODETIME_KEY){
   });
 }
 
+if (process.env.MEWRELIC_KEY){
+  var newrelic=require('newrelic')
+}
 
 if(process.env.VCAP_SERVICES){
     //var vcap = JSON.parse(process.env.VCAP_SERVICES);

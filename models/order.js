@@ -36,7 +36,12 @@ var EnumShippingMode   =config.shop.order.shippingmode;
 var Orders = new Schema({
    /** order identifier */
    oid: { type: Number, required: true, unique:true },
+
+   /*for security reason some data are encrypted in this token */
    token:{type:String},
+
+   /* compute a rank for the set of orders to be shipped together */
+   rank:{type:Number,default:0},
    
    /* customer email */
    email:{type: String, required:true},
@@ -184,6 +189,7 @@ Orders.methods.print=function(){
   console.log("---      closed        ",  this.closed);
   console.log("---      created       ",  this.created);
   console.log("---      user          ",  this.email);
+  console.log("---      rank          ",  this.rank);
   if(this.items)
   console.log("---      items         ",  this.items.map(function(i){ return i.sku}).join(',')); 
   console.log("---      quantity      ",  this.items.map(function(i){ return i.quantity}).join(',')); 
@@ -495,6 +501,17 @@ Orders.statics.checkItems = function(items, callback){
   });
 }
 
+Orders.methods.computeRankAndSave=function(cb){
+
+  var self=this, sd=new Date(this.shipping.when), ed, promise, orderRank=1;
+  sd.setHours(1,0,0,0)
+  ed=new Date(sd.getTime()+86400000-3601000);
+  db.model('Orders').find({"shipping.when":{"$gte": sd, "$lt": ed}}).exec(function(err,orders){
+    self.rank=orders.length
+    self.save(cb)
+  })
+}
+
 
 Orders.methods.updateProductQuantityAndSave=function(callback){
   assert(callback)
@@ -727,15 +744,16 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       // this new order as is own token 
       dborder.createToken()
 
-      db.model('Users').findOneAndUpdate({id:customer.id}, {$push: {orders: oid}},function(e,u){
+      //
+      // update product stock
+      return dborder.updateProductQuantityAndSave(function(e,o){
         if(e){return callback(e)}
-
-
         //
-        // update product stock
-        return dborder.updateProductQuantityAndSave(callback)
+        // rank this order
+        o.computeRankAndSave(callback);
 
       })
+
 
 
 
@@ -788,7 +806,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   else if(criteria.closed ){
     criteria.closed=new Date(criteria.closed)
     var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000-60000);
+        ed=new Date(sd.getTime()+86400000-60000);        
     q["closed"]={"$gte": sd, "$lt": ed};
   }
 
@@ -800,7 +818,6 @@ Orders.statics.findByCriteria = function(criteria, callback){
     var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
         ed=new Date(sd.getTime()+86400000-60000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
-    // console.log("find shipping",q["shipping.when"])
   }
   //
   // filter by date (24h = today up to tonight)
