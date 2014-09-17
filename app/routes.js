@@ -62,8 +62,9 @@ module.exports = function(app, config, passport) {
   app.get ('/v1', api.index(app));
 
   //
-  //config
+  // system
   app.get ('/v1/config', cached, api.config);
+  app.post('/v1/trace/:key', api.trace);
   
   //
   // email validation

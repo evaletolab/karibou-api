@@ -2,7 +2,19 @@
 /*
  * API introspection
  */
-var _ = require('underscore');
+var _ = require('underscore'),
+    bus=require('../app/bus'),
+    origins=[]
+
+//
+// authorized origins
+function btoa(str){
+  return new Buffer(str).toString('base64')
+}
+
+config.cors.allowedDomains.forEach(function(origin){
+  origins.push(btoa(origin))
+})
 
 exports.index = function(app){
   return function(req, res) {
@@ -18,6 +30,8 @@ exports.index = function(app){
 };
 
 
+
+
 exports.config = function(req, res) {
     //
     // admin you get server env
@@ -25,4 +39,16 @@ exports.config = function(req, res) {
       config.shop.env=process.env;
     }
     res.json(config.shop);
+};
+
+
+
+exports.trace = function(req, res) {
+    if(origins.indexOf(req.params.key)==-1){
+      return res.send(401,"invalid token")
+    }
+    bus.emit('trace.error',req.params.key,req.body);
+
+    console.log("ERROR[UI]",req.body.name,req.body.url, req.body.stack[0].context)
+    res.json({});
 };
