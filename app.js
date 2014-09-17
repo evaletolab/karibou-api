@@ -74,7 +74,7 @@ var app = express()
 require('./app/utils')(app);
 
 // Events Bus
-var bus=require('./app/bus');
+var bus=require('./app/bus');require('./app/bus.routes');
 
 // mailer
 var sendmail=require('./app/mail')(app,bus);
