@@ -49,6 +49,6 @@ exports.trace = function(req, res) {
     }
     bus.emit('trace.error',req.params.key,req.body);
 
-    console.log("ERROR[UI]",req.body.name,req.body.url, req.body.stack[0].context)
+    if(req.body.stack.length)console.log("ERROR[UI]",req.body.name,req.body.url, req.body.stack[0].context)
     res.json({});
 };

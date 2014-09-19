@@ -48,6 +48,27 @@ var user= exports.user = function(req){
     }
 
 }
+exports.password=function(auth){
+  var len=config.shop.system.password.len;
+  check(auth.new,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
+  check(auth.email,"Entrez une adresse mail valide").isEmail();
+  if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
+}
+
+exports.authenticate=function(auth){
+  var len=config.shop.system.password.len;
+  check(auth.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
+  check(auth.email,"Entrez une adresse mail valide").isEmail();
+  check(auth.provider,"Erreur interne de format [provider]").len(3, 64);  
+}
+
+exports.register=function(auth){
+  var len=config.shop.system.password.len;
+  check(auth.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
+  check(auth.email,"Entrez une adresse mail valide").isEmail();
+  check(auth.firstname,"Le format du nom est invalide").isText().len(2, 64);
+  check(auth.lastname,"Le format de prénom est invalide").isText().len(2, 64);
+}
 
 /**
  *

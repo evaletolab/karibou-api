@@ -8,9 +8,7 @@ var db  = require('mongoose');
 var passport = require('passport');
 var errorHelper = require('mongoose-error-helper').errorHelper;
 var _ = require('underscore'),
-    validator = require('../app/validator'),
-    check = validator.check,
-    sanitize = validator.sanitize;
+    validate = require('./validate/validate')
 
 
 var passport_Authenticate=function(req, res, next){
@@ -99,7 +97,7 @@ exports.ensureAdmin=function(req, res, next) {
 exports.checkPassword=function(req, res, next) {
   try{
     var len=config.shop.system.password.len;
-    check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
+    validate.check(req.body.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   }catch(err){  
     return res.send(400, err.message);
   }   
@@ -138,10 +136,7 @@ exports.login_post=function(req, res, next) {
   //  session.access_token=md5
 
   try{
-    var len=config.shop.system.password.len;
-    check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
-    check(req.body.email,"Le format de l'email est invalide").isEmail();
-    check(req.body.provider,"Erreur interne de format [provider]").len(3, 64);
+      validate.authenticate(req.body)
   }catch(err){  
     console.log("ERROR",err.message)    
     return res.send(400, err.message);
@@ -170,11 +165,7 @@ exports.register= function(req, res) {
 exports.register_post= function(req, res,next) {
 
     try{
-      var len=config.shop.system.password.len;
-      check(req.body.password,"Votre mot de passe est trop court ou trop long").len(len, 64);
-      check(req.body.email,"Le format de l'email est invalide").isEmail();
-      check(req.body.firstname,"Le format du nom est invalide").len(3, 64);
-      check(req.body.lastname,"Le format de prénom est invalide").len(3, 64);
+      validate.register(req.body)
     }catch(err){
       console.log("ERROR [register] ", err.message)
       return res.send(400, err.message);
@@ -204,8 +195,15 @@ exports.register_post= function(req, res,next) {
           if(redirect){
             return  res.redirect(redirect);
           }
-          //else
-          passport_Authenticate(req, res, next)
+
+          //
+          // send mail validation after user creation
+          db.model('Emails').createAndSendMail(user,function(err,validate){
+            if(err){return req.send(400,err)}
+            //
+            // authenticate user
+            passport_Authenticate(req, res, next)
+          })
       });
 
     }, config.shop.system.post.limitMS);

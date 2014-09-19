@@ -4,6 +4,7 @@ var assert = require("assert");
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
+  , bus=require('../app/bus')
   , validate = require('mongoose-validate')
   , ObjectId = Schema.ObjectId;
   
@@ -32,6 +33,30 @@ Emails.statics.findOrCreate=function(e,callback){
   });
 };
 
+
+Emails.statics.createAndSendMail=function(user, cb){
+  this.create(user, function(err,validate){
+    if(err){
+      return cb(err);
+    }      
+    
+    var content=user;
+    content.validate=validate;
+    
+    //
+    // send email
+    bus.emit('sendmail', user.email.address, 
+                 "Confirmation de votre adresse e-mail", 
+                 content, 
+                 "confirm", function(err, status){
+      if(err){
+        return cb(err);
+      }      
+                 
+      cb(null,validate);                 
+    })
+  });  
+}
 
 Emails.statics.create = function(user, callback){
   assert(user);

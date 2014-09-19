@@ -82,7 +82,7 @@ exports.list = function (req, res, next)  {
 exports.recover=function(req,res){
   try{
     //check(req.params.token,"token inconnu").isEmail();
-    validate.check(req.params.email,"Utilisateur inconnu").isEmail();
+    validate.check(req.params.email,"Entrez une adresse mail valide").isEmail();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -129,10 +129,8 @@ exports.recover=function(req,res){
 exports.password=function(req,res){
 
   try{
-    validate.check(req.params.id).isInt();
-    validate.check(req.body.email).isEmail();
-    validate.check(req.body.new,"Votre nouveau mot de passe est trop court ou trop long").len(4,32);
-    if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
+      validate.check(req.params.id,"Invalid uid request").isInt();
+      validate.password(auth)
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -186,7 +184,7 @@ exports.password=function(req,res){
 exports.update=function(req,res){
 
   try{
-    validate.check(req.params.id).isInt();
+    validate.check(req.params.id,"Invalid uid request").isInt();
     validate.user(req);
   }catch(err){
     return res.send(400, err.message);
@@ -209,8 +207,8 @@ exports.update=function(req,res){
 exports.unlike=function(req,res){
 
   try{
-    validate.check(req.params.id).isInt();
-    validate.check(req.params.sku).isInt();
+    validate.check(req.params.id,"Invalid uid request").isInt();
+    validate.check(req.params.sku, "Invalid pid request").isInt();
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -247,7 +245,7 @@ exports.status=function(req,res){
 
   try{
     validate.check(req.params.id).isInt();
-    if(req.body.status===undefined)throw new Error("Invalid request");;
+    if(req.body.status===undefined)throw new Error("Invalid uid request");;
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -264,7 +262,7 @@ exports.status=function(req,res){
 
 exports.remove= function(req, res) {
   try{
-    check(req.params.id, "Invalid  identifier for user").isInt();    
+    check(req.params.id, "Invalid uid request").isInt();    
   }catch(err){
     return res.send(400, err.message);
   }  
