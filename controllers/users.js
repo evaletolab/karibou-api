@@ -131,6 +131,7 @@ exports.password=function(req,res){
   try{
       validate.check(req.params.id,"Invalid uid request").isInt();
       validate.password(auth)
+      if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -185,7 +186,7 @@ exports.update=function(req,res){
 
   try{
     validate.check(req.params.id,"Invalid uid request").isInt();
-    validate.user(req);
+    validate.user(req.body);
   }catch(err){
     return res.send(400, err.message);
   }  
@@ -262,14 +263,25 @@ exports.status=function(req,res){
 
 exports.remove= function(req, res) {
   try{
-    check(req.params.id, "Invalid uid request").isInt();    
+    validate.check(req.params.id, "Invalid uid request").isInt();    
   }catch(err){
     return res.send(400, err.message);
   }  
-  
-  db.model('Users').remove({id:req.params.id},function(err){
-    if (err){return res.send(400,err)}
-    return res.send(200);
-  });
+  Users.findOne({id:req.params.id},function(err,user){
+    if (err){return res.send(400,errorHelper(err))}
+
+    if(!user){return res.send(400,"L'utilisateur n'existe pas")}
+
+    //user has shop ?
+    if(user.shops&&user.shops.length){
+      return res.send(400,"Impossible de supprimer un utilisateur qui possède une boutique.")
+    }
+
+    user.remove(function(err){
+      if (err){return res.send(400,errorHelper(err))}
+      return res.send(200);
+    });
+
+  })
 
 };

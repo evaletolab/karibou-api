@@ -10,20 +10,19 @@ exports.ifCheck = ifCheck;
 var user_address = exports.address =  function(address){
       ifCheck(address.region,    "Votre adresse n'est pas valide").isText().len(2, 30)
       ifCheck(address.primary,   "Votre adresse n'est pas valide").isBoolean()
-      check(address.geo.lng,     "Votre adresse n'est pas valide").isFloat()
-      check(address.geo.lat,     "Votre adresse n'est pas valide").isFloat()
+      check(address.geo.lng,     "Ooops, erreur de réseau, recommencer plus tard").isFloat()
+      check(address.geo.lat,     "Ooops, erreur de réseau, recommencer plus tard").isFloat()
       check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
       ifCheck(address.floor,     "Votre étage n'est pas valide").isText().len(1, 30)
       check(address.streetAdress,"Votre adresse n'est pas valide").isText().len(10, 50)
       ifCheck(address.note,        "Votre note n'est pas valide").isText().len(4, 40)
-      check(address.name,        "Votre nom d'adresse n'est pas valide").isText().len(2, 40)
+      check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 60)
 }
 
 /**
  *
  */
-var user= exports.user = function(req){
-    var u=(req.body)?req.body:req;
+var user= exports.user = function(u, lean){
 
     if(u.email){
       ifCheck(u.email.address,   "Votre adresse email n'est pas valide").len(6, 64).isEmail();
@@ -34,7 +33,7 @@ var user= exports.user = function(req){
       ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 64).isText();
     }
 
-    if(!u.phoneNumbers.length){
+    if(!lean && !u.phoneNumbers.length){
       throw new Error("Vous devez définir au moins un téléphone");      
     }
 
@@ -52,7 +51,6 @@ exports.password=function(auth){
   var len=config.shop.system.password.len;
   check(auth.new,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   check(auth.email,"Entrez une adresse mail valide").isEmail();
-  if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
 }
 
 exports.authenticate=function(auth){

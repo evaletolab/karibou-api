@@ -136,6 +136,10 @@ exports.login_post=function(req, res, next) {
   //  session.access_token=md5
 
   try{
+      if(req.user){
+        throw new Error("Une session est déjà ouverte")
+      }
+
       validate.authenticate(req.body)
   }catch(err){  
     console.log("ERROR",err.message)    
@@ -161,20 +165,40 @@ exports.register= function(req, res) {
 };
 
 
-  // app.post('/register'...)
+//
+// register has extended attributes 
+// to register a complete profile
 exports.register_post= function(req, res,next) {
 
     try{
+
+      if(req.user){
+        throw new Error("Une session est déjà ouverte")
+      }
+
       validate.register(req.body)
+      //
+      // validate addresses (with force)
+      validate.user(req.body, true)
+
     }catch(err){
       console.log("ERROR [register] ", err.message)
       return res.send(400, err.message);
     }  
+    var reg={}
+    if(req.body.addresses&&req.body.addresses.length)reg.addresses=req.body.addresses;
+    if(req.body.phoneNumbers&&req.body.phoneNumbers.length)reg.phoneNumbers=req.body.phoneNumbers
+    
     //
     // setup a simple timer to prevent scripted multiple post 
-    setTimeout(function() {
+    // setTimeout(function() {
       db.model('Users')
-      .register(req.param('email'),req.param('firstname'),req.param('lastname'),req.param('password'),req.param('confirm'),
+      .register(req.param('email'),
+                req.param('firstname'),
+                req.param('lastname'),
+                req.param('password'),
+                req.param('confirm'),
+                reg,
         function(err,user){
           if(err&&err.code==11000){
             console.log("ERROR [register] ", "Cet adresse email est déjà utilisée")
@@ -199,13 +223,16 @@ exports.register_post= function(req, res,next) {
           //
           // send mail validation after user creation
           db.model('Emails').createAndSendMail(user,function(err,validate){
-            if(err){return req.send(400,err)}
+            if(err){
+              console.log("ERROR",err)
+              return res.send(400,err)
+            }
             //
             // authenticate user
             passport_Authenticate(req, res, next)
           })
       });
 
-    }, config.shop.system.post.limitMS);
+    // }, config.shop.system.post.limitMS);
 };
 

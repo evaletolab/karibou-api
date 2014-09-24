@@ -6,7 +6,7 @@ module.exports = function (app) {
   String.prototype.hash=function hash(append){
     var more=append||''
     // return require('crypto').createHash('md5').update(this+more).digest("hex")
-    return require('fnv-plus').hash(this+more, 64).dec()
+    return require('fnv-plus').hash(this+more).dec()
   }   
 
   String.prototype.slug=function () {

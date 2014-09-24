@@ -373,7 +373,11 @@ UserSchema.statics.authenticate=function(email, password, callback) {
 
 
 
-UserSchema.statics.register = function(email, first, last, password, confirm, callback){
+UserSchema.statics.register = function(email, first, last, password, confirm, extend, callback){
+  // check signature
+  if(callback===undefined && typeof extend==='function' )
+    callback=extend;
+
 	var Users=this.model('Users'),
       uid=email.hash(new Date());
 	//error("TODO, we cannot register a user without matching a common provider (twitter, google, fb, flickr)");
@@ -408,6 +412,16 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ca
         password:password,
         created:new Date()
     });
+
+    //
+    // extended registration
+    if(extend.phoneNumbers)
+      user.phoneNumbers=extend.phoneNumbers;
+
+    //
+    // extended registration
+    if(extend.addresses)
+      user.addresses=extend.addresses
 
     //save it
     user.save(function(err){    

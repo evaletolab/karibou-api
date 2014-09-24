@@ -13,7 +13,7 @@ var mongoose = require('mongoose')
 // 86400000[ms] = 24 * 60² * 1000
 var Emails = new Schema({
     uid:{ type: String, required: true, unique:true },
-    email: { type: String, required: true, unique:true },
+    email: { type: String, required: true, unique:false },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
     created:{type:Date, default: Date.now, expires: (config.mail.ttl.long+2)*3600}
 });
@@ -45,6 +45,7 @@ Emails.statics.createAndSendMail=function(user, cb){
     
     //
     // send email
+    console.log('/validate/'+validate.uid+'/'+validate.email)
     bus.emit('sendmail', user.email.address, 
                  "Confirmation de votre adresse e-mail", 
                  content, 
