@@ -192,7 +192,7 @@ exports.update=function(req,res){
   }  
       
 
-  Users.update({id:req.params.id},req.body,function(err,user){
+  Users.findAndUpdate({id:req.params.id},req.body,function(err,user){
 
     if (err){
       if(err.code==11001){
@@ -204,6 +204,58 @@ exports.update=function(req,res){
   });
 
 };
+
+exports.addPayment=function(req,res){
+
+  try{
+    var alias="fake alias";
+    validate.check(req.params.id,"Invalid uid request").isInt();
+    validate.payment(req.body, alias);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  Users.addPayment(req.params.id,req.body,function(err,user){
+    if (err){
+      return res.send(400,errorHelper(err));    
+    }
+    return res.json(user);  
+  });
+};
+
+exports.deletePayment=function(req,res){
+  try{
+    validate.check(req.params.id,"Invalid uid request").isInt();
+    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(3, 256)
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  Users.deletePayment(req.params.id,req.params.alias,function(err,user){
+    if (err){
+      return res.send(400,errorHelper(err));    
+    }
+    return res.json(user);  
+  });
+};
+
+exports.updatePayment=function(req,res){
+  try{
+    var alias=(req.params.alias)?req.params.alias:req.body.alias
+    validate.check(req.params.id,"Invalid uid request").isInt();
+    validate.payment(req.body,alias);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  Users.updatePayment(req.params.id,req.params.alias, req.body,function(err,user){
+    if (err){
+      return res.send(400,errorHelper(err));    
+    }
+    return res.json(user);  
+  });
+};
+
 
 exports.unlike=function(req,res){
 

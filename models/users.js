@@ -99,6 +99,16 @@ validate.postal = function (value) {
 
     /* disqus sso */
     context:{type:Schema.Types.Mixed},
+
+    /* payments methods */
+    payments:[{type:Schema.Types.Mixed, unique: true}],
+    // payments:[{
+    //   type:{type:String},
+    //   name:{type:String},
+    //   number:{type:String},
+    //   expiry:{type:String},
+    //   alias:{type:String,unique:true,required:true}
+    // }],
     
     /* make user valid/invalid */
     status:{type:Boolean, default: true},
@@ -464,10 +474,10 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 
 
 //
-// update shop content
-UserSchema.statics.update=function(id, u,callback){
+// update user 
+UserSchema.statics.findAndUpdate=function(id, u,callback){
 	var Users=this.model('Users');	
-
+  //http://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
   return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
     if(err){
       return callback(err);
@@ -518,13 +528,82 @@ UserSchema.statics.update=function(id, u,callback){
     }
     user.updated=Date.now();
     
-    user.save(function (err) {
-      //if ( err && err.code === 11000 )
-        
-      return callback(err,user);
-    });
+    user.save(callback);
   });
 };
+
+//
+// update user payment
+UserSchema.statics.updatePayment=function(id, alias, payment,callback){
+  var Users=this.model('Users');
+  return Users.update({id: id,'payments.alias':alias.crypt()}, {'$set': {
+    'payments.$.type': payment.type,
+    'payments.$.name': payment.name,
+    'payments.$.number': payment.number,
+    'payments.$.cvv': payment.cvv||'',
+    'payments.$.expiry': payment.expiry,
+    'payments.$.updated': Date.now(),
+  }}, function(err, n, stat){
+
+    if(n===0){
+      return callback("Invalid request")
+    }
+
+    return callback(err)
+  });
+}
+
+//
+// delete user payment
+UserSchema.statics.deletePayment=function(id, alias,callback){
+  var Users=this.model('Users');  
+
+  // for ecurity reason alias is crypted    
+  Users.update({id: id, 'payments.alias':alias.crypt()},
+    {$pull: {payments:{alias:alias.crypt()}}},{safe:true},
+  function(err, n,stat){
+
+    if(n===0){
+      return callback("Invalid request")
+    }
+    return callback(err)
+  });
+}
+
+//
+// add payment
+UserSchema.statics.addPayment=function(id, payment,callback){
+  var Users=this.model('Users'), safePayment={};  
+
+  // for ecurity reason alias is crypted
+  var alias=(id+payment.type).hash().crypt()
+  safePayment.alias=alias;
+  safePayment.type=payment.type;
+  safePayment.name=payment.name;
+  safePayment.number=payment.number;
+  safePayment.cvv=payment.cvv||'';
+  safePayment.expiry=payment.expiry;
+  safePayment.updated=Date.now();
+  Users.findOne({id: id}, function(err,user){
+    if(err){
+      return callback(err)
+    }
+    if(!user){
+      return callback("Utilisateur inconnu");      
+    }
+    if(!user.payments) user.payments=[]
+
+    for (var i in user.payments){
+      if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
+    }
+    user.payments.push(safePayment)
+
+    return user.save(callback)
+  });
+}
+
+
+
 UserSchema.set('autoIndex', config.mongo.ensureIndex);
 module.exports = db.model('Users', UserSchema);
 

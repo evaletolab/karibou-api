@@ -12,6 +12,23 @@ describe("system", function(){
   before(function(done){
     done()
   });
+  describe("tools", function(){
+    it("Crypt string", function(done){
+        var crypt="Hello World".crypt()
+            done()
+    });
+
+    it("DeCrypt string", function(done){
+        "Hello World".crypt().decrypt().should.equal("Hello World")
+        done()
+    });
+
+    it("crypt already crypted string", function(done){
+        "olivier".crypt().crypt().crypt().decrypt().should.equal("olivier")
+        done()
+    });
+
+  });
 
   describe("Administration", function(){
   

@@ -20,7 +20,8 @@ module.exports = {
   },
   admin:{
     emails:['evaleto@gmail.com'],
-    secret: process.env.KARIBOO_SECRET ||'t1im5hjyMbW6juAb7W7o6QesrTUKVLe3E0jIlusvDeE='
+    secret: process.env.KARIBOO_SECRET ||'t1im5hjyMbW6juAb7W7o6QesrTUKVLe3E0jIlusvDeE=',
+    padding:'0e0e0e0e'    
   },
   
   

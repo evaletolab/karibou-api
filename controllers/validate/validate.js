@@ -15,7 +15,7 @@ var user_address = exports.address =  function(address){
       check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
       ifCheck(address.floor,     "Votre étage n'est pas valide").isText().len(1, 30)
       check(address.streetAdress,"Votre adresse n'est pas valide").isText().len(10, 50)
-      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(4, 40)
+      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 40)
       check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 60)
 }
 
@@ -47,6 +47,16 @@ var user= exports.user = function(u, lean){
     }
 
 }
+
+exports.payment=function(payment, alias){  
+  console.log("TODO check payment card with node-payment")
+  check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
+  check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,30)
+  check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,30)
+  ifCheck(payment.cvc,  "Le code de vérification de la carte n'est pas valide").isText().len(4,30)
+}
+
+
 exports.password=function(auth){
   var len=config.shop.system.password.len;
   check(auth.new,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);

@@ -6,7 +6,7 @@ module.exports = function (app) {
   String.prototype.hash=function hash(append){
     var more=append||''
     // return require('crypto').createHash('md5').update(this+more).digest("hex")
-    return require('fnv-plus').hash(this+more).dec()
+    return require('fnv-plus').hash(this.valueOf()+more).dec()
   }   
 
   String.prototype.slug=function () {
@@ -27,5 +27,51 @@ module.exports = function (app) {
 
     return str;
   }
+
+
+  String.prototype.crypt=function(){
+    if(!config.admin.secret)
+      throw new Error("Oopps, secret key not available")
+
+
+    var str=this.valueOf(), cipher=require('crypto').
+              createCipher('aes-256-cbc',config.admin.secret);
+
+    var blocks=str.split(config.admin.padding);
+
+
+    if(blocks.length==2){
+      return str;
+    }              
+
+    var out = cipher.update(str, 'utf8', 'hex');
+    return out+cipher.final('hex')+config.admin.padding
+
+  }
+
+
+  String.prototype.decrypt=function(){
+    if(!config.admin.secret)
+      throw new Error("Oopps, secret key not available")
+
+    var decipher=require('crypto').
+              createDecipher('aes-256-cbc', config.admin.secret),
+        str=this.valueOf();
+
+    function dc(str){
+      var tokenStr=decipher.update(str, 'hex', 'utf8');        
+      return tokenStr+decipher.final('utf8');      
+    }
+
+
+    var blocks=str.split(config.admin.padding);
+
+    if(blocks.length==2){
+      return dc(blocks[0])
+    }
+    
+    return dc(str);
+  }
+
 
 }

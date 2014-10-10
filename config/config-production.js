@@ -21,7 +21,8 @@ module.exports = {
 
   admin:{
     emails:['evaleto@gmail.com', 'delphine.cluzel@gmail.com'],
-    secret: process.env.KARIBOO_SECRET 
+    secret: process.env.KARIBOO_SECRET,
+    padding:'0e0e0e0e'    
   },
 
   payment:{

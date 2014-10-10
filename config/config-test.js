@@ -22,7 +22,8 @@ module.exports = {
 
   admin:{
     emails:['evaleto@gmail.com'],
-    secret: process.env.KARIBOO_SECRET || '1234'
+    secret: process.env.KARIBOO_SECRET || '1234',
+    padding:'0e0e0e0e'    
   },
   
   cors:{

@@ -50,8 +50,18 @@ module.exports = function(app, config, passport) {
   app.post('/v1/users/:id/unlike/:sku', users.ensureMe,users.unlike);
   app.post('/v1/users/:id/status', auth.ensureAdmin,users.status);
   app.post('/v1/users/:id/password',users.ensureMe, users.password);
+
+  //
+  // manage payment
+  app.post('/v1/users/:id/payment', users.ensureMe,users.addPayment);
+  app.post('/v1/users/:id/payment/:alias/delete', users.ensureMe,users.deletePayment);
+  app.post('/v1/users/:id/payment/:alias/update', users.ensureMe,users.updatePayment);
+
+  // recover email  
   app.post('/v1/recover/:token/:email/password', users.recover);
   
+  //
+  // delete
   app.put('/v1/users/:id', auth.ensureAdmin, auth.checkPassword, users.remove);
 
 	//
