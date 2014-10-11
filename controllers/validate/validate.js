@@ -49,11 +49,11 @@ var user= exports.user = function(u, lean){
 }
 
 exports.payment=function(payment, alias){  
-  console.log("TODO check payment card with node-payment")
   check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
   check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,30)
   check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,30)
-  ifCheck(payment.cvc,  "Le code de vérification de la carte n'est pas valide").isText().len(4,30)
+  ifCheck(payment.csc,  "Le code de vérification de la carte n'est pas valide").isText().len(0,4)
+
 }
 
 

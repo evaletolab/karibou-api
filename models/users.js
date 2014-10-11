@@ -4,6 +4,7 @@ var db = require('mongoose')
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
 	, passport = require('passport')
+  , postfinance = require('node-postfinance')
   , _ = require('underscore');
 	
 //var	bcrypt = require('bcrypt');
@@ -536,11 +537,38 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
 // update user payment
 UserSchema.statics.updatePayment=function(id, alias, payment,callback){
   var Users=this.model('Users');
+
+  var card
+  try{
+    card=new postfinance.Card({
+      name:payment.name,
+      number:payment.number,
+      expiry:payment.expiry,
+      csc:payment.csc
+    })    
+  }catch(e){
+    return callback(e)
+  }
+
+  if(!card.isValid()){
+    return callback("Cette carte n'est pas valide")
+  }
+
+  if(card.isExpired()){
+    return callback("Cette carte n'est plus valide")
+  }
+
+
+  if((id+card.issuer.toLowerCase()).hash().crypt()!==alias.crypt()){
+    return callback("Vous ne pouvez pas changer de type de carte")
+  }
+
+
   return Users.update({id: id,'payments.alias':alias.crypt()}, {'$set': {
-    'payments.$.type': payment.type,
+    'payments.$.type': card.issuer.toLowerCase(),
     'payments.$.name': payment.name,
-    'payments.$.number': payment.number,
-    'payments.$.cvv': payment.cvv||'',
+    'payments.$.number': card.hiddenNumber,
+    'payments.$.csc': payment.csc||'',
     'payments.$.expiry': payment.expiry,
     'payments.$.updated': Date.now(),
   }}, function(err, n, stat){
@@ -575,13 +603,36 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
 UserSchema.statics.addPayment=function(id, payment,callback){
   var Users=this.model('Users'), safePayment={};  
 
+  // try to build the card
+
+  var card
+  try{
+    card=new postfinance.Card({
+      name:payment.name,
+      number:payment.number,
+      expiry:payment.expiry,
+      csc:payment.csc
+    })    
+  }catch(e){
+    return callback(e)
+  }
+
+  if(!card.isValid()){
+    return callback("Cette carte n'est pas valide")
+  }
+
+  if(card.isExpired()){
+    return callback("Cette carte n'est plus valide")
+  }
+
+
   // for ecurity reason alias is crypted
-  var alias=(id+payment.type).hash().crypt()
+  var alias=(id+card.issuer.toLowerCase()).hash().crypt()
   safePayment.alias=alias;
-  safePayment.type=payment.type;
+  safePayment.type=card.issuer.toLowerCase();
   safePayment.name=payment.name;
-  safePayment.number=payment.number;
-  safePayment.cvv=payment.cvv||'';
+  safePayment.number=payment.hiddenNumber;
+  safePayment.csc=payment.csc||'';
   safePayment.expiry=payment.expiry;
   safePayment.updated=Date.now();
   Users.findOne({id: id}, function(err,user){

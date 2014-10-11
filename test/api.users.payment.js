@@ -14,29 +14,30 @@ describe("api.users.payment", function(){
 
   var cookie, user;
 
+http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm
 
   var MasterCard = {
     number: '5399999999999999', // MasterCard
     csc: '111',
     year: '2020',
-    month: '09',
-    firstName: 'Foo',
-    lastName: 'Bar',
-    address1: '221 Foo st',
-    address2: '', // blank
-    city: '', // blank
-    state: '', // blank
-    zip: '1208'
+    month: '09'
   };
 
   var VisaCard = {
     number: '4111-1111-1111-1111',
     csc: '123',
     year: '2020',
-    month: '09',
-    firstName: 'Foo',
-    lastName: 'Bar'
+    month: '09'
   };
+
+  var AmericanExpressCard = {
+    number: '371449635398431',
+    csc: '1234',
+    year: '2020',
+    month: '09'
+  };
+
+  //378282246310005
 
 
   before(function(done){
@@ -103,7 +104,7 @@ describe("api.users.payment", function(){
   it('user add new payment without number return 400',function(done){
     request(app)
       .post('/v1/users/'+user.id+'/payment')
-      .send({alias:'1234567890',expiry:'0915',name:'TO OLI',type:'MC'})
+      .send({alias:'1234567890',expiry:'0915',name:'TO OLI',type:'mastercard'})
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
@@ -114,7 +115,19 @@ describe("api.users.payment", function(){
   it('user add new payment without name return 400',function(done){
     request(app)
       .post('/v1/users/'+user.id+'/payment')
-      .send({alias:'1234567890',expiry:'0915',number:'TO OLI',type:'MC'})
+      .send({alias:'1234567890',expiry:'0915',number:'TO OLI',type:'mastercard'})
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        done()
+      });
+  });
+
+  it('user add new payment without CSC return 400',function(done){
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI'};
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
@@ -124,7 +137,7 @@ describe("api.users.payment", function(){
 
 
   it('user add new payment return 200',function(done){
-    var payment={number:'1234567890',expiry:'0915',name:'TO OLI',type:'MC'};
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
     var alias=(user.id+payment.type).hash();
     payment.alias=alias;
     request(app)
@@ -139,9 +152,7 @@ describe("api.users.payment", function(){
 
 
   it('user add duplicate payment return 400',function(done){
-    var payment={number:'1234567890',expiry:'0916',name:'TO OLI',type:'MC'};
-    var alias=(user.id+payment.type).hash().crypt();
-    payment.alias=alias;
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc};
     request(app)
       .post('/v1/users/'+user.id+'/payment')
       .send(payment)
@@ -154,7 +165,7 @@ describe("api.users.payment", function(){
 
 
   it('user update payment number return 200',function(done){
-    var payment={number:'1234567890',expiry:'0916',name:'TO OLI',type:'MC'};
+    var payment={number:VisaCard.number,expiry:'0922',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
     var alias=(user.id+payment.type).hash().crypt();
     payment.alias=alias;
     request(app)
@@ -162,14 +173,30 @@ describe("api.users.payment", function(){
       .send(payment)
       .set('cookie', cookie)
       .end(function(err,res){
+        console.log(res.text)
         res.should.have.status(200);
         done()
       });
   });
 
 
+  it('user update card from visa to MasterCard return 400',function(done){
+    var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'visa'};
+    var alias=(user.id+payment.type).hash().crypt();
+    payment.alias=alias;
+    request(app)
+      .post('/v1/users/'+user.id+'/payment/'+alias+'/update')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        done()
+      });
+  });
+
+
   it('user update unknow alias return 400',function(done){
-    var payment={alias:'pipo',number:'1234567890',expiry:'0916',name:'TO OLI',type:'MC'};
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'mastercard'};
     request(app)
       .post('/v1/users/'+user.id+'/payment/pipo2/update')
       .send(payment)
@@ -181,7 +208,7 @@ describe("api.users.payment", function(){
   });
 
   it('user remove alias payment return 200',function(done){
-    var payment={number:'1234567890',expiry:'0916',name:'TO OLI',type:'MC'};
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
     var alias=(user.id+payment.type).hash();
     request(app)
       .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
@@ -193,7 +220,7 @@ describe("api.users.payment", function(){
   });
 
   it('user add new payment (crypt) return 200',function(done){
-    var payment={number:'1234567890',expiry:'0915',name:'TO OLI',type:'MC'};
+    var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'mastercard'};
     var alias=(user.id+payment.type).hash().crypt();
     payment.alias=alias;
     request(app)
@@ -209,7 +236,7 @@ describe("api.users.payment", function(){
 
 
   it('user remove alias payment (crypt) return 200',function(done){
-    var payment={number:'1234567890',expiry:'0916',name:'TO OLI',type:'MC'};
+    var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'mastercard'};
     var alias=(user.id+payment.type).hash().crypt();
     request(app)
       .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
