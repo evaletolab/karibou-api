@@ -242,6 +242,7 @@ http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.
       .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
       .set('cookie', cookie)
       .end(function(err,res){
+        console.log(res.text)
         res.should.have.status(200);
         done()
       });
