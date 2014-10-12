@@ -547,7 +547,7 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
       csc:payment.csc
     })    
   }catch(e){
-    return callback(e)
+    return callback(e.message)
   }
 
   if(!card.isValid()){
@@ -614,7 +614,7 @@ UserSchema.statics.addPayment=function(id, payment,callback){
       csc:payment.csc
     })    
   }catch(e){
-    return callback(e)
+    return callback(e.message)
   }
 
   if(!card.isValid()){
@@ -631,7 +631,7 @@ UserSchema.statics.addPayment=function(id, payment,callback){
   safePayment.alias=alias;
   safePayment.type=card.issuer.toLowerCase();
   safePayment.name=payment.name;
-  safePayment.number=payment.hiddenNumber;
+  safePayment.number=card.hiddenNumber;
   safePayment.csc=payment.csc||'';
   safePayment.expiry=payment.expiry;
   safePayment.updated=Date.now();
