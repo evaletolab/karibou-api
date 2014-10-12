@@ -6,7 +6,7 @@ var dbtools = require("./fixtures/dbtools");
 var should = require("should");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
-
+//http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm
 describe("api.users.payment", function(){
   var request= require('supertest');
 
@@ -14,7 +14,6 @@ describe("api.users.payment", function(){
 
   var cookie, user;
 
-http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm
 
   var MasterCard = {
     number: '5399999999999999', // MasterCard
