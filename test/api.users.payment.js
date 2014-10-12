@@ -163,23 +163,6 @@ describe("api.users.payment", function(){
   });
 
 
-  it('user update payment number return 200',function(done){
-    var payment={number:VisaCard.number,expiry:'0922',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
-    var alias=(user.id+payment.type).hash().crypt();
-    payment.alias=alias;
-    request(app)
-      .post('/v1/users/'+user.id+'/payment/'+alias+'/update')
-      .send(payment)
-      .set('cookie', cookie)
-      .end(function(err,res){
-
-        console.log(err)
-        res.should.have.status(200);
-        done()
-      });
-  });
-
-
   it('user update card from visa to MasterCard return 400',function(done){
     var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'visa'};
     var alias=(user.id+payment.type).hash().crypt();
@@ -190,6 +173,22 @@ describe("api.users.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
+        done()
+      });
+  });
+
+
+
+  it('user update payment number return 200',function(done){
+    var payment={number:VisaCard.number,expiry:'0922',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
+    var alias=(user.id+payment.type).hash().crypt();
+    payment.alias=alias;
+    request(app)
+      .post('/v1/users/'+user.id+'/payment/'+alias+'/update')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(200);
         done()
       });
   });
@@ -242,7 +241,6 @@ describe("api.users.payment", function(){
       .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
       .set('cookie', cookie)
       .end(function(err,res){
-        console.log(err)
         res.should.have.status(200);
         done()
       });

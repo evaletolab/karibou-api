@@ -231,11 +231,11 @@ exports.deletePayment=function(req,res){
     return res.send(400, err.message);
   }  
 
-  Users.deletePayment(req.params.id,req.params.alias,function(err,user){
+  Users.deletePayment(req.params.id,req.params.alias,function(err){
     if (err){
       return res.send(400,errorHelper(err));    
     }
-    return res.json(user);  
+    return res.json({});  
   });
 };
 
@@ -248,11 +248,11 @@ exports.updatePayment=function(req,res){
     return res.send(400, err.message);
   }  
 
-  Users.updatePayment(req.params.id,req.params.alias, req.body,function(err,user){
+  Users.updatePayment(req.params.id,req.params.alias, req.body,function(err,payment){
     if (err){
       return res.send(400,errorHelper(err));    
     }
-    return res.json(user);  
+    return res.json(payment);  
   });
 };
 

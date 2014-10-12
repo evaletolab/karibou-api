@@ -563,13 +563,20 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
     return callback("Vous ne pouvez pas changer de type de carte")
   }
 
+  var out={
+    type:card.issuer.toLowerCase(),
+    name:payment.name,
+    number:card.hiddenNumber,
+    csc:payment.csc,
+    expiry:payment.expiry      
+  }
 
   return Users.update({id: id,'payments.alias':alias.crypt()}, {'$set': {
-    'payments.$.type': card.issuer.toLowerCase(),
-    'payments.$.name': payment.name,
-    'payments.$.number': card.hiddenNumber,
-    'payments.$.csc': payment.csc||'',
-    'payments.$.expiry': payment.expiry,
+    'payments.$.type': out.type,
+    'payments.$.name': out.name,
+    'payments.$.number': out.number,
+    'payments.$.csc': out.csc||'',
+    'payments.$.expiry': out.expiry,
     'payments.$.updated': Date.now(),
   }}, function(err, n, stat){
 
@@ -577,7 +584,7 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
       return callback("Invalid request")
     }
 
-    return callback(err)
+    return callback(err,out)
   });
 }
 
