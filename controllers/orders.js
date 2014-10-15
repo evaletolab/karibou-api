@@ -42,18 +42,18 @@ exports.ensureValidAlias=function(req,res,next){
   //
   // only authorize payment alias that belongs to user of the session
   // 
-  var alias, method;
+  var alias, issuer;
   if (req.params.alias) alias=req.params.alias;
   else if(req.body.alias) alias=req.body.alias;
   else if(req.body.payment.alias)alias=req.body.payment.alias;
   else return res.send(401,"Impossible de valider l'alias de paiement (1)")
 
-  if(req.body.method) method=req.body.method;
-  else if(req.body.payment.method)method=req.body.payment.method;
+  if(req.body.issuer) issuer=req.body.issuer;
+  else if(req.body.payment.issuer)issuer=req.body.payment.issuer;
   else return res.send(401,"Impossible de valider l'alias de paiement (2)")
 
 
-  if(!req.user.isValidAlias(alias,method)){
+  if(!req.user.isValidAlias(alias,issuer)){
     return res.send(401,"La méthode de paiement utilisée n'est pas valide (0)")
   }
 
@@ -235,7 +235,7 @@ exports.create=function(req,res){
   Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment, 
     function(err,order){
     if(err){
-      return res.send(400, err);
+      return res.send(400, errorHelper(err));
     }      
 
     // items issue?
@@ -247,6 +247,7 @@ exports.create=function(req,res){
 
     // order is prepared, now we are waiting for valid payment. 
     // Unless a full payment, order is closed and reserved products are available for everyone
+    // TODO replace timeout by node-postfinance here!!
     setTimeout(function(){
       //
       Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){

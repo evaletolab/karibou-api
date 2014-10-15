@@ -63,7 +63,7 @@ var Orders = new Schema({
    payment:{
       alias: {type:String, required:true},
       number:{type:String, required:true},
-      method:{type:String,enum: EnumOrderMethod, required:true},
+      issuer:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'}
    },
    
@@ -655,12 +655,12 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
 
   // early test
-  // make sure that payment method belongs to this customer 
-  if(!payment.alias ||!customer.id ||!payment.method||!payment.number){
+  // make sure that payment issuer belongs to this customer 
+  if(!payment.alias ||!customer.id ||!payment.issuer||!payment.number){
     return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
   }
 
-  if(!db.model('Users').isValidAliasWithId(payment.alias,customer.id, payment.method)){
+  if(!db.model('Users').isValidAliasWithId(payment.alias,customer.id, payment.issuer)){
     return callback("Votre méthode de paiement est inconnue, l'ordre ne peut pas être passé")
   }
 
@@ -749,7 +749,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       order.payment={
         alias:payment.alias,
         number:payment.number,
-        method:payment.method
+        issuer:payment.issuer
       };
 
       //

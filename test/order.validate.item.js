@@ -48,7 +48,7 @@ describe("orders.validate.item", function(){
           region: "GE",
           when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
       }
-    , payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
+    , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
 
   before(function(done){
     dbtools.clean(function(e){

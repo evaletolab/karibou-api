@@ -28,7 +28,7 @@ describe("orders.create", function(){
           region: "GE",
           when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
       }
-    , payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxxxx3456'},
+    , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxxxx3456'},
     okDay,
     toshortDay,
     okDayBadTime;
@@ -257,7 +257,7 @@ describe("orders.create", function(){
             region: "Genève",
             when:okDay
         }
-      , payment={alias:'122',method:'test',number:'123'};
+      , payment={alias:'122',issuer:'test',number:'123'};
 
 
 

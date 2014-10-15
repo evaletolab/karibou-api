@@ -54,7 +54,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            method: "postfinance",
+            issuer: "postfinance",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"paid"
