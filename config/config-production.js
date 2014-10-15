@@ -76,7 +76,7 @@ module.exports = {
   , twit: {
         consumerKey: 'PzDBUUZoU5hVtigzAz73w'
       , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
-		  , cb: "http://karibou-api.evaletolab.ch/auth/twitter/callback"
+		  , cb: "http://api.karibou.evaletolab.ch/auth/twitter/callback"
     }
   , github: {
         appId: '11932f2b6d05d2a5fa18'
@@ -85,7 +85,7 @@ module.exports = {
   , google: {
         clientId: '224794776836-cp3a2v0elt955h9uqhgmskplhg85ljjm.apps.googleusercontent.com'
       , clientSecret: 'rxGFo1mBG_H3DX2ifDFawiMZ'
-      , cb: "http://karibou-api.evaletolab.ch/auth/google/callback"
+      , cb: "http://api.karibou.evaletolab.ch/auth/google/callback"
     }	
   , persona:{
       audience:'http://kariboo.evaletolab.ch'
@@ -106,7 +106,7 @@ module.exports = {
 
     methodOverride: '_method',
 
-    cookieParser: process.env.COOKIE_PARSER||'ogXMXgRbnInguKYYx9Pm',
+    cookieParser: process.env.COOKIE_PARSER,
 
     session: {
       /*
@@ -119,12 +119,13 @@ module.exports = {
        *              (via "x-forwarded-proto")
       */
 
-  		secret:process.env.SESSION_SECRET||'cp3a2v0elt955h9uqhgmskplhg85ljjm',
+  		secret:process.env.KARIBOO_SECRET,
       key: 'sid',
       cookie: {
         path: '/',
-        httpOnly: false,
-        maxAge: 1000 * 60 * 60 * 24 * 10 // = 60 days (in miliseconds)
+        httpOnly: true,
+        // maxAge: 1000 * 60 * 60 * 24 * 10 // = 10 days (in miliseconds)
+        maxAge: 1000 * 60 * 60 * 1 // = 1 hour (in miliseconds)
       }
     },
 

@@ -136,37 +136,35 @@ exports.product = function(req){
 var order_items = exports.orderItems = function(items){
   for (var i in items){      
     check(items[i].sku).isNumeric()
-    check(items[i].title,       "Le description n'est pas valide, top courte ou trop longue").isText().len(3, 300);
-    check(items[i].categories,  "La catégorie n'est pas reconnu").isHexadecimal()
-    check(items[i].vendor,      "Le vendeur n'est pas reconnu").isHexadecimal()
+    check(items[i].title,       "Le description n'est pas valide, trop courte ou trop longue").isText().len(3, 300);
+    check(items[i].categories,  "La catégorie n'est pas connue").isHexadecimal()
+    check(items[i].vendor,      "Le vendeur n'est pas connu").isHexadecimal()
 
     check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
     check(items[i].price,       "Le prix n'est pas valable").isFloat()
     check(items[i].part,        "La portion du produit n'est pas valable").isText().len(1, 50);
     ifCheck(items[i].note,        "Le commentaire n'est pas valide, il est top court ou trop long").isText().len(0, 500);
-    check(items[i].finalprice,  "Le prix final n'est pas correct").isFloat()
+    check(items[i].finalprice,  "Le prix final n'est pas correcte").isFloat()
   }
 }
 /**
  *
  */
-exports.order = function(req){
-    if (!req.body)return;
+exports.order = function(order){
+  if (!order)return;
 
-    order_items(req.body.items)
+  order_items(order.items)
 
-    // if(req.body.customer){
-    //   user(req.body.customer)
-    // }
+  // if(order.customer){
+  //   user(order.customer)
+  // }
 
-    if(req.body.shipping){
-      user_address(req.body.shipping)
-      check(req.body.shipping.when,"La commande doit contenir une date de livraison").isDate();
-    }
+  if(order.shipping){
+    user_address(order.shipping)
+    check(order.shipping.when,"La commande doit contenir une date de livraison").isDate();
+  }
 
-    if(req.body.payment){
-      // TODO check payment gateway for later
-    }   
+   check(order.payment.alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
 }
 
 exports.orderFind = function(req){
@@ -178,7 +176,6 @@ exports.shop=function(shop){
     if(shop.name) check(shop.name,"Le nom n'est pas valide ou trop long").len(3, 48).isText()
     if(shop.description){
       check(shop.description,"La description n'est pas valide ou trop longue").len(3, 400).isText()
-      console.log("FIXME sanitize")
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
     }
     

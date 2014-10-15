@@ -51,9 +51,11 @@ exports.Orders=[
         /* email customer */
         "email": "evaleto@gmail.com",
 
-        /* payment */
-        "payment": {
-            "gateway": "postfinance"
+        payment: {
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
+            status:"paid"
         },
 
         /* shipping */

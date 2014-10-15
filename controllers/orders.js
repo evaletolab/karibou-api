@@ -31,11 +31,33 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure owner
   if(!isUserOrderOwner()){ 
-    return res.send(401, "Your are not the owner of this shop"); 
+    return res.send(401, "Your are not the owner of this order"); 
   }
   
   return next();
 
+}
+
+exports.ensureValidAlias=function(req,res,next){
+  //
+  // only authorize payment alias that belongs to user of the session
+  // 
+  var alias, method;
+  if (req.params.alias) alias=req.params.alias;
+  else if(req.body.alias) alias=req.body.alias;
+  else if(req.body.payment.alias)alias=req.body.payment.alias;
+  else return res.send(401,"Impossible de valider l'alias de paiement (1)")
+
+  if(req.body.method) method=req.body.method;
+  else if(req.body.payment.method)method=req.body.payment.method;
+  else return res.send(401,"Impossible de valider l'alias de paiement (2)")
+
+
+  if(!req.user.isValidAlias(alias,method)){
+    return res.send(401,"La méthode de paiement utilisée n'est pas valide (0)")
+  }
+
+  return next();
 }
 
 
@@ -204,7 +226,7 @@ exports.create=function(req,res){
 
   // check && validate input field
   try{
-    validate.order(req);
+    validate.order(req.body);
   }catch(err){
     return res.send(400, err.message);
   }    

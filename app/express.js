@@ -6,6 +6,7 @@ var express = require('express')
   , mongoStore = require('connect-mongo')(express)
   , bus = require('../app/bus')
   , methodOverride = require('method-override')
+  , helmet=require('helmet')
 
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
@@ -127,6 +128,8 @@ var tokenSession=function (req, res, next) {
     app.use(express.urlencoded())
     app.use(express.json())
 
+    app.use(helmet());  
+
     app.use(methodOverride())
 
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));  
@@ -171,8 +174,11 @@ var tokenSession=function (req, res, next) {
       app.use(express.csrf())
 
       // This could be moved to view-helpers :-)
+      // http://stackoverflow.com/questions/19566949/csrf-protection-in-expressjs
       app.use(function(req, res, next){
-        res.locals.csrf_token = req.csrfToken()
+        // because we have a full ajax application, local field is not recommended
+        //res.locals.csrf_token = req.csrfToken()
+        req.cookie('XSRF-TOKEN', req.csrfToken());
         next()
       })
     }

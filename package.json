@@ -35,7 +35,8 @@
     "mocha-lcov-reporter": "0.0.1",
     "fnv-plus": "~1.2.9",
     "newrelic": "~1.11.1",
-    "node-postfinance": "https://github.com/evaletolab/node-postfinance/tarball/master"
+    "node-postfinance": "https://github.com/evaletolab/node-postfinance/tarball/master",
+    "helmet": "~0.4.1"
   },
   "devDependencies": {
     "mocha": "1.x",

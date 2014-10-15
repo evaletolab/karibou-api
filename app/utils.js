@@ -7,7 +7,7 @@ module.exports = function (app) {
     var more=append||''
     // return require('crypto').createHash('md5').update(this+more).digest("hex")
     return require('fnv-plus').hash(this.valueOf()+more).dec()
-  }   
+  };
 
   String.prototype.slug=function () {
     var str = this.
@@ -26,7 +26,7 @@ module.exports = function (app) {
       .replace(/-+/g, '-'); // collapse dashes
 
     return str;
-  }
+  };
 
 
   String.prototype.crypt=function(){
@@ -47,7 +47,7 @@ module.exports = function (app) {
     var out = cipher.update(str, 'utf8', 'hex');
     return out+cipher.final('hex')+config.admin.padding
 
-  }
+  };
 
 
   String.prototype.decrypt=function(){
@@ -71,7 +71,7 @@ module.exports = function (app) {
     }
     
     return dc(str);
-  }
+  };
 
 
 }

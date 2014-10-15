@@ -29,7 +29,7 @@ var mongoose = require('mongoose')
 var EnumOrderStatus    =config.shop.order.status;
 var EnumCancelReason   =config.shop.order.cancelreason;
 var EnumFinancialStatus=config.shop.order.financialstatus;
-var EnumOrderGateway   =_.map(config.shop.order.gateway,
+var EnumOrderMethod   =_.map(config.shop.order.gateway,
                             function(e){return e.label});
 var EnumShippingMode   =config.shop.order.shippingmode;
 
@@ -61,7 +61,9 @@ var Orders = new Schema({
    /* cart_token:{type: String}, */
 
    payment:{
-      gateway:{type:String,enum: EnumOrderGateway, required:true},
+      alias: {type:String, required:true},
+      number:{type:String, required:true},
+      method:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'}
    },
    
@@ -311,7 +313,7 @@ Orders.statics.checkItem=function(item, product, cb){
     return cb(msg1,item)
   }
 
-  if(product.vendor.status!==true){
+  if(!product.vendor||product.vendor.status!==true){
     return cb(msg5,item)
   }
 
@@ -485,7 +487,7 @@ Orders.statics.checkItems = function(items, callback){
       //
       // check an item
       Orders.checkItem(items[i],products[i],function(err,item, vendor){
-        vendors.push(vendor);
+        if(vendor)vendors.push(vendor);
         var error={}; error[item.sku]=err;
         //
         // collect error by product
@@ -652,6 +654,16 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   }
 
 
+  // early test
+  // make sure that payment method belongs to this customer 
+  if(!payment.alias ||!customer.id ||!payment.method||!payment.number){
+    return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
+  }
+
+  if(!db.model('Users').isValidAliasWithId(payment.alias,customer.id, payment.method)){
+    return callback("Votre méthode de paiement est inconnue, l'ordre ne peut pas être passé")
+  }
+
 
   //
   // get unique Order identifier
@@ -734,7 +746,11 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
       //
       // adding payment
-      order.payment={gateway:payment};
+      order.payment={
+        alias:payment.alias,
+        number:payment.number,
+        method:payment.method
+      };
 
       //
       // ready to create one order

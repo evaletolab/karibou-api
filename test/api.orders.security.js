@@ -117,5 +117,33 @@ describe("api.orders.security", function(){
       .expect(401,done);
   });
 
+
+ it("POST /v1/orders shoulld return 401 for payment that doesn't belongs to logged user", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
+
+
+    items.push(Orders.prepare(data.Products[0], 2, ""))
+    items.push(Orders.prepare(data.Products[1], 3, ""))
+
+    var order={
+      items:items,
+      shipping:{},
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(401,function(err,res){
+        should.not.exist(err)
+        res.text.should.include("La méthode de paiement utilisée n'est pas valide")
+        done()
+      });
+  }); 
+
 });
 

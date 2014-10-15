@@ -28,7 +28,7 @@ describe("orders.create", function(){
           region: "GE",
           when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
       }
-    , payment="postfinance",
+    , payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxxxx3456'},
     okDay,
     toshortDay,
     okDayBadTime;
@@ -44,7 +44,7 @@ describe("orders.create", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Products.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -206,7 +206,7 @@ describe("orders.create", function(){
     });
   });    
 
- it("Error on creation of an order with a bad gateway", function(done){
+ it("Error on creation of an order with a bad payment", function(done){
     var items=[]
       , customer=data.Users[1]
       , shipping={
@@ -221,17 +221,13 @@ describe("orders.create", function(){
             },
             primary: true,
             region: "Genève",
-            when:Date.now()
+            when:okDay
         }
       , payment="pooet";
 
 
-    data.Products.forEach(function(product){
-      //
-      // prepare is a private helper function for testing purpose
-      var e=Orders.prepare(product, 3, "");
-      items.push(e)
-    });
+
+    items.push(Orders.prepare(data.Products[0], 2, ""))
 
 
     //
@@ -239,9 +235,45 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
+      err.should.include("Votre commande est incomplète")
       done();          
     });
   });    
+
+ it("Error on creation of an order with a bad payment.alias", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , shipping={
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            },
+            primary: true,
+            region: "Genève",
+            when:okDay
+        }
+      , payment={alias:'122',method:'test',number:'123'};
+
+
+
+    items.push(Orders.prepare(data.Products[0], 2, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.exist(err)
+      err.should.include("Votre méthode de paiement est inconnue")
+      done();          
+    });
+  });    
+
 
   it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
 
@@ -296,10 +328,9 @@ describe("orders.create", function(){
   });  
 
   it("Error:selected products are not in the database", function(done){
-
     shipping.when=okDay
     items=[]
-    items.push(Orders.prepare(data.Products[0], 1, ""))
+    items.push(Orders.prepare(data.Products[2], 1, ""))
 
 
     //

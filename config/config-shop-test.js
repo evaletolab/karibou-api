@@ -78,7 +78,7 @@ module.exports = {
       ],
       cancelreason:["customer", "fraud", "inventory", "other"],
       status:["failure","created","reserved","partial","fulfilled"],
-      gateway:[ {label:"postfinance",fees:0.015}, {label:"paypal",fees:0.0017}, {label:"bitcoin",fees:0.0}],
+      gateway:[ {label:"postfinance",fees:0.03}, {label:"american express",fees:0.029}, {label:"visa",fees:0.029}, {label:"mastercard",fees:0.029}, {label:"paypal",fees:0.034}, {label:"bitcoin",fees:0.0}],
 
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/

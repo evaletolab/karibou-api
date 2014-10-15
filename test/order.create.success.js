@@ -63,7 +63,7 @@ describe("orders.create.success", function(){
   it("Checking status after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
-    var payment="postfinance"
+    var payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
     var items=[];
     items.push(Orders.prepare(data.Products[0], 2, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))
@@ -113,7 +113,7 @@ describe("orders.create.success", function(){
   it("Checking token after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
-    var payment="postfinance"
+    var payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
     var items=[];
     items.push(Orders.prepare(data.Products[4], 3, ""))
 
@@ -143,7 +143,7 @@ describe("orders.create.success", function(){
   it("Checking product stock after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
-    var payment="postfinance"
+    var payment={alias:((customer.id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
     var items=[];
     items.push(Orders.prepare(data.Products[0], 2, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))

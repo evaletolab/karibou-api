@@ -33,7 +33,9 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            gateway: "postfinance",
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
             status:"pending"
         },
 
@@ -72,7 +74,9 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            gateway: "postfinance",
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
             status:"pending"
         },
 
@@ -175,7 +179,9 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            gateway: "postfinance",
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
             status:"paid"
         },
 
@@ -279,7 +285,9 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            gateway: "postfinance",
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
             status:"paid"
         },
 
@@ -383,7 +391,9 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            gateway: "postfinance",
+            method: "postfinance",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
             status:"paid"
         },
 

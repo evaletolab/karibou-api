@@ -533,6 +533,7 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
   });
 };
 
+
 //
 // update user payment
 UserSchema.statics.updatePayment=function(id, alias, payment,callback){
@@ -567,7 +568,6 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
     type:card.issuer.toLowerCase(),
     name:payment.name,
     number:card.hiddenNumber,
-    csc:payment.csc,
     expiry:payment.expiry      
   }
 
@@ -575,7 +575,6 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
     'payments.$.type': out.type,
     'payments.$.name': out.name,
     'payments.$.number': out.number,
-    'payments.$.csc': out.csc||'',
     'payments.$.expiry': out.expiry,
     'payments.$.updated': Date.now(),
   }}, function(err, n, stat){
@@ -587,6 +586,17 @@ UserSchema.statics.updatePayment=function(id, alias, payment,callback){
     return callback(err,out)
   });
 }
+
+//
+// verify if an alias belongs to this user
+UserSchema.methods.isValidAlias=function(alias, method){
+  return ((this.id+method.toLowerCase()).hash().crypt()===alias.crypt());
+}
+
+UserSchema.statics.isValidAliasWithId=function(alias, id, method){
+  return ((id+method.toLowerCase()).hash().crypt()===alias.crypt());
+}
+
 
 //
 // delete user payment
@@ -639,7 +649,6 @@ UserSchema.statics.addPayment=function(id, payment,callback){
   safePayment.type=card.issuer.toLowerCase();
   safePayment.name=payment.name;
   safePayment.number=card.hiddenNumber;
-  safePayment.csc=payment.csc||'';
   safePayment.expiry=payment.expiry;
   safePayment.updated=Date.now();
   Users.findOne({id: id}, function(err,user){

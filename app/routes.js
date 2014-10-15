@@ -18,7 +18,7 @@ module.exports = function(app, config, passport) {
 
   //
   // wrap a request to a simple queuing system. 
-  // This should help to avoid race condition on product 
+  // It's not efficient, but this should avoid race condition on product and orders
   var queue=require('../app/queue')(1,true);
   var queued=function(f){
     return function(req,res){
@@ -137,7 +137,7 @@ module.exports = function(app, config, passport) {
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 
   app.post('/v1/orders/items/verify',orders.verifyItems)
-  app.post('/v1/orders', auth.ensureUserValid, queued(orders.create));
+  app.post('/v1/orders', auth.ensureUserValid, orders.ensureValidAlias, queued(orders.create));
   app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, queued(orders.update));
 
 

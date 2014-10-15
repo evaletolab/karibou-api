@@ -72,7 +72,7 @@ describe("orders.create.success", function(){
 
 
   it("race condition when creating parallel orders ", function(done){
-    var payment="postfinance"
+    var payment={alias:((data.Users[1].id+"postfinance").hash().crypt()),method:"postfinance",number:'12xxxxxxx3456'};
     // console.log(data.Products)
     require("async").parallelLimit([
       function(cb){
