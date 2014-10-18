@@ -10,7 +10,10 @@ var Products=db.model('Products')
   , Orders=db.model('Orders')
   , today=new Date()
   , toshortDay
-  , okDay;
+  , okDay
+  , timelimitH=config.shop.order.timelimitH
+  , timelimit=config.shop.order.timelimit
+  , timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
 
 
 
@@ -65,6 +68,9 @@ describe("orders.create.success", function(){
     data.Products[0].pricing.stock=10
     data.Products[1].pricing.stock=10
     data.Products[2].pricing.stock=10
+    config.shop.order.timelimitH=timelimitH;
+    config.shop.order.timelimit=timelimit;
+    config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
     done();
     });    
   });

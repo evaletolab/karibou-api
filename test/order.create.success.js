@@ -10,7 +10,10 @@ var Products=db.model('Products')
   , Orders=db.model('Orders')
   , today=new Date()
   , toshortDay
-  , okDay;
+  , okDay
+  , timelimitH=config.shop.order.timelimitH
+  , timelimit=config.shop.order.timelimit
+  , timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
 
 
 
@@ -54,6 +57,9 @@ describe("orders.create.success", function(){
   
   after(function(done){
     dbtools.clean(function(){    
+      config.shop.order.timelimitH=timelimitH;
+      config.shop.order.timelimit=timelimit;
+      config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
       done();
     });    
   });

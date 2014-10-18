@@ -80,6 +80,9 @@ exports.list = function(req,res){
   }  
   var criteria={}
 
+  // restrict for open orders only
+  criteria.closed=null  
+
   if (req.query.status=='close'){
     criteria.closed=true
   }
@@ -140,8 +143,8 @@ exports.listByShop = function(req,res){
   }  
   var criteria={}
 
-  // restrict for available orders
-  // criteria.closed=null
+  // restrict for open orders
+  criteria.closed=null
 
   if (req.query.status=='close'){
     criteria.closed=true
@@ -248,23 +251,34 @@ exports.create=function(req,res){
     // order is prepared, now we are waiting for valid payment. 
     // Unless a full payment, order is closed and reserved products are available for everyone
     // TODO replace timeout by node-postfinance here!!
-    setTimeout(function(){
-      //
-      Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
-        if(err){
-          return res.send(400, errorHelper(err));
-        }
+    //
+    // payment workflow:
+    //    - 1) get auth 2) prepare 3) cancel||paid  4) issue||ok
+    order.payment.status="authorized";
+    order.save(function(err){
+      if(err){
+        return res.json(401,errorHelper(err))
+      }
+      return res.json(order)
+    })
 
-        order[0].rollbackProductQuantityAndSave(function(err){
-          //
-          // notify this order has been successfully rollbacked
-          bus.emit('order.rollback',null,order)
+    // setTimeout(function(){
+    //   //
+    //   Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
+    //     if(err){
+    //       return res.send(400, errorHelper(err));
+    //     }
 
-        })
-      })
-    },config.shop.order.timeoutAndNotPaid*1000)
+    //     order[0].rollbackProductQuantityAndSave(function(err){
+    //       //
+    //       // notify this order has been successfully rollbacked
+    //       bus.emit('order.rollback',null,order)
 
-    return res.json(order)
+    //     })
+    //   })
+    // },config.shop.order.timeoutAndNotPaid*1000)
+    // return res.json(order)
+
 
   });
 

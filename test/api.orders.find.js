@@ -85,9 +85,10 @@ describe("api.orders.security", function(){
       .get('/v1/orders?when=next')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
+
         should.not.exist(err)
         res.body.length.should.equal(4)
-        for(var o in res.body){
+        for(var o in res.body){          
           (nextShippingDay).getTime().should.equal(new Date(res.body[o].shipping.when).getTime())
         }
         done()

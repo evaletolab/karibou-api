@@ -33,6 +33,11 @@ describe("orders.find.admin", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);        
+        Orders.printInfo()
+        Orders.find({}).exec(function(e,os){
+          os.forEach(function(o){o.print()})
+        })
+        
         done();
       });
     });      

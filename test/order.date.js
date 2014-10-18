@@ -7,7 +7,11 @@ var Orders=db.model('Orders');
 
 describe("orders.date", function(){
   var _ = require("underscore"),
-      now=new Date();
+      now=new Date(),
+      timelimitH=config.shop.order.timelimitH,
+      timelimit=config.shop.order.timelimit,
+      timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid,
+      weekdays=config.shop.order.weekdays;
 
   before(function(done){
     //Orders.printInfo()
@@ -19,6 +23,10 @@ describe("orders.date", function(){
 
   
   after(function(done){
+    config.shop.order.timelimitH=timelimitH;
+    config.shop.order.timelimit=timelimit;
+    config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
+    config.shop.order.weekdays=weekdays;
     done()
   });
 
