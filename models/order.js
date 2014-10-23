@@ -472,7 +472,7 @@ Orders.statics.checkItems = function(items, callback){
     , Products=db.model('Products')
 
   items=_.sortBy(items,function(i){return i.sku});
-  var skus=_.collect(items,function(item){return item.sku});
+  var skus=items.map(function(item){return item.sku});
   Products.findBySkus(skus).sort("sku").exec(function(err,products){
     if(skus.length!==products.length){
       return callback("Certains produits sélectionnés n'existe pas, vérifier votre panier")
@@ -806,13 +806,17 @@ Orders.statics.findByCriteria = function(criteria, callback){
   //
   // filter by shop
   if(criteria.shop){
-    q["items.vendor"]=criteria.shop;
+    q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
+    // q["items.vendor"]=criteria.shop;
+    // q["vendors.slug"]=criteria.shop;
   }
 
   //
   // filter by closed date
-  if(criteria.closed === null){
-    q["closed"]=null;     
+  if((criteria.closed === null || criteria.closed === undefined)&&
+     !criteria.fulfillment&&
+     !criteria.reason){
+    q["closed"]={$exists:false};     
   }
   else if(criteria.closed === true){
     var sd=new Date('1980'),
@@ -848,6 +852,14 @@ Orders.statics.findByCriteria = function(criteria, callback){
   if(criteria.user){
     // q["email"]=criteria.user
     q["customer.id"]=parseInt(criteria.user);
+  }
+
+  if(criteria.fulfillment){
+    q["fulfillments.status"]=criteria.fulfillment;
+  }
+
+  if(criteria.reason){
+    q["cancel.reason"]=criteria.reason;
   }
 
   //

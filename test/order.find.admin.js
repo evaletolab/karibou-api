@@ -33,10 +33,10 @@ describe("orders.find.admin", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);        
-        Orders.printInfo()
-        Orders.find({}).exec(function(e,os){
-          os.forEach(function(o){o.print()})
-        })
+        // Orders.printInfo()
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){o.print()})
+        // })
         
         done();
       });
@@ -50,14 +50,14 @@ describe("orders.find.admin", function(){
     });    
   });
 
-  it("find all orders (5)", function(done){
+  it("find all orders (4)", function(done){
 
     var criteria={      
     }
 
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(5)
+      order.length.should.equal(4)
       done();
     });
   });

@@ -62,12 +62,54 @@ exports.ensureValidAlias=function(req,res,next){
 
 
 /**
- * get orders by criteria
- * - closed order >=Date
- * - nextShippingDate
+ * get orders by shop. 
+ *   you get a list of order that contains only items concerning the shop
+ * - closed=true||Date
+ * - payment=pending||authorized||partially_paid||paid||partially_refunded||refunded||voided
+ * - fulfillments=failure||created||reserved||partial||fulfilled"
+ * - reason=customer||fraud||inventory||other
+ * - when=next||Date
  * - created orders, when==Date
  * - limited to a shop, shopname=slug
  * - limited to a user, uid
+ */
+function parseCriteria(criteria, req){
+
+  if (req.query.closed){
+    criteria.closed=Date.parse(req.query.closed)
+    if(!criteria.closed)criteria.closed=true
+  }
+
+  if (req.query.payment &&
+      config.shop.order.financialstatus.indexOf(req.query.payment)!=-1){
+    criteria.payment=req.query.payment
+  }
+
+  if (req.query.reason &&
+      config.shop.order.cancelreason.indexOf(req.query.reason)!=-1){
+    criteria.reason=req.query.reason
+  }
+
+  
+  if (req.query.fulfillments &&
+      config.shop.order.status.indexOf(req.query.fulfillments)!=-1){
+    criteria.fulfillment=req.query.fulfillments
+  }
+
+  // get orders for next shipping day
+  if (req.query.when=='next'){
+    criteria.nextShippingDay=true
+  }
+
+  // get orders for specific date
+  else if(req.query.when){
+    var when=new Date(req.query.when)
+    if(when!== "Invalid Date") criteria.when=when
+  }
+
+}
+/**
+ * get orders by criteria
  */
 exports.list = function(req,res){    
   try{
@@ -81,30 +123,9 @@ exports.list = function(req,res){
   var criteria={}
 
   // restrict for open orders only
-  criteria.closed=null  
+  criteria.closed=undefined;  
 
-  if (req.query.status=='close'){
-    criteria.closed=true
-  }
-
-  if (req.query.status=='paid'){
-    criteria.paid=true
-  }
-
-  if (req.query.status=='fail'){
-    criteria.payment='failure'
-  }
-
-  // get orders for next shipping day
-  if (req.query.when=='next'){
-    criteria.nextShippingDay=true
-  }
-
-  // get orders for specific date
-  else if(req.query.when){
-    var when=new Date(req.query.when)
-    if(when!== "Invalid Date") criteria.when=when
-  }
+  parseCriteria(criteria,req)
 
   // restrict to an user
   if (req.params.id){
@@ -126,13 +147,8 @@ exports.list = function(req,res){
 };
 
 /**
- * get orders by shop. This function differ from the previous because for a shop and one date,
+ * get orders by shop. 
  *   you get a list of order that contains only items concerning the shop
- * - closed order >=Date
- * - nextShippingDate
- * - created orders, when==Date
- * - limited to a shop, shopname=slug
- * - limited to a user, uid
  */
 exports.listByShop = function(req,res){    
   try{
@@ -146,35 +162,10 @@ exports.listByShop = function(req,res){
   // restrict for open orders
   criteria.closed=null
 
-  if (req.query.status=='close'){
-    criteria.closed=true
-  }
-
-  if (req.query.status=='paid'){
-    criteria.paid=true
-  }
-
-  if (req.query.status=='fail'){
-    criteria.payment='failure'
-  }
-
-  // get orders for next shipping day
-  if (req.query.when=='next'){
-    criteria.nextShippingDay=true
-  }
-
-  // get orders for specific date
-  else if(req.query.when){
-    var when=new Date(req.query.when)
-    if(when!== "Invalid Date") criteria.when=when
-  }
+  parseCriteria(criteria,req)
 
   // restrict to a shopname
   criteria.shop=req.params.shopname
-
-
-
-
 
   // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
@@ -184,6 +175,36 @@ exports.listByShop = function(req,res){
     return res.json(Orders.filterByShop(criteria.shop, orders))
   });
 };
+
+/**
+ * get orders by shops for one owner. 
+ *   you get a list of order that contains only items concerning the shops
+ */
+exports.listByShopOwner = function(req,res){    
+  try{
+    validate.orderFind(req);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+  var criteria={}
+
+  // restrict for open orders
+  criteria.closed=null
+
+  parseCriteria(criteria,req)
+
+  // restrict shops to a user  
+  criteria.shops=req.user.shops.map(function(i){ return i.sku})
+
+  // console.log("find orders",criteria)
+  Orders.findByCriteria(criteria, function(err,orders){
+    if(err){
+      return res.send(400,err);
+    }
+    return res.json(Orders.filterByShop(criteria.shop, orders))
+  });
+};
+
 
 exports.get = function(req,res){    
   try{

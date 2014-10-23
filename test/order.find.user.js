@@ -35,6 +35,11 @@ describe("orders.find.user", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
+        // Orders.printInfo()
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){o.print()})
+        // })
+
         done();
       });
     });      
@@ -47,13 +52,13 @@ describe("orders.find.user", function(){
     });    
   });
 
-  it("find all orders (4) for user evaleto", function(done){
+  it("find all orders (3) for user evaleto", function(done){
     var criteria={
       user: 12346,
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
-      order.length.should.equal(4)
+      order.length.should.equal(3)
       order[0].customer.id.should.equal(12346)
       done();
     });
@@ -68,6 +73,19 @@ describe("orders.find.user", function(){
       should.not.exist(err)
       order[0].customer.id.should.equal(12346)
       order.length.should.equal(3)
+      done();
+    });
+  });
+
+  it("find closed orders (1) for user evaleto", function(done){
+    var criteria={
+      user: 12346,
+      closed:true
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order[0].customer.id.should.equal(12346)
+      order.length.should.equal(1)
       done();
     });
   });

@@ -8,28 +8,21 @@ var data = dbtools.fixtures(["Users.js","Categories.js","Orders.validate.js"]);
 
 var Products=db.model('Products')
   , Orders=db.model('Orders')
+  , weekdays=config.shop.order.weekdays
   , today=new Date()
   , toshortDay
   , okDay;
 
-// available shipping day for testing [1..6]
-// check times in config.shop.order.timelimit (50 for testing)
-function prepareOrderDates(){
-  var today=new Date();
-  if (today.getDay()==6){
-    toshortDay=Orders.jumpToNextWeekDay(today,1);
-    okDay=Orders.jumpToNextWeekDay(today,3);
-    okDay.setHours(11,0,0,0)
-    return
-  } 
-  toshortDay=Orders.jumpToNextWeekDay(today,today.getDay()+1);
-  okDay=Orders.jumpToNextWeekDay(today,today.getDay()+3);
-  okDay.setHours(11,0,0,0)
-}
-prepareOrderDates()
+
 
 describe("orders.validate.item", function(){
   var _ = require("underscore");
+
+  config.shop.order.weekdays=[0,1,2,3,4,5,6];
+
+  toshortDay=Orders.findCurrentShippingDay();
+  okDay=Orders.findNextShippingDay();
+  okDay.setHours(11,0,0,0)
 
   var items=[]
     , customer=data.Users[1]
@@ -54,6 +47,10 @@ describe("orders.validate.item", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);
+        // Orders.printInfo()
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){o.print()})
+        // })
         done();
       });
     });      
@@ -61,6 +58,7 @@ describe("orders.validate.item", function(){
 
   
   after(function(done){
+    config.shop.order.weekdays=weekdays;
     dbtools.clean(function(){    
       done();
     });    

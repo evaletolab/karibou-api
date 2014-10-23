@@ -36,7 +36,7 @@ exports.Orders=[
             issuer: "postfinance",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"pending"
+            status:"voided"
         },
 
 
@@ -55,9 +55,19 @@ exports.Orders=[
             }
         },
 
+        /* vendors */
+        vendors: [
+            {
+                /* shop available !=true */
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "un autre shop",
+                address: "TODO",
+            }
+        ],
 
         fulfillments: {
-            status: "created"
+            status: "failure"
         },
 
         created: new Date(),

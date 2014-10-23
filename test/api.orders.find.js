@@ -29,7 +29,6 @@ describe("api.orders.security", function(){
         //   os.forEach(function(o){o.print()})
         // })
 
-
         done();
       });
     });      
@@ -87,7 +86,7 @@ describe("api.orders.security", function(){
       .expect(200,function(err,res){
 
         should.not.exist(err)
-        res.body.length.should.equal(4)
+        res.body.length.should.equal(3)
         for(var o in res.body){          
           (nextShippingDay).getTime().should.equal(new Date(res.body[o].shipping.when).getTime())
         }
@@ -95,9 +94,9 @@ describe("api.orders.security", function(){
       });  
   });  
 
-  it('GET /v1/orders/shops/mon-shop?status=fail  ',function(done){
+  it('GET /v1/orders/shops/mon-shop?fulfillments=failure  ',function(done){
     request(app)
-      .get('/v1/orders/shops/mon-shop?status=fail')
+      .get('/v1/orders/shops/mon-shop?fulfillments=failure')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -108,9 +107,9 @@ describe("api.orders.security", function(){
       });  
   });  
 
-  it('GET /v1/orders/shops/mon-shop?status=close  ',function(done){
+  it('GET /v1/orders/shops/mon-shop?closed=true  ',function(done){
     request(app)
-      .get('/v1/orders/shops/mon-shop?status=close')
+      .get('/v1/orders/shops/mon-shop?closed=true')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -121,9 +120,21 @@ describe("api.orders.security", function(){
       });  
   });  
 
-  it('GET /v1/orders?status=close  ',function(done){
+  it('GET /v1/orders/shops/un-autre-shop?closed=true  ',function(done){
     request(app)
-      .get('/v1/orders?status=close')
+      .get('/v1/orders/shops/un-autre-shop?closed=true')
+      .set('cookie', cookie)      
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        res.body.length.should.equal(1)
+        done()
+      });  
+  });  
+
+
+  it('GET /v1/orders?closed=true  ',function(done){
+    request(app)
+      .get('/v1/orders?closed=true')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
@@ -134,7 +145,19 @@ describe("api.orders.security", function(){
       });  
   }); 
 
-  it.skip('GET /v1/orders?status=fail  ',function(done){
+
+  it('GET /v1/orders?fulfillments=failure  ',function(done){
+    request(app)
+      .get('/v1/orders?fulfillments=failure')
+      .set('cookie', cookie)      
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        res.body.length.should.equal(1)
+        for(var o in res.body){
+        }
+        done()
+      });  
+
   });  
 
   

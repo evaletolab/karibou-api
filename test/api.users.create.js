@@ -52,7 +52,6 @@ describe("api.users.create", function(){
       .post('/register')
       .send(r)
       .end(function(err,res){   
-      console.log(res.text)   
         res.should.have.status(200);
         done();        
       });
