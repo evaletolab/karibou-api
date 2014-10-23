@@ -243,5 +243,51 @@ describe("api.orders.create", function(){
   });    
 
 
+ it("POST /v1/orders create new order get right payment status 'authorized' and 'reserved'", function(done){
+    var items=[]
+      , customer=data.Users[0]
+      , payment={
+        alias:((customer.id+"postfinance").hash().crypt()),
+        issuer:"postfinance",
+        number:'12xxxxxxx3456'
+      };
+
+    data.Products.forEach(function(product){
+      //
+      // prepare is a private helper fundction for testing purpose
+      var e=Orders.prepare(product, 1, "");
+      if([1000002,1000003,1000004,1000005].indexOf(e.sku)==-1){
+          items.push(e)
+      }
+    });
+
+    items=_.sortBy(items,function(i){return i.title});
+    shipping.when=new Date(okDay);
+
+    var order={
+      items:items,
+      shipping:shipping,
+      payment:payment
+    }
+
+    request(app)
+      .post('/v1/orders')
+      .set('Content-Type','application/json')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(200,function(err,res){
+        should.not.exist(err)
+        should.not.exist(res.body.errors)
+        should.not.exist(res.body.cancel)
+        should.not.exist(res.body.closed)
+        res.body.payment.status.should.equal('authorized')
+        res.body.fulfillments.status.should.equal('reserved')
+
+
+        done()
+      });
+  });    
+
+
 });
 

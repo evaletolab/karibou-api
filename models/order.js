@@ -179,24 +179,29 @@ Orders.methods.verifyToken=function(callback){
 }
 
 
+Orders.methods.print=function(order){
+  mongoose.model('Orders').print(this)
+}
 
-Orders.methods.print=function(){
-
-  console.log("-- OID    ", this.oid);
-  console.log("---      shipping.when ",  this.shipping.when);
-  console.log("---      payment       ",  this.payment.status);
-  console.log("---      fulfillments  ",  this.fulfillments.status);
-  console.log("---      cancel.status ",  this.cancel.reason);
-  console.log("---      cancel.when   ",  this.cancel.when);
-  console.log("---      closed        ",  this.closed);
-  console.log("---      created       ",  this.created);
-  console.log("---      user          ",  this.email);
-  console.log("---      rank          ",  this.rank);
-  if(this.items)
-  console.log("---      items         ",  this.items.map(function(i){ return i.sku}).join(',')); 
-  console.log("---      quantity      ",  this.items.map(function(i){ return i.quantity}).join(',')); 
-  if(this.vendors)
-  console.log("---      vendors       ",  this.vendors.map(function(v){ return v.slug}).join(',')); 
+Orders.statics.print=function(order){
+  var self=order
+  console.log("-- OID    ", self.oid);
+  console.log("---      shipping.when ",  self.shipping.when);
+  console.log("---      payment       ",  self.payment.status);
+  console.log("---      fulfillments  ",  self.fulfillments.status);
+  if(self.cancel){
+    console.log("---      cancel.status ",  self.cancel.reason);
+    console.log("---      cancel.when   ",  self.cancel.when);
+  }
+  console.log("---      closed        ",  self.closed);
+  console.log("---      created       ",  self.created);
+  console.log("---      user          ",  self.email);
+  console.log("---      rank          ",  self.rank);
+  if(self.items)
+  console.log("---      items         ",  self.items.map(function(i){ return i.sku}).join(',')); 
+  console.log("---      quantity      ",  self.items.map(function(i){ return i.quantity}).join(',')); 
+  if(self.vendors)
+  console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(',')); 
 }
 
 Orders.statics.printInfo=function(){
