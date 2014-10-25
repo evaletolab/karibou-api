@@ -80,6 +80,11 @@ var bus=require('./app/bus');require('./app/bus.routes');
 var sendmail=require('./app/mail')(app,bus);
   
 
+// payment api
+var payment=require('./app/payment');
+  
+
+
 // express settings
 require('./app/express')(app, config, passport, sendmail)
 

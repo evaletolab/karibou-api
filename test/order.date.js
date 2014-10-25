@@ -8,12 +8,17 @@ var Orders=db.model('Orders');
 describe("orders.date", function(){
   var _ = require("underscore"),
       now=new Date(),
-      timelimitH=config.shop.order.timelimitH,
-      timelimit=config.shop.order.timelimit,
-      timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid,
-      weekdays=config.shop.order.weekdays;
+      timelimitH,
+      timelimit,
+      timeoutAndNotPaid,
+      weekdays;
 
   before(function(done){
+    timelimitH=config.shop.order.timelimitH;
+    timelimit=config.shop.order.timelimit;
+    timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
+    weekdays=config.shop.order.weekdays;
+
     //Orders.printInfo()
     // var days=['sunday','monday','tuesday', 'wednesday', 'thursday','friday','saturday']
     // console.log("-- today it's ",days[now.getDay()])

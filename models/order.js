@@ -37,9 +37,6 @@ var Orders = new Schema({
    /** order identifier */
    oid: { type: Number, required: true, unique:true },
 
-   /*for security reason some data are encrypted in this token */
-   token:{type:String},
-
    /* compute a rank for the set of orders to be shipped together */
    rank:{type:Number,default:0},
    
@@ -64,7 +61,10 @@ var Orders = new Schema({
       alias: {type:String, required:true},
       number:{type:String, required:true},
       issuer:{type:String,enum: EnumOrderMethod, required:true},
-      status:{type:String, enum:EnumFinancialStatus, default:'pending'}
+      status:{type:String, enum:EnumFinancialStatus, default:'pending'},
+
+      /*for security reason transaction data are encrypted */
+      transaction:{type:String}
    },
    
 
@@ -134,50 +134,37 @@ var Orders = new Schema({
 //
 // API
 
+/**
+ * total price
+ *  - some of item finalprice ()
+ *  - add payment gateway fees [visa,postfinance,mc,ae]
+ *  - add shipping
+ */
 Orders.methods.getTotalPrice=function(){
   var total=0.0;
-  this.items.forEach(function(item){
-    total+=item.finalprice*item.quantity;
+  this.items&&this.items.forEach(function(item){
+    //
+    // item should not be failure (fulfillment)
+    if(item.fulfillment!=='failure'){
+      total+=item.finalprice;
+    }
   });
 
-  return total;
-}
-
-
-Orders.methods.createToken=function(){
-  var tokenData = {
-      id: this.oid,
-      created: this.created,
-      when: this.shipping.when
-    }, 
-    cipher=require('crypto').
-            createCipher('aes-256-cbc',config.admin.secret),
-    tokenStr = JSON.stringify(tokenData);
-
-  if(!config.admin.secret)
-    throw new Error("Oopps, secret key not available")
-
-  this.token = cipher.update(tokenStr, 'utf8', 'base64');
-  this.token+= cipher.final('base64')
-}
-
-Orders.methods.verifyToken=function(callback){
-  var decipher=require('crypto').
-            createDecipher('aes-256-cbc', config.admin.secret), 
-
-      tokenStr=decipher.update(this.token, 'base64', 'utf8');
-      
-      tokenStr+=decipher.final('utf8')
-
-  var tokenData=JSON.parse(tokenStr), now=new Date(), error;
-
-  if(now<tokenData.created || now>tokenData.when){
-    error="Cette commande n'est plus valable"
+  //
+  // add payment fees
+  for (var gateway in config.shop.order.gateway){
+    gateway=config.shop.order.gateway[gateway]
+    if (gateway.label===this.payment.issuer){
+      total+=total*gateway.fees;
+      break;
+    }
   }
+  
+  // add shipping fees (10CHF)
+  total+=config.shop.marketplace.shipping;
 
-  return callback(error,tokenData)
+  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
 }
-
 
 Orders.methods.print=function(order){
   mongoose.model('Orders').print(this)
@@ -187,8 +174,11 @@ Orders.statics.print=function(order){
   var self=order
   console.log("-- OID    ", self.oid);
   console.log("---      shipping.when ",  self.shipping.when);
-  console.log("---      payment       ",  self.payment.status);
+  console.log("---      payment       ",  self.payment.status,self.payment.issuer);
   console.log("---      fulfillments  ",  self.fulfillments.status);
+  if(self.getTotalPrice){
+    console.log("---      full price    ",  self.getTotalPrice())
+  }
   if(self.cancel){
     console.log("---      cancel.status ",  self.cancel.reason);
     console.log("---      cancel.when   ",  self.cancel.when);
@@ -602,9 +592,10 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
 Orders.statics.findByTimeoutAndNotPaid = function(callback){
   var q={
     closed:null,
-    "payment.status":{'$ne':'paid'},
+    "payment.status":{'$nin':['paid','authorized']},
     created:{"$lte": new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000}
   }
+
 
   // console.log(q)
   var query=db.model('Orders').find(q).sort({created: -1});
@@ -761,9 +752,6 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       // ready to create one order
       var dborder =new Orders(order);
 
-      //
-      // this new order as is own token 
-      dborder.createToken()
 
       //
       // update product stock

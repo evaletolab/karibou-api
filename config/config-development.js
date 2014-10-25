@@ -24,7 +24,19 @@ module.exports = {
     padding:'0e0e0e0e'    
   },
   
+  payment:{
+    postfinance:{
+      enabled:false,
+      sandbox:true,
+      debug:true,
+      pspid:process.env.PSPID||'test',
+      apiUser:process.env.PFUSER||'test',
+      apiPassword:process.env.PFSECRET||'test',
+      shaSecret:process.env.PFSHA||'test'
+    }
+  },
   
+
   cors:{
     allowedDomains:['http://lo.cal:3000','http://192.168.1.39:3000'],
     credentials:true,

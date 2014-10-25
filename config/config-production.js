@@ -26,7 +26,15 @@ module.exports = {
   },
 
   payment:{
-    postfinance:{psid:process.env.PFID ,password:process.env.PFSECRET}
+    postfinance:{
+      enabled:false,
+      sandbox:true,
+      debug:false,
+      pspid:process.env.PSPID,
+      apiUser:process.env.PFUSER,
+      apiPassword:process.env.PFSECRET,
+      shaSecret:process.env.PFSHA
+    }
   },
 
   cors:{

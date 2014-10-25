@@ -75,6 +75,7 @@ module.exports = function(app, config, passport) {
   // system
   app.get ('/v1/config', cached, api.config);
   app.post('/v1/trace/:key', api.trace);
+  app.post('/v1/message/:key', api.message);
   
   //
   // email validation

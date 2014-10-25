@@ -31,18 +31,22 @@ describe("orders.create", function(){
     , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxxxx3456'},
     okDay,
     toshortDay,
-    okDayBadTime;
-
-  // init dates
-  okDay=Orders.findNextShippingDay();
-  toshortDay=Orders.findCurrentShippingDay();
-  okDayBadTime=new Date(okDay)
-
-  // select a shipping time
-  okDay.setHours(11,0,0,0)
-  okDayBadTime.setHours(14,0,0,0)
+    okDayBadTime,
+    weekdays;
 
   before(function(done){
+
+    // init dates
+    //config.shop.order.weekdays=[0,1,2,3,4,5,6]
+    weekdays=config.shop.order.weekdays;
+    okDay=Orders.findNextShippingDay();
+    toshortDay=Orders.findCurrentShippingDay();
+    okDayBadTime=new Date(okDay)
+
+    // select a shipping time
+    okDay.setHours(11,0,0,0)
+    okDayBadTime.setHours(14,0,0,0)
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Products.js"],db,function(err){
         should.not.exist(err);
@@ -53,6 +57,7 @@ describe("orders.create", function(){
 
   
   after(function(done){
+    config.shop.order.weekdays=weekdays;
     dbtools.clean(function(){    
       done();
     });    

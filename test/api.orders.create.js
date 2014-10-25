@@ -22,7 +22,9 @@ var Products=db.model('Products'),
         region: "GE",
         when:null
     },
-    okDay, toshortDay;
+    okDay, 
+    toshortDay,
+    weekdays=config.shop.order.weekdays;
 
 
 okDay=Orders.findNextShippingDay();
@@ -48,6 +50,7 @@ describe("api.orders.create", function(){
   
   after(function(done){
     dbtools.clean(function(){    
+      config.shop.order.weekdays=weekdays;
       done();
     });    
   });

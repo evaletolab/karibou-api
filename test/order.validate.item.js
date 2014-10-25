@@ -18,11 +18,6 @@ var Products=db.model('Products')
 describe("orders.validate.item", function(){
   var _ = require("underscore");
 
-  config.shop.order.weekdays=[0,1,2,3,4,5,6];
-
-  toshortDay=Orders.findCurrentShippingDay();
-  okDay=Orders.findNextShippingDay();
-  okDay.setHours(11,0,0,0)
 
   var items=[]
     , customer=data.Users[1]
@@ -38,12 +33,19 @@ describe("orders.validate.item", function(){
               lng: 6.1692497
           },
           primary: true,
-          region: "GE",
-          when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
+          region: "GE"
       }
     , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
 
   before(function(done){
+
+    config.shop.order.weekdays=[0,1,2,3,4,5,6];
+    toshortDay=Orders.findCurrentShippingDay();
+    okDay=Orders.findNextShippingDay();
+    okDay.setHours(11,0,0,0)
+    shipping.when=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0]);
+
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);

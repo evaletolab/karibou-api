@@ -25,6 +25,18 @@ module.exports = {
     secret: process.env.KARIBOO_SECRET || '1234',
     padding:'0e0e0e0e'    
   },
+
+  payment:{
+    postfinance:{
+      enabled:false,
+      sandbox:true,
+      debug:false,
+      pspid:process.env.PSPID||'test',
+      apiUser:process.env.PFUSER||'test',
+      apiPassword:process.env.PFSECRET||'test',
+      shaSecret:process.env.PFSHA||'test'
+    }
+  },  
   
   cors:{
     allowedDomains:['http://lo.cal:3000'],

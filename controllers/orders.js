@@ -10,6 +10,7 @@ var db = require('mongoose'),
     _=require('underscore'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
+    postfinance = require('node-postfinance')
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 
@@ -275,13 +276,43 @@ exports.create=function(req,res){
     //
     // payment workflow:
     //    - 1) get auth 2) prepare 3) cancel||paid  4) issue||ok
-    order.payment.status="authorized";
-    order.save(function(err){
-      if(err){
-        return res.json(401,errorHelper(err))
-      }
-      return res.json(order)
+    var card=new postfinance.Card({
+      alias: order.payment.alias.decrypt()
     })
+
+    transaction = new postfinance.Transaction({
+      operation: 'authorize',
+      amount:order.getTotalPrice(),
+      orderId: 'TX'+Date.now(),
+      email:order.customer.email,
+      groupId:order.shipping.when
+    });    
+
+    transaction.process(card, function(err,result){
+      if(err){
+
+        order.order.rollbackProductQuantityAndSave(function(err){
+          if(err){
+            //FIXME
+            console.log("-------------------------------",err)
+          }
+          return res.json(400,err.message)          
+        });
+      }
+
+      order.payment.status="authorized";
+      order.payment.transaction=transaction.toJSON();
+      order.save(function(err){
+        if(err){
+          return res.json(400,errorHelper(err))
+        }
+        return res.json(order)
+      })
+
+    });
+    
+
+
 
     // setTimeout(function(){
     //   //

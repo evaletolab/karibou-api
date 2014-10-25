@@ -10,6 +10,7 @@ module.exports = {
       types:['Category', 'Catalog']
     },
     marketplace:{
+      shipping:10,
       list:[
         {name:"Marché de Plainpalais le mardi",lat:46.19838,lng:6.14083, d:2},
         {name:"Marché de Plainpalais le vendredi",lat:46.19838,lng:6.14083, d:5},
@@ -78,7 +79,14 @@ module.exports = {
       ],
       cancelreason:["customer", "fraud", "inventory", "other"],
       status:["failure","created","reserved","partial","fulfilled"],
-      gateway:[ {label:"postfinance",fees:0.03}, {label:"american express",fees:0.029}, {label:"visa",fees:0.029}, {label:"mastercard",fees:0.029}, {label:"paypal",fees:0.034}, {label:"bitcoin",fees:0.0}],
+      gateway:[ 
+        {label:"postfinance",fees:0.02}, 
+        {label:"american express",fees:0.029}, 
+        {label:"visa",fees:0.029}, 
+        {label:"mastercard",fees:0.029}, 
+        {label:"paypal",fees:0.034}, 
+        {label:"bitcoin",fees:0.0}
+      ],
 
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
