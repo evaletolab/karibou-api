@@ -14,11 +14,7 @@ var db = require('mongoose'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 
-exports.ensureOwnerOrAdmin=function(req, res, next) {
-  function isUserOrderOwner(){
-    return (_.any(req.user.orders,function(s){return s===req.params.oid}));
-  }
-    
+exports.ensureOwnerOrAdmin=function(req, res, next) {    
   //
   // ensure auth
   if (!req.isAuthenticated()) { 
@@ -31,11 +27,39 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
   //
   // ensure owner
-  if(!isUserOrderOwner()){ 
-    return res.send(401, "Your are not the owner of this order"); 
-  }
+  db.model('Orders').findOne({email:req.user.email.address,oid:req.params.oid}).exec(function(e,o){
+    if(!o){
+      return res.send(401, "Your are not the owner of this order"); 
+    }
+    next()
+  })
   
-  return next();
+}
+
+exports.ensureShopOwnerOrAdmin=function(req, res, next) {
+  //
+  // ensure auth
+  if (!req.isAuthenticated()) { 
+      return res.send(401); 
+  }
+
+  // if admin, we've done here
+  if (req.user.isAdmin()) 
+    return next();  
+
+
+  // ensure that all items in this update bellongs to this user 
+  // req.user.shops.$.urlpathreq.body.items.$.vendor
+  var slugs=_.collect(req.user.shops,function(p){return (p._id+'');})
+  var items=(req.body.length)?req.body:[req.body]
+
+  for(var item in items){
+    if(slugs.indexOf(items[item].vendor.toString())==-1){
+      return res.send(401,'Cet article '+items[item].sku+' n\'appartient pas à votre boutique')
+    }
+  }
+
+  next();
 
 }
 
@@ -114,9 +138,9 @@ function parseCriteria(criteria, req){
  */
 exports.list = function(req,res){    
   try{
-    validate.ifCheck(req.params.id, "Le format d'utilisateur n'est pas valide").isInt()
-    validate.ifCheck(req.params.oid, "Le format de la commande n'est pas valide").isInt()
-    validate.ifCheck(req.params.shopname, "Le format de la boutique n'est pas valide").len(3, 34).isSlug()
+    validate.ifCheck(req.params.id, "L'utilisateur n'est pas valide").isInt()
+    validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
+    validate.ifCheck(req.params.shopname, "La boutique n'est pas valide").len(3, 34).isSlug()
     validate.orderFind(req);
   }catch(err){
     return res.send(400, err.message);
@@ -168,7 +192,6 @@ exports.listByShop = function(req,res){
   // restrict to a shopname
   criteria.shop=req.params.shopname
 
-  // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,err);
@@ -284,7 +307,7 @@ exports.create=function(req,res){
       operation: 'authorize',
       amount:order.getTotalPrice(),
       orderId: 'TX'+Date.now(),
-      email:order.customer.email,
+      email:order.customer.email.address,
       groupId:order.shipping.when
     });    
 
@@ -300,8 +323,10 @@ exports.create=function(req,res){
         });
       }
 
+      //
+      // get authorisation, save status and transaction
       order.payment.status="authorized";
-      order.payment.transaction=transaction.toJSON();
+      order.payment.transaction=transaction.toJSON().crypt();
       order.save(function(err){
         if(err){
           return res.json(400,errorHelper(err))
@@ -311,9 +336,6 @@ exports.create=function(req,res){
 
     });
     
-
-
-
     // setTimeout(function(){
     //   //
     //   Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
@@ -335,3 +357,26 @@ exports.create=function(req,res){
   });
 
 };
+
+exports.updateItem=function(req,res){
+
+  // check && validate input item
+  try{
+    validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
+    validate.orderItems(req.body);
+  }catch(err){
+    return res.send(400, err.message);
+  }    
+  
+
+  Orders.updateItem(req.params.oid, req.body, function(err,order){
+    if(err){
+      return res.send(400, (err));
+    }      
+    return res.json(200,order)
+  });
+}
+
+exports.updateStatus=function(req,res){
+
+}

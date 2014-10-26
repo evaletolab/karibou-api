@@ -93,6 +93,7 @@ describe("orders.create.success", function(){
 
       //
       // check financial status after creation
+      // this value is set by the payment gateway
       should.not.exist(order.financial_status)
 
       //
@@ -107,7 +108,13 @@ describe("orders.create.success", function(){
       // checking normal price
       order.items[1].quantity.should.equal(3)
       order.items[1].finalprice.should.equal(data.Products[0].pricing.price*3)
+
+      // checking item reservation
+      order.items.forEach(function(o,i){
+        o.fulfillment.status.should.equal('reserved')
+      })
       order.rollbackProductQuantityAndSave(function(err,order){
+        should.not.exist(err)
         done();                  
       })
       // console.log(order.oid)

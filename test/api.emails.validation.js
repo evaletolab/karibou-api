@@ -145,6 +145,16 @@ describe("api.validate", function(){
         done()
       });
   });
+
+  it('GET re /v1/validate/<uid>/evaleto@gluck.com should return 400 ',function(done){
+    request(app)
+      .get('/v1/validate/'+uid+'/evaleto@gluck.com')
+      .end(function(err,res){
+        res.should.have.status(400);        
+        res.text.should.include('n\'est plus disponible')
+        done()
+      });
+  });
   
   it('GET /v1/validate should return 200 ad 0 validation',function(done){
     request(app)
@@ -159,7 +169,7 @@ describe("api.validate", function(){
       });
   });   
     
-  it.skip('Cannot validate after a timeout (>48h)');
+  it.skip('Cannot validate after a timeout ');
   it.skip('Cannot validate if email has changed');
   it.skip('Clean old orphan validation  (for timeout > 100 days)');
       

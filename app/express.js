@@ -172,16 +172,14 @@ var tokenSession=function (req, res, next) {
     // adds CSRF support
     if (process.env.NODE_ENV !== 'test' && config.express.csrf) {
       app.use(express.csrf())
-
-      // This could be moved to view-helpers :-)
+      //
       // http://stackoverflow.com/questions/19566949/csrf-protection-in-expressjs
       app.use(function(req, res, next){
-        // because we have a full ajax application, local field is not recommended
-        //res.locals.csrf_token = req.csrfToken()
         req.cookie('XSRF-TOKEN', req.csrfToken());
         next()
       })
     }
+
 
     // app.use(function(req, res, next){
     //   req.sendmail=sendmail;

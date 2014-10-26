@@ -89,7 +89,7 @@ describe("orders.update", function(){
           note:"nouveau prix",
           fulfillment:{status:"fulfilled"}
         },{      
-          sku:1000003,
+          sku:1000004,
           finalprice:8.0,
           note:"correction poids ",
           fulfillment:{status:"fulfilled"}
@@ -103,13 +103,13 @@ describe("orders.update", function(){
       // check price
       order.items[1].finalprice.should.not.equal(order.items[1].price)
 
-      order.items[2].note.should.equal(items[1].note)
-      order.items[2].fulfillment.status.should.equal(items[1].fulfillment.status)
+      order.items[0].note.should.equal(items[1].note)
+      order.items[0].fulfillment.status.should.equal(items[1].fulfillment.status)
       // check price
-      order.items[2].finalprice.should.not.equal(order.items[2].price)
+      order.items[0].finalprice.should.not.equal(order.items[2].price)
 
       // check price and finalprice
-      order.items[2].finalprice.should.equal(items[1].finalprice)
+      order.items[0].finalprice.should.equal(items[1].finalprice)
 
     });
 
@@ -128,7 +128,7 @@ describe("orders.update", function(){
   it("get notified when updating items order ", function(done){
     var oid=2000007;
     var items=[{      
-          sku:1000004,
+          sku:1000003,
           fulfillment:{status:"fulfilled"}
         }
     ]
@@ -136,7 +136,7 @@ describe("orders.update", function(){
     db.model('Orders').updateItem(oid,items, function(err,order){
       should.not.exist(err)
       // check price and finalprice
-      order.items[0].finalprice.should.equal(order.items[0].price*order.items[0].quantity)
+      order.items[2].finalprice.should.equal(order.items[2].price*order.items[2].quantity)
 
     });
 
@@ -146,6 +146,24 @@ describe("orders.update", function(){
       should.exist(items)
       done();
     })
+
+  });  
+
+
+  it("get error when updating fulfilled order ", function(done){
+    var oid=2000007;
+    var items=[{      
+          sku:1000003,
+          fulfillment:{status:"failure"}
+        }
+    ]
+
+    db.model('Orders').updateItem(oid,items, function(err,order){
+      should.exist(err)
+      err.should.include('Impossible de modifier une commande')
+      done()
+    });
+
 
   });  
 

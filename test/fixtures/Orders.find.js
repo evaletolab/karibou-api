@@ -165,7 +165,7 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 7.6,
+                finalprice: 15.2,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -270,7 +270,7 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 7.6,
+                finalprice: 15.2,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -376,7 +376,7 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 7.6,
+                finalprice: 15.2,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -482,7 +482,7 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 7.6,
+                finalprice: 15.2,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {

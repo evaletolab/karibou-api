@@ -8,7 +8,7 @@ module.exports = {
   mail:{
     from:'james@karibou.io',
     to:['james@karibou.io'],
-    ttl:{long:24,short:1},
+    validate:{time:24,short:1},
     site:'http://karibou.io',
     default:'mandril',
     mandril:{    

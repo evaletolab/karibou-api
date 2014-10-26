@@ -537,8 +537,15 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
       throw new Error("rollback not implemented: "+(err.message||err));
     }
 
-    // we have to mention this state to avoid two times reservation
+
+    // we have to mention this state to avoid two times reservation    
     self.fulfillments.status="reserved";
+
+    //items are also in right state
+    self.items.forEach(function(item,i){
+      //initialise fulfillment
+      item.fulfillment.status='reserved';
+    })
     return self.save(callback)
   });
 }
@@ -875,6 +882,11 @@ Orders.statics.findByCriteria = function(criteria, callback){
   return query;
 }
 
+
+Orders.statics.updateStatus = function(oid,status, callback){
+  return callback()
+}
+
 //
 // only finalprice and note can be modified for an item
 Orders.statics.updateItem = function(oid,items, callback){
@@ -900,12 +912,12 @@ Orders.statics.updateItem = function(oid,items, callback){
     }
     //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
     if(["authorized","partially_paid","paid"].indexOf(order.payment.status)==-1){
-      return callback("Impossible de modifier une commande en attente de validation financière (1): "+oid); 
+      return callback("Impossible de modifier une commande en attente de validation financière : "+order.payment.status); 
     }
 
-    //["failure","created","partial","fulfilled"]
-    if(order.fulfillments.status!=="partial"){
-      return callback("Impossible de modifier une commande en attente de validation financière (2): "+oid); 
+
+    if(["reserved","partial"].indexOf(order.fulfillments.status)==-1){
+      return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status); 
     }
 
 
@@ -922,14 +934,22 @@ Orders.statics.updateItem = function(oid,items, callback){
         }
       }
     })
+
     if(itemId.length!==items.length){
-      return callback("Impossible de modifer tous les articles. Les articles modifiés : "+itemId.join(', '));      
+      return callback("L'action est annulée, Seul les articles suivants peuvent être modifiés : "+itemId.join(', '));      
     }
 
     //
     // notify this order has been successfully modified
     bus.emit('order.update.items',null,order,items)
 
+    // if the order is not fulfilled
+    order.fulfillments.status='fulfilled'
+    order.items.forEach(function(item){
+      if(['failure','fulfilled'].indexOf(item.fulfillment.status)===-1){
+        order.fulfillments.status='partial'
+      }
+    })
 
     order.save(callback)
     // I DONT KNOW WHY THE NATIVE UPDATE IS NOT WORKING!!!

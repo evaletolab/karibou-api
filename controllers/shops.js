@@ -177,7 +177,7 @@ exports.askStatus=function(req,res){
       var elapsed=Math.round((Date.now()-shop.status)/oneday);
       // max 1 mail by month
       console.log(elapsed,Date.now(),shop.status, Date.now()-shop.status,oneday)
-      if (elapsed<config.mail.ttl.long)
+      if (elapsed<config.mail.validate.time)
         return res.send(400,"Une demande d'activiation est déjà en cours");    
     }
     

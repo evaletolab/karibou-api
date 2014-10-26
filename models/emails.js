@@ -15,7 +15,7 @@ var Emails = new Schema({
     uid:{ type: String, required: true, unique:true },
     email: { type: String, required: true, unique:false },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
-    created:{type:Date, default: Date.now, expires: (config.mail.ttl.long+2)*3600}
+    created:{type:Date, default: Date.now, expires: (config.mail.validate.time+2)*3600}
 });
 
 
@@ -107,7 +107,7 @@ Emails.statics.validate=function(uid,email,callback){
     //
     // validate existant email
     if(!validate){
-      return callback(("This validation url is no more avaiable (1)"));
+      return callback(("Cette demande de validation n'est plus disponible (1)"));
     }
 
 
@@ -120,10 +120,11 @@ Emails.statics.validate=function(uid,email,callback){
     //
     // validate check timeout to,leave TTL
     var oneday=1000*60*60*24;
-    if (((validate.created-Date.now())/oneday)>config.mail.ttl.long){
+    if (((validate.created-Date.now())/oneday)>config.mail.validate.time){
       // remove this validation process
-      validate.remove();
-      return callback(("This validation url is no more avaiable (2)"));
+      validate.remove(function(){
+        return callback(("Cette demande de validation n'est plus disponible (2)"));
+      });
     };
     
     validate.owner.email.status=true;
