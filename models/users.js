@@ -94,10 +94,6 @@ validate.postal = function (value) {
     /* The available Shop for this user */
     shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
     
-    
-    /* link user and orders */    
-    orders : [{type: String}],
-
     /* disqus sso */
     context:{type:Schema.Types.Mixed},
 
