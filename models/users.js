@@ -639,30 +639,40 @@ UserSchema.statics.addPayment=function(id, payment,callback){
   }
 
 
-  // for ecurity reason alias is crypted
-  var alias=(id+card.issuer.toLowerCase()).hash().crypt()
-  safePayment.alias=alias;
+  // for security reason alias is crypted
+  var alias=(id+card.issuer.toLowerCase()).hash()
+  safePayment.alias=alias.crypt();
   safePayment.type=card.issuer.toLowerCase();
   safePayment.name=payment.name;
   safePayment.number=card.hiddenNumber;
   safePayment.expiry=payment.expiry;
   safePayment.updated=Date.now();
-  Users.findOne({id: id}, function(err,user){
+
+  card.publish({alias:alias},function(err,res){
     if(err){
-      return callback(err)
+      return callback(err.message)
     }
-    if(!user){
-      return callback("Utilisateur inconnu");      
-    }
-    if(!user.payments) user.payments=[]
 
-    for (var i in user.payments){
-      if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
-    }
-    user.payments.push(safePayment)
+    // save card alias
+    Users.findOne({id: id}, function(err,user){
+      if(err){
+        // TODO alias should be removed
+        return callback(err)
+      }
+      if(!user){
+        return callback("Utilisateur inconnu");      
+      }
+      if(!user.payments) user.payments=[]
 
-    return user.save(callback)
-  });
+      for (var i in user.payments){
+        if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
+      }
+      user.payments.push(safePayment)
+
+      return user.save(callback)
+    });
+
+  })
 }
 
 
