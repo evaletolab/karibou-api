@@ -314,10 +314,11 @@ exports.create=function(req,res){
     transaction.process(card, function(err,result){
       if(err){
 
-        order.order.rollbackProductQuantityAndSave(function(err){
+        order.rollbackProductQuantityAndSave(function(e){
           if(err){
             //FIXME
-            console.log("-------------------------------",err)
+            console.log("-------------------------------pf",err)
+            console.log("-------------------------------mg",e)
           }
           return res.json(400,err.message)          
         });
