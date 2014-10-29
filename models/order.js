@@ -227,6 +227,7 @@ Orders.statics.prepare=function(product, quantity, note){
   copy.part=product.pricing.part;
   copy.note=note;
   copy.finalprice=getPrice(product)*quantity;
+  copy.fulfillment={status:'partial'}
   return copy;
 }
 
@@ -328,7 +329,6 @@ Orders.statics.checkItem=function(item, product, cb){
     };
   }
 
-  
   //
   // check item is still available in stock
   if(!product.attributes.available){
@@ -482,6 +482,7 @@ Orders.statics.checkItems = function(items, callback){
       //
       // check an item
       Orders.checkItem(items[i],products[i],function(err,item, vendor){
+
         if(vendor)vendors.push(vendor);
         var error={}; error[item.sku]=err;
         //
@@ -713,11 +714,15 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       }
 
 
+
+
       debug('create new orders for %s on %s with %d items',shipping.name,shipping.when,items.length)
+
       //
       // attache items on success,
       order.items=items;
-      order.vendors=_.uniq(vendors,false,function(a,b){return a.slug===b.slug;});
+      order.vendors=_.uniq(vendors,false,function(e){return e.slug;});
+
 
       //
       // adding customer info and email (check validity)
@@ -921,7 +926,7 @@ Orders.statics.updateItem = function(oid,items, callback){
     }
 
 
-    var itemId=[];
+    var itemIds=[];
     items.forEach(function(item){
       assert(item.sku)
       for(var i in order.items){
@@ -929,14 +934,23 @@ Orders.statics.updateItem = function(oid,items, callback){
           if(item.finalprice) order.items[i].finalprice=item.finalprice;
           if(item.note)       order.items[i].note=item.note;
           if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
-          itemId.push(order.items[i].sku);
+          itemIds.push(order.items[i].sku);
           break;
         }
       }
     })
 
-    if(itemId.length!==items.length){
-      return callback("L'action est annulée, Seul les articles suivants peuvent être modifiés : "+itemId.join(', '));      
+    // console.log('-----------> items:',_.collect(items,function(i){return i.sku}))
+    // console.log('-----------> order.items:',_.collect(order.items,function(i){return i.sku}))
+    // console.log('-----------> fulfillment:',_.collect(order.items,function(i){return i.fulfillment.status}))
+
+
+    if(itemIds.length!==items.length){
+      var itemIds=items.filter(function(e){
+          return (itemIds.indexOf(e.sku)===-1);
+      })
+
+      return callback("L'action est annulée, les articles suivants ne concernent pas cette commande : "+itemIds.map(function(i){return i.sku}).join(', '));      
     }
 
     //

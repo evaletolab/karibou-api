@@ -54,7 +54,9 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   var items=(req.body.length)?req.body:[req.body]
 
   for(var item in items){
-    if(slugs.indexOf(items[item].vendor.toString())==-1){
+    // console.log('---------',slugs)
+    // console.log('---------',items[item].sku,items[item].vendor, req.user.email.address)
+    if(slugs.indexOf(items[item].vendor+'')==-1){
       return res.send(401,'Cet article '+items[item].sku+' n\'appartient pas à votre boutique')
     }
   }

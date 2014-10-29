@@ -70,7 +70,7 @@ var Users=exports.Users=[{
     photo : "jpg", 
     provider : "local", 
     roles : [], 
-    shops : [], 
+    shops : ['515ec12e56a8d5961e000006'], 
     tags : [],
     password:'password'
   },{

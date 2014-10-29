@@ -27,7 +27,7 @@ module.exports = {
 
   payment:{
     postfinance:{
-      enabled:false,
+      enabled:true,
       sandbox:true,
       debug:false,
       pspid:process.env.PSPID,

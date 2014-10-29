@@ -37,12 +37,23 @@ okDay.setHours(11,0,0,0)
 describe("api.orders.create", function(){
   var request= require('supertest');
   var _ = require("underscore");
-  var orderId;
+  var orderId, admins=config.admin.emails;
 
   before(function(done){
+    //
+    // remove admin right
+    config.admin.emails=[]
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js",
+                    "../fixtures/Categories.js",
+                    "../fixtures/Orders.update.js"
+        ],db,function(err){
         should.not.exist(err);
+        // Orders.printInfo()
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){o.print()})
+        // })
+
         done();
       });
     });      
@@ -52,6 +63,7 @@ describe("api.orders.create", function(){
   after(function(done){
     dbtools.clean(function(){    
       config.shop.order.weekdays=weekdays;
+      config.admin.emails=admins;
       done();
     });    
   });
@@ -75,7 +87,7 @@ describe("api.orders.create", function(){
   it("login evaleto",function(done){
     request(app)
       .post('/login')
-      .send({ email: "evaleto@gluck.com", password:'password',provider:'local' })
+      .send({ email: "evaleto@gmail.com", password:'password',provider:'local' })
       .end(function(e,res){
         should.not.exist(e)
         evaleto = res.headers['set-cookie'];
@@ -101,8 +113,8 @@ describe("api.orders.create", function(){
       //
       // prepare is a private helper fundction for testing purpose
       var e=Orders.prepare(product, 1, "");
-      if([1000001,1000006,1000007].indexOf(e.sku)!==-1){
-          // console.log('------------------',e)
+        //gluck,  evaleto, gluck, gluck 
+      if([1000001,1000002,1000005,1000007].indexOf(e.sku)!==-1){
           items.push(e)
       }
     });
@@ -140,12 +152,13 @@ describe("api.orders.create", function(){
   });    
 
 
-  it("POST /v1/orders/:id/items evaleto update item should change the fulfillment to fulfilled/failure", function(done){
+  it("POST /v1/orders/:id/items gluck can change own items fulfillment", function(done){
     var items=[]
     data.Products.forEach(function(product){
       var e=Orders.prepare(product, 1, "");
       // gluck owner
       if([1000001].indexOf(e.sku)!==-1){
+          e.fulfillment.status='fulfilled'
           items.push(e)
       }
     });
@@ -154,7 +167,7 @@ describe("api.orders.create", function(){
       .post('/v1/orders/'+orderId+'/items')
       .set('Content-Type','application/json')
       .send(items)
-      .set('cookie', evaleto)
+      .set('cookie', cookie)
       .expect(200,function(err,res){
         should.not.exist(err)
         should.not.exist(res.body.errors)
@@ -167,11 +180,11 @@ describe("api.orders.create", function(){
   });    
 
 
-  it("POST /v1/orders/:id/items update unknnow item generate an ERROR", function(done){
+  it("POST /v1/orders/:id/items evaleto update item from other shop generate an ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
       var e=Orders.prepare(product, 1, "");
-      if([1000001,1000003].indexOf(e.sku)!==-1){
+      if([1000006].indexOf(e.sku)!==-1){
           items.push(e)
       }
     });
@@ -182,7 +195,6 @@ describe("api.orders.create", function(){
       .send(items)
       .set('cookie', evaleto)
       .expect(401,function(err,res){
-        console.log('FIXME error here is not appropriate : 400 with unknow item')
         should.not.exist(err)
         res.text.should.include('appartient pas à votre boutique')
 
@@ -190,12 +202,59 @@ describe("api.orders.create", function(){
       });
   }); 
 
-  it("POST /v1/orders/:id/items gluck update item should change the fulfillment to fulfilled/failure", function(done){
+  it("POST /v1/orders/:id/items gluck update item from other shop generate an ERROR", function(done){
+    var items=[]
+    data.Products.forEach(function(product){
+      var e=Orders.prepare(product, 1, "");
+      if([1000002].indexOf(e.sku)!==-1){
+          items.push(e)
+      }
+    });
+
+    request(app)
+      .post('/v1/orders/'+orderId+'/items')
+      .set('Content-Type','application/json')
+      .send(items)
+      .set('cookie', cookie)
+      .expect(401,function(err,res){
+        should.not.exist(err)
+        res.text.should.include('appartient pas à votre boutique')
+
+        done()
+      });
+  }); 
+
+
+
+  it("POST /v1/orders/:id/items not in this order generate an ERROR", function(done){
+    var items=[]
+    data.Products.forEach(function(product){
+      var e=Orders.prepare(product, 1, "");
+      if([1000004].indexOf(e.sku)!==-1){
+          items.push(e)
+      }
+    });
+
+    request(app)
+      .post('/v1/orders/'+orderId+'/items')
+      .set('Content-Type','application/json')
+      .send(items)
+      .set('cookie', cookie)
+      .expect(400,function(err,res){
+        should.not.exist(err)
+        res.text.should.include('les articles suivants ne concernent pas')
+        done()
+      });
+  });    
+
+
+  it("POST /v1/orders/:id/items evaleto update fulfillment", function(done){
     var items=[]
     data.Products.forEach(function(product){
       var e=Orders.prepare(product, 1, "");
       // gluck owner
-      if([1000001,1000007].indexOf(e.sku)!==-1){
+      if([1000002].indexOf(e.sku)!==-1){
+          e.fulfillment.status='failure'
           items.push(e)
       }
     });
@@ -218,31 +277,12 @@ describe("api.orders.create", function(){
 
 
 
-  it.skip("POST /v1/orders/:id/items not owner generate an ERROR", function(done){
+  it("POST /v1/orders/:id/items update lasts items finalize this order", function(done){
     var items=[]
     data.Products.forEach(function(product){
       var e=Orders.prepare(product, 1, "");
-      if([1000003,1000005].indexOf(e.sku)!==-1){
-          items.push(e)
-      }
-    });
-
-    request(app)
-      .post('/v1/orders/'+orderId+'/items')
-      .set('Content-Type','application/json')
-      .send(items)
-      .set('cookie', cookie)
-      .expect(400,function(err,res){
-        should.exist(err)
-        done()
-      });
-  });    
-
-  it.skip("POST /v1/orders/:id/items update lasts items finalize this order", function(done){
-    var items=[]
-    data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
-      if([1000005].indexOf(e.sku)!==-1){
+      if([1000005,1000007].indexOf(e.sku)!==-1){
+          e.fulfillment.status='fulfilled'
           items.push(e)
       }
     });
@@ -267,6 +307,28 @@ describe("api.orders.create", function(){
       });
   });    
 
+
+  it("POST /v1/orders/:id/items update after finalize generate an ERROR", function(done){
+    var items=[]
+    data.Products.forEach(function(product){
+      var e=Orders.prepare(product, 1, "");
+      if([1000007].indexOf(e.sku)!==-1){
+          e.fulfillment.status='fulfilled'
+          items.push(e)
+      }
+    });
+
+    request(app)
+      .post('/v1/orders/'+orderId+'/items')
+      .set('Content-Type','application/json')
+      .send(items)
+      .set('cookie', cookie)
+      .expect(400,function(err,res){
+        should.not.exist(err)
+        res.text.should.include('modifier une commande avec le status: fulfilled')
+        done()
+      });
+  });    
 
 
 });

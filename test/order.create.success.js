@@ -113,6 +113,10 @@ describe("orders.create.success", function(){
       order.items.forEach(function(o,i){
         o.fulfillment.status.should.equal('reserved')
       })
+
+      // check that vendor is correct
+      order.vendors.length.should.be.above(1)
+
       order.rollbackProductQuantityAndSave(function(err,order){
         should.not.exist(err)
         done();                  
