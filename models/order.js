@@ -574,8 +574,12 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
   },function(err){
     if(err){
-      callback(err);
-      throw new Error("rollback: "+(err.message||err));
+      
+      //
+      //DANGER send email
+      bus.emit('system.message',"[kariboo-danger] : ",{error:err,order:self.oid,customer:self.email});
+
+      return callback(err);
     }
 
     //

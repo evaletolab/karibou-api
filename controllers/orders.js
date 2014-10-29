@@ -316,10 +316,11 @@ exports.create=function(req,res){
     transaction.process(card, function(err,result){
       if(err){
         return order.rollbackProductQuantityAndSave(function(e){
-          if(err){
-            //FIXME
-            console.log("-------------------------------pf",err)
-            console.log("-------------------------------mg",e)
+          if(e){
+            
+            //
+            //DANGER on 
+            bus.emit('system.message',"[kariboo-danger] : ",{error:e,order:o.oid,customer:o.email});
           }
           return res.json(400,err.message)          
         });

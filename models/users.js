@@ -648,9 +648,7 @@ UserSchema.statics.addPayment=function(id, payment,callback){
   safePayment.expiry=payment.expiry;
   safePayment.updated=Date.now();
 
-  console.log('1 alias',alias)
   card.publish({alias:alias},function(err,res){
-    console.log('2 publish err',err, res)
     if(err){
       return callback(err.message)
     }

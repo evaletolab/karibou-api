@@ -11,10 +11,10 @@ onTrace=function(token,error){
 
 };
 
-onMessage=function(token,content){
+onMessage=function(title,content){
     var msg=JSON.stringify(content,null,2);
     bus.emit( "sendmail", 
-              "info@karibou.io","[kariboo-subscribe] : "+content.email, 
+              "info@karibou.io",title, 
               {content:msg}, "simple");
 
 };

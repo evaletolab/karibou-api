@@ -66,7 +66,7 @@ exports.message = function(req, res) {
     if(origins.indexOf(req.params.key)==-1){
       // return res.send(401,"invalid token")
     }
-    bus.emit('system.message',req.params.key,req.body);
+    bus.emit('system.message',"[kariboo-subscribe] : ",req.body);
 
     res.json({});
 };
