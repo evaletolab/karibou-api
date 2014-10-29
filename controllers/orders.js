@@ -315,8 +315,7 @@ exports.create=function(req,res){
 
     transaction.process(card, function(err,result){
       if(err){
-
-        order.rollbackProductQuantityAndSave(function(e){
+        return order.rollbackProductQuantityAndSave(function(e){
           if(err){
             //FIXME
             console.log("-------------------------------pf",err)
