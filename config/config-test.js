@@ -12,7 +12,7 @@ module.exports = {
     validate:{time:24,short:1},
     site:'http://karibou.evaletolab.ch',
     default:'mandril',
-    mandril:{    
+    mandril:{
       host:'smtp.mandrillapp.com',
       port:587,
       user:'',
@@ -23,10 +23,11 @@ module.exports = {
   admin:{
     emails:['evaleto@gmail.com'],
     secret: process.env.KARIBOO_SECRET || '1234',
-    padding:'0e0e0e0e'    
+    padding:'0e0e0e0e'
   },
 
   payment:{
+    reserve:1.15,
     postfinance:{
       enabled:false,
       sandbox:true,
@@ -36,8 +37,8 @@ module.exports = {
       apiPassword:process.env.PFSECRET||'test',
       shaSecret:process.env.PFSHA||'test'
     }
-  },  
-  
+  },
+
   cors:{
     allowedDomains:['http://lo.cal:3000'],
     credentials:true,
@@ -49,16 +50,16 @@ module.exports = {
     views: PATH('views'),
     'view engine': 'jade'
   },
-  
+
  /**
   * Time to validate an email 2 ms
   */
   validate:{
     email:0.002
   },
-  
-  
-  // TODO load by env  
+
+
+  // TODO load by env
   mongo:{
     name:'mongodb://localhost/karibou-test',
     ensureIndex:true
@@ -66,12 +67,12 @@ module.exports = {
 
 	nodetime:{
 	},
-	
+
   disqus:{
     pub:'123',
     secret:'456'
   },
-	
+
 
 	auth:{
     fb: {
@@ -90,9 +91,9 @@ module.exports = {
   , google: {
         clientId: '224794776836-cp3a2v0elt955h9uqhgmskplhg85ljjm.apps.googleusercontent.com'
       , clientSecret: 'rxGFo1mBG_H3DX2ifDFawiMZ'
-    }	
+    }
 	},
-  
+
 
 	// TODO auto load middleware?
   middleware: {

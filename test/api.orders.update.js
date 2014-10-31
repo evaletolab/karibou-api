@@ -5,7 +5,7 @@ var dbtools = require("./fixtures/dbtools");
 var should = require("should");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
-var Products=db.model('Products'), 
+var Products=db.model('Products'),
     Orders=db.model('Orders'),
     shipping={
         name: "famille olivier evalet",
@@ -22,17 +22,9 @@ var Products=db.model('Products'),
         region: "GE",
         when:null
     },
-    okDay, 
+    okDay,
     toshortDay,
     weekdays=config.shop.order.weekdays;
-
-
-okDay=Orders.findNextShippingDay();
-toshortDay=Orders.findCurrentShippingDay();
-
-// select a shipping time
-okDay.setHours(11,0,0,0)
-
 
 describe("api.orders.create", function(){
   var request= require('supertest');
@@ -43,6 +35,12 @@ describe("api.orders.create", function(){
     //
     // remove admin right
     config.admin.emails=[]
+    okDay=Orders.findNextShippingDay();
+    toshortDay=Orders.findCurrentShippingDay();
+
+    // select a shipping time
+    okDay.setHours(11,0,0,0)
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js",
                     "../fixtures/Categories.js",
@@ -56,16 +54,16 @@ describe("api.orders.create", function(){
 
         done();
       });
-    });      
+    });
   });
 
-  
+
   after(function(done){
-    dbtools.clean(function(){    
+    dbtools.clean(function(){
       config.shop.order.weekdays=weekdays;
       config.admin.emails=admins;
       done();
-    });    
+    });
   });
 
   //
@@ -113,7 +111,7 @@ describe("api.orders.create", function(){
       //
       // prepare is a private helper fundction for testing purpose
       var e=Orders.prepare(product, 1, "");
-        //gluck,  evaleto, gluck, gluck 
+        //gluck,  evaleto, gluck, gluck
       if([1000001,1000002,1000005,1000007].indexOf(e.sku)!==-1){
           items.push(e)
       }
@@ -149,7 +147,7 @@ describe("api.orders.create", function(){
         orderId=res.body.oid
         done()
       });
-  });    
+  });
 
 
   it("POST /v1/orders/:id/items gluck can change own items fulfillment", function(done){
@@ -177,7 +175,7 @@ describe("api.orders.create", function(){
         res.body.fulfillments.status.should.equal('partial')
         done()
       });
-  });    
+  });
 
 
   it("POST /v1/orders/:id/items evaleto update item from other shop generate an ERROR", function(done){
@@ -200,7 +198,7 @@ describe("api.orders.create", function(){
 
         done()
       });
-  }); 
+  });
 
   it("POST /v1/orders/:id/items gluck update item from other shop generate an ERROR", function(done){
     var items=[]
@@ -222,7 +220,7 @@ describe("api.orders.create", function(){
 
         done()
       });
-  }); 
+  });
 
 
 
@@ -245,7 +243,7 @@ describe("api.orders.create", function(){
         res.text.should.include('les articles suivants ne concernent pas')
         done()
       });
-  });    
+  });
 
 
   it("POST /v1/orders/:id/items evaleto update fulfillment", function(done){
@@ -273,7 +271,7 @@ describe("api.orders.create", function(){
         res.body.fulfillments.status.should.equal('partial')
         done()
       });
-  });    
+  });
 
 
 
@@ -305,7 +303,7 @@ describe("api.orders.create", function(){
 
         done()
       });
-  });    
+  });
 
 
   it("POST /v1/orders/:id/items update after finalize generate an ERROR", function(done){
@@ -328,8 +326,7 @@ describe("api.orders.create", function(){
         res.text.should.include('modifier une commande avec le status: fulfilled')
         done()
       });
-  });    
+  });
 
 
 });
-

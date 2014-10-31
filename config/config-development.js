@@ -11,7 +11,7 @@ module.exports = {
     validate:{time:24,short:1},
     site:'http://lo.cal:3000',
     default:'mandril',
-    mandril:{    
+    mandril:{
       host:'smtp.mandrillapp.com',
       port:587,
       user:'evaleto@gmail.com',
@@ -21,12 +21,13 @@ module.exports = {
   admin:{
     emails:['evaleto@gmail.com'],
     secret: process.env.KARIBOO_SECRET ||'t1im5hjyMbW6juAb7W7o6QesrTUKVLe3E0jIlusvDeE=',
-    padding:'0e0e0e0e'    
+    padding:'0e0e0e0e'
   },
-  
+
   payment:{
+    reserve:1.15,
     postfinance:{
-      enabled:false,
+      enabled:true,
       sandbox:true,
       debug:true,
       pspid:process.env.PSPID||'test',
@@ -35,7 +36,7 @@ module.exports = {
       shaSecret:process.env.PFSHA||'test'
     }
   },
-  
+
 
   cors:{
     allowedDomains:['http://lo.cal:3000','http://192.168.1.39:3000'],
@@ -48,12 +49,12 @@ module.exports = {
     views: '/views',
     'view engine': 'jade',
     csrf:false,
-    mongoSession:true    
+    mongoSession:true
   },
-  
-  
-  
-  // TODO load by env  
+
+
+
+  // TODO load by env
   mongo:{
     name:'mongodb://localhost/karibou-devel',
     ensureIndex:true
@@ -68,8 +69,8 @@ module.exports = {
   */
   validate:{
     email:60*3
-  },  
-	
+  },
+
   // disqus is not available for localhost
   disqus:{
     pub:'123',
@@ -94,12 +95,12 @@ module.exports = {
         clientId: '224794776836-cp3a2v0elt955h9uqhgmskplhg85ljjm.apps.googleusercontent.com'
       , clientSecret: 'rxGFo1mBG_H3DX2ifDFawiMZ'
       , cb: 'http://localhost:4000/auth/google/callback'
-    }	
+    }
   , persona:{
       audience:'http://lo.cal:3000'
     }
 	},
-  
+
 
 	// TODO auto load middleware?
   middleware: {

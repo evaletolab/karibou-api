@@ -14,41 +14,41 @@ var db = require('mongoose'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 
-exports.ensureOwnerOrAdmin=function(req, res, next) {    
+exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
-  if (!req.isAuthenticated()) { 
-      return res.send(401); 
+  if (!req.isAuthenticated()) {
+      return res.send(401);
   }
 
   // if admin, we've done here
-  if (req.user.isAdmin()) 
-    return next();  
+  if (req.user.isAdmin())
+    return next();
 
   //
   // ensure owner
   db.model('Orders').findOne({'customer.id':req.user.id,oid:req.params.oid}).exec(function(e,o){
     if(!o){
-      return res.send(401, "Your are not the owner of this order"); 
+      return res.send(401, "Your are not the owner of this order");
     }
     next()
   })
-  
+
 }
 
 exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
-  if (!req.isAuthenticated()) { 
-      return res.send(401); 
+  if (!req.isAuthenticated()) {
+      return res.send(401);
   }
 
   // if admin, we've done here
-  if (req.user.isAdmin()) 
-    return next();  
+  if (req.user.isAdmin())
+    return next();
 
 
-  // ensure that all items in this update bellongs to this user 
+  // ensure that all items in this update bellongs to this user
   // req.user.shops.$.urlpathreq.body.items.$.vendor
   var slugs=_.collect(req.user.shops,function(p){return (p._id+'');})
   var items=(req.body.length)?req.body:[req.body]
@@ -68,7 +68,7 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
 exports.ensureValidAlias=function(req,res,next){
   //
   // only authorize payment alias that belongs to user of the session
-  // 
+  //
   var alias, issuer;
   if (req.params.alias) alias=req.params.alias;
   else if(req.body.alias) alias=req.body.alias;
@@ -89,7 +89,7 @@ exports.ensureValidAlias=function(req,res,next){
 
 
 /**
- * get orders by shop. 
+ * get orders by shop.
  *   you get a list of order that contains only items concerning the shop
  * - closed=true||Date
  * - payment=pending||authorized||partially_paid||paid||partially_refunded||refunded||voided
@@ -117,7 +117,7 @@ function parseCriteria(criteria, req){
     criteria.reason=req.query.reason
   }
 
-  
+
   if (req.query.fulfillments &&
       config.shop.order.status.indexOf(req.query.fulfillments)!=-1){
     criteria.fulfillment=req.query.fulfillments
@@ -138,7 +138,7 @@ function parseCriteria(criteria, req){
 /**
  * get orders by criteria
  */
-exports.list = function(req,res){    
+exports.list = function(req,res){
   try{
     validate.ifCheck(req.params.id, "L'utilisateur n'est pas valide").isInt()
     validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
@@ -146,11 +146,11 @@ exports.list = function(req,res){
     validate.orderFind(req);
   }catch(err){
     return res.send(400, err.message);
-  }  
+  }
   var criteria={}
 
   // restrict for open orders only
-  criteria.closed=undefined;  
+  criteria.closed=undefined;
 
   parseCriteria(criteria,req)
 
@@ -174,16 +174,16 @@ exports.list = function(req,res){
 };
 
 /**
- * get orders by shop. 
+ * get orders by shop.
  *   you get a list of order that contains only items concerning the shop
  */
-exports.listByShop = function(req,res){    
+exports.listByShop = function(req,res){
   try{
     validate.check(req.params.shopname, "Le format de la boutique n'est pas valide").len(3, 34).isSlug()
     validate.orderFind(req);
   }catch(err){
     return res.send(400, err.message);
-  }  
+  }
   var criteria={}
 
   // restrict for open orders
@@ -203,15 +203,15 @@ exports.listByShop = function(req,res){
 };
 
 /**
- * get orders by shops for one owner. 
+ * get orders by shops for one owner.
  *   you get a list of order that contains only items concerning the shops
  */
-exports.listByShopOwner = function(req,res){    
+exports.listByShopOwner = function(req,res){
   try{
     validate.orderFind(req);
   }catch(err){
     return res.send(400, err.message);
-  }  
+  }
   var criteria={}
 
   // restrict for open orders
@@ -219,7 +219,7 @@ exports.listByShopOwner = function(req,res){
 
   parseCriteria(criteria,req)
 
-  // restrict shops to a user  
+  // restrict shops to a user
   criteria.shops=req.user.shops.map(function(i){ return i.sku})
 
   // console.log("find orders",criteria)
@@ -232,14 +232,14 @@ exports.listByShopOwner = function(req,res){
 };
 
 
-exports.get = function(req,res){    
+exports.get = function(req,res){
   try{
     validate.ifCheck(req.params.uid, "Le format d'utilisateur n'est pas valide").isInt()
     validate.check(req.params.oid, "Le format de la commande n'est pas valide").isInt()
   }catch(err){
     return res.send(400, err.message);
-  }  
-  
+  }
+
   Orders.find({oid:oid}).exec(function(err,order){
     if(err){
       return res.send(400,err);
@@ -248,18 +248,18 @@ exports.get = function(req,res){
   })
 };
 
-exports.verifyItems = function(req,res){   
+exports.verifyItems = function(req,res){
   try{
     validate.orderItems(req.body.items)
   }catch(err){
     return res.send(400, err.message);
-  }  
+  }
 
   var items=req.body.items;
   if(!items || !Array.isArray(items)){
     return res.send(400, "Vos articles ne sont pas valides");
   }
-  
+
   db.model('Orders').checkItems(items,function(err,products, vendors, errors){
     if(err){
       return res.send(400, err);
@@ -279,14 +279,14 @@ exports.create=function(req,res){
     validate.order(req.body);
   }catch(err){
     return res.send(400, err.message);
-  }    
-  
+  }
 
-  Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment, 
+
+  Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment,
     function(err,order){
     if(err){
       return res.send(400, errorHelper(err));
-    }      
+    }
 
     // items issue?
     if(order.errors){
@@ -295,34 +295,38 @@ exports.create=function(req,res){
 
     var oid=order.oid;
 
-    // order is prepared, now we are waiting for valid payment. 
+    // order is prepared, now we are waiting for valid payment.
     // Unless a full payment, order is closed and reserved products are available for everyone
     // TODO replace timeout by node-postfinance here!!
     //
     // payment workflow:
     //    - 1) get auth 2) prepare 3) cancel||paid  4) issue||ok
-    var card=new postfinance.Card({
-      alias: order.payment.alias.decrypt()
-    })
+    try{
+      var card=new postfinance.Card({
+        alias: order.payment.alias.decrypt()
+      })
 
-    transaction = new postfinance.Transaction({
-      operation: 'authorize',
-      amount:order.getTotalPrice(),
-      orderId: 'TX'+Date.now(),
-      email:order.customer.email.address,
-      groupId:order.shipping.when
-    });    
+      transaction = new postfinance.Transaction({
+        operation: 'authorize',
+        amount:order.getTotalPrice(config.payment.reserve),
+        orderId: 'TX'+Date.now(),
+        email:order.customer.email.address,
+        groupId:order.shipping.when
+      });
+    }catch(err){
+      return res.json(400,err.message)
+    }
 
     transaction.process(card, function(err,result){
       if(err){
         return order.rollbackProductQuantityAndSave(function(e){
           if(e){
-            
+
             //
-            //DANGER on 
+            //DANGER send email
             bus.emit('system.message',"[kariboo-danger] : ",{error:e,order:o.oid,customer:o.email});
           }
-          return res.json(400,err.message)          
+          return res.json(400,err.message)
         });
       }
 
@@ -338,7 +342,7 @@ exports.create=function(req,res){
       })
 
     });
-    
+
     // setTimeout(function(){
     //   //
     //   Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
@@ -369,13 +373,13 @@ exports.updateItem=function(req,res){
     validate.orderItems(req.body);
   }catch(err){
     return res.send(400, err.message);
-  }    
-  
+  }
+
 
   Orders.updateItem(req.params.oid, req.body, function(err,order){
     if(err){
       return res.send(400, (err));
-    }      
+    }
     return res.json(200,order)
   });
 }

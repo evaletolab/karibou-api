@@ -49,16 +49,16 @@ describe("api.users.payment", function(){
         should.not.exist(err);
         done();
       });
-    });      
+    });
   });
 
-  
+
   after(function(done){
-    dbtools.clean(function(){    
+    dbtools.clean(function(){
       done();
-    });    
+    });
   });
-  
+
 
 
 
@@ -66,16 +66,16 @@ describe("api.users.payment", function(){
     request(app)
       .post('/login')
       .send({ email: "evaleto@gluck.com", password:'password', provider:'local' })
-      .end(function(err,res){      
+      .end(function(err,res){
         res.should.have.status(200);
         res.body.roles.should.not.include('admin');
         cookie = res.headers['set-cookie'];
         user=res.body;
-        done();        
+        done();
       });
   });
 
-   
+
   it('GET /v1/users/me should return 200',function(done){
     request(app)
       .get('/v1/users/me')
@@ -244,6 +244,5 @@ describe("api.users.payment", function(){
         res.should.have.status(200);
         done()
       });
-  });      
+  });
 });
-

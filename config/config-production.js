@@ -26,6 +26,7 @@ module.exports = {
   },
 
   payment:{
+    reserve:1.15,
     postfinance:{
       enabled:true,
       sandbox:true,

@@ -20,7 +20,7 @@ module.exports = function(app,bus) {
   });
 
   //
-  // send a single mail 
+  // send a single mail
   var sendmail=function(to, subject, content, template, cb) {
     emailTemplates(templatesDir, function(err, t) {
 
@@ -52,14 +52,14 @@ module.exports = function(app,bus) {
 
   if (process.env.NODE_ENV==='test'){
     sendmail=function(to, subject, content, template, cb){
-      cb(null,"test is running")
+      cb&&cb(null,"test is running")
     }
   }
 
   bus.on('sendmail',function(to, subject, content, template, cb){
     // console.log("---------------------------EMAIL:",to,subject)
     sendmail(to, subject, content, template, cb);
-  }); 
+  });
 
 
   return sendmail;

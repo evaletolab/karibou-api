@@ -10,17 +10,17 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.Types.ObjectId
   , errorHelper = require('mongoose-error-helper').errorHelper;
 
-  
+
 
 //
 // managing geospatial with mongo
 // http://blog.nodeknockout.com/post/35215504793/the-wonderful-world-of-geospatial-indexes-in-mongodb
 //  Db.connect("mongodb://localhost:27017/geodb", function(err, db) {
 //    if(err) return console.dir(err)
-//  
+//
 //    db.collection('places').geoNear(50, 50, {$maxDistance:10}, function(err, result) {
 //      if(err) return console.dir(err)
-//  
+//
 //      assert.equal(result.results, 2);
 //    });
 //  });
@@ -39,7 +39,7 @@ var Orders = new Schema({
 
    /* compute a rank for the set of orders to be shipped together */
    rank:{type:Number,default:0},
-   
+
    /* customer email */
    email:{type: String, required:true},
    created:{type: Date, default: Date.now() },
@@ -47,14 +47,14 @@ var Orders = new Schema({
 
    /* full customer details */
    customer:{type: Schema.Types.Mixed, required:true},
-   
+
    /* order canceled reason and dates */
    cancel:{
       reason:{type:String, enum:EnumCancelReason},
       when:{type: Date}
    },
-   
-   /* discount_code:{type: String}, */   
+
+   /* discount_code:{type: String}, */
    /* cart_token:{type: String}, */
 
    payment:{
@@ -66,54 +66,54 @@ var Orders = new Schema({
       /*for security reason transaction data are encrypted */
       transaction:{type:String}
    },
-   
+
 
    fulfillments:{
-     status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},     
+     status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
    },
 
    items:[{
-      sku:{type:Number, min:10000, requiered:true}, 
+      sku:{type:Number, min:10000, requiered:true},
       title:{type:String, required:true},
       category:{type:String, required:true},
 
       // customer quantity
-      quantity:{type:Number, min:1, max:100, requiered:true}, 
+      quantity:{type:Number, min:1, max:100, requiered:true},
       // given price
-      price:{type:Number, min:0, max:2000, requiered:true},      
+      price:{type:Number, min:0, max:2000, requiered:true},
       part:{type: String, required: true},
 
-      // real price, maximum +/- 10% of given price 
+      // real price, maximum +/- 10% of given price
       finalprice:{type:Number, min:0, max:1000, requiered:true},
 
       // customer note
-      note:{type:String, required:false}, 
+      note:{type:String, required:false},
 
       //
       // product variation is not yet implemented
       variant:{
-        id:{type:String, required:false},  
+        id:{type:String, required:false},
         name:{type:String, required:false}
       },
-      
-      /* where is the product now? */      
+
+      /* where is the product now? */
       fulfillment:{
         status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
         note:{type: String, required: false},
         shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}
       },
 
-      vendor:{type:String, required:true}          
+      vendor:{type:String, required:true}
    }],
-   
+
    vendors:[{
     ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
     slug:{type:String, required:true},
     name:{type:String, required:true},
     fullName:{type:String, required:false},
     address:{type:String, required:true},
-   }],        
-   
+   }],
+
    shipping:{
       when:{type:Date, required:true},
       name:{type:String, required:true},
@@ -121,13 +121,13 @@ var Orders = new Schema({
       streetAdress:{type:String,required:true},
       floor:{type:String, required:true},
       postalCode:{type:String, required:true},
-      region:{type:String, required:true},      
+      region:{type:String, required:true},
       geo:{
         lat:{type:Number, required: true},
         lng:{type:Number, required: true}
-      }      
-   }   
-   
+      }
+   }
+
 
 });
 
@@ -140,7 +140,7 @@ var Orders = new Schema({
  *  - add payment gateway fees [visa,postfinance,mc,ae]
  *  - add shipping
  */
-Orders.methods.getTotalPrice=function(){
+Orders.methods.getTotalPrice=function(factor){
   var total=0.0;
   this.items&&this.items.forEach(function(item){
     //
@@ -151,7 +151,7 @@ Orders.methods.getTotalPrice=function(){
   });
 
   //
-  // add payment fees
+  // add gateway fees
   for (var gateway in config.shop.order.gateway){
     gateway=config.shop.order.gateway[gateway]
     if (gateway.label===this.payment.issuer){
@@ -159,7 +159,10 @@ Orders.methods.getTotalPrice=function(){
       break;
     }
   }
-  
+
+  // add mul factor
+  factor&&(total*=factor);
+
   // add shipping fees (10CHF)
   total+=config.shop.marketplace.shipping;
 
@@ -188,10 +191,10 @@ Orders.statics.print=function(order){
   console.log("---      user          ",  self.email);
   console.log("---      rank          ",  self.rank);
   if(self.items)
-  console.log("---      items         ",  self.items.map(function(i){ return i.sku}).join(',')); 
-  console.log("---      quantity      ",  self.items.map(function(i){ return i.quantity}).join(',')); 
+  console.log("---      items         ",  self.items.map(function(i){ return i.sku}).join(','));
+  console.log("---      quantity      ",  self.items.map(function(i){ return i.quantity}).join(','));
   if(self.vendors)
-  console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(',')); 
+  console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(','));
 }
 
 Orders.statics.printInfo=function(){
@@ -211,7 +214,7 @@ Orders.statics.prepare=function(product, quantity, note){
   function getPrice(p){
     if(p.attributes.discount && p.pricing.discount)
       return p.pricing.discount;
-    return p.pricing.price;    
+    return p.pricing.price;
   }
 
   assert(product)
@@ -219,7 +222,7 @@ Orders.statics.prepare=function(product, quantity, note){
   // check(product.attributes.available)
 
   keys.forEach(function(key){
-    copy[key]=product[key];    
+    copy[key]=product[key];
   })
 
   copy.quantity=quantity;
@@ -337,7 +340,7 @@ Orders.statics.checkItem=function(item, product, cb){
 
   // check if item.quantity <1
   if(item.quantity<1){
-    return cb(msg4,item)    
+    return cb(msg4,item)
   }
 
   //
@@ -369,7 +372,7 @@ Orders.statics.checkItem=function(item, product, cb){
 
   return cb(null,item,vendor)
 
-  // mongoose.model('Products').findOneBySku(itecreatem.sku,function(err,product){    
+  // mongoose.model('Products').findOneBySku(itecreatem.sku,function(err,product){
   // })
 
 }
@@ -404,7 +407,7 @@ Orders.statics.findOneWeekOfShippingDay=function(){
         nextDate=new Date((day-next.getDay())*86400000+next.getTime())
         if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
           all.push(nextDate)
-    }    
+    }
   })
 
   return all.sort(function(a,b){
@@ -426,16 +429,16 @@ Orders.statics.findNextShippingDay=function(){
   // next is available until time  (timeLimitH)
   next.setHours(config.shop.order.timelimitH,0,0,0)
 
-  var limit=Math.abs((now-next.getTime())/3600000) 
+  var limit=Math.abs((now-next.getTime())/3600000)
   while(config.shop.order.weekdays.indexOf(next.getDay())<0 || limit<config.shop.order.timelimit){
     next=new Date(next.getTime()+86400000)
-    limit=Math.abs((now-next.getTime())/3600000) 
+    limit=Math.abs((now-next.getTime())/3600000)
   }
 
   //
   // we dont care about seconds and ms
   next.setHours(next.getHours(),next.getMinutes(),0,0)
-  
+
   return next;
 }
 
@@ -444,11 +447,11 @@ Orders.statics.findCurrentShippingDay=function(){
   var next=new Date(), now=Date.now();
 
   // if next is today && next hours >= config.shop.order.timelimitH ==> select next day
-  var elpased=Math.abs((now-next.getTime())/3600000) 
-  while((config.shop.order.weekdays.indexOf(next.getDay())<0) || 
+  var elpased=Math.abs((now-next.getTime())/3600000)
+  while((config.shop.order.weekdays.indexOf(next.getDay())<0) ||
         (elpased<24 && next.getHours()>config.shop.order.timelimitH)){
     next=new Date(next.getTime()+86400000)
-    elpased=Math.abs((now-next.getTime())/3600000)  
+    elpased=Math.abs((now-next.getTime())/3600000)
   }
 
   //
@@ -539,7 +542,7 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
     }
 
 
-    // we have to mention this state to avoid two times reservation    
+    // we have to mention this state to avoid two times reservation
     self.fulfillments.status="reserved";
 
     //items are also in right state
@@ -555,7 +558,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
   assert(callback)
   var self=this
 
-  var msg1="Could not rollback product quantity for paid order", 
+  var msg1="Could not rollback product quantity for paid order",
       msg2="Rollback product quantity is possible when there is a fulfilled item in the order";
 
   var order=this;
@@ -574,7 +577,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
     db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
   },function(err){
     if(err){
-      
+
       //
       //DANGER send email
       bus.emit('system.message',"[kariboo-danger] : ",{error:err,order:self.oid,customer:self.email});
@@ -600,7 +603,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
 }
 
 //
-// find open orders with financial status not paid 
+// find open orders with financial status not paid
 Orders.statics.findByTimeoutAndNotPaid = function(callback){
   var q={
     closed:null,
@@ -613,7 +616,7 @@ Orders.statics.findByTimeoutAndNotPaid = function(callback){
   var query=db.model('Orders').find(q).sort({created: -1});
   if (callback) return query.exec(callback);
 
-  return query;  
+  return query;
 }
 
 //
@@ -643,7 +646,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
   // be sure that is a Date object
   shipping.when=new Date(shipping.when)
 
-  // 
+  //
   // check that shipping day is available on: config.shop.order.weekdays
   if (config.shop.order.weekdays.indexOf(shipping.when.getDay())==-1){
     return callback("La date de livraison n'est pas valable")
@@ -651,7 +654,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
   var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
   if(Math.abs((Date.now()-when)/3600000) < config.shop.order.timelimit){
-    return callback("Cette date de livraison n'est plus disponible.")    
+    return callback("Cette date de livraison n'est plus disponible.")
   }
 
   //
@@ -663,7 +666,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
 
   // early test
-  // make sure that payment issuer belongs to this customer 
+  // make sure that payment issuer belongs to this customer
   if(!payment.alias ||!customer.id ||!payment.issuer||!payment.number){
     return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
   }
@@ -703,7 +706,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       return callback('shipping address is missing or imcomplet.')
     }
 
-    
+
     Orders.checkItems(items,function(err, products,vendors, errors){
       //
       // unknow issue?
@@ -712,7 +715,7 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       }
 
       //
-      // items issue? return the lists of issues 
+      // items issue? return the lists of issues
       if((errors&&errors.length)){
         return callback(null,{errors:errors})
       }
@@ -739,11 +742,11 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
         phoneNumbers:customer.phoneNumbers,
         name:customer.name,
         email:customer.email
-      }      
+      }
       order.email=customer.email.address;
 
       //
-      // adding shipping address (minimum 3 fields 
+      // adding shipping address (minimum 3 fields
       // for general error msg)
       order.shipping={
         name:shipping.name,
@@ -782,12 +785,12 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
 
 
-    });  
-    
-  });
-  
+    });
 
-}; 
+  });
+
+
+};
 
 
 
@@ -808,7 +811,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
       // force integers
       var oids=criteria.oid.split(/[,+]/)
       oids.forEach(function(x,y,z){ z[y]=x|0 });
-      q['oid']={$in:oids}  
+      q['oid']={$in:oids}
   }
 
 
@@ -825,7 +828,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   if((criteria.closed === null || criteria.closed === undefined)&&
      !criteria.fulfillment&&
      !criteria.reason){
-    q["closed"]={$exists:false};     
+    q["closed"]={$exists:false};
   }
   else if(criteria.closed === true){
     var sd=new Date('1980'),
@@ -835,7 +838,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   else if(criteria.closed ){
     criteria.closed=new Date(criteria.closed)
     var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000-60000);        
+        ed=new Date(sd.getTime()+86400000-60000);
     q["closed"]={"$gte": sd, "$lt": ed};
   }
 
@@ -912,21 +915,21 @@ Orders.statics.updateItem = function(oid,items, callback){
     //
     // check order status
     if(order.closed){
-      return callback("Impossible de modifier une commande fermée: "+oid); 
+      return callback("Impossible de modifier une commande fermée: "+oid);
     }
 
     // cancelreason:["customer", "fraud", "inventory", "other"],
     if(order.cancel&&order.cancel.when){
-      return callback("Impossible de modifier une commande annulée: "+oid); 
+      return callback("Impossible de modifier une commande annulée: "+oid);
     }
     //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
     if(["authorized","partially_paid","paid"].indexOf(order.payment.status)==-1){
-      return callback("Impossible de modifier une commande en attente de validation financière : "+order.payment.status); 
+      return callback("Impossible de modifier une commande en attente de validation financière : "+order.payment.status);
     }
 
 
     if(["reserved","partial"].indexOf(order.fulfillments.status)==-1){
-      return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status); 
+      return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status);
     }
 
 
@@ -954,7 +957,7 @@ Orders.statics.updateItem = function(oid,items, callback){
           return (itemIds.indexOf(e.sku)===-1);
       })
 
-      return callback("L'action est annulée, les articles suivants ne concernent pas cette commande : "+itemIds.map(function(i){return i.sku}).join(', '));      
+      return callback("L'action est annulée, les articles suivants ne concernent pas cette commande : "+itemIds.map(function(i){return i.sku}).join(', '));
     }
 
     //
@@ -992,5 +995,3 @@ Orders.statics.updateItem = function(oid,items, callback){
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
 exports.Orders = mongoose.model('Orders', Orders);
-
-
