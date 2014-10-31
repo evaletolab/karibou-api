@@ -1,7 +1,7 @@
 {
   "name": "karibou-api",
   "description": "Karibou is an opensource project aim to help the creation of an online community marketplace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "engines": {
     "node": "0.10.x",

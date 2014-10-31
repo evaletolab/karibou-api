@@ -30,7 +30,7 @@ module.exports = {
     postfinance:{
       enabled:true,
       sandbox:true,
-      debug:false,
+      debug:true,
       pspid:process.env.PSPID,
       apiUser:process.env.PFUSER,
       apiPassword:process.env.PFSECRET,
