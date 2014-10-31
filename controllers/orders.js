@@ -311,7 +311,7 @@ exports.create=function(req,res){
         amount:order.getTotalPrice(config.payment.reserve),
         orderId: 'TX'+Date.now(),
         email:order.customer.email.address,
-        groupId:order.shipping.when
+        groupId:(order.shipping.when+'').substring(0,14)
       });
     }catch(err){
       return res.json(400,err.message)
