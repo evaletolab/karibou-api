@@ -34,10 +34,10 @@ var user= exports.user = function(u, lean){
     }
 
     if(!lean && !u.phoneNumbers.length){
-      throw new Error("Vous devez définir au moins un téléphone");      
+      throw new Error("Vous devez définir au moins un téléphone");
     }
 
-    for( var i in u.phoneNumbers){ 
+    for( var i in u.phoneNumbers){
       check(u.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(4, 30)
       check(u.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
     }
@@ -48,7 +48,7 @@ var user= exports.user = function(u, lean){
 
 }
 
-exports.payment=function(payment, alias){  
+exports.payment=function(payment, alias){
   check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
   check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,30)
   check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,30)
@@ -67,7 +67,7 @@ exports.authenticate=function(auth){
   var len=config.shop.system.password.len;
   check(auth.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   check(auth.email,"Entrez une adresse mail valide").isEmail();
-  check(auth.provider,"Erreur interne de format [provider]").len(3, 64);  
+  check(auth.provider,"Erreur interne de format [provider]").len(3, 64);
 }
 
 exports.register=function(auth){
@@ -84,8 +84,8 @@ exports.register=function(auth){
 exports.product = function(req){
     if (!req.body)return;
     if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64).isText();
-    
-    
+
+
     if(req.body.details){
       check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300).isText();
       req.body.details.bio && check(req.body.details.bio).isBoolean();
@@ -96,11 +96,11 @@ exports.product = function(req){
     }else{
       throw new Error("Vous devez définir une description");
     }
-    
+
     if(req.body.pricing){
       check(req.body.pricing.price, "La valeur du prix n'est pas correct").isFloat();
       req.body.pricing.discount&&check(req.body.pricing.discount, "La valeur du discount n'est pas correct").isFloat();
-      
+
       check(req.body.pricing.stock, "La valeur du stock n'est pas correct").isInt();
       check(req.body.pricing.part, "La valeur d'une portion n'est pas correct").len(3, 10);
     }else{
@@ -112,10 +112,10 @@ exports.product = function(req){
       req.body.photo.fg && check(req.body.photo.fg).len(6, 164).isUrl();
       req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
     }else{
-      throw new Error("Vous devez définir une photo");      
+      throw new Error("Vous devez définir une photo");
     }
-        
-    
+
+
     if (req.body.available){
       req.body.available.active && check(req.body.available.active).isBoolean();
       req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").isText();
@@ -126,23 +126,24 @@ exports.product = function(req){
       req.body.info.comment && check(req.body.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
     }
 
-    for (var i in req.body.faq){      
+    for (var i in req.body.faq){
       check(req.body.faq[i].q,"La question n'est pas valide ou trop longue").len(3, 128).isText();
       check(req.body.faq[i].a,"La réponse n'est pas valide ou trop longue").len(3, 400).isText()
-    }      
-    
+    }
+
 }
 
-var order_items = exports.orderItems = function(items){
-  for (var i in items){      
+var order_items = exports.orderItems = function(items, update){
+  for (var i in items){
     check(items[i].sku).isNumeric()
     check(items[i].title,       "Le description n'est pas valide, trop courte ou trop longue").isText().len(3, 300);
-    check(items[i].categories,  "La catégorie n'est pas connue").isHexadecimal()
-    check(items[i].vendor,      "Le vendeur n'est pas connu").isHexadecimal()
-
-    check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
-    check(items[i].price,       "Le prix n'est pas valable").isFloat()
-    check(items[i].part,        "La portion du produit n'est pas valable").isText().len(1, 50);
+    if(update!==true){
+      check(items[i].categories,  "La catégorie n'est pas connue").isText().len(3, 228);
+      check(items[i].vendor,      "Le vendeur n'est pas connu").isText().len(3, 228);
+      check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
+      check(items[i].price,       "Le prix n'est pas valable").isFloat()
+      check(items[i].part,        "La portion du produit n'est pas valable").isText().len(1, 50);
+    }
     ifCheck(items[i].note,        "Le commentaire n'est pas valide, il est top court ou trop long").isText().len(0, 500);
     check(items[i].finalprice,  "Le prix final n'est pas correcte").isFloat()
   }
@@ -178,7 +179,7 @@ exports.shop=function(shop){
       check(shop.description,"La description n'est pas valide ou trop longue").len(3, 400).isText()
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
     }
-    
+
     if(shop.url) check(shop.url).len(6, 164).isUrl();
 
     if (shop.photo){
@@ -186,19 +187,19 @@ exports.shop=function(shop){
       shop.photo.fg && check(shop.photo.fg).len(6, 164).isUrl();
       shop.photo.owner && check(shop.photo.owner).len(6, 164).isUrl();
     }
-    
+
     if (shop.details){
       shop.details.bio && check(shop.details.bio).isBoolean();
       shop.details.gluten && check(shop.details.gluten).isBoolean();
       shop.details.lactose && check(shop.details.lactose).isBoolean();
       shop.details.local && check(shop.details.local).isBoolean();
     }
-    
-    for (var i in shop.faq){      
+
+    for (var i in shop.faq){
       check(shop.faq[i].q,"La question n'est pas valide, trop courte ou trop longue").len(3, 128).isText();
       check(shop.faq[i].a,"La réponse n'est pas valide, trop courte ou trop longue").len(3, 400).isText();
     }
-    
+
     if (shop.available){
       shop.available.active && check(shop.available.active).isBoolean();
       shop.available.comment && check(shop.available.comment,"Le commentaire n'est pas valide ou trop long").len(6, 264).isText();
@@ -208,7 +209,7 @@ exports.shop=function(shop){
       shop.info.active && check(shop.info.active).isBoolean();
       shop.info.comment && check(shop.info.comment,"Le format du commentaire n'est pas valide").len(6, 264).isText();
     }
-      
+
     if(!shop.address && !shop.marketplace){
       throw new Error("Vous devez définir au moins une adresse de collecte");
     }
@@ -222,9 +223,8 @@ exports.shop=function(shop){
     }
     for (var i in shop.marketplace){
         check(shop.marketplace[i],"Votre point de collect n'est pas valide").isText().len(4,45)
-    }      
-      
-    
+    }
+
+
 
 }
-

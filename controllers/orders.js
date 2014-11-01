@@ -370,7 +370,7 @@ exports.updateItem=function(req,res){
   // check && validate input item
   try{
     validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
-    validate.orderItems(req.body);
+    validate.orderItems(req.body,true); // true => do not check all fields
   }catch(err){
     return res.send(400, err.message);
   }
