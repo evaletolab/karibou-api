@@ -29,7 +29,7 @@ Running
 ## API
 Current API version is v1. You need to prepend `v1/` to app requests except auth.
 
-* backend, http://karibou-api.evaletolab.ch/v1 
+* backend, http://api.karibou.evaletolab.ch/v1 
 * from appfog, http://http://karibou-api.eu01.aws.af.cm/v1
 
 ### Auth
@@ -48,7 +48,7 @@ All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
   app.post('/v1/recover/:token/:email/password'                           , users.recover);
   
 ```
-**Example:** http://karibou-api.evaletolab.ch/v1/users/me
+**Example:** http://api.karibou.evaletolab.ch/v1/users/me
 
 #### Get product data
 ```
@@ -65,7 +65,7 @@ All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
   app.delete('/v1/products/:sku'               , products.ensureOwnerOrAdmin
                                                , auth.ensureUserValid    , products.remove);
 ```
-**Example:** http://karibou-api.evaletolab.ch/v1/products?group=categories.name&sort=categories.weight
+**Example:** http://api.karibou.evaletolab.ch/v1/products?group=categories.name&sort=categories.weight
 
 #### Get shop data
 ```
