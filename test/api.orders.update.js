@@ -149,6 +149,9 @@ describe("api.orders.create", function(){
       });
   });
 
+  it("POST /v1/orders/:id/items on item status failure => finalprice should be 0", function(done){
+    done();
+  });
 
   it("POST /v1/orders/:id/items gluck can change own items fulfillment", function(done){
     var items=[]

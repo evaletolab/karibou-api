@@ -9,7 +9,7 @@ module.exports = function(app,bus) {
 
   //
   // Prepare nodemailer transport object
-  var transport = nodemailer.createTransport("SMTP", {
+  var transport = nodemailer.createTransport({
     //service: config.mail.default,
     host: provider.host,
     port: provider.port,
@@ -38,7 +38,7 @@ module.exports = function(app,bus) {
               from: config.mail.from,
               to: to,
               subject: subject,
-              _html: html,
+              //_html: html,
               // generateTextFromHTML: true,
               text: text
             };
@@ -57,7 +57,7 @@ module.exports = function(app,bus) {
   }
 
   bus.on('sendmail',function(to, subject, content, template, cb){
-    // console.log("---------------------------EMAIL:",to,subject)
+    //console.log("---------------------------EMAIL:",to,subject)
     sendmail(to, subject, content, template, cb);
   });
 

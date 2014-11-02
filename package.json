@@ -12,6 +12,7 @@
     "connect-mongo": "~0.4.1",
     "connect-mongodb": "1.x",
     "debug": "^0.8.1",
+    "ejs": "^1.0.0",
     "email-templates": "1.x",
     "express": "3.16.x",
     "fnv-plus": "~1.2.9",

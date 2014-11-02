@@ -933,7 +933,7 @@ Orders.statics.updateItem = function(oid,items, callback){
     }
 
 
-    var itemIds=[];
+    var itemIds=[], rollback=[];
     items.forEach(function(item){
       assert(item.sku)
       for(var i in order.items){
@@ -941,6 +941,13 @@ Orders.statics.updateItem = function(oid,items, callback){
           if(item.finalprice) order.items[i].finalprice=item.finalprice;
           if(item.note)       order.items[i].note=item.note;
           if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
+
+          // this item has bean removed from the order
+          if(item.fulfillment==='failure'){
+            rollback.push({sku:item.sku,qty:item.quantity})
+            item.finalprice=0.0;
+            item.quantity=0;
+          }
           itemIds.push(order.items[i].sku);
           break;
         }
