@@ -12,14 +12,14 @@ This is a backend part of the futur [karibou.*] application.
     $ git clone https://github.com/evaletolab/karibou-api.git
     $ cd karibou-api
     $ npm install
-    $ edit config-devel|test.js
+    $ optional edit config-devel|test.js
     $ mongod
     
 Testing
 
     $ sudo npm -g install mocha
-    $ make test
     $ NODE_ENV=test ./node_modules/.bin/mocha
+    $ (or) make test
 
 Running    
 
