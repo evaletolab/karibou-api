@@ -130,14 +130,14 @@ exports.password=function(req,res){
 
   try{
       validate.check(req.params.id,"Invalid uid request").isInt();
-      validate.password(auth)
+      validate.password(req.body)
       if(!req.body.current && req.user.hash) throw new Error("Il manque votre mot de passe");
   }catch(err){
     return res.send(400, err.message);
   }
 
 
-  var stderr="L' utilisateur "+req.body.email+"@"+req.params.id+" n'existe pas ou son mot de passe est incorrect";
+  var stderr="L' utilisateur "+req.body.email+":"+req.params.id+" n'existe pas ou son mot de passe est incorrect";
 
   Users.findOne({'email.address': req.body.email, id:req.params.id},
     function(err,user){

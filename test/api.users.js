@@ -42,7 +42,7 @@ describe("api.users", function(){
   it('POST /login should return 400 ',function(done){
     request(app)
       .post('/login')
-      .send({ email: "evaleto@gluck.com", password:'12', provider:'local' })
+      .send({ email: "evaleto@gluck.com", password:'123456789', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(400);
         res.body.should.be.a.string;        
@@ -97,7 +97,6 @@ describe("api.users", function(){
         done();        
       });
   });
-
    
   it('GET /v1/users/me should return 200',function(done){
     request(app)
@@ -139,6 +138,63 @@ describe("api.users", function(){
       .set('cookie', cookie)
       .expect(200,done);
   });
+
+  it('POST /v1/users/12345/password anonymous update password should return 401',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/12345/password')      
+      .send({ email:"evaleto@gluck.com", new:'12345',current:'password'})
+      .expect(401,done);
+  });
+
+  it('POST /v1/users/12347/password wrong user update password should return 401',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/12347/password')      
+      .send({ email:"delphine@gmail.com", new:'12347',current:'password' })
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.text.should.include('pas le propriétaire de ce compte')
+        res.should.have.status(401);
+        done()
+      });    
+  });
+
+  it('POST /v1/users/12345/password update with short password should return 400',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/12345/password')      
+      .send({ email:"evaleto@gluck.com", new:'1234',current:'password' })
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.include('passe doit contenir au moins')
+        done()
+      });    
+  });
+
+  it('POST /v1/users/12345/password update with wrong old password should return 400',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/12345/password')      
+      .send({ email:"evaleto@gluck.com", new:'12345',current:'12345' })
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.text.should.include('mot de passe est incorrect (2)')
+        res.should.have.status(400);
+        done()
+      });    
+  });
+
+  it('POST /v1/users/12345/password update password should return 200',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/12345/password')      
+      .send({ email:"evaleto@gluck.com", new:'12345',current:'password' })
+      .set('cookie', cookie)
+      .expect(200,done);
+  });
+
   it('valid user contains DISQUS SSO',function(done){
     request(app)
       .get('/v1/users/me')
