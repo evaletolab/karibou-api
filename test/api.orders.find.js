@@ -9,7 +9,7 @@ var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
 var Products=db.model('Products'), 
     Orders=db.model('Orders');
 
-describe("api.orders.security", function(){
+describe("api.orders.find", function(){
   var request= require('supertest');
   var _ = require("underscore");
 
@@ -25,9 +25,9 @@ describe("api.orders.security", function(){
         should.not.exist(err);
 
         // Orders.printInfo()
-        // Orders.find({}).exec(function(e,os){
-        //   os.forEach(function(o){o.print()})
-        // })
+        //  Orders.find({}).exec(function(e,os){
+        //    os.forEach(function(o){o.print()})
+        //  })
 
         done();
       });

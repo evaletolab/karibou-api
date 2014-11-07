@@ -72,6 +72,17 @@ describe("orders.find.shop", function(){
     });
   });
 
+  it("find open orders (4) filter by an unknow shops names ['pouet','prout']", function(done){
+    var criteria={
+      shop:["pouet","prout"],  /*super-shop*/
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(0)
+      done();
+    });
+  });
+
   it("find open orders (4) filter by shops name ['Super shop','Mon shop']", function(done){
     var criteria={
       shop:["mon-shop","un-autre-shop"],  /*super-shop*/

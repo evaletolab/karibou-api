@@ -50,12 +50,12 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
 
   // ensure that all items in this update bellongs to this user
   // req.user.shops.$.urlpathreq.body.items.$.vendor
-  var slugs=_.collect(req.user.shops,function(p){return (p._id+'');})
+  var slugs=_.collect(req.user.shops,function(p){return (p.urlpath+'');})
   var items=(req.body.length)?req.body:[req.body]
 
   for(var item in items){
-    // console.log('---------',slugs)
-    // console.log('---------',items[item].sku,items[item].vendor, req.user.email.address)
+    //console.log('---------',req.user.email.address,slugs)
+    //console.log('---------',items[item].vendor,items[item].vendor, req.user.email.address)
     if(slugs.indexOf(items[item].vendor+'')==-1){
       return res.send(401,'Cet article '+items[item].sku+' n\'appartient pas à votre boutique')
     }
@@ -198,7 +198,7 @@ exports.listByShop = function(req,res){
     if(err){
       return res.send(400,err);
     }
-    return res.json(Orders.filterByShop([criteria.shop], orders))
+    return res.json(Orders.filterByShop(criteria.shop, orders))
   });
 };
 

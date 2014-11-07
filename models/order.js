@@ -134,40 +134,6 @@ var Orders = new Schema({
 //
 // API
 
-/**
- * total price
- *  - some of item finalprice ()
- *  - add payment gateway fees [visa,postfinance,mc,ae]
- *  - add shipping
- */
-Orders.methods.getTotalPrice=function(factor){
-  var total=0.0;
-  this.items&&this.items.forEach(function(item){
-    //
-    // item should not be failure (fulfillment)
-    if(item.fulfillment!=='failure'){
-      total+=item.finalprice;
-    }
-  });
-
-  //
-  // add gateway fees
-  for (var gateway in config.shop.order.gateway){
-    gateway=config.shop.order.gateway[gateway]
-    if (gateway.label===this.payment.issuer){
-      total+=total*gateway.fees;
-      break;
-    }
-  }
-
-  // add mul factor
-  factor&&(total*=factor);
-
-  // add shipping fees (10CHF)
-  total+=config.shop.marketplace.shipping;
-
-  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
-}
 
 Orders.methods.print=function(order){
   mongoose.model('Orders').print(this)
@@ -207,9 +173,10 @@ Orders.statics.printInfo=function(){
   console.log("-- next shipping day for customers  ", this.findNextShippingDay());
   console.log("-- next shipping day for sellers  ", this.findCurrentShippingDay());
 }
+
 //
 // prepare one product as order item
-Orders.statics.prepare=function(product, quantity, note){
+Orders.statics.prepare=function(product, quantity, note, shops){
   var copy={}, keys=['sku','title','categories','vendor'];
   function getPrice(p){
     if(p.attributes.discount && p.pricing.discount)
@@ -219,11 +186,14 @@ Orders.statics.prepare=function(product, quantity, note){
 
   assert(product)
   assert(product.vendor)
-  // check(product.attributes.available)
 
   keys.forEach(function(key){
     copy[key]=product[key];
   })
+
+  if(shops){
+    copy.vendor=_.find(shops,function(shop){return (shop._id+'')===copy.vendor}).urlpath
+  }
 
   copy.quantity=quantity;
   copy.price=getPrice(product)
@@ -234,28 +204,66 @@ Orders.statics.prepare=function(product, quantity, note){
   return copy;
 }
 
+/**
+ * total price
+ *  - some of item finalprice ()
+ *  - add payment gateway fees [visa,postfinance,mc,ae]
+ *  - add shipping
+ */
+Orders.methods.getTotalPrice=function(factor){
+  var total=0.0;
+  this.items&&this.items.forEach(function(item){
+    //
+    // item should not be failure (fulfillment)
+    if(item.fulfillment!=='failure'){
+      total+=item.finalprice;
+    }
+  });
+
+  //
+  // add gateway fees
+  for (var gateway in config.shop.order.gateway){
+    gateway=config.shop.order.gateway[gateway]
+    if (gateway.label===this.payment.issuer){
+      total+=total*gateway.fees;
+      break;
+    }
+  }
+
+  // add mul factor
+  factor&&(total*=factor);
+
+  // add shipping fees (10CHF)
+  total+=config.shop.marketplace.shipping;
+
+  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
+}
+
 //
 // filter order content by User//Shop 
 Orders.statics.filterByShop=function(shopname,orders){
   assert(shopname)
   assert(orders)
-  var i=0;
+  var i=0, toKeep=[];
 
   orders.forEach(function(order,j){
     //
     // remove exo shops
     i=order.vendors.length;while (i--){
-      if(order.vendors[i].slug!==shopname){
+      if(shopname.indexOf(order.vendors[i].slug)===-1){
           order.vendors.splice(i,1)
       }
     }
+    if(order.vendors.length){
+      toKeep.push(order)
+    }
   })
 
-  orders.forEach(function(order,j){
+  toKeep.forEach(function(order,j){
     //
     // remove exo items
     i=order.items.length;while (i--){
-      if(order.items[i].vendor!==shopname){
+      if(shopname.indexOf(order.items[i].vendor+'')===-1){
           order.items.splice(i,1)
       }
     }
@@ -263,7 +271,7 @@ Orders.statics.filterByShop=function(shopname,orders){
 
   })
 
-  return orders
+  return toKeep
 }
 
 
@@ -487,7 +495,6 @@ Orders.statics.checkItems = function(items, callback){
       //
       // check an item
       Orders.checkItem(items[i],products[i],function(err,item, vendor){
-
         if(vendor)vendors.push(vendor);
         var error={}; error[item.sku]=err;
         //

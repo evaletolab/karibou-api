@@ -156,7 +156,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items gluck can change own items fulfillment", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       // gluck owner
       if([1000001].indexOf(e.sku)!==-1){
           e.fulfillment.status='fulfilled'
@@ -184,7 +184,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items evaleto update item from other shop generate an ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       if([1000006].indexOf(e.sku)!==-1){
           items.push(e)
       }
@@ -206,7 +206,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items gluck update item from other shop generate an ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       if([1000002].indexOf(e.sku)!==-1){
           items.push(e)
       }
@@ -230,7 +230,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items not in this order generate an ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       if([1000004].indexOf(e.sku)!==-1){
           items.push(e)
       }
@@ -252,7 +252,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items evaleto update fulfillment", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       // gluck owner
       if([1000002].indexOf(e.sku)!==-1){
           e.fulfillment.status='failure'
@@ -281,7 +281,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items update lasts items finalize this order", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       if([1000005,1000007].indexOf(e.sku)!==-1){
           e.fulfillment.status='fulfilled'
           items.push(e)
@@ -312,7 +312,7 @@ describe("api.orders.create", function(){
   it("POST /v1/orders/:id/items update after finalize generate an ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
-      var e=Orders.prepare(product, 1, "");
+      var e=Orders.prepare(product, 1, "",data.Shops);
       if([1000007].indexOf(e.sku)!==-1){
           e.fulfillment.status='fulfilled'
           items.push(e)

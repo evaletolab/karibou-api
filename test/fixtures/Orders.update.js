@@ -191,9 +191,9 @@ exports.Shops=[{
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
     status:true,
-    name: "valid shop",
-    description:"valid shop",
-    urlpath:"valid-shop",
+    name: "invalid shop",
+    description:"invalid shop",
+    urlpath:"invalid-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[2]._id,    
     available:{

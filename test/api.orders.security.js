@@ -18,6 +18,7 @@ describe("api.orders.security", function(){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Shops.js"],db,function(err){
         should.not.exist(err);
         done();
+
       });
     });      
   });
