@@ -133,6 +133,7 @@ module.exports = function(app, config, passport) {
   //
   // orders
   app.get('/v1/orders', auth.ensureAdmin, orders.list);
+  app.get('/v1/orders/shops', auth.ensureUserValid, orders.listByShopOwner);
   app.get('/v1/orders/shops/:shopname', shops.ensureOwnerOrAdmin, orders.listByShop);
   app.get('/v1/orders/users/:id', users.ensureMeOrAdmin, orders.list);
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);

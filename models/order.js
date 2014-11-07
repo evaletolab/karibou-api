@@ -64,7 +64,7 @@ var Orders = new Schema({
       status:{type:String, enum:EnumFinancialStatus, default:'pending'},
 
       /*for security reason transaction data are encrypted */
-      transaction:{type:String}
+      transaction:{type:String,select:false}
    },
 
 
@@ -234,6 +234,8 @@ Orders.statics.prepare=function(product, quantity, note){
   return copy;
 }
 
+//
+// filter order content by User//Shop 
 Orders.statics.filterByShop=function(shopname,orders){
   assert(shopname)
   assert(orders)
@@ -816,11 +818,13 @@ Orders.statics.findByCriteria = function(criteria, callback){
 
 
   //
-  // filter by shop
+  // filter by shop or shops
   if(criteria.shop){
-    q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
-    // q["items.vendor"]=criteria.shop;
-    // q["vendors.slug"]=criteria.shop;
+    if(Array.isArray(criteria.shop)){
+      q["vendors.slug"]={"$in":criteria.shop};
+    }else{
+      q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
+    }
   }
 
   //

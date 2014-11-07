@@ -154,7 +154,7 @@ exports.list = function(req,res){
 
   parseCriteria(criteria,req)
 
-  // restrict to an user
+  // restrict to customer
   if (req.params.id){
     criteria.user=parseInt(req.params.id)
   }
@@ -192,13 +192,13 @@ exports.listByShop = function(req,res){
   parseCriteria(criteria,req)
 
   // restrict to a shopname
-  criteria.shop=req.params.shopname
+  criteria.shop=[req.params.shopname]
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,err);
     }
-    return res.json(Orders.filterByShop(criteria.shop, orders))
+    return res.json(Orders.filterByShop([criteria.shop], orders))
   });
 };
 
@@ -220,7 +220,7 @@ exports.listByShopOwner = function(req,res){
   parseCriteria(criteria,req)
 
   // restrict shops to a user
-  criteria.shops=req.user.shops.map(function(i){ return i.sku})
+  criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
 
   // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){

@@ -33,6 +33,11 @@ describe("orders.find.shop", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
+        // Orders.printInfo()
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){o.print()})
+        // })
+
         done();
       });
     });      
@@ -48,8 +53,6 @@ describe("orders.find.shop", function(){
   it("find open orders (1) filter by shop name 'Super shop'", function(done){
     var criteria={
       shop:"super-shop",  /*super-shop*/
-      closed:null
-
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
@@ -61,8 +64,17 @@ describe("orders.find.shop", function(){
   it("find open orders (4) filter by shop name 'Un autre shop'", function(done){
     var criteria={
       shop:"un-autre-shop",  /*super-shop*/
-      closed:null
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err)
+      order.length.should.equal(4)
+      done();
+    });
+  });
 
+  it("find open orders (4) filter by shops name ['Super shop','Mon shop']", function(done){
+    var criteria={
+      shop:["mon-shop","un-autre-shop"],  /*super-shop*/
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){
       should.not.exist(err)
