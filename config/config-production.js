@@ -6,15 +6,15 @@ var PATH = function(p) {
 
 module.exports = {
   mail:{
-    from:'james@karibou.io',
-    to:['james@karibou.io'],
+    from:'james@karibou.ch',
+    to:['james@karibou.ch'],
     validate:{time:24,short:1},
-    site:'http://karibou.io',
+    site:'http://karibou.ch',
     default:'mandril',
     mandril:{    
       host:'smtp.mandrillapp.com',
       port:587,
-      user:'evaleto@gmail.com',
+      user:process.env.MANDRIL_USER,
       code:process.env.MANDRIL 
     }
   },
@@ -44,6 +44,8 @@ module.exports = {
         'http://kariboo.evaletolab.ch',
         'http://logistic.evaletolab.ch',
         'http://karibou.io',
+        'http://demo.karibou.io',
+        'http://demo.karibou.ch',
         'http://karibou.ch'
     ],
     credentials:true,

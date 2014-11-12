@@ -1009,7 +1009,30 @@ Orders.statics.updateItem = function(oid,items, callback){
   });
 }
 
+Orders.statics.getStatsByOrder=function(query){
+  query=query||{ closed: { '$exists': false } };
 
+  return db.model('Orders').aggregate(
+     [
+       { $match: query },
+       {$project:{week: { $week: "$shipping.when"}, year: { $year: "$shipping.when" },
+                 items:1,
+                 shipping:1,
+                 oid:1
+       }},
+       {$unwind: '$items'}, 
+       {$group:
+           {
+             _id:"$oid",
+             week:{$first:"$week"},
+             totalAmount: { $sum: "$items.finalprice" },
+             count: { $sum: "$items.quantity" }
+           }
+       },
+       {$sort:{week:-1}}
+     ]
+  )
+}
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
 exports.Orders = mongoose.model('Orders', Orders);

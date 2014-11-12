@@ -4,6 +4,8 @@
  */
 var _ = require('underscore'),
     bus=require('../app/bus'),
+    sm = require('sitemap'),
+    errorHelper = require('mongoose-error-helper').errorHelper;
     origins=[]
 
 //
@@ -70,3 +72,46 @@ exports.message = function(req, res) {
 
     res.json({});
 };
+
+
+
+exports.sitemap=function(req,res){
+  var sitemap;
+
+  // if sitemap is cached
+  if (sitemap && sitemap.isCacheValid()){
+    return sitemap.toXML( function (xml) {
+        res.header('Content-Type', 'application/xml');
+        res.send( xml );
+    });    
+  }
+
+  // else
+  require('mongoose').model('Products').findByCriteria({'query.status':true},function(err,products){
+    if(err){
+      return req.send(400,errorHelper(err))
+    }
+    var prefix="/products/";
+    var urls=[];
+    products.forEach(function(product){
+      // use lastmod wit product update date ??
+      urls.push({url:prefix+product.sku, changefreq: 'weekly', priority: 1.0 })
+    })
+
+    sitemap = sm.createSitemap ({
+      hostname: 'http://karibou.ch',
+      cacheTime: (12*3600000),        // 12h - cache purge period
+      urls: urls
+    });
+
+    sitemap.toXML( function (xml) {
+        res.header('Content-Type', 'application/xml');
+        res.send( xml );
+    });    
+
+  })
+}
+
+exports.robots=function(req,res){
+  req.send(400,'not implemented')
+}

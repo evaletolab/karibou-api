@@ -40,7 +40,14 @@ module.exports = function(app, config, passport) {
   app.post('/login', queued(auth.login_post));
   app.get ('/register', auth.register);
   app.post('/register', queued(auth.register_post));
+
+  //
+  // sitemap
+  app.get ('/sitemap.xml', api.sitemap);
+  app.get ('/robots.txt', api.robots);
   
+  
+
   //
   // user
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);

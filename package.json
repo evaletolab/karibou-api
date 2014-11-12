@@ -36,6 +36,7 @@
     "passport-twitter": "1.x",
     "password-generator": "0.2.x",
     "queue-async": "~1.0.7",
+    "sitemap": "^0.7.4",
     "underscore": "1.x",
     "validator": "3.x"
   },
