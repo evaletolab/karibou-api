@@ -34,7 +34,7 @@ Emails.statics.findOrCreate=function(e,callback){
 };
 
 
-Emails.statics.createAndSendMail=function(user, cb){
+Emails.statics.createAndSendMail=function(user,origin, cb){
   this.create(user, function(err,validate){
     if(err){
       return cb(err);
@@ -42,7 +42,7 @@ Emails.statics.createAndSendMail=function(user, cb){
     
     var content=user;
     content.validate=validate;
-    content.origin=config.mail.validate.origin;
+    content.origin=origin;
     
     //
     // send email

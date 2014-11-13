@@ -222,7 +222,8 @@ exports.register_post= function(req, res,next) {
 
           //
           // send mail validation after user creation
-          db.model('Emails').createAndSendMail(user,function(err,validate){
+          var origin=req.header('Origin')||config.mail.validate.origin;
+          db.model('Emails').createAndSendMail(user,origin,function(err,validate){
             if(err){
               console.log("ERROR",err)
               return res.send(400,err)
