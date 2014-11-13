@@ -42,6 +42,7 @@ Emails.statics.createAndSendMail=function(user, cb){
     
     var content=user;
     content.validate=validate;
+    content.origin=config.mail.validate.origin;
     
     //
     // send email
