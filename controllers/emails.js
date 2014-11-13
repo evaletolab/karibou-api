@@ -9,6 +9,7 @@ var Emails = db.model('Emails');
 
 var check = require('../app/validator').check,
     sanitize = require('../app/validator').sanitize,
+    errorHelper = require('mongoose-error-helper').errorHelper,
     bus=require('../app/bus'),
     _=require('underscore');
 
@@ -34,7 +35,7 @@ exports.create=function (req, res) {
     
     var content=req.user;
     content.validate=validate;
-    content.origin=config.mail.validate.origin;
+    content.origin=req.header('Origin')||config.mail.validate.origin;
     console.log(content.origin+'/validate/'+validate.uid+'/'+validate.email)
     bus.emit('sendmail',req.user.email.address, 
                  "Confirmation de votre adresse e-mail", 
@@ -42,7 +43,10 @@ exports.create=function (req, res) {
                  "confirm", function(err, status){
       if(err){
         console.log(err,status)
-        return res.send(400,err);
+        return validate.remove(function(){
+          return res.send(400,'Oops, quelque chose est allé de travers avec la messagerie: '+err.message);
+        });
+
       }      
                  
       res.json(validate);                 
@@ -77,8 +81,7 @@ exports.validate=function (req, res) {
 exports.list=function (req, res) {
   Emails.find({})/*.where("status",true)*/.exec(function (err,emails){
     if (err){
-    	res.status(400);
-      return res.json({error:err});    
+      return res.send(400,errorHelper(err));    
     }
     
 
