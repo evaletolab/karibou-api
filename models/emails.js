@@ -46,7 +46,7 @@ Emails.statics.createAndSendMail=function(user, cb){
     
     //
     // send email
-    console.log('/validate/'+validate.uid+'/'+validate.email)
+    console.log(content.origin+'/validate/'+validate.uid+'/'+validate.email)
     bus.emit('sendmail', user.email.address, 
                  "Confirmation de votre adresse e-mail", 
                  content, 
