@@ -1,16 +1,11 @@
-<p>
-  Salut <%= name.givenName %>
-</p>
-<p>
-  Afin de valider ton compte, merci de bien vouloir confirmer ton adresse e-mail en cliquant sur le lien suivant:
-  <p><a href="http://karibou.evaletolab.ch/validate/<%= validate.uid %>/<%= validate.email %>">
-    http://karibou.evaletolab.ch/validate/<%= validate.uid %>/<%= validate.email %>
-  </a></p>
-</p>
-<p>
-  A bientôt,
-  <address>
-    <strong>Olivier Evalet<br/>Ingénieur chez Karibou.</strong><br>
-    <abbr title="Phone">P:</abbr> (123) 456-7890
-  </address>
-</p>
+Salut <%= name.givenName %>,
+
+Afin de valider ton compte, merci de bien vouloir confirmer ton adresse e-mail en cliquant sur le lien suivant:
+    <% origin %>/validate/<%= validate.uid %>/<%= validate.email %>
+
+A bientot,
+
+-- 
+Olivier Evalet
+Ingénieur chez Karibou.
+
