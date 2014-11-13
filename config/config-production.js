@@ -8,7 +8,7 @@ module.exports = {
   mail:{
     from:'james@karibou.ch',
     to:['james@karibou.ch'],
-    validate:{time:24,short:1,origin:'http://karibou.ch'},
+    validate:{time:24,short:1,origin:process.env.KARIBOU_ORIGIN},
     site:'http://karibou.ch',
     default:'mandril',
     mandril:{    
@@ -21,7 +21,7 @@ module.exports = {
 
   admin:{
     emails:['evaleto@gmail.com', 'delphine.cluzel@gmail.com'],
-    secret: process.env.KARIBOO_SECRET,
+    secret: process.env.KARIBOU_SECRET,
     padding:'0e0e0e0e'    
   },
 
@@ -53,8 +53,8 @@ module.exports = {
   },
   
   express: {
-    port: process.env.PORT || 3000,
-    host:'localhost',
+    port: process.env.KARIBOU_PORT || 3000,
+    host:process.env.KARIBOU_HOST,
     views: '/views',
     'view engine': 'jade',
     csrf:false,
