@@ -54,6 +54,7 @@ module.exports = {
   
   express: {
     port: process.env.PORT || 3000,
+    host:'localhost',
     views: '/views',
     'view engine': 'jade',
     csrf:false,
