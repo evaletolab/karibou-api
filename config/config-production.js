@@ -41,11 +41,14 @@ module.exports = {
   cors:{
     allowedDomains:[
         'http://karibou.evaletolab.ch',
-        'http://kariboo.evaletolab.ch',
+        'https://karibou.evaletolab.ch',
         'http://logistic.evaletolab.ch',
         'http://karibou.io',
+        'https://karibou.io',
         'http://demo.karibou.io',
         'http://demo.karibou.ch',
+        'https://demo.karibou.ch',
+        'https://karibou.ch',
         'http://karibou.ch'
     ],
     credentials:true,
