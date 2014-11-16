@@ -134,7 +134,7 @@ module.exports = {
        *              (via "x-forwarded-proto")
       */
 
-  		secret:process.env.KARIBOO_SECRET,
+  		secret:process.env.KARIBOU_SECRET,
       key: 'sid',
       cookie: {
         path: '/',

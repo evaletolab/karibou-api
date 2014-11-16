@@ -309,7 +309,7 @@ exports.create=function(req,res){
       transaction = new postfinance.Transaction({
         operation: 'authorize',
         amount:order.getTotalPrice(config.payment.reserve),
-        orderId: 'TX'+Date.now(),
+        orderId: 'TX'+order.oid,
         email:order.customer.email.address,
         groupId:(order.shipping.when+'').substring(0,14)
       });
