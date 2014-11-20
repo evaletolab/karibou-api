@@ -1,5 +1,5 @@
-#config-production.js
-config-development.js
+config/config-production.js
+config/config-shop.js
 node_modules
 tips
 backups
