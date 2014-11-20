@@ -11,8 +11,8 @@ exports.Products=[{
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
-        gluten:true, 
-        ogm:false,
+        homemade:true, 
+        natural:false,
         bio:true, 
      },  
      
@@ -40,8 +40,8 @@ exports.Products=[{
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
-        gluten:true, 
-        ogm:false,
+        homemade:true, 
+        natural:false,
         bio:false, 
      },  
      attributes:{
@@ -67,8 +67,8 @@ exports.Products=[{
      details:{
         description:"Gragnano de sa colline qui donne sur le Golfe de Naples, est depuis le XVI siècle la patrie de la pasta. ",
         comment:"Temps de cuisson : 16 minutes",
-        gluten:true, 
-        ogm:false,
+        homemade:true, 
+        natural:false,
         bio:true, 
      },  
      attributes:{

@@ -9,7 +9,7 @@ module.exports = {
     from:'james@karibou.io',
     to:['james@karibou.io'],
     validate:{time:24,short:1},
-    site:'http://lo.cal:3000',
+    origin:'http://lo.cal:3000',
     default:'mandril',
     mandril:{
       host:'smtp.mandrillapp.com',

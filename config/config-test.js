@@ -10,7 +10,7 @@ module.exports = {
     from:'james@karibou.evaletolab.ch',
     to:['delphine.cluzel@gmail.com','evaleto@gmail.com'],
     validate:{time:24,short:1},
-    site:'http://karibou.evaletolab.ch',
+    origin:'http://karibou.evaletolab.ch',
     default:'mandril',
     mandril:{
       host:'smtp.mandrillapp.com',

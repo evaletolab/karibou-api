@@ -69,13 +69,13 @@ describe("products.find:", function(){
     });
   });
 
-  it("Find Non-OGM products by Shop  ", function(done){
+  it("Find Natural products by Shop  ", function(done){
 
     db.model('Shops').findByUser({"email.address":"evaleto@gluck.com"},function(err,shops){
       should.exist(shops[0]);
-      Products.findByCriteria({shopname:shops[0].urlpath,details:'ogm'},function(err,products){          
+      Products.findByCriteria({shopname:shops[0].urlpath,details:'natural'},function(err,products){          
         products.length.should.equal(1)
-        products[0].details.ogm.should.equal(true);
+        products[0].details.natural.should.equal(true);
         done();
       });
     });
@@ -127,8 +127,8 @@ describe("products.find:", function(){
 
   });
 
-  it("Find products by Category and details(bio=true, ogm free=true, gluten free=true) ", function(done){
-    Products.findByCriteria({category:data.Categories[3].slug,details:'bio+ogm+gluten'},function(err,products){
+  it("Find products by Category and details(bio=true, natural=true, homemade=true) ", function(done){
+    Products.findByCriteria({category:data.Categories[3].slug,details:'bio+natural+homemade'},function(err,products){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(1)

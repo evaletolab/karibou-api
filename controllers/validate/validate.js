@@ -83,15 +83,16 @@ exports.register=function(auth){
  */
 exports.product = function(req){
     if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom n'est pas valide ou trop long").len(3, 64).isText();
+    if(req.body.title) check(req.body.title,"Le nom n'est pas valide").len(3, 64).isText();
 
 
     if(req.body.details){
-      check(req.body.details.description,"Le description n'est pas valide ou trop longue").len(3, 300).isText();
-      req.body.details.bio && check(req.body.details.bio).isBoolean();
-      req.body.details.gluten && check(req.body.details.gluten).isBoolean();
-      req.body.details.lactose && check(req.body.details.lactose).isBoolean();
-      req.body.details.local && check(req.body.details.local).isBoolean();
+      check(req.body.details.description,"Le description n'est pas valide").len(3, 300).isText();
+      req.body.details.bio && check(req.body.details.bio,"Erreur system p1").isBoolean();
+      req.body.details.homemade && check(req.body.details.homemade,"Erreur system p2").isBoolean();
+      req.body.details.natural && check(req.body.details.natural,"Erreur system p3").isBoolean();
+      req.body.details.local && check(req.body.details.local,"Erreur system p4").isBoolean();
+      req.body.details.cold && check(req.body.details.cold,"Erreur system p5").isBoolean();
 
     }else{
       throw new Error("Vous devez définir une description");
@@ -108,9 +109,9 @@ exports.product = function(req){
     }
 
     if (req.body.photo){
-      req.body.photo.bg && check(req.body.photo.bg).len(6, 164).isUrl();
-      req.body.photo.fg && check(req.body.photo.fg).len(6, 164).isUrl();
-      req.body.photo.owner && check(req.body.photo.owner).len(6, 164).isUrl();
+      req.body.photo.bg && check(req.body.photo.bg,"Erreur system p6").len(6, 164).isUrl();
+      req.body.photo.fg && check(req.body.photo.fg,"Erreur system p7").len(6, 164).isUrl();
+      req.body.photo.owner && check(req.body.photo.owner,"Erreur system p8").len(6, 164).isUrl();
     }else{
       throw new Error("Vous devez définir une photo");
     }

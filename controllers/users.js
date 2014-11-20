@@ -102,7 +102,7 @@ exports.recover=function(req,res){
       // change the password
       var content=user;
       content.password=user.password=password();
-      content.origin=req.header('Origin')||config.mail.validate.origin;
+      content.origin=req.header('Origin')||config.mail.origin;
       user.save(function(err){
         if(err)return res.send(400,err);
 

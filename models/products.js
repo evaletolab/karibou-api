@@ -40,13 +40,13 @@ var Product = new Schema({
       description:{type:String, required:true},
       comment:{type:String, required:false},
       origin:{type:String, required:false},
-      gluten:{type:Boolean, default:false}, 
-      cold:{type:Boolean, default:false},
-      ogm:{type:Boolean, default:false},
-      lactose:{type:Boolean, default:false},
-      local:{type:Boolean, default:false},
-      bio:{type:Boolean, default:false}, 
-      biodegradable:{type:Boolean, default:false}, 
+      gluten:{type:Boolean, default:false},        // Gluten free
+      cold:{type:Boolean, default:false},          // Fresh food
+      homemade:{type:Boolean, default:false},      // Home made
+      natural:{type:Boolean, default:false},       // Synthetic Pesticide & Fertilizer Free
+      local:{type:Boolean, default:false},         // Locally Grown
+      bio:{type:Boolean, default:false},           // Certified Organic
+      biodegradable:{type:Boolean, default:false}, //  
    },  
    
    attributes:{

@@ -132,7 +132,7 @@ exports.email=function(req,res){
     var content={};
     content.user=req.user;
     content.text=req.body.content;
-    content.site=config.mail.site;
+    content.origin=req.header('Origin')||config.mail.origin;
 
     //
     // send email
@@ -182,7 +182,7 @@ exports.askStatus=function(req,res){
 
     var content=req.user;
     content.shop=shop;
-    content.site=config.mail.site;
+    content.origin=req.header('Origin')||config.mail.origin;
     //
     // send email
     bus.emit('sendmail',config.mail.to,

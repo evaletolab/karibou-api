@@ -39,9 +39,9 @@ describe("api.products.find", function(){
       });
   });
   
-  it("GET 200,/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
+  it("GET 200,/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade", function(done){
     request(app)
-      .get("/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
+      .get("/v1/shops/un-autre-shop/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade")
       .end(function(err, res){
         // console.log(res.text)
         res.should.have.status(200);
@@ -52,9 +52,9 @@ describe("api.products.find", function(){
       });
   });  
 
-  it("GET 400,/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
+  it("GET 400,/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade", function(done){
     request(app)
-      .get("/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
+      .get("/v1/shops/un-autre-shop2/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade")
       .end(function(err, res){
         res.should.have.status(400);
         done();
@@ -63,9 +63,9 @@ describe("api.products.find", function(){
 
 
 
-  it("GET 200,/v1/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten", function(done){
+  it("GET 200,/v1/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade", function(done){
     request(app)
-      .get("/v1/products/category/"+data.Categories[3].slug+"/details/bio+ogm+gluten")
+      .get("/v1/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade")
       .expect('Content-Type', /json/)
       .end(function(err, res){
         res.should.have.status(200);

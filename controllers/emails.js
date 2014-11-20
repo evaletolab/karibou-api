@@ -35,7 +35,7 @@ exports.create=function (req, res) {
     
     var content=req.user;
     content.validate=validate;
-    content.origin=req.header('Origin')||config.mail.validate.origin;
+    content.origin=req.header('Origin')||config.mail.origin;
     console.log(content.origin+'/validate/'+validate.uid+'/'+validate.email)
     bus.emit('sendmail',req.user.email.address, 
                  "Confirmation de votre adresse e-mail", 
