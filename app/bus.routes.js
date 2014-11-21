@@ -12,7 +12,6 @@ onTrace=function(token,error){
 };
 
 onMessage=function(title,content){
-    console.log("-------------------------",title,content)
     var msg=JSON.stringify(content,null,2);
     bus.emit( "sendmail",
               "info@karibou.io",title,
