@@ -120,6 +120,7 @@ exports.robots=function(req,res){
 exports.github=function(req,res){
   function verify(key, body) {
     var str=JSON.stringify(body);
+    console.log(str,key)
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
   }
 
