@@ -128,12 +128,12 @@ exports.github=function(req,res){
       ,id    = req.headers['x-github-delivery']  
       ,verify= verify(config.admin.github.secret,req.body)
 
+  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.match(config.admin.github.release))
 
   if(!sig||!event||!id){
-    //ERROR
+    return res.send(400)
   }
 
-  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.match(config.admin.github.release))
 
   bus.emit('github.push',{sig:sig,id:id,name:event},req.body);
 
