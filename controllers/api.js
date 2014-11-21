@@ -129,7 +129,7 @@ exports.github=function(req,res){
       ,verify= verify(config.admin.github.secret,req.body)
 
 
-  if(!sig||!event||!id||){
+  if(!sig||!event||!id){
     //ERROR
   }
 
