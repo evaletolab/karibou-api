@@ -113,7 +113,7 @@ exports.sitemap=function(req,res){
 }
 
 exports.robots=function(req,res){
-  res.send(400,'not implemented')
+  res.send(200,'User-agent: *\nDisallow: /\n');
 }
 
 
@@ -124,22 +124,39 @@ exports.github=function(req,res){
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
   }
 
+
+  //
+  // simple checks
+  if(!config.admin.github||!config.admin.github.secret){
+    return res.send(400)
+  }
+
+  if(req.body.ref.indexOf(config.admin.github.release)===-1){
+    return res.send(400)    
+  }
+
   var  sig   = req.headers['x-hub-signature']
       ,event = req.headers['x-github-event']
       ,id    = req.headers['x-github-delivery']  
       ,verify= verify(config.admin.github.secret,req.body)
 
-  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.match(config.admin.github.release))
+  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.indexOf(config.admin.github.release))
 
   if(!sig||!event||!id){
     return res.send(400)
   }
 
+  if(sig!==verify){
+    console.log('gihub sig verification error',sig,verify)
+    return res.send(400,'sig verification error')
+  }
+
+  if (req.body.ref.indexOf(config.admin.github.release)===-1) {
+    return res.send(200)
+  }
 
   bus.emit('github.push',{sig:sig,id:id,name:event},req.body);
 
-  //if (!req.body.ref.match(config.admin.github.release)) {
-  //}
   //exec('bash -x /path/install.sh', function (error, stdout, stderr) {
 
 }
