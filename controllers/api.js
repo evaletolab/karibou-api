@@ -113,5 +113,28 @@ exports.sitemap=function(req,res){
 }
 
 exports.robots=function(req,res){
-  req.send(400,'not implemented')
+  res.send(400,'not implemented')
+}
+
+
+exports.github=function(req,res){
+  function verify(key, str) {
+    return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
+  }
+
+  var  sig   = req.headers['x-hub-signature']
+      ,event = req.headers['x-github-event']
+      ,id    = req.headers['x-github-delivery']  
+
+  if(!sig||!event||!id){
+    //ERROR
+  }
+
+  //if (feedback.ref.match('master')) {
+  //}
+  //exec('bash -x /path/install.sh', function (error, stdout, stderr) {
+
+  console.log("github ----------------",sig,id,event,req.body)
+
+  bus.emit('github.push',req.body);
 }

@@ -8,7 +8,7 @@ module.exports = {
   mail:{
     from:'james@karibou.ch',
     to:['james@karibou.ch'],
-    validate:{time:24,short:1,origin:process.env.KARIBOU_ORIGIN},
+    validate:{time:24,short:1},
     origin:process.env.KARIBOU_ORIGIN,
     default:'mandril',
     mandril:{    
@@ -22,6 +22,7 @@ module.exports = {
   admin:{
     emails:['evaleto@gmail.com', 'delphine.cluzel@gmail.com'],
     secret: process.env.KARIBOU_SECRET,
+    github: {release:process.env.KARIBOU_RELEASE,secret:process.env.KARIBOU_GITHUB},
     padding:'0e0e0e0e'    
   },
 

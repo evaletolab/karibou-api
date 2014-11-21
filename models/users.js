@@ -489,11 +489,15 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
     user.displayName=user.name.givenName+" "+user.name.familyName;
 
     //
-    // check is email has changed (require a validation)
+    // check is email has changed (require a new validation)
     if (u.email&&u.email.address) {
       if (user.email.address!==u.email.address)
         user.email.status=new Date();
       user.email.address=u.email.address;
+
+      // security check for admin? currently status is false
+      //if(config.admin.emails.indexOf(user.email.address)!=-1){
+      //}
     }
     //
     // update the adress

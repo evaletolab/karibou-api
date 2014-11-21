@@ -28,6 +28,7 @@ bus.on('cron.day.19',dummy)
 bus.on('cron.week',dummy)
 bus.on('trace.error',onTrace) //signature(key, error)
 bus.on('system.message',onMessage)
+bus.on('github.push',dummy)
 
 //
 // bus message for orders
