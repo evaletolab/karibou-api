@@ -118,23 +118,27 @@ exports.robots=function(req,res){
 
 
 exports.github=function(req,res){
-  function verify(key, str) {
+  function verify(key, body) {
+    var str=JSON.stringify(body);
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
   }
 
   var  sig   = req.headers['x-hub-signature']
       ,event = req.headers['x-github-event']
       ,id    = req.headers['x-github-delivery']  
+      ,verify= verify(config.admin.github.secret,req.body)
 
-  if(!sig||!event||!id){
+
+  if(!sig||!event||!id||){
     //ERROR
   }
 
-  //if (feedback.ref.match('master')) {
+  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.match(config.admin.github.release))
+
+  bus.emit('github.push',{sig:sig,id:id,name:event},req.body);
+
+  //if (!req.body.ref.match(config.admin.github.release)) {
   //}
   //exec('bash -x /path/install.sh', function (error, stdout, stderr) {
 
-  console.log("github ----------------",sig,id,event,req.body)
-
-  bus.emit('github.push',req.body);
 }
