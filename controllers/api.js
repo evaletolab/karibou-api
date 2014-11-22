@@ -162,7 +162,7 @@ exports.github=function(req,res){
 
   var child=spawn('node-continuous.sh',[config.admin.github.release,config.express.port],{detached:true})
   child.stdout.on('data', function (stdout) {
-    console.log("github",event,stdout)    
+    console.log("github",event,stdout.toString('utf8'))    
   })
 
   child.stderr.on('data', function (error) {
