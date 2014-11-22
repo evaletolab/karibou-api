@@ -8,13 +8,13 @@ exports.check   = check;
 exports.ifCheck = ifCheck;
 
 var user_address = exports.address =  function(address){
-      ifCheck(address.region,    "Votre adresse n'est pas valide").isText().len(2, 30)
-      ifCheck(address.primary,   "Votre adresse n'est pas valide").isBoolean()
-      check(address.geo.lng,     "Ooops, erreur de réseau, recommencer plus tard").isFloat()
-      check(address.geo.lat,     "Ooops, erreur de réseau, recommencer plus tard").isFloat()
+      ifCheck(address.region,    "La région n'est pas valide").isText().len(2, 30)
+      ifCheck(address.primary,   "Ooops votre adresse n'est pas valide").isBoolean()
+      check(address.geo.lng,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
+      check(address.geo.lat,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
       check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
-      ifCheck(address.floor,     "Votre étage n'est pas valide").isText().len(1, 30)
-      check(address.streetAdress,"Votre adresse n'est pas valide").isText().len(10, 50)
+      ifCheck(address.floor,     "L'étage n'est pas valide").isText().len(1, 30)
+      check(address.streetAdress,"L'adresse n'est pas valide").isText().len(4, 100)
       ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 40)
       check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 60)
 }

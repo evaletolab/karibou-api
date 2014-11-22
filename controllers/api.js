@@ -99,7 +99,7 @@ exports.sitemap=function(req,res){
     })
 
     sitemap = sm.createSitemap ({
-      hostname: 'http://karibou.ch',
+      hostname: config.mail.origin,
       cacheTime: (12*3600000),        // 12h - cache purge period
       urls: urls
     });
@@ -113,11 +113,14 @@ exports.sitemap=function(req,res){
 }
 
 exports.robots=function(req,res){
+  res.type('text/plain');
   res.send(200,'User-agent: *\nDisallow: /\n');
 }
 
 
 exports.github=function(req,res){
+  var spawn = require('child_process').spawn;
+
   function verify(key, body) {
     var str=JSON.stringify(body);
     console.log(str,key)
@@ -126,21 +129,24 @@ exports.github=function(req,res){
 
 
   //
-  // simple checks
+  // checks github config 
   if(!config.admin.github||!config.admin.github.secret){
     return res.send(400)
   }
 
+  //
+  // checks push release
   if(req.body.ref.indexOf(config.admin.github.release)===-1){
     return res.send(400)    
   }
 
+  //
+  // checks github posting params
   var  sig   = req.headers['x-hub-signature']
       ,event = req.headers['x-github-event']
       ,id    = req.headers['x-github-delivery']  
       ,verify= verify(config.admin.github.secret,req.body)
 
-  console.log('---------github ',sig,verify,(sig===verify),event, req.body.ref.indexOf(config.admin.github.release))
 
   if(!sig||!event||!id){
     return res.send(400)
@@ -155,8 +161,14 @@ exports.github=function(req,res){
     return res.send(200)
   }
 
-  bus.emit('github.push',{sig:sig,id:id,name:event},req.body);
+  var child=spawn('node-continuous.sh',[config.admin.github.release,config.express.port],{detached:true})
+  child.stderr.on('data', function (error) {
+    console.log("----------------",error)
+    return bus.emit('system.message',"[karibou-github error] : ",error);
+  });
 
-  //exec('bash -x /path/install.sh', function (error, stdout, stderr) {
+
+  
+
 
 }
