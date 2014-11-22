@@ -123,7 +123,6 @@ exports.github=function(req,res){
 
   function verify(key, body) {
     var str=JSON.stringify(body);
-    console.log(str,key)
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
   }
 
@@ -167,8 +166,8 @@ exports.github=function(req,res){
   })
 
   child.stderr.on('data', function (error) {
-    console.log("----------------",error)
-    return bus.emit('system.message',"[karibou-github error] : ",error);
+    console.log("----------------",error.toString('utf8'))
+    return bus.emit('system.message',"[karibou-github error] : ",error.toString('utf8'));
   });
 
 
