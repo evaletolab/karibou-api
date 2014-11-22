@@ -162,6 +162,10 @@ exports.github=function(req,res){
   }
 
   var child=spawn('node-continuous.sh',[config.admin.github.release,config.express.port],{detached:true})
+  child.stdout.on('data', function (stdout) {
+    console.log("github",event,stdout)    
+  })
+
   child.stderr.on('data', function (error) {
     console.log("----------------",error)
     return bus.emit('system.message',"[karibou-github error] : ",error);
