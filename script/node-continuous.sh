@@ -18,7 +18,5 @@ git pull origin $1
 npm install
 
 echo "#restart server $1"
+nohup bash -c 'sleep 1;node app >> $HOME/www/logs/node-kariboo.logs'&
 fuser -k $PORT/tcp;
-
-echo "#node $PWD/app"
-nohup bash -c 'node app >> $HOME/www/logs/node-kariboo.logs'&
