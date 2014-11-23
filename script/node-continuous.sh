@@ -9,13 +9,13 @@
         echo "wrong root directory"
         exit 1
 }
-echo "#git pull -q --no-ff origin $1"
-
-git pull --no-ff origin $1
+sleep 2;
+echo "#git pull  origin $1"
+git pull origin $1
+npm install
 
 echo "#restart server $1"
 fuser -k $PORT/tcp;
 
-echo "#node app"
-sleep 4;
+echo "#node $PWD/app"
 node app >> $HOME/www/logs/node-kariboo.logs&
