@@ -1,10 +1,9 @@
 config/config-production.js
-config/config-shop.js
 node_modules
 tips
 backups
 karibou.sublime-workspace
-config/config-production.js
+config-production.js
 
 # Compiled source #
 ###################

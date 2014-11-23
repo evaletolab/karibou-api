@@ -153,7 +153,7 @@ module.exports = function(app, config, passport) {
   // only valid shop that bellongs to the order can update the order
   app.post('/v1/orders/:oid/items', orders.ensureShopOwnerOrAdmin, queued(orders.updateItem));
   // only owner to the order can change the status order
-  app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.updateStatus);
+  app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.updateOrder);
 
 
 
