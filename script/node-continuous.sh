@@ -21,4 +21,4 @@ echo "#restart server $1"
 fuser -k $PORT/tcp;
 
 echo "#node $PWD/app"
-nohup node app >> $HOME/www/logs/node-kariboo.logs&
+nohup bash -c 'node app >> $HOME/www/logs/node-kariboo.logs'&
