@@ -18,4 +18,4 @@ echo "#restart server $1"
 fuser -k $PORT/tcp;
 
 echo "#node $PWD/app"
-node app >> $HOME/www/logs/node-kariboo.logs&
+nohup node app >> $HOME/www/logs/node-kariboo.logs&
