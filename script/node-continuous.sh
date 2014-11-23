@@ -7,7 +7,8 @@
         echo "usage:$0 <release>"
         exit 1
 }
-
+#
+# check root directory	
 [ -f app.js ] || {
         echo "wrong root directory"
         exit 1
