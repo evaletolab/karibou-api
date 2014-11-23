@@ -19,6 +19,13 @@ onMessage=function(title,content){
 
 };
 
+onPush=function(event,git){
+  console.log("github ----------------",sig,id,event,req.body)
+
+
+}
+
+
 //
 // bus message for system
 bus.on('sendmail',dummy)
@@ -27,7 +34,7 @@ bus.on('cron.day.19',dummy)
 bus.on('cron.week',dummy)
 bus.on('trace.error',onTrace) //signature(key, error)
 bus.on('system.message',onMessage)
-bus.on('github.push',dummy)
+bus.on('github.push',onPush)
 
 //
 // bus message for orders

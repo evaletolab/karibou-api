@@ -12,7 +12,11 @@ try {
     , test=(env==='test')?'-test':''
 
   // try load environment specific config
-  config = '../config/config-' + env;
+  if(env==='production'){
+    config = '../config-production';
+  }else{
+    config = '../config/config-' + env;
+  }
   global.config= require(config);
 
   config = '../config/config-shop'+test;

@@ -269,9 +269,6 @@ exports.verifyItems = function(req,res){
 };
 
 
-exports.paymentConfirmation=function(req,res){
-}
-
 exports.create=function(req,res){
 
   // check && validate input field
@@ -324,7 +321,7 @@ exports.create=function(req,res){
 
             //
             //DANGER send email
-            bus.emit('system.message',"[kariboo-danger] : ",{error:e,order:o.oid,customer:o.email});
+            bus.emit('system.message',"[kariboo-danger] : ",{error:e,order:order.oid,customer:order.email});
           }
           return res.json(400,err.message)
         });
@@ -384,6 +381,11 @@ exports.updateItem=function(req,res){
   });
 }
 
-exports.updateStatus=function(req,res){
+exports.updateOrder=function(req,res){
+  try{
+    validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
+  }catch(err){
+    return res.send(400, err.message);
+  }
 
 }
