@@ -19,5 +19,5 @@ npm install
 
 
 echo "#restart server $1"
-nohup bash -c 'sleep 1;node app >> $HOME/www/logs/node-kariboo.logs'&
-fuser -k $PORT/tcp;
+#nohup bash -c 'sleep 1;node app >> $HOME/www/logs/node-kariboo.logs'&
+#fuser -k $PORT/tcp;
