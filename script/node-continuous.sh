@@ -22,3 +22,4 @@ npm install
 echo "#restart server $1"
 #nohup bash -c 'sleep 1;node app >> $HOME/www/logs/node-kariboo.logs'&
 #fuser -k $PORT/tcp;
+#forever  --watchIgnore "*newrelic*" -f -w -o $HOME/www/logs/node-kariboo.logs  app
