@@ -1,4 +1,7 @@
 #!/bin/bash
+
+#
+#read params: branch port
 [ -z "$2" ] && PORT=3000 || PORT=$2
 [ -z "$1" ] && {
         echo "usage:$0 <release>"
