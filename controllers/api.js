@@ -75,6 +75,20 @@ exports.message = function(req, res) {
 
 
 
+exports.sessions = function(req, res) {
+  require('mongoose').connection.db.collection('sessions',function(err,sessions){
+    if(err){
+      return res.send(400,errorHelper(err))
+    }
+    sessions.find({}).toArray(function(err,sess){
+      if(err){
+        return res.send(400,errorHelper(err))
+      }
+      return res.json(sess)
+    })
+  })
+}
+
 exports.sitemap=function(req,res){
   var sitemap;
 
@@ -169,9 +183,4 @@ exports.github=function(req,res){
     console.log(error.toString('utf8'))
     //return bus.emit('system.message',"[karibou-github error] : ",error.toString('utf8'));
   });
-
-
-  
-
-
 }

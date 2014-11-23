@@ -68,7 +68,6 @@ module.exports = {
   
   mongo:{
     name:process.env.MONGOLAB_URI,
-    name_openshift:process.env.OPENSHIFT_MONGODB_DB_URL,
     ensureIndex:true
   },
 

@@ -52,6 +52,7 @@ module.exports = function(app, config, passport) {
   // user
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
   app.get('/v1/users', auth.ensureAdmin, users.list);
+  app.get('/v1/users/sessions', auth.ensureAdmin,api.sessions);
   app.post('/v1/users/:id', users.ensureMe,users.update);
   app.post('/v1/users/:id/like/:sku', users.ensureMe,users.like);
   app.post('/v1/users/:id/unlike/:sku', users.ensureMe,users.unlike);
@@ -74,7 +75,6 @@ module.exports = function(app, config, passport) {
 	//
 	// home
   app.get ('/', home.index(app));
-  app.get ('/acceptcookie', home.acceptcookie);
   app.get ('/welcome', home.welcome);
   app.get ('/v1', api.index(app));
 

@@ -140,7 +140,7 @@ var tokenSession=function (req, res, next) {
     if (!config.express.cookieSession){
       app.use(express.cookieSession({
         secret: config.middleware.session.secret,
-        cookie: config.middleware.cookie
+        cookie: config.middleware.session.cookie
       }));
     }
 
@@ -149,11 +149,11 @@ var tokenSession=function (req, res, next) {
     if (config.express.mongoSession){
       app.use(express.session({
         secret: config.middleware.session.secret,
+        maxAge:config.middleware.session.cookie.maxAge,
         store: new mongoStore({
           url: config.mongo.name,
           collection : 'sessions'
-        }),
-        cookie: config.middleware.session.cookie
+        })
       }))
     }
 
@@ -214,7 +214,7 @@ var tokenSession=function (req, res, next) {
       //send emails if you want
       if(process.env.NODE_ENV==='production'){
         var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
-        bus.emit("sendmail", "evaleto@gmail.com","[kariboo] : "+err.toString(), 
+        bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
             {content:msg}, "simple",function(err,status){
               console.log(err,status)
         });
