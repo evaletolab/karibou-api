@@ -110,8 +110,8 @@ module.exports = {
       shippingmode:["grouped", "none"],
 
       //
-      // Dimanche, Lundi, Mardi, Mercredi(1), Jeudi, Vendredi, Samedi(1)
-      weekdays:[3,6],  
+      // Dimanche(0), Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi
+      weekdays:[2,5],  
       shippingtimes:{11:"11:00 à 13:00", 16:"16:00 à 18:00"}
     }
 

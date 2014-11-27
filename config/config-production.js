@@ -140,7 +140,7 @@ module.exports = {
         path: '/',
         httpOnly: true,
         // maxAge: 1000 * 60 * 60 * 24 * 10 // = 10 days (in miliseconds)
-        maxAge: 1000 * 60 * 60 * 1 // = 1 hour (in miliseconds)
+        maxAge: 1000 * 60 * 60 * 24 // = 1 hour (in miliseconds)
       }
     },
 
