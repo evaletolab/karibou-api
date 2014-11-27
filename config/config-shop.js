@@ -112,7 +112,7 @@ module.exports = {
       //
       // Dimanche(0), Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi
       weekdays:[2,5],  
-      shippingtimes:{11:"11:00 à 13:00", 16:"16:00 à 18:00"}
+      shippingtimes:{16:"16:00 à 18:00"}
     }
 
   }
