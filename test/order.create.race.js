@@ -122,7 +122,7 @@ describe("orders.create.success", function(){
 
           require('async').eachLimit(orders,1,function(o,cb){
             o.print()
-            o.rollbackProductQuantityAndSave(function(err,o){
+            o.rollbackProductQuantityAndSave("timeout",function(err,o){
 
               //
               // after rollback order status is failure

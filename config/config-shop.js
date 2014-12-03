@@ -33,15 +33,16 @@ module.exports = {
     },
     region:{
       selection:["Genève","Reignier, France"],
-      list:["Aire-la-Ville","Anières","Avully","Avusy","Bardonnex","Bellevue",
-            "Bernex","Carouge","Cartigny","Céligny","Chancy","Chêne-Bougeries",
-            "Chêne-Bourg","Choulex","Collex-Bossy","Collonge-Bellerive",
-            "Cologny","Confignon","Corsier","Dardagny","Genève",
-            "Genthod","Grand-Saconnex","Gy","Hermance","Jussy","Laconnex",
-            "Lancy","Meinier","Meyrin","Onex","Perly-Certoux",
-            "Plan-les-Ouates","Pregny-Chambésy","Presinge","Puplinge",
-            "Russin","Satigny","Soral","Thônex","Troinex","Vandoeuvres",
-            "Vernier","Versoix","Veyrier", "Reignier, France"
+      list:["Aire-la-Ville,GE","Anières,GE","Avully,GE","Avusy,GE","Bardonnex,GE","Bellevue,GE",
+            "Bernex,GE","Carouge,GE","Cartigny,GE","Céligny,GE","Chancy,GE","Chêne-Bougeries,GE",
+            "Chêne-Bourg,GE","Choulex,GE","Collex-Bossy,GE","Collonge-Bellerive,GE",
+            "Cologny,GE","Confignon,GE","Corsier,GE","Dardagny,GE","Genève",
+            "Genthod,GE","Grand-Saconnex,GE","Gy,GE","Hermance,GE","Jussy,GE","Laconnex,GE",
+            "Lancy,GE","Meinier,GE","Meyrin,GE","Onex,GE","Perly-Certoux,GE",
+            "Plan-les-Ouates,GE","Pregny-Chambésy,GE","Presinge,GE","Puplinge,GE",
+            "Russin,GE","Satigny,GE","Soral,GE","Thônex,GE","Troinex,GE","Vandoeuvres,GE",
+            "Vernier,GE","Versoix,GE","Veyrier,GE", 
+            "Reignier, France"
       ]
     },
     product:{
@@ -81,13 +82,14 @@ module.exports = {
                        "refunded",
                        "voided"
       ],
-      cancelreason:["customer", "fraud", "inventory", "other"],
+      cancelreason:["customer", "fraud", "inventory", "system","timeout","other"],
       status:["failure","created","reserved","partial","fulfilled"],
       gateway:[ 
         {label:"postfinance",fees:0.02}, 
         {label:"american express",fees:0.029}, 
         {label:"visa",fees:0.029}, 
         {label:"mastercard",fees:0.029}, 
+        {label:"invoice",fees:0.0}, 
         {label:"paypal",fees:0.034}, 
         {label:"bitcoin",fees:0.0}
       ],

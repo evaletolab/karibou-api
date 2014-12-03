@@ -206,9 +206,22 @@ describe("api.users.payment", function(){
       });
   });
 
-  it('user remove alias payment return 200',function(done){
+  it('user remove uncrypted alias payment return 400',function(done){
     var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
     var alias=(user.id+payment.type).hash();
+    request(app)
+      .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.include("Impossible de reconnaitre l'alias de votre méthode")
+        done()
+      });
+  });
+
+  it('user remove alias payment return 200',function(done){
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
+    var alias=(user.id+payment.type).hash().crypt();
     request(app)
       .post('/v1/users/'+user.id+'/payment/'+alias+'/delete')
       .set('cookie', cookie)
@@ -217,6 +230,7 @@ describe("api.users.payment", function(){
         done()
       });
   });
+
 
   it('user add new payment (crypt) return 200',function(done){
     var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'mastercard'};

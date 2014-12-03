@@ -109,7 +109,7 @@ describe("system", function(){
         setTimeout(function(){
             queue.defer(function(v, callback ) { setTimeout(function() { callback(null, "task5"); }, 3); },'input',cb)
             queue.defer(function(v, callback ) { setTimeout(function() { callback(null, "task6"); }, 3); },'input',cb)
-        },50)
+        },100)
 
 
     })

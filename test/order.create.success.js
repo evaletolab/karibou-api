@@ -117,7 +117,7 @@ describe("orders.create.success", function(){
       // check that vendor is correct
       order.vendors.length.should.be.above(1)
 
-      order.rollbackProductQuantityAndSave(function(err,order){
+      order.rollbackProductQuantityAndSave('timeout',function(err,order){
         should.not.exist(err)
         done();                  
       })

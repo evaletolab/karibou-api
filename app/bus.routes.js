@@ -41,6 +41,7 @@ bus.on('github.push',onPush)
 bus.on('order.create',dummy)
 bus.on('order.rollback',dummy)
 bus.on('order.update.items',dummy)
+bus.on('order.cancel',dummy)
 
 //
 // bus message for users

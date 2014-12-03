@@ -33,12 +33,14 @@ var Shops = new Schema({
     },
 
     //
-    // define where this shop is available (geneva/lausanne/...)
+    // define where this shop is available
     marketplace: [{type: String, required: false}],
     
     //
     // where to pickup items
     address:{
+          // an other place where things are stored
+          depository:{ type: String, trim: true },
           name: { type: String, trim: true },
           floor: { type: String, trim: true },
           phone: { type: String, trim: true },

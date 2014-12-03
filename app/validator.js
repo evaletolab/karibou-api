@@ -62,13 +62,13 @@ Wrapper.prototype.error = function(msg) {
     throw new Error(msg);
 }
 
-constructWrapper=function(name){
+constructWrapper=function(name,defmsg){
   return function(){
       var args=[this.str];for(var i in arguments){
         args.push(arguments[i])
       }
-       // console.log(name,args)
       if (!this.skip&&!validator[name].apply(this,args)) {
+        //if(defmsg)this.msg=this.msg.replace('%msg',defmsg)
         return this.error(this.msg);
     }
     return this;

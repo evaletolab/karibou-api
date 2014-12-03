@@ -152,8 +152,13 @@ module.exports = function(app, config, passport) {
   app.post('/v1/orders', auth.ensureUserValid, orders.ensureValidAlias, queued(orders.create));
   // only valid shop that bellongs to the order can update the order
   app.post('/v1/orders/:oid/items', orders.ensureShopOwnerOrAdmin, queued(orders.updateItem));
-  // only owner to the order can change the status order
-  app.post('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.updateOrder);
+
+  // only owner to the order can cancel order
+  // shop can only cancel their items
+  app.post('/v1/orders/:oid/cancel', orders.ensureOwnerOrAdmin, queued(orders.onCancel));
+
+  // capture payment 
+  app.post('/v1/orders/:oid/capture', auth.ensureAdmin, queued(orders.capture));
 
 
 

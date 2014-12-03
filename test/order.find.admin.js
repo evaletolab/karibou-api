@@ -93,7 +93,7 @@ describe("orders.find.admin", function(){
 
   it("find all open orders that are paid ", function(done){
     var criteria={
-      payment:"paid",
+      payment:"authorized",
       closed:null
     }
     db.model('Orders').findByCriteria(criteria, function(err,order){

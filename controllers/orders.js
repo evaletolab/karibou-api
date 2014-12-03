@@ -10,8 +10,9 @@ var db = require('mongoose'),
     _=require('underscore'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
-    postfinance = require('node-postfinance')
+    payment = require('../app/payment')
     errorHelper = require('mongoose-error-helper').errorHelper;
+
 
 
 exports.ensureOwnerOrAdmin=function(req, res, next) {
@@ -70,15 +71,21 @@ exports.ensureValidAlias=function(req,res,next){
   // only authorize payment alias that belongs to user of the session
   //
   var alias, issuer;
-  if (req.params.alias) alias=req.params.alias;
-  else if(req.body.alias) alias=req.body.alias;
-  else if(req.body.payment.alias)alias=req.body.payment.alias;
-  else return res.send(401,"Impossible de valider l'alias de paiement (1)")
 
   if(req.body.issuer) issuer=req.body.issuer;
   else if(req.body.payment.issuer)issuer=req.body.payment.issuer;
   else return res.send(401,"Impossible de valider l'alias de paiement (2)")
 
+  //
+  // FIXME HUGLY FIX
+  if(issuer==='invoice'){
+    return next();
+  }
+
+  if (req.params.alias) alias=req.params.alias;
+  else if(req.body.alias) alias=req.body.alias;
+  else if(req.body.payment.alias)alias=req.body.payment.alias;
+  else return res.send(401,"Impossible de valider l'alias de paiement (1)")
 
   if(!req.user.isValidAlias(alias,issuer)){
     return res.send(401,"La méthode de paiement utilisée n'est pas valide (0)")
@@ -291,76 +298,65 @@ exports.create=function(req,res){
     }
 
     var oid=order.oid;
-
-    // order is prepared, now we are waiting for valid payment.
-    // Unless a full payment, order is closed and reserved products are available for everyone
-    // TODO replace timeout by node-postfinance here!!
-    //
-    // payment workflow:
-    //    - 1) get auth 2) prepare 3) cancel||paid  4) issue||ok
-    try{
-      var card=new postfinance.Card({
-        alias: order.payment.alias.decrypt()
-      })
-
-      transaction = new postfinance.Transaction({
-        operation: 'authorize',
-        amount:order.getTotalPrice(config.payment.reserve),
-        orderId: 'TX'+order.oid,
-        email:order.customer.email.address,
-        groupId:(order.shipping.when+'').substring(0,14)
-      });
-    }catch(err){
-      return res.json(400,err.message)
-    }
-
-    transaction.process(card, function(err,result){
-      if(err){
-        return order.rollbackProductQuantityAndSave(function(e){
-          if(e){
-
-            //
-            //DANGER send email
-            bus.emit('system.message',"[kariboo-danger] : ",{error:e,order:order.oid,customer:order.email});
-          }
-          return res.json(400,err.message)
-        });
-      }
-
-      //
-      // get authorisation, save status and transaction
-      order.payment.status="authorized";
-      order.payment.transaction=transaction.toJSON().crypt();
-      order.save(function(err){
-        if(err){
-          return res.json(400,errorHelper(err))
-        }
+    payment.for(order.payment.issuer).authorize(order)
+      .then(function(order){
         return res.json(order)
       })
-
-    });
-
-    // setTimeout(function(){
-    //   //
-    //   Orders.findByTimeoutAndNotPaid().where('oid').equals(oid).exec(function(err,order){
-    //     if(err){
-    //       return res.send(400, errorHelper(err));
-    //     }
-
-    //     order[0].rollbackProductQuantityAndSave(function(err){
-    //       //
-    //       // notify this order has been successfully rollbacked
-    //       bus.emit('order.rollback',null,order)
-
-    //     })
-    //   })
-    // },config.shop.order.timeoutAndNotPaid*1000)
-    // return res.json(order)
-
-
+      .fail(function(err){
+        bus.emit('system.message',"[order-danger] :",{error:err.message,order:order.oid,customer:order.email});
+        return res.json(400,err.message)        
+      })
   });
 
 };
+
+exports.onCancel=function(req,res){
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+  db.model('Orders').onCancel(req.params.oid,req.query.reason,function(err,order){
+    if(err){
+      return res.send(400, errorHelper(err));
+    }
+    return res.json(200,order)
+  })
+}
+
+
+exports.capture=function(req,res){
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  db.model('Orders').findOne({oid:oid}).select('+payment.transaction').exec(function(err,order){
+    if(err){
+      return res.send(400, errorHelper(err));
+    }
+
+    // items issue?
+    if(!order){
+      return res.json(400, "La commande "+req.params.oid+" n'existe pas.");
+    }
+
+
+    payment.for(order.payment.issuer).capture(order)
+      .then(function(order){
+        return res.json(order)
+      })
+      .fail(function(err){
+        bus.emit('system.message',"[order-danger] :",{error:err.message,order:order.oid,customer:order.email});
+        return res.json(400,err.message)        
+      })
+
+
+  })
+
+}
+
 
 exports.updateItem=function(req,res){
 
@@ -379,13 +375,4 @@ exports.updateItem=function(req,res){
     }
     return res.json(200,order)
   });
-}
-
-exports.updateOrder=function(req,res){
-  try{
-    validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
-  }catch(err){
-    return res.send(400, err.message);
-  }
-
 }

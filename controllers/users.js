@@ -219,7 +219,7 @@ exports.addPayment=function(req,res){
 
   Users.addPayment(req.params.id,req.body,function(err,user){
     if (err){
-      return res.send(400,'errorHelper(err)');
+      return res.send(400,errorHelper(err));
     }
     return res.json(user);
   });

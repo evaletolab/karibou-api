@@ -23,8 +23,8 @@ var passedday=new Date(customerDay.getTime()-86400000*7)
 
 exports.Orders=[
     {
-        _id: ObjectId("52f12f09a328f285313bda10"),
-        oid: 2100000,
+        _id: ObjectId("52f12f09a328f285313bda08"),
+        oid: 2000003,
         /* customer */
         customer: u.Users[1],
 
@@ -33,7 +33,109 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "postfinance",
+            issuer: "invoice",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
+            status:"voided"
+        },
+
+
+        /* shipping adresse*/
+        shipping: {
+            name: "famille olivier evalet 1",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            region: "Genève",
+            when: sellerDay,
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            }
+        },
+
+        /* vendors */
+        vendors: [
+            {
+                /* shop available !=true */
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "un autre shop",
+                address: "TODO",
+            }
+        ],
+
+        fulfillments: {
+            status: "failure"
+        },
+
+        created: new Date(),
+        closed:passedday      
+    },
+    {
+        _id: ObjectId("52f12f09a328f285313bda09"),
+        oid: 2000004,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            issuer: "invoice",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
+            status:"refunded"
+        },
+
+
+        /* shipping adresse*/
+        shipping: {
+            name: "famille olivier evalet 1",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            region: "Genève",
+            when: sellerDay,
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            }
+        },
+
+        /* vendors */
+        vendors: [
+            {
+                /* shop available !=true */
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "un autre shop",
+                address: "TODO",
+            }
+        ],
+
+        fulfillments: {
+            status: "failure"
+        },
+
+        created: new Date(),
+        closed:passedday      
+    },
+    {
+        _id: ObjectId("52f12f09a328f285313bda10"),
+        oid: 2000005,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"voided"
@@ -84,7 +186,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "postfinance",
+            issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"pending"
@@ -189,7 +291,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "postfinance",
+            issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"authorized"
@@ -295,7 +397,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "postfinance",
+            issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"authorized"
@@ -401,7 +503,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "postfinance",
+            issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"authorized"

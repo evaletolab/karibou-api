@@ -240,12 +240,46 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Votre commande est incomplète")
+      err.should.include("Could not find payment method")
       done();          
     });
   });    
 
  it("Error on creation of an order with a bad payment.alias", function(done){
+    var items=[]
+      , customer=data.Users[1]
+      , shipping={
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            },
+            primary: true,
+            region: "Genève",
+            when:okDay
+        }
+      , payment={alias:'122',issuer:'postfinance',number:'123'};
+
+
+
+    items.push(Orders.prepare(data.Products[0], 2, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.exist(err)
+      err.should.include("Votre méthode de paiement est inconnue")
+      done();          
+    });
+  });    
+
+ it("Error on creation of an order with a wrong payment.issuer", function(done){
     var items=[]
       , customer=data.Users[1]
       , shipping={
@@ -274,11 +308,10 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Votre méthode de paiement est inconnue")
+      err.should.include("Could not find payment method")
       done();          
     });
   });    
-
 
   it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
 

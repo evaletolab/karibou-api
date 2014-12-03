@@ -52,6 +52,7 @@ describe("api.shops", function(){
         res.should.have.status(200);
         res.body.roles.should.be.empty;
         res.body.shops.length.should.equal(1)
+        console.log(res.body.shops[0].urlpath)
         cookie = res.headers['set-cookie'];
         done();        
       });
@@ -63,6 +64,7 @@ describe("api.shops", function(){
       .set('cookie', cookie)
       .expect(401,done);
   });  
+
 
   it('shops.create /v1/shops should return 400 (shops limit exceed for no admin user)',function(done){
     var s=_.clone(data.Shops[0]);
@@ -78,12 +80,51 @@ describe("api.shops", function(){
         done();
       });
   });  
+ 
 
-  it('GET /v1/users/me should return 200',function(done){
+  it('shops.delete /v1/shops/mon-shop should return 401 (you are not the owner)',function(done){
+    request(app)
+      .put('/v1/shops/mon-shop')
+      .set('cookie', cookie)
+      .end(function(err,res){      
+        res.should.have.status(401);
+        done();
+      });
+  });  
+
+  it('shops.delete /v1/shops/mon-shop should return 400 (wrong protection password)',function(done){
+    request(app)
+      .put('/v1/shops/un-autre-shop')
+      .send({password:'truc1234'})
+      .set('cookie', cookie)
+      .end(function(err,res){      
+        res.should.have.status(400);
+        res.text.should.include('mot de passe est incorrect')
+        done();
+      });
+  });  
+
+
+  it('shops.delete /v1/shops/mon-shop should return 200',function(done){
+    request(app)
+      .put('/v1/shops/un-autre-shop')
+      .send({password:'password'})
+      .set('cookie', cookie)
+      .end(function(err,res){      
+        res.should.have.status(200);
+        done();
+      });
+  });  
+
+  it('GET /v1/users/me should return user.shops.length==0 and status 200',function(done){
     request(app)
       .get('/v1/users/me')
       .set('cookie', cookie)
-      .expect(200,done);
+      .end(function(err,res){      
+        res.should.have.status(200);
+        res.body.shops.length.should.equal(0)
+        done();
+      });
 
   });
       

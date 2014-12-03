@@ -35,6 +35,7 @@
     "passport-persona": "~0.1.7",
     "passport-twitter": "1.x",
     "password-generator": "0.2.x",
+    "q": "^1.1.2",
     "queue-async": "~1.0.7",
     "sitemap": "^0.7.4",
     "underscore": "1.x",

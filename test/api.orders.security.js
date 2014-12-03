@@ -77,10 +77,34 @@ describe("api.orders.security", function(){
       .expect(401,done);
   });
 
-  it('POST /v1/orders/123456 should return 401 for anonymous',function(done){
+  it('POST /v1/orders/123456/capture should return 401 for anonymous',function(done){
     request(app)
-      .post('/v1/orders/123456')
+      .post('/v1/orders/123456/capture')
       .send({})
+      .expect(401,done);
+  });
+
+  it('POST /v1/orders/123456/cancel should return 401 for anonymous',function(done){
+    request(app)
+      .post('/v1/orders/123456/cancel')
+      .send({})
+      .expect(401,done);
+  });
+
+
+  it('POST /v1/orders/123456/cancel should return 401 for non owner',function(done){
+    request(app)
+      .post('/v1/orders/12345/cancel')
+      .send({})
+      .set('cookie', cookie)      
+      .expect(401,done);
+  });
+
+  it('POST /v1/orders/123456/capture should return 401 for non owner',function(done){
+    request(app)
+      .post('/v1/orders/12345/capture')
+      .send({})
+      .set('cookie', cookie)      
       .expect(401,done);
   });
 

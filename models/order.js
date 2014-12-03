@@ -6,6 +6,7 @@ var _=require('underscore');
 
 var mongoose = require('mongoose')
   , bus = require('../app/bus')
+  , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
   , errorHelper = require('mongoose-error-helper').errorHelper;
@@ -522,7 +523,8 @@ Orders.methods.computeRankAndSave=function(cb){
   })
 }
 
-
+//
+// status == created, payment == pending
 Orders.methods.updateProductQuantityAndSave=function(callback){
   assert(callback)
 
@@ -530,7 +532,7 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
   var msg1="Could not update product quantity for paid or partialy fulfilled order";
 
 
-  if(this.fulfillments.status !=="created" || this.payment.status==="paid"){
+  if(this.fulfillments.status !=="created" || this.payment.status!=="pending"){
     callback(msg1)
   }
 
@@ -563,23 +565,30 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
   });
 }
 
-Orders.methods.rollbackProductQuantityAndSave=function(callback){
+//
+// status == reserved||fulfilled, payment==pending||refund||voided 
+Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
   assert(callback)
   var self=this
 
-  var msg1="Could not rollback product quantity for paid order",
-      msg2="Rollback product quantity is possible when there is a fulfilled item in the order";
-
   var order=this;
 
+  if(EnumCancelReason.indexOf(reason)===-1){
+    return callback("Le libéllé de l'annulation n'est pas valable : "+reason)
+  }
+
   //
-  // you can rollback an order only if fulfillments=="partial" and payment!=="paid"
-  if(this.payment.status==="paid"){
-    callback(msg1)
+  // accepted payment status for rollback
+  if(["pending","refund",'voided'].indexOf(order.payment.status)===-1){
+    return callback("Impossible d'annuler une commande avec le status: "+order.fulfillments.status);
   }
-  if(this.fulfillments.status !=="reserved"){
-    callback(msg2)
+
+  //
+  // accepted payment status for rollback
+  if(["fulfilled","reserved"].indexOf(order.fulfillments.status)===-1){
+    return callback("Impossible d'annuler une commande avec le status: "+order.fulfillments.status);
   }
+
 
   require('async').eachLimit(this.items,1, function(item, cb) {
     debug("%d unlock products quantity %s %d",self.oid, item.sku, item.quantity)
@@ -589,7 +598,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
 
       //
       //DANGER send email
-      bus.emit('system.message',"[kariboo-danger] : ",{error:err,order:self.oid,customer:self.email});
+      bus.emit('system.message',"[karibou-danger] rollback: ",{error:err,order:self.oid,customer:self.email});
 
       return callback(err);
     }
@@ -600,7 +609,7 @@ Orders.methods.rollbackProductQuantityAndSave=function(callback){
 
     //
     // status is canceled
-    order.cancel.reason='other';
+    order.cancel.reason=reason;
     order.cancel.when=new Date();
     order.closed=new Date();
 
@@ -630,7 +639,7 @@ Orders.statics.findByTimeoutAndNotPaid = function(callback){
 
 //
 // create a new order
-Orders.statics.create = function(items, customer, shipping, payment, callback){
+Orders.statics.create = function(items, customer, shipping, paymentObj, callback){
   assert(items);
   assert(customer);
   assert(shipping);
@@ -676,14 +685,19 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
 
   // early test
   // make sure that payment issuer belongs to this customer
-  if(!payment.alias ||!customer.id ||!payment.issuer||!payment.number){
-    return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
-  }
+  try{
 
-  if(!db.model('Users').isValidAliasWithId(payment.alias,customer.id, payment.issuer)){
-    return callback("Votre méthode de paiement est inconnue, l'ordre ne peut pas être passé")
-  }
+    if(!paymentObj||!customer.id ||!payment.for(paymentObj.issuer).isPaymentObjectValid(paymentObj)){
+      return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
+    } 
 
+    if(!payment.for(paymentObj.issuer).isValidAlias(paymentObj.alias,customer.id, paymentObj.issuer)){
+      return callback("Votre méthode de paiement est inconnue, l'ordre ne peut pas être passé")
+    }
+
+  }catch(error){
+    return callback(error.message)    
+  }
 
   //
   // get unique Order identifier
@@ -769,11 +783,11 @@ Orders.statics.create = function(items, customer, shipping, payment, callback){
       };
 
       //
-      // adding payment
+      // adding paymentObj
       order.payment={
-        alias:payment.alias,
-        number:payment.number,
-        issuer:payment.issuer
+        alias:paymentObj.alias,
+        number:paymentObj.number,
+        issuer:paymentObj.issuer
       };
 
       //
@@ -833,6 +847,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
       q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
     }
   }
+
 
   //
   // filter by closed date
@@ -906,12 +921,93 @@ Orders.statics.findByCriteria = function(criteria, callback){
 }
 
 
-Orders.statics.updateStatus = function(oid,status, callback){
-  return callback()
+//
+// update cancel
+// 1) from user => reason=customer
+// status=created|reserved, payment=pending|authorized
+// 2) from admin => reason=fraud|inventory|other(|timeout|system)
+// status=created|reserved, payment=pending|authorized
+// status=fulfilled, payment=authorized
+// status=fulfilled, payment=paid
+
+Orders.statics.onCancel = function(oid, reason, callback){
+  assert(oid);
+
+  function cancelOrder (order,reason) {
+    order.items.forEach(function(item){
+      item.fulfillment.status="failure";
+      item.finalprice=0;
+    })
+    order.fulfillments.status="failure";
+    order.cancel.reason=reason;
+    order.cancel.when=new Date();
+    order.closed=new Date();
+    return order;
+  }
+
+  // status:["failure","created","reserved","partial","fulfilled"]
+  // financialstatus:["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+  // cancelreason:["customer", "fraud", "inventory", "other"]
+
+  //
+  // check cancel reason
+  if(EnumCancelReason.indexOf(reason)===-1){
+    return callback("Le libéllé de l'annulation n'est pas valable : "+reason)
+  }
+
+  db.model('Orders').findOne({oid:oid}).select('+payment.transaction').exec(function(err,order){
+    if(err){
+      return callback(err)
+    }
+    if(!order){
+      return callback("Impossible de trouver la commande: "+oid);
+    }
+
+
+    //
+    // check order status
+    if(order.closed){
+      return callback("Impossible de modifier une commande fermée: "+oid);
+    }
+
+    // is already cancel
+    if(order.cancel&&order.cancel.when){
+      return callback("Impossible de modifier une commande annulée: "+oid);
+    }
+
+
+    // 
+    // ==== customer cancel =====
+    // 1) from user => reason=customer
+    // status=created|reserved, payment=pending|authorized
+    if(reason==='customer'){
+    }
+
+    //
+    // TODO should be abel cancel fraud 
+    payment.for(order.payment.issuer).cancel(order,reason)
+      .then(function(order){
+        bus.emit('order.cancel',order,items)
+        return callback(null,order)
+      })
+      .fail(function(err){
+        return callback(err,order)
+      })
+
+    //
+    // === admin cancel ===
+    // 2) from admin => reason=fraud|inventory|other(|timeout|system)
+    // status=created|reserved, payment=pending|authorized
+    // status=fulfilled, payment=authorized
+    // status=fulfilled, payment=paid
+    if(reason!=='customer'){
+    }
+  });
 }
 
 //
 // only finalprice and note can be modified for an item
+// status == reserver,partial ,  payment==authorized
 Orders.statics.updateItem = function(oid,items, callback){
   assert(oid);
   assert(items);
@@ -934,8 +1030,8 @@ Orders.statics.updateItem = function(oid,items, callback){
       return callback("Impossible de modifier une commande annulée: "+oid);
     }
     //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-    if(["authorized","partially_paid","paid"].indexOf(order.payment.status)==-1){
-      return callback("Impossible de modifier une commande en attente de validation financière : "+order.payment.status);
+    if(["authorized"].indexOf(order.payment.status)==-1){
+      return callback("Impossible de modifier une commande sans validation financière : "+order.payment.status);
     }
 
 
@@ -957,7 +1053,6 @@ Orders.statics.updateItem = function(oid,items, callback){
           if(item.fulfillment==='failure'){
             rollback.push({sku:item.sku,qty:item.quantity})
             item.finalprice=0.0;
-            item.quantity=0;
           }
           itemIds.push(order.items[i].sku);
           break;
