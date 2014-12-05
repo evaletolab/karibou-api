@@ -749,7 +749,6 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
     // checking shipping data
     if (!shipping ||Object.keys(shipping).length<3
                   ||!shipping.name
-                  ||!shipping.note
                   ||!shipping.streetAdress
                   ||!shipping.floor
                   ||!shipping.postalCode

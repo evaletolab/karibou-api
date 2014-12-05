@@ -49,7 +49,6 @@ var Users=exports.Users=[{
     addresses: [
         {
             name: "famille olivier evalet",
-            note: "123456",
             streetAdress: "route de chêne 34",
             floor: "2",
             postalCode: "1208",
