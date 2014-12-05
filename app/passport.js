@@ -44,12 +44,10 @@ module.exports = function (app, config, passport) {
       }
 
       //
-      // check the first admin
-      config.admin.emails.forEach(function(admin){
-        if (user&&user.email.address === admin){
-          user.roles.push('admin');
-        }
-      });
+      // populate default roles
+      user.populateRoles()
+
+
       //console.log(id,config.admin.emails, user.email)
       // var u= user.toObject()
       // console.log(u)

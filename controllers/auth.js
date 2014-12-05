@@ -94,6 +94,22 @@ exports.ensureAdmin=function(req, res, next) {
   return next();
 }
 
+exports.ensureLogisticOrAdmin=function(req,res,next){
+  //
+  // ensure auth
+  if (!req.isAuthenticated()) { 
+      return res.send(401); 
+  }
+
+  // if not admin, 
+  if (!req.user.isAdmin()&&!req.user.hasRole('logistic')) { 
+      return res.send(401,"Cette fonctionalité est réservée à la logistique");  
+  }
+  
+  return next();
+
+}
+
 exports.checkPassword=function(req, res, next) {
   try{
     var len=config.shop.system.password.len;

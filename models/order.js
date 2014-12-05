@@ -414,7 +414,7 @@ Orders.statics.findOneWeekOfShippingDay=function(){
         nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
         if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
           all.push(nextDate)
-    }else if(day>next.getDay()){
+    }else if(day>=next.getDay()){
         nextDate=new Date((day-next.getDay())*86400000+next.getTime())
         if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
           all.push(nextDate)
@@ -428,11 +428,15 @@ Orders.statics.findOneWeekOfShippingDay=function(){
   });
 }
 
-Orders.statics.findNextShippingDay=function(tl){
+Orders.statics.findNextShippingDay=function(tl,th){
   var now=new Date(), 
       next, 
-      timelimit=tl||config.shop.order.timelimit;
-  // 24h == 86400000
+      timelimit=tl||config.shop.order.timelimit,
+      timelimitH=th||config.shop.order.timelimitH;
+      // 24h == 86400000
+
+      // remove min/sec
+      now.setHours(now.getHours(),0,0,0)
 
 
   // looking for end of the week 
@@ -441,7 +445,7 @@ Orders.statics.findNextShippingDay=function(tl){
     if(day>=now.getDay()){
       // a valid day is at least>=timelimit 
       next=new Date(now.getTime()+86400000*(day-now.getDay()))      
-      next.setHours(config.shop.order.timelimitH,0,0,0)
+      next.setHours(timelimitH,0,0,0)
       //console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
         //console.log('this week',next)
@@ -455,7 +459,7 @@ Orders.statics.findNextShippingDay=function(tl){
     var day=config.shop.order.weekdays[i];
     if(day<now.getDay()){
       next=new Date((7-now.getDay()+day)*86400000+now.getTime());
-      next.setHours(config.shop.order.timelimitH,0,0,0)
+      next.setHours(timelimitH,0,0,0)
       //console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
         //console.log('for next week',next)
@@ -497,7 +501,9 @@ Orders.statics.findNextShippingDay2=function(){
 
 /* return the current shipping day this is for sellers*/
 Orders.statics.findCurrentShippingDay=function(){
-  return this.findNextShippingDay(0.01)
+  var timelimitH=Number(Object.keys(config.shop.order.shippingtimes).sort()[0])+8
+  if(timelimitH>=23)timelimitH=23;
+  return this.findNextShippingDay(0.1,Number(timelimitH))
 }
 
 //
@@ -882,12 +888,13 @@ Orders.statics.findByCriteria = function(criteria, callback){
   if((criteria.closed === null || criteria.closed === undefined)&&
      !criteria.fulfillment&&
      !criteria.reason){
-    q["closed"]={$exists:false};
+    q["closed"]={'$exists':false};
   }
   else if(criteria.closed === true){
     var sd=new Date('1980'),
         ed=new Date();
-    q["closed"]={"$gte": sd, "$lt": ed};
+    //q["closed"]={"$gte": sd, "$lt": ed};
+    q["closed"]={'$exists':true};
   }
   else if(criteria.closed ){
     criteria.closed=new Date(criteria.closed)

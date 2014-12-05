@@ -200,6 +200,22 @@ UserSchema.statics.findByToken = function(token, success, fail){
 };
 
 
+UserSchema.methods.populateRoles=function(){
+  var user=this;
+  config.admin.emails.forEach(function(admin){
+    if (user&&user.email.address === admin){
+      user.roles.push('admin');
+    }
+  });
+
+  // check for admin role
+  config.logistic.emails.forEach(function(logistic){
+    if (user&&user.email.address === logistic){
+      user.roles.push('logistic');
+    }
+  });  
+}
+
 
 UserSchema.methods.getDisquSSO=function(){
   var DISQUS_SECRET = config.disqus.secret;

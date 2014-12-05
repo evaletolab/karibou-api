@@ -71,9 +71,7 @@ exports.list = function (req, res, next)  {
         return res.send(400,errorHelper(err));
       }
       users.forEach(function(user){
-        if( user.email&&user.email.address && config.admin.emails.indexOf(user.email.address)!=-1){
-          user.roles.push('admin');
-        }
+        user.populateRoles()
       })
       return res.json(200,users);
   });

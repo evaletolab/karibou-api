@@ -12,10 +12,10 @@ var Products=db.model('Products'),
 describe("api.orders.find", function(){
   var request= require('supertest');
   var _ = require("underscore");
+  var currentShippingDay=Orders.findCurrentShippingDay();
 
 
 
-  var nextShippingDay=Orders.findCurrentShippingDay();
 
 
   before(function(done){
@@ -64,31 +64,31 @@ describe("api.orders.find", function(){
 
 
   // sugls: super-shop, un-autre-shop, mon-shop
-  it('GET /v1/orders/shops/mon-shop?when=next list open orders for next shipping day ',function(done){
+  it('GET /v1/orders/shops/mon-shop?when=current list open orders for current shipping day ',function(done){
     request(app)
-      .get('/v1/orders/shops/mon-shop?when=next')
+      .get('/v1/orders/shops/mon-shop?when=current')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
         res.body.length.should.equal(2)
         for(var o in res.body){
-          (nextShippingDay.getTime()).should.equal(new Date(res.body[o].shipping.when).getTime())
+          (currentShippingDay.getTime()).should.equal(new Date(res.body[o].shipping.when).getTime())
           // console.log("vendors",res.body[o].vendors)
         }
         done()
       });  
   });
 
-  it('GET /v1/orders?when=next  list all open orders for admin',function(done){
+  it('GET /v1/orders?when=current  list all open orders for admin',function(done){
     request(app)
-      .get('/v1/orders?when=next')
+      .get('/v1/orders?when=current')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
 
         should.not.exist(err)
         res.body.length.should.equal(3)
         for(var o in res.body){          
-          (nextShippingDay).getTime().should.equal(new Date(res.body[o].shipping.when).getTime())
+          (currentShippingDay).getTime().should.equal(new Date(res.body[o].shipping.when).getTime())
         }
         done()
       });  
@@ -171,7 +171,7 @@ describe("api.orders.find", function(){
         should.not.exist(err)
         res.body.length.should.equal(3)
         for(var o in res.body){
-          // nextShippingDay.should.equals(res.body[o].shipping.when)
+          // currentShippingDay.should.equals(res.body[o].shipping.when)
         }
         done()
       });  

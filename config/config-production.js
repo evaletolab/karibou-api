@@ -26,6 +26,11 @@ module.exports = {
     padding:'0e0e0e0e'    
   },
 
+  logistic:{
+    emails:['evaleto@gmail.com']
+  },
+  
+
   payment:{
     reserve:1.15,
     postfinance:{

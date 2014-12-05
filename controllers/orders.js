@@ -132,7 +132,11 @@ function parseCriteria(criteria, req){
 
   // get orders for next shipping day
   if (req.query.when=='next'){
-    criteria.nextShippingDay=true
+    criteria.when=Orders.findNextShippingDay();
+  }
+
+  if (req.query.when=='current'){
+    criteria.when=Orders.findCurrentShippingDay();
   }
 
   // get orders for specific date
@@ -374,6 +378,10 @@ exports.remove=function(req,res){
   return Orders.findOne({oid:req.params.oid}).exec(function(err,order){
     if(err){
       return res.send(400, errorHelper(err));
+    }
+
+    if(!order){
+      return res.send(400,"La commande n'existe pas")
     }
 
     // constraint the remove?
