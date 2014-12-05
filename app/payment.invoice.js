@@ -126,7 +126,7 @@ PaymentInvoice.prototype.refund=function(order,reason){
   order.cancel.reason=reason;
   order.cancel.when=new Date();
   order.closed=new Date();
-  return order.save(function(err){
+  order.save(function(err){
     if(err){
     	// never be there!!
       bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
@@ -159,7 +159,7 @@ PaymentInvoice.prototype.capture=function(order,reason){
 
   order.payment.status="paid";
   order.closed=new Date();
-  return order.save(function(err){
+  order.save(function(err){
     if(err){
     	// never be there!!
       bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
