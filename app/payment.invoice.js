@@ -19,6 +19,11 @@ PaymentInvoice.prototype.isValidAlias=function(alias, id, method){
   return true;
 }
 
+PaymentInvoice.prototype.alias=function(id,payment){
+  return ((id+payment.issuer).hash().crypt());
+}
+
+
 //
 // check if method fields are ok
 PaymentInvoice.prototype.isPaymentObjectValid=function(payment){
@@ -78,11 +83,13 @@ PaymentInvoice.prototype.cancel=function(order,reason){
   //}
 
   // getting transaction
+  order.fulfillments.status='failure';
   order.payment.status="voided";
+  order.cancel={}
   order.cancel.reason=reason;
   order.cancel.when=new Date();
   order.closed=new Date();
-  return order.save(function(err){
+  order.save(function(err){
     if(err){
     	// never be there!!
       bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
@@ -113,7 +120,9 @@ PaymentInvoice.prototype.refund=function(order,reason){
   //	return deferred.reject(new Error('Aucune transaction est attachée à votre commande'))
   //}
 
+  order.fulfillments.status='failure';
   order.payment.status="refunded";
+  order.cancel={};
   order.cancel.reason=reason;
   order.cancel.when=new Date();
   order.closed=new Date();

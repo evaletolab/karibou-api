@@ -64,6 +64,7 @@ describe("orders.date", function(){
     //if today time is > config.shop.order.timelimitH ==> go to next day
     config.shop.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findCurrentShippingDay()
+    console.log('today %d, nextSeller day %d',today.getDay(),nextSeller.getDay())
 
     //
     // sunday is off 

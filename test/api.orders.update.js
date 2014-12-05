@@ -130,7 +130,8 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(order)
       .set('cookie', cookie)
-      .expect(200,function(err,res){
+      .end(function(err,res){
+        res.should.have.status(200);        
         should.not.exist(err)
         should.not.exist(res.body.errors)
         should.not.exist(res.body.cancel)
@@ -195,8 +196,9 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(items)
       .set('cookie', evaleto)
-      .expect(401,function(err,res){
+      .end(function(err,res){
         should.not.exist(err)
+        res.should.have.status(401);
         res.text.should.include('appartient pas à votre boutique')
 
         done()
@@ -217,8 +219,9 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(items)
       .set('cookie', cookie)
-      .expect(401,function(err,res){
+      .end(function(err,res){
         should.not.exist(err)
+        res.should.have.status(401);
         res.text.should.include('appartient pas à votre boutique')
 
         done()
@@ -241,8 +244,9 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(items)
       .set('cookie', cookie)
-      .expect(400,function(err,res){
+      .end(function(err,res){
         should.not.exist(err)
+        res.should.have.status(400);
         res.text.should.include('les articles suivants ne concernent pas')
         done()
       });

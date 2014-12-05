@@ -163,8 +163,9 @@ describe("api.orders.security", function(){
       .set('Content-Type','application/json')
       .send(order)
       .set('cookie', cookie)
-      .expect(401,function(err,res){
+      .end(function(err,res){
         should.not.exist(err)
+        res.should.have.status(401);
         res.text.should.include("La méthode de paiement utilisée n'est pas valide")
         done()
       });

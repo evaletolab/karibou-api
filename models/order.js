@@ -60,7 +60,7 @@ var Orders = new Schema({
 
    payment:{
       alias: {type:String, required:true},
-      number:{type:String, required:true},
+      number:{type:String, required:false},
       issuer:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'},
 
@@ -428,8 +428,49 @@ Orders.statics.findOneWeekOfShippingDay=function(){
   });
 }
 
-/* return the next shipping day available for customers*/
-Orders.statics.findNextShippingDay=function(){
+Orders.statics.findNextShippingDay=function(tl){
+  var now=new Date(), 
+      next, 
+      timelimit=tl||config.shop.order.timelimit;
+  // 24h == 86400000
+
+
+  // looking for end of the week 
+  for (var i = 0; i < config.shop.order.weekdays.length; i++) {
+    var day=config.shop.order.weekdays[i];
+    if(day>=now.getDay()){
+      // a valid day is at least>=timelimit 
+      next=new Date(now.getTime()+86400000*(day-now.getDay()))      
+      next.setHours(config.shop.order.timelimitH,0,0,0)
+      //console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
+      if(((next.getTime()-now.getTime())/3600000)>=timelimit){
+        //console.log('this week',next)
+        return next;
+      }
+    }
+  }
+
+  // looking for begin of the week 
+  for (var i = 0; i < config.shop.order.weekdays.length; i++) {
+    var day=config.shop.order.weekdays[i];
+    if(day<now.getDay()){
+      next=new Date((7-now.getDay()+day)*86400000+now.getTime());
+      next.setHours(config.shop.order.timelimitH,0,0,0)
+      //console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
+      if(((next.getTime()-now.getTime())/3600000)>=timelimit){
+        //console.log('for next week',next)
+        return next;
+      }
+    }
+
+  }
+
+
+
+}
+
+/* DEPRECATED return the next shipping day available for customers*/
+Orders.statics.findNextShippingDay2=function(){
   var now=new Date()
   // computing order start always at 18:00PM
   //now.setHours(18,0,0,0);
@@ -453,22 +494,10 @@ Orders.statics.findNextShippingDay=function(){
   return next;
 }
 
+
 /* return the current shipping day this is for sellers*/
 Orders.statics.findCurrentShippingDay=function(){
-  var next=new Date(), now=Date.now();
-
-  // if next is today && next hours >= config.shop.order.timelimitH ==> select next day
-  var elpased=Math.abs((now-next.getTime())/3600000)
-  while((config.shop.order.weekdays.indexOf(next.getDay())<0) ||
-        (elpased<24 && next.getHours()>config.shop.order.timelimitH)){
-    next=new Date(next.getTime()+86400000)
-    elpased=Math.abs((now-next.getTime())/3600000)
-  }
-
-  //
-  // we dont care about seconds and ms
-  next.setHours(next.getHours(),next.getMinutes(),0,0)
-  return next;
+  return this.findNextShippingDay(0.01)
 }
 
 //
@@ -639,7 +668,7 @@ Orders.statics.findByTimeoutAndNotPaid = function(callback){
 
 //
 // create a new order
-Orders.statics.create = function(items, customer, shipping, paymentObj, callback){
+Orders.statics.create = function(items, customer, shipping, paymentData, callback){
   assert(items);
   assert(customer);
   assert(shipping);
@@ -687,12 +716,12 @@ Orders.statics.create = function(items, customer, shipping, paymentObj, callback
   // make sure that payment issuer belongs to this customer
   try{
 
-    if(!paymentObj||!customer.id ||!payment.for(paymentObj.issuer).isPaymentObjectValid(paymentObj)){
-      return callback("Votre commande est incomplète, l'ordre ne peut pas être passé")
+    if(!paymentData||!customer.id ||!payment.for(paymentData.issuer).isPaymentObjectValid(paymentData)){
+      return callback("Votre commande est incomplète, l'ordre ne peut pas êtree passé")
     } 
 
-    if(!payment.for(paymentObj.issuer).isValidAlias(paymentObj.alias,customer.id, paymentObj.issuer)){
-      return callback("Votre méthode de paiement est inconnue, l'ordre ne peut pas être passé")
+    if(!payment.for(paymentData.issuer).isValidAlias(paymentData.alias,customer.id, paymentData.issuer)){
+      return callback("Votre méthode de paiement est invalide, l'ordre ne peut pas être passé")
     }
 
   }catch(error){
@@ -783,11 +812,11 @@ Orders.statics.create = function(items, customer, shipping, paymentObj, callback
       };
 
       //
-      // adding paymentObj
+      // adding paymentData
       order.payment={
-        alias:paymentObj.alias,
-        number:paymentObj.number,
-        issuer:paymentObj.issuer
+        alias:payment.for(paymentData.issuer).alias(customer.id,paymentData),
+        number:paymentData.number,
+        issuer:paymentData.issuer
       };
 
       //
@@ -890,6 +919,9 @@ Orders.statics.findByCriteria = function(criteria, callback){
   if(criteria.user){
     // q["email"]=criteria.user
     q["customer.id"]=parseInt(criteria.user);
+    if(criteria.closed === null || criteria.closed === undefined){
+      delete (q["closed"])   
+    }
   }
 
   if(criteria.fulfillment){
@@ -933,22 +965,6 @@ Orders.statics.findByCriteria = function(criteria, callback){
 Orders.statics.onCancel = function(oid, reason, callback){
   assert(oid);
 
-  function cancelOrder (order,reason) {
-    order.items.forEach(function(item){
-      item.fulfillment.status="failure";
-      item.finalprice=0;
-    })
-    order.fulfillments.status="failure";
-    order.cancel.reason=reason;
-    order.cancel.when=new Date();
-    order.closed=new Date();
-    return order;
-  }
-
-  // status:["failure","created","reserved","partial","fulfilled"]
-  // financialstatus:["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-  // cancelreason:["customer", "fraud", "inventory", "other"]
-
   //
   // check cancel reason
   if(EnumCancelReason.indexOf(reason)===-1){
@@ -976,6 +992,19 @@ Orders.statics.onCancel = function(oid, reason, callback){
     }
 
 
+    // early test
+    // make sure that payment issuer belongs to this customer
+    try{
+
+      if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer.id, order.payment.issuer)){
+        return callback("Votre méthode de paiement est invalide, l'action ne peut pas être passée")
+      }
+
+    }catch(error){
+      return callback(error.message)    
+    }
+
+
     // 
     // ==== customer cancel =====
     // 1) from user => reason=customer
@@ -987,11 +1016,11 @@ Orders.statics.onCancel = function(oid, reason, callback){
     // TODO should be abel cancel fraud 
     payment.for(order.payment.issuer).cancel(order,reason)
       .then(function(order){
-        bus.emit('order.cancel',order,items)
+        bus.emit('order.cancel',order)
         return callback(null,order)
       })
       .fail(function(err){
-        return callback(err,order)
+        return callback(err.message||err,order)
       })
 
     //

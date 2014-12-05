@@ -241,13 +241,12 @@ exports.listByShopOwner = function(req,res){
 
 exports.get = function(req,res){
   try{
-    validate.ifCheck(req.params.uid, "Le format d'utilisateur n'est pas valide").isInt()
     validate.check(req.params.oid, "Le format de la commande n'est pas valide").isInt()
   }catch(err){
     return res.send(400, err.message);
   }
 
-  Orders.find({oid:oid}).exec(function(err,order){
+  Orders.findOne({oid:req.params.oid}).exec(function(err,order){
     if(err){
       return res.send(400,err);
     }
@@ -276,6 +275,9 @@ exports.verifyItems = function(req,res){
 };
 
 
+
+//
+// create a new order
 exports.create=function(req,res){
 
   // check && validate input field
@@ -284,7 +286,6 @@ exports.create=function(req,res){
   }catch(err){
     return res.send(400, err.message);
   }
-
 
   Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment,
     function(err,order){
@@ -310,13 +311,15 @@ exports.create=function(req,res){
 
 };
 
-exports.onCancel=function(req,res){
+//
+// cancel order 
+exports.cancel=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
   }catch(err){
     return res.send(400, err.message);
   }
-  db.model('Orders').onCancel(req.params.oid,req.query.reason,function(err,order){
+  db.model('Orders').onCancel(req.params.oid,req.body.reason,function(err,order){
     if(err){
       return res.send(400, errorHelper(err));
     }
@@ -325,6 +328,8 @@ exports.onCancel=function(req,res){
 }
 
 
+//
+// capture current order with finalprice
 exports.capture=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
@@ -332,7 +337,7 @@ exports.capture=function(req,res){
     return res.send(400, err.message);
   }
 
-  db.model('Orders').findOne({oid:oid}).select('+payment.transaction').exec(function(err,order){
+  db.model('Orders').findOne({oid:req.params.oid}).select('+payment.transaction').exec(function(err,order){
     if(err){
       return res.send(400, errorHelper(err));
     }
@@ -357,6 +362,33 @@ exports.capture=function(req,res){
 
 }
 
+//
+// delete order 
+exports.remove=function(req,res){
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  return Orders.findOne({oid:req.params.oid}).exec(function(err,order){
+    if(err){
+      return res.send(400, errorHelper(err));
+    }
+
+    // constraint the remove?
+    //if(['voided','refunded'].indexOf(order.payment.status)===-1){
+    //  return res.send(400,"Impossible de supprimer une commande avec le status: "+order.payment.status))
+    //}
+
+    // delete
+    order.remove(function(err){
+      if(err)return res.json(400,errorHelper(err))
+      return res.json(200,{})
+    });
+
+  });
+}
 
 exports.updateItem=function(req,res){
 

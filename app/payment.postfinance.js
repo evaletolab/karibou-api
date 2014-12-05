@@ -35,6 +35,10 @@ PaymentPostfinance.prototype.isPaymentObjectValid=function(payment){
   return (payment&&payment.alias&&payment.issuer&&payment.number);
 }
 
+PaymentPostfinance.prototype.alias=function(id,payment){
+  return payment.alias;
+}
+
 //
 // validate a card or alias and get new Card by callback
 PaymentPostfinance.prototype.card=function(payment, callback){
@@ -165,7 +169,9 @@ PaymentPostfinance.prototype.cancel=function(order,reason){
     		return deferred.reject(err);		
     	}
 
+		  order.fulfillments.status='failure';
       order.payment.status="voided";
+      order.cancel={}
       order.cancel.reason=reason;
       order.cancel.when=new Date();
       order.closed=new Date();
@@ -179,7 +185,8 @@ PaymentPostfinance.prototype.cancel=function(order,reason){
       })
     });
 	}catch(err){
-    return Q.reject(err);
+		console.log('postfinance',err)
+    return Q.reject(new Error('Votre méthode de paiement est invalide (PF)'));
 	}
 
 	// return promise
@@ -216,7 +223,9 @@ PaymentPostfinance.prototype.refund=function(order,reason){
     		return deferred.reject(err);		
     	}
 
+		  order.fulfillments.status='failure';
       order.payment.status="refunded";
+      order.cancel={}
       order.cancel.reason=reason;
       order.cancel.when=new Date();
       order.closed=new Date();
@@ -230,7 +239,8 @@ PaymentPostfinance.prototype.refund=function(order,reason){
       })
     });
 	}catch(err){
-    return Q.reject(err);
+		console.log('postfinance',err)
+    return Q.reject(new Error('Votre méthode de paiement est invalide (PF)'));
 	}
 
 	// return promise
@@ -266,7 +276,8 @@ PaymentPostfinance.prototype.capture=function(order,reason){
     	operation:'capture',
     	amount:order.getTotalPrice()
     });
-    return transaction.process(card, function(err,res){
+
+    transaction.process(card, function(err,res){
     	if(err){
     		return deferred.reject(err);		
     	}
@@ -283,7 +294,8 @@ PaymentPostfinance.prototype.capture=function(order,reason){
       })
     });
 	}catch(err){
-    return Q.reject(err);
+		console.log('postfinance',err)
+    return Q.reject(new Error('Votre méthode de paiement est invalide (PF)'));
 	}
 
 	// return promise

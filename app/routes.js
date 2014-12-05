@@ -155,10 +155,14 @@ module.exports = function(app, config, passport) {
 
   // only owner to the order can cancel order
   // shop can only cancel their items
-  app.post('/v1/orders/:oid/cancel', orders.ensureOwnerOrAdmin, queued(orders.onCancel));
+  app.post('/v1/orders/:oid/cancel', orders.ensureOwnerOrAdmin, queued(orders.cancel));
 
   // capture payment 
   app.post('/v1/orders/:oid/capture', auth.ensureAdmin, queued(orders.capture));
+//  app.post('/v1/orders/:oid/refund', auth.ensureAdmin, queued(orders.refund));
+
+  // for admin only
+  app.post('/v1/orders/:oid/remove', auth.ensureAdmin, orders.remove);
 
 
 

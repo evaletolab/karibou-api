@@ -294,12 +294,12 @@ exports.Orders=[
         payment: {
             issuer: "visa",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:'0123456789012012345678901201234567890120123456789012',
             status:"authorized"
         },
 
         fulfillments: {
-            status: "reserved"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
@@ -511,7 +511,7 @@ exports.Orders=[
         },
 
         fulfillments: {
-            status: "reserved"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/

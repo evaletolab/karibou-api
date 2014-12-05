@@ -26,7 +26,7 @@ var Products=db.model('Products')
  *  - send email
  */
 
-describe("orders.create.success", function(){
+describe("orders.create.race", function(){
   var _ = require("underscore");
 
 
@@ -121,7 +121,7 @@ describe("orders.create.success", function(){
         Orders.findByTimeoutAndNotPaid(function(err,orders){
 
           require('async').eachLimit(orders,1,function(o,cb){
-            o.print()
+            //o.print()
             o.rollbackProductQuantityAndSave("timeout",function(err,o){
 
               //
