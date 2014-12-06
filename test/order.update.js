@@ -70,13 +70,14 @@ describe("orders.update", function(){
       sku:1000002,
       finalprice:6.0,
       note:"j'ai mis 2 pièces",
-      fulfillment:{status:"fulfilled"}
+      fulfillment:{status:"failure"}
     }
 
     db.model('Orders').updateItem(oid,[item], function(err,order){
       should.not.exist(err)
       order.items[1].note.should.equal(item.note)
       order.items[1].fulfillment.status.should.equal(item.fulfillment.status)
+      order.items[1].finalprice.should.equal(0)
       done();
     });
   });

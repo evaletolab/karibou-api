@@ -1085,9 +1085,9 @@ Orders.statics.updateItem = function(oid,items, callback){
           if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
 
           // this item has bean removed from the order
-          if(item.fulfillment==='failure'){
+          if(item.fulfillment.status==='failure'){
             rollback.push({sku:item.sku,qty:item.quantity})
-            item.finalprice=0.0;
+            order.items[i].finalprice=item.finalprice=0.0;
           }
           itemIds.push(order.items[i].sku);
           break;
