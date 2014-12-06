@@ -60,15 +60,15 @@ describe("orders.date", function(){
     done()    
   });
 
-  it("[SELLER] with a time limit at 1:00AM the current shipping day for seller is today+1 (except for saturday+2)", function(done){
+  it("[SELLER] with a time limit at 1:00AM the current shipping day for seller is today (except for sunday+1)", function(done){
     //if today time is > config.shop.order.timelimitH ==> go to next day
     config.shop.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findCurrentShippingDay()
-    //console.log('today %d, nextSeller day %d',today.getDay(),nextSeller.getDay())
+    //console.log('------> today %d, nextSeller day %d',today.getDay(),nextSeller.getDay())
 
     //
     // sunday is off 
-    if (today.getDay()==6){
+    if (today.getDay()==0){
       nextSeller.getDay().should.equal((today.getDay()+1)%7)      
     }else{
       nextSeller.getDay().should.equal(today.getDay()+0)      

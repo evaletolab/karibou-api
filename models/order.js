@@ -448,7 +448,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
       next.setHours(timelimitH,0,0,0)
       //console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
-        //console.log('this week',next)
+        //console.log('return this',next)
         return next;
       }
     }
@@ -473,30 +473,6 @@ Orders.statics.findNextShippingDay=function(tl,th){
 
 }
 
-/* DEPRECATED return the next shipping day available for customers*/
-Orders.statics.findNextShippingDay2=function(){
-  var now=new Date()
-  // computing order start always at 18:00PM
-  //now.setHours(18,0,0,0);
-  now=now.getTime()
-  var next=new Date(now+config.shop.order.timelimit*3600000);
-
-  //
-  // next is available until time  (timeLimitH)
-  next.setHours(config.shop.order.timelimitH,0,0,0)
-
-  var limit=Math.abs((now-next.getTime())/3600000)
-  while(config.shop.order.weekdays.indexOf(next.getDay())<0 || limit<config.shop.order.timelimit){
-    next=new Date(next.getTime()+86400000)
-    limit=Math.abs((now-next.getTime())/3600000)
-  }
-
-  //
-  // we dont care about seconds and ms
-  next.setHours(next.getHours(),next.getMinutes(),0,0)
-
-  return next;
-}
 
 
 /* return the current shipping day this is for sellers*/
@@ -552,8 +528,14 @@ Orders.methods.computeRankAndSave=function(cb){
   var self=this, sd=new Date(this.shipping.when), ed, promise, orderRank=1;
   sd.setHours(1,0,0,0)
   ed=new Date(sd.getTime()+86400000-3601000);
+
   db.model('Orders').find({"shipping.when":{"$gte": sd, "$lt": ed}}).exec(function(err,orders){
-    self.rank=orders.length
+    var newRank=0;
+    for (var i = orders.length - 1; i >= 0; i--) {
+      newRank=Math.max(newRank,orders[i].rank);
+    };
+    self.rank=newRank+1;
+    debug("computeRankAndSave query:shipping.when",sd, ':',ed,'==',self.rank)
     self.save(cb)
   })
 }
