@@ -14,13 +14,14 @@ module.exports = {
     //
     // collect place
     marketplace:{
-      shipping:10,
+      shipping:10, // shipping price
       list:[
         {name:"Marché de Plainpalais le mardi",lat:46.19838,lng:6.14083, d:2},
         {name:"Marché de Plainpalais le vendredi",lat:46.19838,lng:6.14083, d:5},
         {name:"Marché de Plainpalais le dimanche",lat:46.19838,lng:6.14083, d:0},
         {name:"Marché de Rive le jeudi" ,lat:46.20195,lng:6.15491, d:4},
-        {name:"Marché de Rive le samedi" ,lat:46.20195,lng:6.15491, d:6}
+        {name:"Marché de Rive le samedi" ,lat:46.20195,lng:6.15491, d:6},
+        {name:"Halle de Rive" ,lat:46.202077,lng:6.15477, d:7}
       ]
     },
     user:{
