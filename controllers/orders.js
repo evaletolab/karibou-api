@@ -365,6 +365,7 @@ exports.cancel=function(req,res){
         'order-cancel',
         function(err,status){
           //TODO log activities
+          if(err)console.log('---------------------------cancel',order.oid,err)
         })
 
     return res.json(200,order)
@@ -416,6 +417,7 @@ exports.capture=function(req,res){
             'order-billing',
             function(err,status){
               //TODO log activities
+              if(err)console.log('---------------------------capture',order.oid,err)
             })
 
 
