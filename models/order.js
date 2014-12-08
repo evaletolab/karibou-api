@@ -240,6 +240,36 @@ Orders.methods.getTotalPrice=function(factor){
   return parseFloat((Math.ceil(total*20)/20).toFixed(2));
 }
 
+Orders.methods.getSubTotal=function(){
+  var total=0.0;
+  this.items&&this.items.forEach(function(item){
+    //
+    // item should not be failure (fulfillment)
+    if(item.fulfillment!=='failure'){
+      total+=item.finalprice;
+    }
+  });
+
+  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
+}
+
+Orders.methods.getDateString=function(date){
+  var format={
+    months : "janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre".split("_"),
+    weekdays : "dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi".split("_"),
+  }
+
+  var when=new Date(date||this.shipping.when);
+  var m=format.months[when.getMonth()];
+  var d=format.weekdays[when.getDay()]
+  var day=when.getDate()
+  var time=(date)?'':(" de "+config.shop.order.shippingtimes[when.getHours()])
+
+  return d+" "+day+" "+m+" "+when.getFullYear()+time;
+}
+
+
+
 //
 // filter order content by User//Shop 
 Orders.statics.filterByShop=function(shopname,orders){
@@ -438,7 +468,6 @@ Orders.statics.findNextShippingDay=function(tl,th){
       // remove min/sec
       now.setHours(now.getHours(),0,0,0)
 
-
   // looking for end of the week 
   for (var i = 0; i < config.shop.order.weekdays.length; i++) {
     var day=config.shop.order.weekdays[i];
@@ -478,7 +507,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
 /* return the current shipping day this is for sellers*/
 Orders.statics.findCurrentShippingDay=function(){
   var timelimitH=Number(Object.keys(config.shop.order.shippingtimes).sort()[0])+8
-  if(timelimitH>=23)timelimitH=23;
+  timelimitH=23;
   return this.findNextShippingDay(0.1,Number(timelimitH))
 }
 
@@ -662,10 +691,14 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   assert(shipping);
   assert(callback);
   var db=this
+    , now =new Date()
     , Orders=db.model('Orders')
     , Products=db.model('Products')
     , order={};
 
+
+  // remove min/sec to compute the timeleft for shipping
+  now.setHours(now.getHours(),0,0,0)
 
   //
   // simple items check
@@ -688,7 +721,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   }
 
   var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
-  if(Math.abs((Date.now()-when)/3600000) < config.shop.order.timelimit){
+  if(Math.abs((when-now.getTime())/3600000) < config.shop.order.timelimit){
     return callback("Cette date de livraison n'est plus disponible.")
   }
 

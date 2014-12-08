@@ -1,0 +1,43 @@
+Bonjour <%= order.customer.name.givenName %>,
+
+Nous vous remercions pour votre commande du <%= created %>. 
+Vous trouverez ci-dessous le détail de votre commande
+*<% for(var i=0; i<order.items.length; i++) {%>
+* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <% } %>
+* ------------------
+* Sous total  <%= subTotal %> CHF
+* Frais de livraison <%= shippingFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF
+* ------------------
+* Montant total provisoire <%= totalWithFees %> CHF
+*
+
+Récapitulatif
+-------------
+Numéro de commande: <%= order.oid %>
+Méthode de paiement: Bulletin de versement
+Montant total provisoire: <%= totalWithFees %> CHF
+Date de livraison: Le <%= shippingWhen %> 
+Adresse de livraison: 
+# <%- order.shipping.name %> 
+# <%- order.shipping.streetAdress %> 
+# <%- order.shipping.postalCode %>, <%- order.shipping.region %> 
+
+Paiement et montant
+-------------------
+Vous recevrez une facture détaillée par e-mail avant la livraison.
+Le total de la commande peut être ajusté dans le cas où vous avez commandé des produits à poids variables dont le prix est connu le jour de la livraison. 
+Aussi, si un produit devait être en rupture de stock, il sera déduit de la facture finale.
+
+Pour toute question, veuillez répondre à ce mail.
+Avec nos meilleurs messages,
+
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+    
+----
+vos commandes <%= origin %>/account/orders
+Delphine : 004176 379.78.68

@@ -18,5 +18,20 @@ Payment.prototype.for=function(issuer){
 	throw new Error('Could not find payment method: '+issuer)
 }
 
+Payment.prototype.issuerFees=function(issuer, amount){
+  for(var p in config.shop.order.gateway){
+    if(config.shop.order.gateway[p].label===issuer){
+      return config.shop.order.gateway[p].fees*amount
+    }
+  }
+  // 
+  return 0.0;
+}
+
+
+Payment.prototype.authorize=function(){
+	
+}
+
 
 module.exports=new Payment()

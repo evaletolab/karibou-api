@@ -39,6 +39,8 @@ PaymentPostfinance.prototype.alias=function(id,payment){
   return payment.alias;
 }
 
+
+
 //
 // validate a card or alias and get new Card by callback
 PaymentPostfinance.prototype.card=function(payment, callback){

@@ -1,0 +1,32 @@
+Bonjour <%= order.customer.name.givenName %>,
+
+Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <%= created %>.
+Veuillez utiliser cette référence pour le paiement avant le 30.12.2014:
+(1) - Compte:	CH76 0900 0000 1461 5643 8
+(2) - Montant à payer, <%= totalWithFees %> CHF
+(4) - Versement pour:	Karibou Delphine Cluzel Evalet et Olivier Evalet, CH-1208 Genève
+
+*<% for(var i=0; i<order.items.length; i++) {%>
+* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <% } %>
+* ------------------
+* Sous total  <%= subTotal %> CHF
+* Frais de livraison <%= shippingFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF
+* ------------------
+* Montant total <%= totalWithFees %> CHF
+*
+
+
+Pour toute question, veuillez répondre à ce mail.
+Avec nos meilleurs messages,
+
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+    
+
+----
+vos commandes <%= origin %>/account/orders
+Delphine : 004176 379.78.68

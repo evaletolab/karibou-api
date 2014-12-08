@@ -305,6 +305,28 @@ exports.create=function(req,res){
     var oid=order.oid;
     payment.for(order.payment.issuer).authorize(order)
       .then(function(order){
+        //
+        // prepare and send mail
+        var mail={
+          order:order,
+          created:order.getDateString(order.created),
+          shippingFees:config.shop.marketplace.shipping,
+          subTotal:order.getSubTotal(),
+          paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+          totalWithFees:order.getTotalPrice().toFixed(2),
+          shippingWhen:order.getDateString(),
+          subTotal:order.getSubTotal().toFixed(2),
+          origin:req.header('Origin')||config.mail.origin,
+          withHtml:false
+        };
+        bus.emit('sendmail',  
+            order.email,
+            'Confirmation de votre commande Karibou '+order.oid,
+            mail,
+            'order-new',
+            function(err,status){
+              //TODO log activities
+            })
         return res.json(order)
       })
       .fail(function(err){
@@ -327,6 +349,24 @@ exports.cancel=function(req,res){
     if(err){
       return res.send(400, errorHelper(err));
     }
+
+    //
+    // prepare and send mail
+    var mail={
+      order:order,
+      created:order.getDateString(order.created),
+      origin:req.header('Origin')||config.mail.origin,
+      withHtml:false
+    };
+    bus.emit('sendmail',  
+        order.email,
+        'Annulation de votre commande Karibou '+order.oid,
+        mail,
+        'order-cancel',
+        function(err,status){
+          //TODO log activities
+        })
+
     return res.json(200,order)
   })
 }
@@ -354,6 +394,31 @@ exports.capture=function(req,res){
 
     payment.for(order.payment.issuer).capture(order)
       .then(function(order){
+
+        //
+        // prepare and send mail
+        var mail={
+          order:order,
+          created:order.getDateString(order.created),
+          shippingFees:config.shop.marketplace.shipping,
+          subTotal:order.getSubTotal(),
+          paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+          totalWithFees:order.getTotalPrice().toFixed(2),
+          shippingWhen:order.getDateString(),
+          subTotal:order.getSubTotal().toFixed(2),
+          origin:req.header('Origin')||config.mail.origin,
+          withHtml:false
+        };
+        bus.emit('sendmail',  
+            order.email,
+            'Facture de votre commande Karibou '+order.oid,
+            mail,
+            'order-billing',
+            function(err,status){
+              //TODO log activities
+            })
+
+
         return res.json(order)
       })
       .fail(function(err){

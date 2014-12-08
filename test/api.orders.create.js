@@ -27,11 +27,6 @@ var Products=db.model('Products'),
     weekdays=config.shop.order.weekdays;
 
 
-okDay=Orders.findNextShippingDay();
-toshortDay=Orders.findCurrentShippingDay();
-
-// select a shipping time
-okDay.setHours(11,0,0,0)
 
 
 describe("api.orders.create", function(){
@@ -39,6 +34,16 @@ describe("api.orders.create", function(){
   var _ = require("underscore");
 
   before(function(done){
+    okDay=Orders.findNextShippingDay();
+    toshortDay=Orders.findCurrentShippingDay();
+
+    // select a shipping time
+    okDay.setHours(11,0,0,0)
+    //Orders.printInfo()
+    //  Orders.find({}).exec(function(e,os){
+    //    os.forEach(function(o){o.print()})
+    //  })
+
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);
