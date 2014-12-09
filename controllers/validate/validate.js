@@ -8,15 +8,15 @@ exports.check   = check;
 exports.ifCheck = ifCheck;
 
 var user_address = exports.address =  function(address){
-      ifCheck(address.region,    "La région n'est pas valide").isText().len(2, 30)
+      ifCheck(address.region,    "La région n'est pas valide").isText().len(2, 100)
       ifCheck(address.primary,   "Ooops votre adresse n'est pas valide").isBoolean()
       check(address.geo.lng,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
       check(address.geo.lat,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
       check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
-      ifCheck(address.floor,     "L'étage n'est pas valide").isText().len(1, 30)
-      check(address.streetAdress,"L'adresse n'est pas valide").isText().len(4, 100)
-      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 40)
-      check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 60)
+      ifCheck(address.floor,     "L'étage n'est pas valide").isText().len(1, 50)
+      check(address.streetAdress,"L'adresse n'est pas valide").isText().len(4, 200)
+      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 200)
+      check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 100)
 }
 
 /**
@@ -29,8 +29,8 @@ var user= exports.user = function(u, lean){
     }
 
     if(u.name){
-      ifCheck(u.name.familyName, "Votre nom de famille n'est pas valide").len(2, 64).isText();
-      ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 64).isText();
+      ifCheck(u.name.familyName, "Votre nom de famille n'est pas valide").len(2, 100).isText();
+      ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 100).isText();
     }
 
     if(!lean && !u.phoneNumbers.length){
@@ -50,9 +50,9 @@ var user= exports.user = function(u, lean){
 
 exports.payment=function(payment, alias){
   check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
-  check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,30)
-  check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,30)
-  ifCheck(payment.csc,  "Le code de vérification de la carte n'est pas valide").isText().len(0,4)
+  check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,50)
+  check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,50)
+  ifCheck(payment.csc,  "Le code de vérification de la carte n'est pas valide").isText().len(0,5)
 
 }
 
@@ -124,11 +124,11 @@ exports.product = function(req){
 
     if (req.body.info){
       req.body.info.active && check(req.body.info.active).isBoolean();
-      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire doit contenir entre 6 et 264 caractères").len(6, 264).isText();
+      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire doit contenir entre 6 et 300 caractères").len(6, 300).isText();
     }
 
     for (var i in req.body.faq){
-      check(req.body.faq[i].q,"La question doit contenir entre 3 et 128 caractères").len(3, 128).isText();
+      check(req.body.faq[i].q,"La question doit contenir entre 3 et 150 caractères").len(3, 150).isText();
       check(req.body.faq[i].a,"La réponse doit contenir entre 3 et 400 caractères").len(3, 400).isText()
     }
 
@@ -139,8 +139,8 @@ var order_items = exports.orderItems = function(items, update){
     check(items[i].sku).isNumeric()
     check(items[i].title,       "Le description doit contenir entre 6 et 300 caractères").isText().len(3, 300);
     if(update!==true){
-      check(items[i].categories,  "La catégorie doit contenir entre 6 et 220 caractères").isText().len(3, 220);
-      check(items[i].vendor,      "Le vendeur doit contenir entre 3 et 220 caractères").isText().len(3, 220);
+      check(items[i].categories,  "La catégorie doit contenir entre 6 et 200 caractères").isText().len(3, 200);
+      check(items[i].vendor,      "Le vendeur doit contenir entre 3 et 200 caractères").isText().len(3, 200);
       check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
       check(items[i].price,       "Le prix n'est pas valable").isFloat()
       check(items[i].part,        "La portion du produit être entre 1 et 50 caractères").isText().len(1, 50);
@@ -176,7 +176,7 @@ exports.orderFind = function(req){
 exports.shop=function(shop){
     if (!shop)return;
 
-    if(shop.name) check(shop.name,"Le nom doit contenir entre 3 et 48 caractères").len(3, 48).isText()
+    if(shop.name) check(shop.name,"Le nom doit contenir entre 3 et 60 caractères").len(3, 60).isText()
     if(shop.description){
       check(shop.description,"La description doit contenir entre 3 et 400 caractères").len(3, 400).isText()
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
@@ -198,7 +198,7 @@ exports.shop=function(shop){
     }
 
     for (var i in shop.faq){
-      check(shop.faq[i].q,"La question doit contenir entre 3 et 128 caractères").len(3, 128).isText();
+      check(shop.faq[i].q,"La question doit contenir entre 3 et 150 caractères").len(3, 150).isText();
       check(shop.faq[i].a,"La réponse doit contenir entre 3 et 400 caractères").len(3, 400).isText();
     }
 
@@ -219,10 +219,10 @@ exports.shop=function(shop){
     if(shop.address){
 
       ifCheck(shop.address.depository,"Le lieu de collecte de vos produits doit contenir entre 4 et 150 caractères").isText().len(4,150)
-      check(shop.address.name,"Le nom de votre adresse doit contenir entre 4 et 30 caractères").isText().len(4,30)
+      check(shop.address.name,"Le nom de votre adresse doit contenir entre 4 et 100 caractères").isText().len(4,100)
       check(shop.address.floor,"L'étage de votre adresse doit contenir entre 1 et 10 caractères").isText().len(1,10)
-      check(shop.address.phone,"Le téléphone de votre adresse doit contenir entre 4 et 30 caractères").isText().len(4,30)
-      check(shop.address.region,"La région de votre adresse doit contenir entre 1 et 30 caractères").isText().len(4,30)
+      check(shop.address.phone,"Le téléphone de votre adresse doit contenir entre 4 et 100 caractères").isText().len(4,100)
+      check(shop.address.region,"La région de votre adresse doit contenir entre 1 et 100 caractères").isText().len(4,100)
       check(shop.address.postalCode,"Le code postal de votre adresse n'est pas valide").isNumeric()
     }
     for (var i in shop.marketplace){
