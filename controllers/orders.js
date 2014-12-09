@@ -326,6 +326,7 @@ exports.create=function(req,res){
             'order-new',
             function(err,status){
               //TODO log activities
+              if(err)console.log('---------------------------create',order.oid,err)
             })
         return res.json(order)
       })
