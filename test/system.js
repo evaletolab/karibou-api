@@ -28,6 +28,22 @@ describe("system", function(){
         done()
     });
 
+
+
+    it("check result when somming products prices",function(done){
+        var prices=[7.9,4.0,4.2,4.00,5.00,6.50,9.00,4.90,16.00,7.90,7.90,4.20,7.40], total=0.0;
+        prices.forEach(function(p){
+            total+=p;
+        })
+
+        total+=10
+
+        // console.log('x20',(total*20))
+        // console.log('ceil',Math.ceil(total*20))
+        // console.log('round',Math.round(total*20))
+        // console.log('total',total, parseFloat((Math.round(total*20)/20).toFixed(2)))
+        done()
+    })
   });
 
   describe("Administration", function(){

@@ -104,7 +104,7 @@ module.exports = {
       // -> une commande le lundi à 9:00 .... mercredi 10:00 == 49h
       // -> une commande le lundi à 18:00 .... mercredi 10:00 == 40h
       // -> une commande le lundi à 20:00 .... mercredi 10:00 == 38h* minimum pour deux matinées
-      timelimit:37,
+      timelimit:39,
 
       /* order date range between day1 to day2 max 11:00. Lapse time = timelimit */
       timelimitH:10,
