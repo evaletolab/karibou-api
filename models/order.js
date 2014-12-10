@@ -237,7 +237,7 @@ Orders.methods.getTotalPrice=function(factor){
   // add shipping fees (10CHF)
   total+=config.shop.marketplace.shipping;
 
-  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
+  return parseFloat((Math.round(total*20)/20).toFixed(2));
 }
 
 Orders.methods.getSubTotal=function(){
@@ -250,7 +250,7 @@ Orders.methods.getSubTotal=function(){
     }
   });
 
-  return parseFloat((Math.ceil(total*20)/20).toFixed(2));
+  return parseFloat((Math.round(total*20)/20).toFixed(2));
 }
 
 Orders.methods.getDateString=function(date){
@@ -475,9 +475,9 @@ Orders.statics.findNextShippingDay=function(tl,th){
       // a valid day is at least>=timelimit 
       next=new Date(now.getTime()+86400000*(day-now.getDay()))      
       next.setHours(timelimitH,0,0,0)
-      //console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
+      console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
-        //console.log('return this',next)
+        console.log('return this',next)
         return next;
       }
     }
@@ -489,9 +489,9 @@ Orders.statics.findNextShippingDay=function(tl,th){
     if(day<now.getDay()){
       next=new Date((7-now.getDay()+day)*86400000+now.getTime());
       next.setHours(timelimitH,0,0,0)
-      //console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
+      console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
-        //console.log('for next week',next)
+        console.log('for next week',next)
         return next;
       }
     }
@@ -1038,6 +1038,8 @@ Orders.statics.onCancel = function(oid, reason, callback){
     payment.for(order.payment.issuer).cancel(order,reason)
       .then(function(order){
         bus.emit('order.cancel',order)
+        //
+        // TODO rollback items on cancel or delete
         return callback(null,order)
       })
       .fail(function(err){
