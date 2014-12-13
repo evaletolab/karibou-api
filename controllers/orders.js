@@ -484,3 +484,49 @@ exports.updateItem=function(req,res){
     return res.json(200,order)
   });
 }
+
+
+//
+// TODO multiple implement of send email, refactor it?
+exports.sendOrderForOneShop=function(req,res){
+  try{
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
+    if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
+    validate.check(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(3, 600).isText();
+    if(!req.user)throw new Error("Vous devez avoir une session ouverte");
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+
+  db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
+    if (err){
+      return res.send(400,errorHelper(err));
+    }
+    if(!shop){
+      return res.send(400,"Cette boutique n'existe pas");
+    }
+
+    //
+    //
+    var content={};
+    content.user=req.user;
+    content.text=req.body.content;
+    content.origin=req.header('Origin')||config.mail.origin;
+
+    //
+    // send email
+    bus.emit('sendmail',shop.owner.email.address,
+                 "Un utilisateur à une question pour votre boutique "+req.params.shopname,
+                 content,
+                 "shop-question", function(err, status){
+      if(err){
+        return res.send(400,errorHelper(err));
+      }
+
+      res.json(200);
+    })
+
+  });
+
+}
