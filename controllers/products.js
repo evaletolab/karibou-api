@@ -247,6 +247,7 @@ exports.update=function (req, res) {
   //normalize ref
   req.body.vendor=normalizeRef('vendor');
   req.body.categories=normalizeRef('categories');
+  req.body.updated=Date.now();
 
   delete(req.body._id);
   Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){

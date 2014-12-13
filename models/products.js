@@ -76,6 +76,7 @@ var Product = new Schema({
 
 
   created: { type: Date, default: Date.now },
+  updated: { type: Date, default: Date.now },
 
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
