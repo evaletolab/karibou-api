@@ -108,11 +108,14 @@ exports.get=function (req, res) {
     return res.json(shop);
   });
 };
+
+//
+// TODO multiple implement of send email, refactor it?
 exports.email=function(req,res){
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
     if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
-    validate.check(req.body.content,"Le format de votre question n'est pas valide").len(3, 400).isText();
+    validate.check(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(3, 600).isText();
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
   }catch(err){
     return res.send(400, err.message);
