@@ -43,7 +43,7 @@ var Orders = new Schema({
 
    /* customer email */
    email:{type: String, required:true},
-   created:{type: Date, default: Date.now() },
+   created:{type: Date, default: Date.now },
    closed:{type: Date},
 
    /* full customer details */
@@ -113,6 +113,10 @@ var Orders = new Schema({
     name:{type:String, required:true},
     fullName:{type:String, required:false},
     address:{type:String, required:true},
+    geo:{
+      lat:{type:Number, required: false},
+      lng:{type:Number, required: false}
+    }
    }],
 
    shipping:{
@@ -314,7 +318,7 @@ Orders.statics.filterByShop=function(shopname,orders){
 //  if product is available
 //  if item.quantity>product.pricing.stock
 //  if item price is still correct
-Orders.statics.checkItem=function(item, product, cb){
+Orders.statics.checkItem=function(shipping, item, product, cb){
   var msg1="Une erreur c'est produite avec cet article (1)"
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
@@ -365,11 +369,42 @@ Orders.statics.checkItem=function(item, product, cb){
     assert(product.vendor._id.toString()===item.vendor.toString())
     item.vendor=product.vendor.urlpath;
 
+    // default address
+    var address=product.vendor.address.streetAdress+', '+product.vendor.address.postalCode+' tel:'+product.vendor.address.phone, 
+        geo=product.vendor.address.geo,
+        marketplace=false;
+
+    // override address based on marketplace        
+    if(product.vendor.marketplace.length){
+      config.shop.marketplace.list.every(function(place){
+        // check place with date
+        if(place.d&&place.d===shipping.when.getDay()){
+          address=place.name;
+          geo={lat:place.lat,lng:place.lng}
+          marketplace=true;
+          return false;
+        } 
+        return true;
+      })
+    }
+
+    // append repository if marketplace is defined
+    if(marketplace && product.vendor.address.repository){
+      address=address+', '+product.vendor.address.repository
+    }
+    // set respository as address
+    // -> remove geo 
+    else if(product.vendor.address.repository){
+      address=product.vendor.address.repository;
+      geo=undefined;
+    }
+
     vendor={
         ref:product.vendor._id,
         slug:product.vendor.urlpath,
         name:product.vendor.name,
-        address:"TODO"
+        address:address,
+        geo:geo
     };
   }
 
@@ -513,7 +548,7 @@ Orders.statics.findCurrentShippingDay=function(){
 
 //
 // check items a new order
-Orders.statics.checkItems = function(items, callback){
+Orders.statics.checkItems = function(shipping, items, callback){
   assert(items);
   assert(callback);
   var db=this
@@ -535,7 +570,7 @@ Orders.statics.checkItems = function(items, callback){
 
       //
       // check an item
-      Orders.checkItem(items[i],products[i],function(err,item, vendor){
+      Orders.checkItem(shipping, items[i],products[i],function(err,item, vendor){
         if(vendor)vendors.push(vendor);
         var error={}; error[item.sku]=err;
         //
@@ -773,13 +808,12 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
                   ||!shipping.streetAdress
                   ||!shipping.floor
                   ||!shipping.postalCode
-                  ||!shipping.region
-                  ||!shipping.geo){
+                  ||!shipping.region){
       return callback('shipping address is missing or imcomplet.')
     }
 
 
-    Orders.checkItems(items,function(err, products,vendors, errors){
+    Orders.checkItems(shipping, items,function(err, products,vendors, errors){
       //
       // unknow issue?
       if(err){
