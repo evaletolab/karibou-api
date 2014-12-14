@@ -1,9 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
+<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 12px; margin: 0; padding: 0;">
 <head>
 <meta name="viewport" content="width=device-width" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Billing e.g. invoices and receipts</title>
 
 
 <style type="text/css">
@@ -14,7 +13,7 @@ body {
 -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6;
 }
 body {
-background-color: #f6f6f6;
+background-color: #fff;
 }
 @media only screen and (max-width: 640px) {
   h1 {
@@ -54,18 +53,18 @@ background-color: #f6f6f6;
 </style>
 </head>
 
-<body style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6; background: #f6f6f6; margin: 0; padding: 0;">
+<body style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6; background: #fff; margin: 0; padding: 0;">
 
 <!-- BEGIN -->
 
 Bonjour <%= shop.owner.name.givenName %>,<br/>
 
-Tu trouveras ci-dessous les commandes à préparer pour le <%= shippingWhen %>. L'équipe Karibou passera collecter les produits le matin avant 11h00.<br/>
-
+Tu trouveras ci-dessous les commandes à préparer pour le <u><%= shippingWhen %></u>. L'équipe Karibou passera collecter les produits le matin avant 11h00.<br/>
+<br/>
 <table style="border:0px">
 <thead>
   <tr>
-    <th>No de Ssc (à inscrire sur l'emballage)</th>
+    <th style="width:80px;">No de Sac<b>*</b></th>
     <th>Client</th>
     <th>Quantité</th>
     <th>Produit</th>
@@ -75,20 +74,21 @@ Tu trouveras ci-dessous les commandes à préparer pour le <%= shippingWhen %>. 
 </thead>
 <tbody>
 	<tr><% for(var i=0; i<items.length; i++) {%>
-		<td><%= items[i].rank %> </td>
+		<td style="text-align:center"><b><%= items[i].rank %></b> </td>
 		<td><%= items[i].name.familyName %> </td>
-		<td><%= items[i].quantity %>x </td>
+		<td style="text-align:right"><%= items[i].quantity %>x </td>
 		<td><%= items[i].title %> (<%= items[i].part %>)</td>
 		<td><%= items[i].price.toFixed(2) %> </td>
 		<td><%= items[i].finalprice.toFixed(2) %> </td>
 	</tr><% } %>
 </tbody>
 </table>
+<p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
 
 Avec mes meilleurs messages,<br/>
 
 Delphine
-<pre>
+<pre style="font-size:10px">
  | |/ /         (_) |                
  | ' / __ _ _ __ _| |__   ___  _   _ 
  |  < / _` | '__| | '_ \ / _ \| | | |

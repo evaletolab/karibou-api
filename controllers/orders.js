@@ -319,7 +319,7 @@ exports.create=function(req,res){
           shippingWhen:order.getDateString(),
           subTotal:order.getSubTotal().toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
-          withHtml:false
+          withHtml:true
         };
         bus.emit('sendmail',  
             order.email,
@@ -359,7 +359,7 @@ exports.cancel=function(req,res){
       order:order,
       created:order.getDateString(order.created),
       origin:req.header('Origin')||config.mail.origin,
-      withHtml:false
+      withHtml:true
     };
     bus.emit('sendmail',  
         order.email,
