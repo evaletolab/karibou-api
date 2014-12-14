@@ -73,14 +73,16 @@ Tu trouveras ci-dessous les commandes à préparer pour le <u><%= shippingWhen %
   </tr>
 </thead>
 <tbody>
-	<tr><% for(var i=0; i<items.length; i++) {%>
+	<% for(var i=0; i<items.length; i++) {%>
+	<tr>
 		<td style="text-align:center"><b><%= items[i].rank %></b> </td>
 		<td><%= items[i].name.familyName %> </td>
 		<td style="text-align:right"><%= items[i].quantity %>x </td>
 		<td><%= items[i].title %> (<%= items[i].part %>)</td>
 		<td><%= items[i].price.toFixed(2) %> </td>
 		<td><%= items[i].finalprice.toFixed(2) %> </td>
-	</tr><% } %>
+	</tr>
+	<% } %>
 </tbody>
 </table>
 <p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
