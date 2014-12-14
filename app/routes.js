@@ -164,6 +164,8 @@ module.exports = function(app, config, passport) {
   // for admin only
   app.post('/v1/orders/:oid/remove', auth.ensureAdmin, orders.remove);
 
+  // post order items to shopname
+  app.post('/v1/orders/:shopname/email',auth.ensureAdmin,orders.informShopToOrders);
 
 
   

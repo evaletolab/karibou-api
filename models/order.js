@@ -257,17 +257,25 @@ Orders.methods.getSubTotal=function(){
   return parseFloat((Math.round(total*20)/20).toFixed(2));
 }
 
+//
+// format date for this order
 Orders.methods.getDateString=function(date){
+  return db.model('Orders').formatDate(date||this.shipping.when,(date===undefined));
+}
+
+
+Orders.statics.formatDate=function(date, withTime){
   var format={
     months : "janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre".split("_"),
     weekdays : "dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi".split("_"),
   }
 
-  var when=new Date(date||this.shipping.when);
+  var when=new Date(date);
   var m=format.months[when.getMonth()];
   var d=format.weekdays[when.getDay()]
   var day=when.getDate()
-  var time=(date)?'':(" de "+config.shop.order.shippingtimes[when.getHours()])
+  // set time
+  var time='';if(withTime)time=" de "+config.shop.order.shippingtimes[when.getHours()];
 
   return d+" "+day+" "+m+" "+when.getFullYear()+time;
 }

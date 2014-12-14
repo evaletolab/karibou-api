@@ -15,6 +15,7 @@ var db = require('mongoose'),
 
 
 
+
 exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
@@ -93,6 +94,7 @@ exports.ensureValidAlias=function(req,res,next){
 
   return next();
 }
+
 
 
 /**
@@ -444,6 +446,7 @@ exports.remove=function(req,res){
   }
 
   return Orders.findOne({oid:req.params.oid}).exec(function(err,order){
+
     if(err){
       return res.send(400, errorHelper(err));
     }
@@ -488,17 +491,19 @@ exports.updateItem=function(req,res){
 
 //
 // TODO multiple implement of send email, refactor it?
-exports.sendOrderForOneShop=function(req,res){
+exports.informShopToOrders=function(req,res){
   try{
+    if(!req.body.when)throw new Error('La date est obligatoire')
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
-    if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
-    validate.check(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(3, 600).isText();
-    if(!req.user)throw new Error("Vous devez avoir une session ouverte");
+    validate.check(new Date(req.body.when),"La date n'est pas valide").isDate()
+    validate.ifCheck(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(0, 600).isText();
   }catch(err){
     return res.send(400, err.message);
   }
 
 
+
+  // TODO using promise would be better!
   db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
     if (err){
       return res.send(400,errorHelper(err));
@@ -507,24 +512,55 @@ exports.sendOrderForOneShop=function(req,res){
       return res.send(400,"Cette boutique n'existe pas");
     }
 
-    //
-    //
-    var content={};
-    content.user=req.user;
-    content.text=req.body.content;
-    content.origin=req.header('Origin')||config.mail.origin;
 
-    //
-    // send email
-    bus.emit('sendmail',shop.owner.email.address,
-                 "Un utilisateur à une question pour votre boutique "+req.params.shopname,
-                 content,
-                 "shop-question", function(err, status){
+    var criteria={}
+    parseCriteria(criteria,req)
+
+    // restrict to a shopname
+    criteria.shop=[req.params.shopname]
+
+    // get the date
+    criteria.when=new Date(req.body.when);
+
+
+    Orders.findByCriteria(criteria, function(err,orders){
       if(err){
         return res.send(400,errorHelper(err));
       }
 
-      res.json(200);
+
+      //
+      // get items
+      var content={}, when=Orders.formatDate(orders[0].shipping.when), items=[];
+      Orders.filterByShop(req.params.shopname,orders).forEach(function(order){
+        order.items.forEach(function(item){
+          item.rank=order.rank;
+          item.name=order.customer.name;
+          items.push(item)
+        })
+      })    
+
+
+      content.shop=shop;
+      content.shippingWhen=when;
+      content.items=items;
+      content.origin=req.header('Origin')||config.mail.origin;
+      content.more=req.body.content||''
+      content.withHtml=true;
+
+      //
+      // send email
+      return bus.emit('sendmail',shop.owner.email.address,
+                   "Karibou - Confirmation de vos préparations pour le "+when,
+                   content,
+                   "order-prepare", function(err, status){
+        if(err){
+          console.log('---------------------------prepare',err)
+          return res.send(400,errorHelper(err));
+        }
+
+        res.json(200);
+      })
     })
 
   });

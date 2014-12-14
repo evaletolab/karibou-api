@@ -97,7 +97,6 @@ module.exports = function(app,bus) {
           to: to,
           subject: subject,
           //_html: html,
-          // generateTextFromHTML: true,
           text: text
         };
 
