@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0; padding: 0;">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Billing e.g. invoices and receipts</title>
+
+
+<style type="text/css">
+img {
+max-width: 100%;
+}
+body {
+-webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6;
+}
+body {
+background-color: #f6f6f6;
+}
+@media only screen and (max-width: 640px) {
+  h1 {
+    font-weight: 600 !important; margin: 20px 0 5px !important;
+  }
+  h2 {
+    font-weight: 600 !important; margin: 20px 0 5px !important;
+  }
+  h3 {
+    font-weight: 600 !important; margin: 20px 0 5px !important;
+  }
+  h4 {
+    font-weight: 600 !important; margin: 20px 0 5px !important;
+  }
+  h1 {
+    font-size: 22px !important;
+  }
+  h2 {
+    font-size: 18px !important;
+  }
+  h3 {
+    font-size: 16px !important;
+  }
+  .container {
+    width: 100% !important;
+  }
+  .content {
+    padding: 10px !important;
+  }
+  .content-wrap {
+    padding: 10px !important;
+  }
+  .invoice {
+    width: 100% !important;
+  }
+}
+</style>
+</head>
+
+<body style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6; background: #f6f6f6; margin: 0; padding: 0;">
+
+<!-- BEGIN -->
+
+Bonjour <%= shop.owner.name.givenName %>,<br/>
+
+Tu trouveras ci-dessous les commandes à préparer pour le <%= shippingWhen %>. L'équipe Karibou passera collecter les produits le matin avant 11h00.<br/>
+
+<table style="border:0px">
+<thead>
+  <tr>
+    <th>No de Ssc (à inscrire sur l'emballage)</th>
+    <th>Client</th>
+    <th>Quantité</th>
+    <th>Produit</th>
+    <th>Prix</th>
+    <th>Total/th>
+  </tr>
+</thead>
+<tbody>
+	<tr><% for(var i=0; i<items.length; i++) {%>
+		<td><%= items[i].rank %> </td>
+		<td><%= items[i].name.familyName %> </td>
+		<td><%= items[i].quantity %>x </td>
+		<td><%= items[i].title %> (<%= items[i].part %>)</td>
+		<td><%= items[i].price.toFixed(2) %> </td>
+		<td><%= items[i].finalprice.toFixed(2) %> </td>
+	</tr><% } %>
+</tbody>
+</table>
+
+Avec mes meilleurs messages,<br/>
+
+Delphine
+<pre>
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+</pre>    
+tel : +4179.377.21.13
+
+</body>
+</html>
