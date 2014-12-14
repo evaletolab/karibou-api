@@ -58,9 +58,9 @@ background-color: #fff;
 
 Bonjour <%= order.customer.name.givenName %>,<br/>
 <br/>
-Nous vous remercions pour votre commande du <%= created %>. <br/>
+Nous vous remercions pour votre commande du <u><%= created %></u>. <br/>
 Vous trouverez ci-dessous le détail de votre commande<br/>
-<pre>
+<pre style="font-size:10px">
 *<% for(var i=0; i<order.items.length; i++) {%>
 * <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <% } %>
 * ------------------
@@ -71,9 +71,7 @@ Vous trouverez ci-dessous le détail de votre commande<br/>
 * Montant total provisoire <%= totalWithFees %> CHF
 *
 </pre>
-<br/>
-Récapitulatif<br/>
--------------<br/>
+<h4>Récapitulatif</h6>
 Numéro de commande: <%= order.oid %><br/>
 Méthode de paiement: Bulletin de versement<br/>
 Montant total provisoire: <%= totalWithFees %> CHF<br/>
@@ -83,8 +81,7 @@ Adresse de livraison: <br/>
 # <%- order.shipping.streetAdress %> <br/>
 # <%- order.shipping.postalCode %>, <%- order.shipping.region %> <br/>
 
-Paiement et montant<br/>
--------------------<br/>
+<h4>Paiement et montant</h4>
 Vous recevrez une facture détaillée par e-mail avant la livraison.<br/>
 Le total de la commande peut être ajusté dans le cas où vous avez commandé des produits à poids variables dont le prix est connu le jour de la livraison. 
 Aussi, si un produit devait être en rupture de stock, il sera déduit de la facture finale.<br/>
