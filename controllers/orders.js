@@ -10,7 +10,8 @@ var db = require('mongoose'),
     _=require('underscore'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
-    payment = require('../app/payment')
+    payment = require('../app/payment'),
+    csv = require('express-csv'),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 
@@ -405,7 +406,6 @@ exports.capture=function(req,res){
           order:order,
           created:order.getDateString(order.created),
           shippingFees:config.shop.marketplace.shipping,
-          subTotal:order.getSubTotal(),
           paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),
@@ -565,4 +565,76 @@ exports.informShopToOrders=function(req,res){
 
   });
 
+}
+
+//
+// get CSV invoices
+exports.invoicesByUsers=function(req,res){
+  try{
+    if(!req.params.month)throw new Error('Le mois est obligatoire');
+    if(req.params.year){}
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  var criteria={}, result=[];
+
+  // get the date
+  criteria.from=new Date();
+  if(req.params.year){
+    criteria.from.setYear(parseInt(req.params.year))
+  }
+
+  // select a shipping time
+  criteria.from.setDate(1)
+  criteria.from.setMonth(parseInt(req.params.month)-1)
+  criteria.from.setHours(1,0,0,0)
+
+  criteria.to=new Date(criteria.from);
+  criteria.to.setDate(criteria.from.daysInMonth())
+  criteria.to.setHours(23,0,0,0)
+  
+  console.log(criteria,req.params)
+
+  Orders.findByCriteria(criteria, function(err,orders){
+    if(err){
+      return res.send(400,errorHelper(err));
+    }
+    // sort by date and customer
+    function byUser(o1,o2){
+
+      // asc date
+      if(o1.shipping.when!==o2.shipping.when){
+        if (o1.shipping.when > o2.shipping.when) return 1;
+        if (o1.shipping.when < o2.shipping.when) return -1;
+        return 0;
+      }
+      // asc email
+      return o1.email.localeCompare(o2.email)
+    }
+
+    //
+    // oid, date, customer, amount, fees, fees, total
+    orders.sort(byUser).forEach(function(order){
+      result.push({
+        oid:order.oid,
+        shipping:order.shipping.when,
+        customer:order.email,
+        amount:order.getSubTotal().toFixed(2),
+        shippingFees:config.shop.marketplace.shipping,
+        paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+        total:order.getTotalPrice().toFixed(2)
+      })
+    })
+
+    res.setHeader('Content-disposition', 'attachment; filename=invoices-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
+    res.csv(result)
+
+  });
+}
+
+
+//
+// get CSV invoices
+exports.invoicesByShops=function(req,res){
 }

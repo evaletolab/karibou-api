@@ -977,6 +977,17 @@ Orders.statics.findByCriteria = function(criteria, callback){
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
 
+
+  //
+  // filter by free date
+  if(criteria.from && criteria.to){
+    var sd=new Date(criteria.from.getFullYear(), criteria.from.getUTCMonth(), criteria.from.getUTCDate());
+    var ed=new Date(criteria.to.getFullYear(), criteria.to.getUTCMonth(), criteria.to.getUTCDate());
+    q["shipping.when"]={"$gte": sd, "$lt": ed};
+  }
+
+
+
   //
   // filter by user
   if(criteria.user){

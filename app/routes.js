@@ -168,6 +168,11 @@ module.exports = function(app, config, passport) {
   app.post('/v1/orders/:shopname/email',auth.ensureAdmin,orders.informShopToOrders);
 
 
+  //
+  // invoices
+  app.get('/v1/orders/invoices/users/:month/:year?', auth.ensureAdmin, orders.invoicesByUsers);
+  app.get('/v1/orders/invoices/shops/:month/:year?', auth.ensureAdmin, orders.invoicesByShops);
+
   
   
 };

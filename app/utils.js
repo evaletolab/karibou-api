@@ -74,4 +74,21 @@ module.exports = function (app) {
   };
 
 
+  // Date
+  // Month is 1 based
+  Date.prototype.daysInMonth=function(month) {
+    return new Date(this.getFullYear(), month||this.getMonth(), 0).getDate();
+  };
+
+  // the number of months in the difference
+  // http://stackoverflow.com/questions/2536379/difference-in-months-between-two-dates-in-javascript
+  Date.prototype.monthDiff=function(d1) {
+    var months;
+    months = (d1.getFullYear() - this.getFullYear()) * 12;
+    months -= this.getMonth() + 1;
+    months += d1.getMonth();
+    return months <= 0 ? 0 : months;
+  };
+  
 }
+
