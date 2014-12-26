@@ -593,8 +593,7 @@ exports.invoicesByUsers=function(req,res){
   criteria.to=new Date(criteria.from);
   criteria.to.setDate(criteria.from.daysInMonth())
   criteria.to.setHours(23,0,0,0)
-  
-  console.log(criteria,req.params)
+  criteria.fulfillment='fulfilled'
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
@@ -623,6 +622,7 @@ exports.invoicesByUsers=function(req,res){
         amount:order.getSubTotal().toFixed(2),
         shippingFees:config.shop.marketplace.shipping,
         paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+        payment:order.payment.status,
         total:order.getTotalPrice().toFixed(2)
       })
     })
