@@ -658,11 +658,11 @@ exports.invoicesByShops=function(req,res){
   if(req.params.year){
     criteria.from.setYear(parseInt(req.params.year))
   }
-
   // select a shipping time
   criteria.from.setDate(1)
   criteria.from.setMonth(parseInt(req.params.month)-1)
   criteria.from.setHours(1,0,0,0)
+
 
   criteria.to=new Date(criteria.from);
   criteria.to.setDate(criteria.from.daysInMonth())
@@ -699,7 +699,7 @@ exports.invoicesByShops=function(req,res){
       result.push({slug:slug});
       total=amount=0;
       shops[slug].sort(byDateAndUser).forEach(function(item){
-        if(item.fulfillment.status==='fulfilled'){
+        if(item.fulfillment.status==='fulfilled' || req.query.all){
           result.push({
             oid:item.oid,
             shipping:item.shipping.when,
@@ -712,8 +712,10 @@ exports.invoicesByShops=function(req,res){
             fulfillment:item.fulfillment.status,
             note:item.note
           })
-          //
-          //
+        }
+        //
+        //
+        if(item.fulfillment.status==='fulfilled'){
           total+=parseFloat(item.finalprice.toFixed(2));
           amount+=parseFloat(item.price.toFixed(2));          
         }

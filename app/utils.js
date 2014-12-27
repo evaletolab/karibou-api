@@ -77,7 +77,10 @@ module.exports = function (app) {
   // Date
   // Month is 1 based
   Date.prototype.daysInMonth=function(month) {
-    return new Date(this.getFullYear(), month||this.getMonth(), 0).getDate();
+    //var y=this.getFullYear(), m=(month||this.getMonth())
+    //return /8|3|5|10/.test(m)?30:m==1?(!(y%4)&&y%100)||!(y%400)?29:28:31;
+
+    return new Date(this.getFullYear(), (month||this.getMonth())+1, 0).getDate();
   };
 
   // the number of months in the difference
