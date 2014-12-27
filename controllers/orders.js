@@ -718,8 +718,9 @@ exports.invoicesByShops=function(req,res){
         if(item.fulfillment.status==='fulfilled'){
           total+=parseFloat(item.finalprice.toFixed(2));
           amount+=parseFloat(item.price.toFixed(2));          
-          if(!products[item.sku])products[item.sku]={count:0,title:item.title+'('+item.part+')'}
+          if(!products[item.sku])products[item.sku]={count:0,amount:0,title:item.title+'('+item.part+')'}
           products[item.sku].count+=item.quantity  
+          products[item.sku].amount+=item.finalprice  
         }
       })
       monthtotal+=total;
@@ -730,11 +731,12 @@ exports.invoicesByShops=function(req,res){
     result.push(['total ventes',monthtotal])
     result.push(['total commission',monthtotal*0.15])
 
-    result.push(['ditribution','produits du mois'])
+    result.push(['ditribution','produits du mois','CHF cummulé'])
     Object.keys(products).sort(function(a,b){return products[b].count-products[a].count;}).forEach(function(sku){
       result.push({
         count:products[sku].count,
-        title:products[sku].title
+        title:products[sku].title,
+        amount:products[sku].amount
       })
     })
 
