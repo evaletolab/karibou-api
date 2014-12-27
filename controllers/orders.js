@@ -686,7 +686,7 @@ exports.invoicesByShops=function(req,res){
       return o1.customer.displayName.localeCompare(o2.customer.displayName)
     }
 
-    var amount=0,total=0,shipping=0, shops={};
+    var amount=0,total=0,shipping=0, monthtotal=0; products={}, shops={};
     result.push(['du',criteria.from])
     result.push(['au',criteria.to])
     result.push(['shop/oid','shipping','customer','qty','title','part','amount','total']);
@@ -718,10 +718,24 @@ exports.invoicesByShops=function(req,res){
         if(item.fulfillment.status==='fulfilled'){
           total+=parseFloat(item.finalprice.toFixed(2));
           amount+=parseFloat(item.price.toFixed(2));          
+          if(!products[item.sku])products[item.sku]={count:0,title:item.title+'('+item.part+')'}
+          products[item.sku].count+=item.quantity  
         }
       })
-      result.push(['','','','','','',amount,total]);
+      monthtotal+=total;
+      result.push(['','','','','','total',amount,total]);
 
+    })
+
+    result.push(['total ventes',monthtotal])
+    result.push(['total commission',monthtotal*0.15])
+
+    result.push(['ditribution','produits du mois'])
+    Object.keys(products).sort(function(a,b){return products[b].count-products[a].count;}).forEach(function(sku){
+      result.push({
+        count:products[sku].count,
+        title:products[sku].title
+      })
     })
 
     res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
