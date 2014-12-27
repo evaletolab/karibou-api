@@ -284,7 +284,7 @@ Orders.statics.formatDate=function(date, withTime){
 
 //
 // filter order content by User//Shop 
-Orders.statics.filterByShop=function(shopname,orders){
+Orders.statics.filterByShop=function(orders,shopname){
   assert(shopname)
   assert(orders)
   var i=0, toKeep=[];
@@ -317,6 +317,31 @@ Orders.statics.filterByShop=function(shopname,orders){
   return toKeep
 }
 
+//
+// group by shop
+Orders.statics.groupByShop=function(orders){
+  assert(orders)
+  var shops={}
+  orders.forEach(function(order){
+    order.items.forEach(function(item){
+
+      // init item for this shop
+      if(!shops[item.vendor]){
+        shops[item.vendor]=[]
+      }
+      // add item to this shop
+      item.rank=order.rank
+      item.oid=order.oid
+      item.email=order.email
+      item.customer=order.customer
+      item.created=order.created
+      item.shipping=order.shipping
+      item.fulfillments=order.fulfillments
+      shops[item.vendor].push(item)
+    })
+  })
+  return shops
+}
 
 //
 // check item

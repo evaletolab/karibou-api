@@ -212,7 +212,7 @@ exports.listByShop = function(req,res){
     if(err){
       return res.send(400,err);
     }
-    return res.json(Orders.filterByShop(criteria.shop, orders))
+    return res.json(Orders.filterByShop(orders,criteria.shop))
   });
 };
 
@@ -241,7 +241,7 @@ exports.listByShopOwner = function(req,res){
     if(err){
       return res.send(400,err);
     }
-    return res.json(Orders.filterByShop(criteria.shop, orders))
+    return res.json(Orders.filterByShop(orders,criteria.shop))
   });
 };
 
@@ -532,7 +532,7 @@ exports.informShopToOrders=function(req,res){
       //
       // get items
       var content={}, when=Orders.formatDate(orders[0].shipping.when), items=[];
-      Orders.filterByShop(req.params.shopname,orders).forEach(function(order){
+      Orders.filterByShop(orders,req.params.shopname).forEach(function(order){
         order.items.forEach(function(item){
           item.rank=order.rank;
           item.name=order.customer.name;
@@ -600,7 +600,7 @@ exports.invoicesByUsers=function(req,res){
       return res.send(400,errorHelper(err));
     }
     // sort by date and customer
-    function byUser(o1,o2){
+    function byDateAndUser(o1,o2){
 
       // asc date
       if(o1.shipping.when!==o2.shipping.when){
@@ -612,9 +612,12 @@ exports.invoicesByUsers=function(req,res){
       return o1.email.localeCompare(o2.email)
     }
 
+    var amount=0,total=0,shipping=0;
+
     //
     // oid, date, customer, amount, fees, fees, total
-    orders.sort(byUser).forEach(function(order){
+    result.push(['oid','shipping','customer','amount','sfees','pfees','status','total'])
+    orders.sort(byDateAndUser).forEach(function(order){
       result.push({
         oid:order.oid,
         shipping:order.shipping.when,
@@ -625,9 +628,13 @@ exports.invoicesByUsers=function(req,res){
         payment:order.payment.status,
         total:order.getTotalPrice().toFixed(2)
       })
+      total+=parseFloat(order.getTotalPrice().toFixed(2));
+      amount+=parseFloat(order.getSubTotal().toFixed(2));
+      shipping+=config.shop.marketplace.shipping;
     })
+    result.push(['','','',amount,shipping,'','',total])
 
-    res.setHeader('Content-disposition', 'attachment; filename=invoices-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
+    res.setHeader('Content-disposition', 'attachment; filename=invoices-users-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
     res.csv(result)
 
   });
@@ -637,4 +644,86 @@ exports.invoicesByUsers=function(req,res){
 //
 // get CSV invoices
 exports.invoicesByShops=function(req,res){
+  try{
+    if(!req.params.month)throw new Error('Le mois est obligatoire');
+    if(req.params.year){}
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  var criteria={}, result=[];
+
+  // get the date
+  criteria.from=new Date();
+  if(req.params.year){
+    criteria.from.setYear(parseInt(req.params.year))
+  }
+
+  // select a shipping time
+  criteria.from.setDate(1)
+  criteria.from.setMonth(parseInt(req.params.month)-1)
+  criteria.from.setHours(1,0,0,0)
+
+  criteria.to=new Date(criteria.from);
+  criteria.to.setDate(criteria.from.daysInMonth())
+  criteria.to.setHours(23,0,0,0)
+  criteria.fulfillment='fulfilled'
+
+  Orders.findByCriteria(criteria, function(err,orders){
+    if(err){
+      return res.send(400,errorHelper(err));
+    }
+    // sort by date and customer
+    function byDateAndUser(o1,o2){
+
+      // asc date
+      if(o1.shipping.when!==o2.shipping.when){
+        if (o1.shipping.when > o2.shipping.when) return 1;
+        if (o1.shipping.when < o2.shipping.when) return -1;
+        return 0;
+      }
+      // asc email
+      return o1.customer.displayName.localeCompare(o2.customer.displayName)
+    }
+
+    var amount=0,total=0,shipping=0, shops={};
+    result.push(['du',criteria.from])
+    result.push(['au',criteria.to])
+    result.push(['shop/oid','shipping','customer','qty','title','part','amount','total']);
+
+    //
+    // shopname
+    //  
+    shops=Orders.groupByShop(orders);
+    Object.keys(shops).forEach(function(slug){
+      result.push({slug:slug});
+      total=amount=0;
+      shops[slug].sort(byDateAndUser).forEach(function(item){
+        if(item.fulfillment.status==='fulfilled'){
+          result.push({
+            oid:item.oid,
+            shipping:item.shipping.when,
+            customer:item.customer.displayName,
+            quantity:item.quantity,
+            title:item.title,
+            part:item.part,
+            price:item.price,
+            finalprice:item.finalprice,
+            fulfillment:item.fulfillment.status,
+            note:item.note
+          })
+          //
+          //
+          total+=parseFloat(item.finalprice.toFixed(2));
+          amount+=parseFloat(item.price.toFixed(2));          
+        }
+      })
+      result.push(['','','','','','',amount,total]);
+
+    })
+
+    res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
+    res.csv(result)
+
+  });
 }

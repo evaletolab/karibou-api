@@ -119,7 +119,7 @@ describe("orders.find.shop", function(){
       should.not.exist(err);
 
       order.length.should.equal(1);
-      order=db.model('Orders').filterByShop(criteria.shop,order)
+      order=db.model('Orders').filterByShop(order,criteria.shop)
 
       order[0].vendors.length.should.equal(1);
       order[0].vendors[0].slug.should.equal(criteria.shop)
