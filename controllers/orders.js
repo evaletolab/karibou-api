@@ -620,7 +620,7 @@ exports.invoicesByUsers=function(req,res){
     orders.sort(byDateAndUser).forEach(function(order){
       result.push({
         oid:order.oid,
-        shipping:order.shipping.when,
+        shipping:Orders.formatDate(order.shipping.when),
         customer:order.email,
         amount:order.getSubTotal().toFixed(2),
         shippingFees:config.shop.marketplace.shipping,
@@ -692,8 +692,13 @@ exports.invoicesByShops=function(req,res){
     result.push(['shop/oid','shipping','customer','qty','title','part','amount','total']);
 
     //
-    // shopname
-    //  
+    // filter by shopname?
+    if(req.params.shop){
+      orders=Orders.filterByShop(orders,[req.params.shop])
+    }  
+
+    //
+    // group by shops
     shops=Orders.groupByShop(orders);
     Object.keys(shops).forEach(function(slug){
       result.push({slug:slug});
@@ -702,7 +707,7 @@ exports.invoicesByShops=function(req,res){
         if(item.fulfillment.status==='fulfilled' || req.query.all){
           result.push({
             oid:item.oid,
-            shipping:item.shipping.when,
+            shipping:Orders.formatDate(item.shipping.when),
             customer:item.customer.displayName,
             quantity:item.quantity,
             title:item.title,
