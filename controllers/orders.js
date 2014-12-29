@@ -6,8 +6,9 @@
 require('../app/config');
 
 var db = require('mongoose'),
-    Orders = db.model('Orders'),
     _=require('underscore'),
+    formatOrder=require('./format/order'),
+    Orders = db.model('Orders'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
     payment = require('../app/payment'),
@@ -640,7 +641,6 @@ exports.invoicesByUsers=function(req,res){
   });
 }
 
-
 //
 // get CSV invoices
 exports.invoicesByShops=function(req,res){
@@ -651,7 +651,7 @@ exports.invoicesByShops=function(req,res){
     return res.send(400, err.message);
   }
 
-  var criteria={}, result=[];
+  var criteria={}, result=[], showAll=req.query.all||false, output=req.query.output||'json';
 
   // get the date
   criteria.from=new Date();
@@ -665,31 +665,27 @@ exports.invoicesByShops=function(req,res){
 
 
   criteria.to=new Date(criteria.from);
-  criteria.to.setDate(criteria.from.daysInMonth())
-  criteria.to.setHours(23,0,0,0)
-  criteria.fulfillment='fulfilled'
+  criteria.to.setDate(criteria.from.daysInMonth());
+  criteria.to.setHours(23,0,0,0);
+  criteria.fulfillment='fulfilled';
+
+  // sort by date and customer
+  criteria.byDateAndUser=function(o1,o2){
+    // asc date
+    if(o1.shipping.when!==o2.shipping.when){
+      if (o1.shipping.when > o2.shipping.when) return 1;
+      if (o1.shipping.when < o2.shipping.when) return -1;
+      return 0;
+    }
+    // asc email
+    return o1.customer.displayName.localeCompare(o2.customer.displayName)
+  }
+
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,errorHelper(err));
     }
-    // sort by date and customer
-    function byDateAndUser(o1,o2){
-
-      // asc date
-      if(o1.shipping.when!==o2.shipping.when){
-        if (o1.shipping.when > o2.shipping.when) return 1;
-        if (o1.shipping.when < o2.shipping.when) return -1;
-        return 0;
-      }
-      // asc email
-      return o1.customer.displayName.localeCompare(o2.customer.displayName)
-    }
-
-    var amount=0,total=0,shipping=0, monthtotal=0; products={}, shops={};
-    result.push(['du',criteria.from])
-    result.push(['au',criteria.to])
-    result.push(['shop/oid','shipping','customer','qty','title','part','amount','total']);
 
     //
     // filter by shopname?
@@ -697,56 +693,14 @@ exports.invoicesByShops=function(req,res){
       orders=Orders.filterByShop(orders,[req.params.shop])
     }  
 
+
+
     //
-    // group by shops
-    shops=Orders.groupByShop(orders);
-    Object.keys(shops).forEach(function(slug){
-      result.push({slug:slug});
-      total=amount=0;
-      shops[slug].sort(byDateAndUser).forEach(function(item){
-        if(item.fulfillment.status==='fulfilled' || req.query.all){
-          result.push({
-            oid:item.oid,
-            shipping:Orders.formatDate(item.shipping.when),
-            customer:item.customer.displayName,
-            quantity:item.quantity,
-            title:item.title,
-            part:item.part,
-            price:item.price,
-            finalprice:item.finalprice,
-            fulfillment:item.fulfillment.status,
-            note:item.note
-          })
-        }
-        //
-        //
-        if(item.fulfillment.status==='fulfilled'){
-          total+=parseFloat(item.finalprice.toFixed(2));
-          amount+=parseFloat(item.price.toFixed(2));          
-          if(!products[item.sku])products[item.sku]={count:0,amount:0,title:item.title+'('+item.part+')'}
-          products[item.sku].count+=item.quantity  
-          products[item.sku].amount+=item.finalprice  
-        }
-      })
-      monthtotal+=total;
-      result.push(['','','','','','total',amount,total]);
-
-    })
-
-    result.push(['total ventes',monthtotal])
-    result.push(['total commission',monthtotal*0.15])
-
-    result.push(['ditribution','produits du mois','CHF cummulé'])
-    Object.keys(products).sort(function(a,b){return products[b].count-products[a].count;}).forEach(function(sku){
-      result.push({
-        count:products[sku].count,
-        title:products[sku].title,
-        amount:products[sku].amount
-      })
-    })
-
-    res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
-    res.csv(result)
-
+    // CSV output
+    if(output==='csv'){
+      res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
+      return res.csv(formatOrder.invoicesByShopsCSV(req, criteria, orders))
+    }
+    res.json(formatOrder.invoicesByShopsJSON(req, criteria, orders))
   });
 }
