@@ -17,7 +17,7 @@ var queued=function(f){
 }
 
 var Sequences = new Schema({
-    name:String,
+    name:{type:String, unique:true},
     seq:{type:Number,min:100000, default:1000000}
 });
 

@@ -67,6 +67,12 @@ for(var i in files) {
   if(/\.js$/.test(files[i])) require('./models/'+files[i]);
 }
 
+// extend config right after db is ready
+mongoose.model('Config').getMain(function(err,c){
+  if(err)console.log('Ooops error when reading stored config')
+  config.shop.global=c;
+})
+
 var app = express()
 
 

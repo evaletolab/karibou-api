@@ -48,6 +48,30 @@ describe("system", function(){
 
   describe("Administration", function(){
   
+    it("Get default stored config",function(done) {
+        db.model('Config').getMain(function(e,c) {
+            should.not.exist(e);
+            should.exist(c);
+            should.exist(c.messages);
+            should.exist(c.maintenance);
+            done()
+        })
+    })
+
+    it("Save default stored config",function(done) {
+        var c={
+            messages:[{content:'hello',active:true,updated:Date.now()}],
+            noshipping:[{reason:'paques',when:Date.now()}],
+            other:'not possible'
+        }
+        db.model('Config').saveMain(c,function(e,c) {
+            should.not.exist(e);
+            should.exist(c);
+
+            done()
+        })
+    })
+
     it.skip("Contact customers directly via email or newsletters", function(done){
     });
 

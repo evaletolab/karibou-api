@@ -322,12 +322,17 @@ Orders.statics.filterByShop=function(orders,shopname){
 Orders.statics.groupByShop=function(orders){
   assert(orders)
   var shops={}
+  function findOneVendor(order,slug){
+    for (var i = order.vendors.length - 1; i >= 0; i--) {
+      if(order.vendors[i].slug===slug)return order.vendors[i]
+    };
+  }
   orders.forEach(function(order){
     order.items.forEach(function(item){
 
       // init item for this shop
       if(!shops[item.vendor]){
-        shops[item.vendor]=[]
+        shops[item.vendor]={items:[],details:null}
       }
       // add item to this shop
       item.rank=order.rank
@@ -337,7 +342,10 @@ Orders.statics.groupByShop=function(orders){
       item.created=order.created
       item.shipping=order.shipping
       item.fulfillments=order.fulfillments
-      shops[item.vendor].push(item)
+      shops[item.vendor].items.push(item);
+      if(!shops[item.vendor].details){
+        shops[item.vendor].details=findOneVendor(order,item.vendor)
+      }
     })
   })
   return shops
@@ -772,6 +780,12 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   // simple items check
   if(!items.length){
     return callback("items are required.")
+  }
+
+  //
+  // check shipping maintenance
+  if(config.shop.global.maintenance.active){
+    return callback("Les livraisons ne sont pas possibles pour l'instant")    
   }
 
   //

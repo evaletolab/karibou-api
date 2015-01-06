@@ -5,6 +5,7 @@
 var _ = require('underscore'),
     bus=require('../app/bus'),
     sm = require('sitemap'),
+    db = require('mongoose'),
     errorHelper = require('mongoose-error-helper').errorHelper;
     origins=[]
 
@@ -35,13 +36,19 @@ exports.index = function(app){
 
 
 exports.config = function(req, res) {
-    //
-    // admin you get server env
-    if (req.user&&req.user.isAdmin()) { 
-      config.shop.env=process.env;
-    }
-    res.json(config.shop);
+  if (req.user&&req.user.isAdmin()) { 
+    //config.shop.env=process.env;
+  }
+  res.json(config.shop);
 };
+
+
+exports.saveConfig = function(req, res) {
+  db.model('Config').saveMain(req.body,function(err,conf) {
+    res.json(config.shop);
+  })
+};
+
 
 
 
