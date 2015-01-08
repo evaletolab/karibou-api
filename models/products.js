@@ -376,6 +376,12 @@ Product.statics.findByCriteria = function(criteria, callback){
           query=query.where("details."+detail,true);
         });        
       }
+
+      //
+      // only available products ?
+      if(criteria.available!==undefined){
+        query=query.where("attributes.available",criteria.available);
+      }
       
       
       if(callback){
