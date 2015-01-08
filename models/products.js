@@ -380,7 +380,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       //
       // only available products ?
       if(criteria.available!==undefined){
-        query=query.where("attributes.available",criteria.available);
+        query=query.where("attributes.available",Boolean(criteria.available));
       }
       
       

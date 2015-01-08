@@ -132,6 +132,7 @@ exports.list=function (req, res) {
     if(req.user)req.query.status=req.user.shops;
   }
   
+
   //
   return Products.findByCriteria(query,function (err, products) {
     var results=products;
