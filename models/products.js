@@ -50,6 +50,7 @@ var Product = new Schema({
    },  
    
    attributes:{
+      home:{type:Boolean, default:false},
       available:{type:Boolean, default:true},
       comment:{type:Boolean, default:false}, 
       discount:{type:Boolean, default:false}
@@ -382,7 +383,12 @@ Product.statics.findByCriteria = function(criteria, callback){
       if(criteria.available!==undefined){
         query=query.where("attributes.available",Boolean(criteria.available));
       }
-      
+
+      //
+      // available at home ?
+      if(criteria.home!==undefined){
+        query=query.where("attributes.home",Boolean(criteria.home));
+      }
       
       if(callback){
         //.populate({path:'categories',select:'weight name'})

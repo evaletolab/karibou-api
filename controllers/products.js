@@ -243,7 +243,12 @@ exports.update=function (req, res) {
   function normalizeRef(field){
     return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
   }
-  
+
+  // if not admin  
+  if(!req.user.isAdmin() && req.body.attributes && req.body.attributes.home){
+    delete req.body.attributes.home;
+  }
+
   //
   //normalize ref
   req.body.vendor=normalizeRef('vendor');
