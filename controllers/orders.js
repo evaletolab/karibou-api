@@ -149,6 +149,27 @@ function parseCriteria(criteria, req){
     if(when!== "Invalid Date") criteria.when=when
   }
 
+  // select order year
+  if(req.query.year){
+    criteria.from=new Date();
+    criteria.from.setYear(parseInt(req.query.year))
+  }
+  // select order month
+  if(req.query.month){
+    if(!criteria.from)criteria.from=new Date()
+    criteria.from.setDate(1)
+    criteria.from.setMonth(parseInt(req.query.month)-1)
+    criteria.from.setHours(1,0,0,0)
+  }
+
+  if(criteria.from){
+    criteria.to=new Date(criteria.from);
+    criteria.to.setDate(criteria.from.daysInMonth());
+    criteria.to.setHours(23,0,0,0);    
+  }
+
+
+
 }
 /**
  * get orders by criteria
@@ -586,7 +607,7 @@ exports.invoicesByUsers=function(req,res){
     criteria.from.setYear(parseInt(req.params.year))
   }
 
-  // select a shipping time
+  // select a shipping month
   criteria.from.setDate(1)
   criteria.from.setMonth(parseInt(req.params.month)-1)
   criteria.from.setHours(1,0,0,0)
@@ -658,7 +679,7 @@ exports.invoicesByShops=function(req,res){
   if(req.params.year){
     criteria.from.setYear(parseInt(req.params.year))
   }
-  // select a shipping time
+  // select a shipping month
   criteria.from.setDate(1)
   criteria.from.setMonth(parseInt(req.params.month)-1)
   criteria.from.setHours(1,0,0,0)
