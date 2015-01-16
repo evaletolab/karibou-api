@@ -150,15 +150,18 @@ function parseCriteria(criteria, req){
   }
 
   // select order year
-  if(req.query.year){
+  var year=req.query.year||req.params.year;
+  if(year){
     criteria.from=new Date();
-    criteria.from.setYear(parseInt(req.query.year))
+    criteria.from.setYear(parseInt(year))
   }
+
   // select order month
-  if(req.query.month){
+  var month=req.query.month||req.params.month;
+  if(month){
     if(!criteria.from)criteria.from=new Date()
     criteria.from.setDate(1)
-    criteria.from.setMonth(parseInt(req.query.month)-1)
+    criteria.from.setMonth(parseInt(month)-1)
     criteria.from.setHours(1,0,0,0)
   }
 
@@ -674,21 +677,21 @@ exports.invoicesByShops=function(req,res){
 
   var criteria={}, result=[], showAll=req.query.all||false, output=req.query.output||'json';
 
+
+  parseCriteria(criteria,req)
+
   // get the date
-  criteria.from=new Date();
-  if(req.params.year){
-    criteria.from.setYear(parseInt(req.params.year))
+  if(criteria.from){
+    criteria.to=new Date(criteria.from);
+    criteria.to.setDate(criteria.from.daysInMonth());
+    criteria.to.setHours(23,0,0,0);
+    criteria.fulfillment='fulfilled';
   }
-  // select a shipping month
-  criteria.from.setDate(1)
-  criteria.from.setMonth(parseInt(req.params.month)-1)
-  criteria.from.setHours(1,0,0,0)
 
+  //
+  // restrict to a shop name
+  if(req.query.shop&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
 
-  criteria.to=new Date(criteria.from);
-  criteria.to.setDate(criteria.from.daysInMonth());
-  criteria.to.setHours(23,0,0,0);
-  criteria.fulfillment='fulfilled';
 
   // sort by date and customer
   criteria.byDateAndUser=function(o1,o2){
@@ -707,13 +710,6 @@ exports.invoicesByShops=function(req,res){
     if(err){
       return res.send(400,errorHelper(err));
     }
-
-    //
-    // filter by shopname?
-    if(req.params.shop){
-      orders=Orders.filterByShop(orders,[req.params.shop])
-    }  
-
 
 
     //
