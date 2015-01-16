@@ -718,7 +718,11 @@ exports.invoicesByShops=function(req,res){
       res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
       return res.csv(formatOrder.invoicesByShopsCSV(req, criteria, orders))
     }
-    
-    res.json(formatOrder.invoicesByShopsJSON(req, criteria, Orders.filterByShop(orders,criteria.shop)))
+    //
+    // filter only when needed
+    if(criteria.shop){
+      orders=Orders.filterByShop(orders,criteria.shop);
+    }
+    res.json(formatOrder.invoicesByShopsJSON(req, criteria, orders))
   });
 }
