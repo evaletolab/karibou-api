@@ -690,7 +690,7 @@ exports.invoicesByShops=function(req,res){
 
   //
   // restrict to a shop name
-  if(req.query.shops&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+  if(req.query.shops&&req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
 
 
   // sort by date and customer
