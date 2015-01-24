@@ -17,7 +17,7 @@ describe("Shops", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js",'../fixtures/Shops.js'],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -68,6 +68,15 @@ describe("Shops", function(){
     Shops.findOne({urlpath:"votre-nouveau-velo-en-ligne"},function(err,shop){
         //shop.user.id.should.equal(user.id);
         shop.name.should.equal("Votre nouveau vélo en ligne");
+        done();
+    });
+  });
+
+  it("Find list of shop", function(done){
+    Shops.findAllBySlug(["votre-nouveau-velo-en-ligne","un-autre-shop"],function(err,shops){
+        //shops.user.id.should.equal(user.id);
+        [shops[0].name,shops[1].name].should.include("Votre nouveau vélo en ligne");
+        shops.length.should.equal(2);
         done();
     });
   });
@@ -167,9 +176,9 @@ describe("Shops", function(){
 
   it("Find Shops by the user", function(done){
     Shops.findByUser({id:data.Users[0].id},function(err,shops){
-        shops[0].name.should.equal("Votre nouveau vélo en ligne");
-        shops.length.should.equal(1);
-        done();
+      [shops[0].name,shops[1].name].should.include("Votre nouveau vélo en ligne");
+      shops.length.should.equal(2);
+      done();
     });
   });
 

@@ -30,11 +30,10 @@ module.exports = {
         list:["1201","1202","1203","1204","1205","1206","1207","1208","1227"]
       },
       region:{
-        list:["Genève", "Carouge"]
+        list:["Genève", "Carouge,GE"]
       }
     },
     region:{
-      selection:["Genève","Reignier, France"],
       list:["Aire-la-Ville,GE","Anières,GE","Avully,GE","Avusy,GE","Bardonnex,GE","Bellevue,GE",
             "Bernex,GE","Carouge,GE","Cartigny,GE","Céligny,GE","Chancy,GE","Chêne-Bougeries,GE",
             "Chêne-Bourg,GE","Choulex,GE","Collex-Bossy,GE","Collonge-Bellerive,GE",

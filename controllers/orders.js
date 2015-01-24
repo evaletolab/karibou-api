@@ -366,6 +366,67 @@ exports.create=function(req,res){
 
 };
 
+
+exports.updateItem=function(req,res){
+
+  // check && validate input item
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+    validate.orderItems(req.body,true); // true => do not check all fields
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+
+  Orders.updateItem(req.params.oid, req.body, function(err,order){
+    if(err){
+      return res.send(400, (err));
+    }
+    return res.json(200,order)
+  });
+}
+
+exports.updateShipping=function(req,res){
+
+  // check && validate input 
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+    validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+
+  Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,order){
+    if(err){
+      return res.send(400, (err));
+    }
+    return res.json(200,order)
+  });
+}
+
+
+exports.updateCollect=function(req,res){
+
+  // check && validate input 
+  try{
+    validate.check(req.params.shopname, "Le vendeur n'est pas valide").len(2, 164).isSlug();    
+    validate.check(req.body.when, "La date de livraison n'est pas valide").isDate()
+    validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+
+
+  Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,order){
+    if(err){
+      return res.send(400, (err));
+    }
+    return res.json(200,order)
+  });
+}
+
 //
 // cancel order 
 exports.cancel=function(req,res){
@@ -491,25 +552,6 @@ exports.remove=function(req,res){
       return res.json(200,{})
     });
 
-  });
-}
-
-exports.updateItem=function(req,res){
-
-  // check && validate input item
-  try{
-    validate.ifCheck(req.params.oid, "La commande n'est pas valide").isInt()
-    validate.orderItems(req.body,true); // true => do not check all fields
-  }catch(err){
-    return res.send(400, err.message);
-  }
-
-
-  Orders.updateItem(req.params.oid, req.body, function(err,order){
-    if(err){
-      return res.send(400, (err));
-    }
-    return res.json(200,order)
   });
 }
 
@@ -678,10 +720,12 @@ exports.invoicesByShops=function(req,res){
   var criteria={}, result=[], showAll=req.query.all||false, output=req.query.output||'json';
 
 
+  criteria.closed=true;
+
   parseCriteria(criteria,req)
 
   // get the date
-  if(criteria.from){
+  if(criteria.from &&!criteria.to){
     criteria.to=new Date(criteria.from);
     criteria.to.setDate(criteria.from.daysInMonth());
     criteria.to.setHours(23,0,0,0);
@@ -690,7 +734,11 @@ exports.invoicesByShops=function(req,res){
 
   //
   // restrict to a shop name
-  if(req.query.shops&&req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+  if(req.query.shops){
+    if(req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+    //req.query.shops.split(',')
+  }
+
 
 
   // sort by date and customer
@@ -706,23 +754,26 @@ exports.invoicesByShops=function(req,res){
   }
 
 
+
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.send(400,errorHelper(err));
     }
 
-
-    //
-    // CSV output
-    if(output==='csv'){
-      res.setHeader('Content-disposition', 'attachment; filename=invoices-shops-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
-      return res.csv(formatOrder.invoicesByShopsCSV(req, criteria, orders))
-    }
     //
     // filter only when needed
     if(criteria.shop){
       orders=Orders.filterByShop(orders,criteria.shop);
     }
-    res.json(formatOrder.invoicesByShopsJSON(req, criteria, orders))
+
+
+    //
+    // get shops details
+    var slugs=Orders.getVendorsSlug(orders)
+    return db.model('Shops').findAllBySlug(slugs,function(err,shops) {
+      res.json(formatOrder.invoicesByShopsJSON(req, criteria, orders, shops))
+    });
+
+
   });
 }

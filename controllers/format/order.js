@@ -7,20 +7,35 @@ var db = require('mongoose'),
 
 //
 // structure data for JSON output
-exports.invoicesByShopsJSON=function(req,criteria,orders){
-  var result={from:criteria.from,to:criteria.to,products:[],shops:{}}
-  var amount=0,total=0,count=0,shipping=0, monthtotal=0;monthcount=0, products={}, shops={}, showAll=req.query.all||false;
+exports.invoicesByShopsJSON=function(req,criteria,orders, shops){
+  var result={from:criteria.from,to:criteria.to,products:[],shops:{},users:{}}
+  var amount=0,
+      total=0,
+      count=0,
+      shipping=0, 
+      monthtotal=0,
+      monthcount=0, 
+      products={}, 
+      oshops={}, 
+      showAll=req.query.all||false,
+      shop;
 
-    result.users={}
+  //
+  // fast mapping slug to shop 
+  function findShopBySlug (shops,slug) {
+    return _.find(shops,function(s) {
+      return s.urlpath===slug
+    })
+  }
 
 
   //
   // group by shops
-  shops=Orders.groupByShop(orders);
-  Object.keys(shops).forEach(function(slug){
+  oshops=Orders.groupByShop(orders);
+  Object.keys(oshops).forEach(function(slug){
     total=amount=count=0;
     result.shops[slug]={items:[]};
-    shops[slug].items.sort(criteria.byDateAndUser).forEach(function(item){
+    oshops[slug].items.sort(criteria.byDateAndUser).forEach(function(item){
       //
       // map user items
       if(!result.users[item.customer.displayName]){
@@ -64,29 +79,41 @@ exports.invoicesByShopsJSON=function(req,criteria,orders){
     })
     monthtotal+=total;
     monthcount+=count;
-    result.shops[slug].details=shops[slug].details
-    result.shops[slug].total=(total).toFixed(2)
-    result.shops[slug].fees=(total*.15).toFixed(2)
+    shop=findShopBySlug(shops,slug)
+    result.shops[slug].details=oshops[slug].details;
+    result.shops[slug].streetAdress=shop.address.streetAdress;
+    result.shops[slug].region=shop.address.region;
+    result.shops[slug].postalCode=shop.address.postalCode;
+    result.shops[slug].geo=shop.address.geo;
+    result.shops[slug].total=(total).toFixed(2);
+    
+    //FIXME fees should not be hardcoded ;( 
+    result.shops[slug].fees=(total*.15).toFixed(2);
 
   })
 
-  result.user={};
-  result.user.displayName=req.user.displayName;
+  // result.user={};
+  // result.user.displayName=req.user&&req.user.displayName||'';
 
+  //FIXME fees should not be hardcoded ;( 
   result.monthtotal=monthtotal;
   result.monthca=(monthtotal*0.15)
   result.monthcount=monthcount;
   result.fees=0.15;
 
-  Object.keys(result.users).forEach(function(user){
-    var items=[]
-    Object.keys(result.users[user]).forEach(function (sku) {
-      items.push(result.users[user][sku])
-    })
-    result.users[user]=items
-  });
+  //
+  // pivot on user
+  // Object.keys(result.users).forEach(function(user){
+  //   var items=[]
+  //   Object.keys(result.users[user]).forEach(function (sku) {
+  //     items.push(result.users[user][sku])
+  //   })
+  //   result.users[user]=items
+  // });
 
 
+  //
+  // pivot on product
   Object.keys(products).sort(function(a,b){return products[b].count-products[a].count;}).forEach(function(sku){
     result.products.push({
       sku:sku,
@@ -95,7 +122,7 @@ exports.invoicesByShopsJSON=function(req,criteria,orders){
       amount:products[sku].amount
     })
   })
-
+  console.log(result)
   return result;
 }
 

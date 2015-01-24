@@ -149,6 +149,7 @@ module.exports = function(app, config, passport) {
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 
   app.post('/v1/orders/items/verify',orders.verifyItems)
+  
   // only valid user with valid alias can create new order
   app.post('/v1/orders', auth.ensureUserValid, orders.ensureValidAlias, queued(orders.create));
   // only valid shop that bellongs to the order can update the order
@@ -168,12 +169,15 @@ module.exports = function(app, config, passport) {
   // post order items to shopname
   app.post('/v1/orders/:shopname/email',auth.ensureAdmin,orders.informShopToOrders);
 
+  // shopper update logistic
+  app.post('/v1/orders/:oid/shipping', auth.ensureLogisticOrAdmin, orders.updateShipping);
+  app.post('/v1/orders/:shopname/collect', auth.ensureLogisticOrAdmin, orders.updateCollect);
+
 
   //
   // invoices
   app.get('/v1/orders/invoices/users/:month/:year?', auth.ensureAdmin, orders.invoicesByUsers);
-  app.get('/v1/orders/invoices/shops/:month/:year?', /*auth.ensureAdmin,*/ orders.invoicesByShops);
-  app.get('/v1/orders/invoices/shop/:shop/:month/:year?', orders.ensureShopOwnerOrAdmin, orders.invoicesByShops);
+  app.get('/v1/orders/invoices/shops/:month/:year?', orders.ensureShopOwnerOrAdmin, orders.invoicesByShops);
 
   
   

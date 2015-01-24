@@ -183,9 +183,7 @@ Shops.statics.update=function(id,s,callback){
     _.extend(shop,s);
 
  
-    return shop.save(function (err) {    
-      return callback(err,shop);
-    });
+    return shop.save(callback);
   });
 };
 
@@ -197,21 +195,29 @@ Shops.statics.findByUser=function(u,callback){
 };
 
 Shops.statics.findAllByUser=function(u,callback){
-  	return this.model('Users').findOne(u).populate('shops').populate('catalog').exec(function(err,user){
-  	    if (!user) return callback(err)
-  	    callback(err,user.shops);
-  	});
+	return this.model('Users').findOne(u).populate('shops').populate('catalog').exec(function(err,user){
+	    if (!user) return callback(err)
+	    callback(err,user.shops);
+	});
   	
 };
 
 
 Shops.statics.findOneShop=function(s,callback){
-  	var Shops=this.model('Shops');
-    return Shops.findOne(s).populate('owner').populate('catalog').exec(function(err,shop){
-      callback(err,shop);
-    });
+	var Shops=this.model('Shops'), query;
+  query=Shops.findOne(s).populate('owner').populate('catalog');
+  if(callback)return query.exec(callback)
+  return query;
 };
 
+
+Shops.statics.findAllBySlug=function (slugs,callback) {
+  var Shops=this.model('Shops'), q=(Array.isArray(slugs))?slugs:[slugs];
+
+  var query=Shops.find({urlpath:{"$in":q}}).populate('owner').populate('catalog')
+  if(callback)return query.exec(callback)
+  return query;
+}
 
 Shops.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Shops', Shops);

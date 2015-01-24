@@ -252,7 +252,7 @@ Product.statics.findBySkus = function(skus, callback){
   }
   var query=this.model('Products').find({sku:{
     $in:skus
-  }}).populate('vendor').populate('vendor.owner').populate('categories');
+  }}).populate(['vendor','vendor.owner','categories']);
 
   if (cb) return query.exec(cb)
   return query;
@@ -267,7 +267,7 @@ Product.statics.findOneBySku = function(sku, callback){
     cb=undefined;
   }
 
-  return this.model('Products').findOne({sku:sku}).populate('vendor').exec(cb);
+  return this.model('Products').findOne({sku:sku}).populate(['vendor','vendor.owner','categories']).exec(cb);
 };
 
 

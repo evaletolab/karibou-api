@@ -113,10 +113,12 @@ var Orders = new Schema({
     name:{type:String, required:true},
     fullName:{type:String, required:false},
     address:{type:String, required:true},
+    address2:{type:String},
     geo:{
       lat:{type:Number, required: false},
       lng:{type:Number, required: false}
-    }
+    },
+    collected:{type:Boolean,default:false}
    }],
 
    shipping:{
@@ -130,7 +132,8 @@ var Orders = new Schema({
       geo:{
         lat:{type:Number, required: true},
         lng:{type:Number, required: true}
-      }
+      },
+      shipped:{type:Boolean,default:false}
    }
 
 
@@ -147,6 +150,7 @@ Orders.methods.print=function(order){
 Orders.statics.print=function(order){
   var self=order
   console.log("-- OID    ", self.oid);
+  console.log("---      shipped       ",  self.shipping.shipped);
   console.log("---      shipping.when ",  self.shipping.when);
   console.log("---      payment       ",  self.payment.status,self.payment.issuer);
   console.log("---      fulfillments  ",  self.fulfillments.status);
@@ -164,8 +168,10 @@ Orders.statics.print=function(order){
   if(self.items)
   console.log("---      items         ",  self.items.map(function(i){ return i.sku}).join(','));
   console.log("---      quantity      ",  self.items.map(function(i){ return i.quantity}).join(','));
-  if(self.vendors)
-  console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(','));
+  if(self.vendors){
+    console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(','));
+    console.log("---      collected     ",  self.vendors.map(function(v){ return v.collected}).join(','));
+  }
 }
 
 Orders.statics.printInfo=function(){
@@ -315,6 +321,16 @@ Orders.statics.filterByShop=function(orders,shopname){
   })
 
   return toKeep
+}
+
+Orders.statics.getVendorsSlug=function  (orders) {
+  if(!orders)return [];
+  var slugs=orders.map(function (order) {    
+      return order.vendors.map(function (vendor) {
+        return vendor.slug;
+      })
+  })
+  return _.uniq(_.flatten(slugs))
 }
 
 //
@@ -553,7 +569,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
       next.setHours(timelimitH,0,0,0)
       console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
-        console.log('return this',next)
+        //console.log('return this',next)
         return next;
       }
     }
@@ -567,7 +583,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
       next.setHours(timelimitH,0,0,0)
       console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
       if(((next.getTime()-now.getTime())/3600000)>=timelimit){
-        console.log('for next week',next)
+        //console.log('for next week',next)
         return next;
       }
     }
@@ -604,11 +620,7 @@ Orders.statics.checkItems = function(shipping, items, callback){
     }
 
     var vendors=[], errors=[];
-
-    var i=-1;require('async').eachLimit(items,1, function(item, cb) {
-      i++;//get the iterator
-
-
+    for (var i = 0; i <items.length; i++) {
       //
       // check an item
       Orders.checkItem(shipping, items[i],products[i],function(err,item, vendor){
@@ -617,14 +629,9 @@ Orders.statics.checkItems = function(shipping, items, callback){
         //
         // collect error by product
         err&&errors.push(error)
-        cb();
       })
-    },function(err){
-      //
-      // this checking generate a list of products
-      callback(err,products,vendors, errors)
-    });
-
+    };
+    return callback(err,products,vendors, errors)
   });
 }
 
@@ -649,32 +656,33 @@ Orders.methods.computeRankAndSave=function(cb){
 // status == created, payment == pending
 Orders.methods.updateProductQuantityAndSave=function(callback){
   assert(callback)
+  var Q=require('q'),deferred = Q.defer();
 
-  var self=this;
+  var self=this, tasks=[];
   var msg1="Could not update product quantity for paid or partialy fulfilled order";
 
 
   if(this.fulfillments.status !=="created" || this.payment.status!=="pending"){
     callback(msg1)
   }
+  this.items.forEach(function (item) {
+    tasks.push((function(item) {
+      //
+      // rollback item quantity in stock
+      debug("%d lock products quantity %s %s",self.oid, item.sku, -item.quantity)
+      db.model('Products')
+        .update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true },function(err,result) {
+          if(err){
+            return deferred.reject(err);
+          }
+          deferred.resolve(result)
+        })
+      return deferred.promise;
+      
+    })(item))
+  })
 
-
-  require('async').eachLimit(this.items,1, function(item, cb) {
-
-    //
-    // rollback item quantity in stock
-    debug("%d lock products quantity %s %s",self.oid, item.sku, -item.quantity)
-    db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":-item.quantity}}, { safe: true }, cb)
-  },function(err){
-    //
-    // if catching an error durring the update, rollback
-    // which product must be rollback????
-    if(err){
-      callback(err);
-      throw new Error("rollback not implemented: "+(err.message||err));
-    }
-
-
+  return Q.all(tasks).then(function(result) {
     // we have to mention this state to avoid two times reservation
     self.fulfillments.status="reserved";
 
@@ -684,16 +692,20 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
       item.fulfillment.status='reserved';
     })
     return self.save(callback)
-  });
+  },function (err) {
+      callback(err);
+      // FIXME error in this place is an issue!!!
+      throw new Error("rollback not implemented: "+(err.message||err));
+  })
 }
 
 //
 // status == reserved||fulfilled, payment==pending||refund||voided 
 Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
   assert(callback)
+  var Q=require('q'),deferred = Q.defer(), tasks=[];
   var self=this
 
-  var order=this;
 
   if(EnumCancelReason.indexOf(reason)===-1){
     return callback("Le libéllé de l'annulation n'est pas valable : "+reason)
@@ -701,45 +713,48 @@ Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
 
   //
   // accepted payment status for rollback
-  if(["pending","refund",'voided'].indexOf(order.payment.status)===-1){
-    return callback("Impossible d'annuler une commande avec le status: "+order.fulfillments.status);
+  if(["pending","refund",'voided'].indexOf(self.payment.status)===-1){
+    return callback("Impossible d'annuler une commande avec le status: "+self.fulfillments.status);
   }
 
   //
   // accepted payment status for rollback
-  if(["fulfilled","reserved"].indexOf(order.fulfillments.status)===-1){
-    return callback("Impossible d'annuler une commande avec le status: "+order.fulfillments.status);
+  if(["fulfilled","reserved"].indexOf(self.fulfillments.status)===-1){
+    return callback("Impossible d'annuler une commande avec le status: "+self.fulfillments.status);
   }
 
-
-  require('async').eachLimit(this.items,1, function(item, cb) {
-    debug("%d unlock products quantity %s %d",self.oid, item.sku, item.quantity)
-    db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, cb)
-  },function(err){
-    if(err){
-
-      //
-      //DANGER send email
-      bus.emit('system.message',"[karibou-danger] rollback: ",{error:err,order:self.oid,customer:self.email});
-
-      return callback(err);
-    }
-
+  this.items.forEach(function (item) {
+    tasks.push((function(item) {
+      debug("%d unlock products quantity %s %d",self.oid, item.sku, item.quantity)
+      db.model('Products').update({sku:item.sku},{$inc: {"pricing.stock":item.quantity}}, { safe: true }, function (err,result) {
+        if(err){return deferred.reject(err);}
+        deferred.resolve(result)
+      })
+    })(item));
+  })
+  return Q.all(tasks).then(function(result) {
     //
     // after rollback order is no more available
-    order.fulfillments.status="failure";
+    self.fulfillments.status="failure";
 
     //
     // status is canceled
-    order.cancel.reason=reason;
-    order.cancel.when=new Date();
-    order.closed=new Date();
-
+    self.cancel.reason=reason;
+    self.cancel.when=new Date();
+    self.closed=new Date();
 
     //
     // this checking generate a list of products
-    return order.save(callback)
+    return self.save(callback)
+
+  },function (err) {
+    //
+    //DANGER send email
+    bus.emit('system.message',"[karibou-danger] rollback: ",{error:err,order:self.oid,customer:self.email});
+
+    return callback(err);
   });
+
 }
 
 //
@@ -1247,6 +1262,122 @@ Orders.statics.updateItem = function(oid,items, callback){
 
   });
 }
+
+
+//
+// only finalprice and note can be modified for an item
+// status == reserver,partial ,  payment==authorized
+Orders.statics.updateLogistic = function(query,options, callback){
+  assert(query);
+  assert(options);
+  var saveTasks=[], Q=require('q'), deferred = Q.defer();
+
+  if(options.status === undefined){
+    return callback("Ooops error updateLogistic missing param");          
+  }
+
+
+
+  //
+  // select orders by date
+  if(query['vendors.slug']){
+    var when=Date.parse(options.when);
+    if(!when||when==NaN){
+      return callback("Ooops error updateLogistic missing date ");                
+    }
+    // date is ok
+    when=new Date(when)
+
+    var sd=new Date(when.getFullYear(), when.getUTCMonth(), when.getUTCDate()),
+        ed=new Date(sd.getTime()+86400000-60000);
+    query["shipping.when"]={"$gte": sd, "$lt": ed};
+
+    //
+    // in this case do not find closed order!
+    query["closed"]={'$exists':false};
+
+  //
+  // select order by OID
+  }else if(!query.oid){
+    return callback('Ooops error updateLogistic missing order selector ')
+  }
+
+  db.model('Orders').find(query,function(err,orders){
+    if(err){
+      return callback(err)
+    } 
+
+    if(!orders.length){
+      if(query.oid) return callback("Impossible de trouver la commande: "+query.oid);
+      return callback("Impossible de trouver une commande pour la boutique: "+query['vendors.slug']);
+    }
+
+    for (var i=0; i < orders.length; i++) {
+      //
+      // fill an array of promises
+      saveTasks.push((function(order) {
+        //
+        // check order status
+        if(order.closed){
+          return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
+        }
+
+        // cancelreason:["customer", "fraud", "inventory", "other"],
+        if(order.cancel&&order.cancel.when){
+          return Q.reject(("Impossible de livrer une commande annulée: "+order.oid))
+        }
+        //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+        if(["authorized"].indexOf(order.payment.status)==-1){
+          return Q.reject(("Impossible de livrer une commande sans validation financière : "+order.payment.status));
+        }
+
+
+        if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
+          return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
+        }
+
+
+        var statusShopper=Boolean(options.status)
+
+        //
+        // vendor is collected?
+        if(query['vendors.slug']){
+          for (var i = order.vendors.length - 1; i >= 0; i--) {
+            if(order.vendors[i].slug===query['vendors.slug']){
+              order.vendors[i].collected=statusShopper;
+              break;
+            }
+          };
+        }
+        // customer is shipped
+        else{
+          order.shipping.shipped=statusShopper;
+        }
+
+        return order.save()
+        // order.save(function (err,order) {
+        //   if(err){return deferred.reject(err);}
+        //   deferred.resolve(order)
+        // })
+        // return deferred.promise;
+      })(orders[i]));
+    }
+    //
+    // notify this order has been successfully modified
+    bus.emit('order.update.logistic',null,orders,options)
+
+    return Q.all(saveTasks).then(function(){
+
+      callback(null,orders)
+    },function(err) {
+      callback(err)
+    })
+
+
+
+  });
+}
+
 
 Orders.statics.getStatsByOrder=function(query){
   query=query||{ closed: { '$exists': false } };

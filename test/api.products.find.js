@@ -34,6 +34,7 @@ describe("api.products.find", function(){
       .end(function(err, res){
         res.should.have.status(200);
         should.exist(res.body.vendor)
+        console.log(res.body.vendor )
         res.body.vendor.should.be.an.instanceOf(Object)
         done();
       });
