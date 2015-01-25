@@ -40,6 +40,24 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 }
 
+exports.ensureHasShopOrAdmin=function(req, res, next) {
+  //
+  // ensure auth
+  if (!req.isAuthenticated()) {
+      return res.send(401);
+  }
+
+  // if admin, we've done here
+  if (req.user.isAdmin())
+    return next();
+
+  if(!req.user.shops || !req.user.shops.length){
+    return res.send(401,"Vous n'avez pas de boutique")
+  }
+
+  return next();
+};
+
 exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
@@ -51,7 +69,9 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   if (req.user.isAdmin())
     return next();
 
-
+  if(!req.user.shops || !req.user.shops.length){
+    return res.send(401,"Vous n'avez pas de boutique boutique")
+  }
   // ensure that all items in this update bellongs to this user
   // req.user.shops.$.urlpathreq.body.items.$.vendor
   var slugs=_.collect(req.user.shops,function(p){return (p.urlpath+'');})

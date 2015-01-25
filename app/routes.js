@@ -177,7 +177,7 @@ module.exports = function(app, config, passport) {
   //
   // invoices
   app.get('/v1/orders/invoices/users/:month/:year?', auth.ensureAdmin, orders.invoicesByUsers);
-  app.get('/v1/orders/invoices/shops/:month/:year?', orders.ensureShopOwnerOrAdmin, orders.invoicesByShops);
+  app.get('/v1/orders/invoices/shops/:month/:year?', orders.ensureHasShopOrAdmin, orders.invoicesByShops);
 
   
   

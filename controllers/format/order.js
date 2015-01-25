@@ -122,7 +122,6 @@ exports.invoicesByShopsJSON=function(req,criteria,orders, shops){
       amount:products[sku].amount
     })
   })
-  console.log(result)
   return result;
 }
 
