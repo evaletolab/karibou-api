@@ -116,8 +116,8 @@ validate.postal = function (value) {
     updated:{type:Date, default: Date.now},
     logged:{type:Date, default: Date.now},
 
-		salt: { type: String, required: false },
-		hash: { type: String, required: false },
+		salt: { type: String, required: false,select:false},
+		hash: { type: String, required: false,select:false},
 		roles: Array,
     rank: String
 });
@@ -137,7 +137,7 @@ UserSchema.statics.findOrCreate=function(u,callback){
     criteria['email.address']=u['email.address']
   }
 
-  Users.findOne(criteria, function(err, user){
+  Users.findOne(criteria).exec(function(err, user){
     if(!user){
       //
       // user should be created
@@ -356,13 +356,13 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
   //
   // for security reason password hash is removed from the memory!
-  if(this.hash==="true"){
-    this.model('Users').findOne({ id: this.id }).exec(function(err,user){
+  // if(this.hash==="true"){
+    this.model('Users').findOne({ id: this.id }).select('+hash +salt').exec(function(err,user){
       return   callback(null,hash===user.hash);
     })
-  }else{
-    callback(null,hash===this.hash);
-  }
+  // }else{
+  //   callback(null,hash===this.hash);
+  // }
 //  bcrypt.compare(password, this.hash, callback);
 });
 

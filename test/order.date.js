@@ -179,7 +179,7 @@ describe("orders.date", function(){
 
   it("A[CUSTOMER] preparing the order at sunday, the delivery day is wednesday", function(done){
     config.shop.order.weekdays=[0,1,2,3,4,5,6]
-    config.shop.order.timelimit=41
+    config.shop.order.timelimit=40
     config.shop.order.timelimitH=1
     var today=new Date();
     delete config.shop.order.weekdays[(today.getDay())]

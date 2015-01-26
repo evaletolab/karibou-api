@@ -567,8 +567,8 @@ Orders.statics.findNextShippingDay=function(tl,th){
       // a valid day is at least>=timelimit 
       next=new Date(now.getTime()+86400000*(day-now.getDay()))      
       next.setHours(timelimitH,0,0,0)
-      console.log('----- this week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
-      if(((next.getTime()-now.getTime())/3600000)>=timelimit){
+      console.log('----- this week -- delta 1',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
+      if(((next.getTime()-now.getTime())/3600000)>timelimit){
         //console.log('return this',next)
         return next;
       }
@@ -581,8 +581,8 @@ Orders.statics.findNextShippingDay=function(tl,th){
     if(day<now.getDay()){
       next=new Date((7-now.getDay()+day)*86400000+now.getTime());
       next.setHours(timelimitH,0,0,0)
-      console.log('----- next week -- delta',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
-      if(((next.getTime()-now.getTime())/3600000)>=timelimit){
+      console.log('----- next week -- delta 2',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
+      if(((next.getTime()-now.getTime())/3600000)>timelimit){
         //console.log('for next week',next)
         return next;
       }

@@ -46,7 +46,6 @@ describe("api.users.addresses", function(){
       .post('/register')
       .send(r)
       .end(function(err,res){      
-        console.log(err)
         res.should.have.status(200);
         done();        
       });
@@ -62,8 +61,8 @@ describe("api.users.addresses", function(){
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("reg1@test.com");
-        res.body.hash.should.equal('true');
-        res.body.salt.should.equal('true');
+        should.not.exist(res.body.hash)
+        should.not.exist(res.body.salt)
         cookie = res.headers['set-cookie'];
         user=res.body;
         //res.headers.location.should.equal('/');

@@ -138,8 +138,8 @@ exports.password=function(req,res){
 
   var stderr="L' utilisateur "+req.body.email+":"+req.params.id+" n'existe pas ou son mot de passe est incorrect";
 
-  Users.findOne({'email.address': req.body.email, id:req.params.id},
-    function(err,user){
+  Users.findOne({'email.address': req.body.email, id:req.params.id}).select('+hash +salt')
+    .exec(function(err,user){
       if (err){
         return res.send(400,err);
       }
@@ -149,9 +149,11 @@ exports.password=function(req,res){
         return res.send(400,stderr);
       }
 
+      console.log('---------------------',req.body, req.user.hash)
       //
       // check password
-      if(req.user.hash){user.verifyPassword(req.body.current, function(err, passwordCorrect) {
+      if(req.user.hash||true){
+        user.verifyPassword(req.body.current, function(err, passwordCorrect) {
           if (err) {
             return res.send(400,err);
           }

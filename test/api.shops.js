@@ -52,7 +52,6 @@ describe("api.shops", function(){
         res.should.have.status(200);
         res.body.roles.should.be.empty;
         res.body.shops.length.should.equal(1)
-        console.log(res.body.shops[0].urlpath)
         cookie = res.headers['set-cookie'];
         done();        
       });

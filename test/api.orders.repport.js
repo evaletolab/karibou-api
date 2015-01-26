@@ -61,7 +61,6 @@ describe("api.orders.find", function(){
       .set('cookie', cookie)      
       .expect(200,function(err,res){
         should.not.exist(err)
-        console.log(res.body.shops)
         //res.body.length.should.equal(3)
         done()
       });  

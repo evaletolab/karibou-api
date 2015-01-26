@@ -55,6 +55,7 @@ exports.ensureHasShopOrAdmin=function(req, res, next) {
     return res.send(401,"Vous n'avez pas de boutique")
   }
 
+
   return next();
 };
 
@@ -757,6 +758,10 @@ exports.invoicesByShops=function(req,res){
   if(req.query.shops){
     if(req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
     //req.query.shops.split(',')
+  }else{
+    if(!req.user.isAdmin() ){
+      return res.send(401)
+    }    
   }
 
 

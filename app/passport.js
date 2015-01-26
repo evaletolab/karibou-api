@@ -34,10 +34,10 @@ module.exports = function (app, config, passport) {
 
       //
       // don't serialise the private hash, but confirm the password existance
-      if (user.hash) {
-        user.hash=true;
-        user.salt=true;
-      }
+      // if (user.hash) {
+      //   user.hash=true;
+      //   user.salt=true;
+      // }
       
       if(config.disqus){
         user.context.disqus=user.getDisquSSO();

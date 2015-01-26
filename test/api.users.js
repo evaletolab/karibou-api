@@ -89,8 +89,8 @@ describe("api.users", function(){
       .end(function(err,res){
         res.should.have.status(200);
         res.body.email.address.should.equal("evaleto@gluck.com");
-        res.body.hash.should.equal('true');
-        res.body.salt.should.equal('true');
+        should.not.exist(res.body.hash)
+        should.not.exist(res.body.salt)
         cookie = res.headers['set-cookie'];
         user=res.body;
         //res.headers.location.should.equal('/');
@@ -204,5 +204,9 @@ describe("api.users", function(){
         done()
       });    
   })
+
+
+  it.skip('list users content without hash and salt',function(done){
+  })  
 });
 
