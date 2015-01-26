@@ -149,7 +149,6 @@ exports.password=function(req,res){
         return res.send(400,stderr);
       }
 
-      console.log('---------------------',req.body, req.user.hash)
       //
       // check password
       if(req.user.hash||true){

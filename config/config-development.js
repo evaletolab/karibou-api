@@ -26,7 +26,7 @@ module.exports = {
   },
 
   logistic:{
-    emails:['evaleto@gmail.com']
+    emails:['evaleto@gmail.com','shopper1@karibou.ch']
   },
 
   payment:{

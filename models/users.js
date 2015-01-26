@@ -200,6 +200,7 @@ UserSchema.statics.findByToken = function(token, success, fail){
 };
 
 
+// TODO this should be stored in db
 UserSchema.methods.populateRoles=function(){
   var user=this;
   config.admin.emails.forEach(function(admin){

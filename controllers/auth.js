@@ -20,22 +20,11 @@ var passport_Authenticate=function(req, res, next){
     if (!user) { 
       return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
     }
-    // CUSTOM USER CONTENT
-    //
-    // don't serialise the private hash/salt, but confirm the password existance
-    if (user.hash){ 
-      user.hash=true;
-      user.salt=true;
-    }
     
     //
-    // check the first admin
-    config.admin.emails.forEach(function(admin){
-      if (user&&user.email.address === admin){
-        user.roles.push('admin');
-      }
-    });
-    
+    // populate roles for admin and shopper
+    user.populateRoles()
+
     /* account is not valid */
     if (!user.isAdmin() && !user.status){
       console.log("ERROR","Votre compte est désactivé")    
