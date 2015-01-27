@@ -85,6 +85,7 @@ module.exports = function(app, config, passport) {
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/message/:key', api.message);
   app.post('/v1/github/webhook',api.github)
+  app.post('/v1/psp/:token/webhook',api.psp)
   
   //
   // email validation
@@ -179,6 +180,5 @@ module.exports = function(app, config, passport) {
   app.get('/v1/orders/invoices/users/:month/:year?', auth.ensureAdmin, orders.invoicesByUsers);
   app.get('/v1/orders/invoices/shops/:month/:year?', orders.ensureHasShopOrAdmin, orders.invoicesByShops);
 
-  
-  
+
 };

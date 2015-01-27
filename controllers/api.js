@@ -191,3 +191,11 @@ exports.github=function(req,res){
     //return bus.emit('system.message',"[karibou-github error] : ",error.toString('utf8'));
   });
 }
+
+
+//
+// PSP callback /v1/psp/:token/webhook
+exports.psp=function(req,res){
+  console.log('-----------------PSP',req.params.token,req.body)
+  res.send('Yeah!')
+}
