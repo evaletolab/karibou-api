@@ -28,7 +28,7 @@ describe("orders.create", function(){
           region: "GE",
           when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
       }
-    , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxxxx3456'},
+    , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxxxx3456'},
     okDay,
     toshortDay,
     okDayBadTime,
@@ -74,7 +74,7 @@ describe("orders.create", function(){
       , shipping={
           when:new Date()
         }
-      , payment="postfinance";
+      , payment="postfinance card";
 
 
     //
@@ -92,7 +92,7 @@ describe("orders.create", function(){
       , shipping={
           when:Date.now()
         }
-      , payment="postfinance";
+      , payment="postfinance card";
 
 
     data.Products.forEach(function(product){
@@ -118,7 +118,7 @@ describe("orders.create", function(){
       , shipping={
           when:Date.now()
         }
-      , payment="postfinance";
+      , payment="postfinance card";
 
 
     data.Products.forEach(function(product){
@@ -151,7 +151,7 @@ describe("orders.create", function(){
             region: "Genève",
             when:Date.now()
         }
-        , payment="postfinance";
+        , payment="postfinance card";
 
 
 
@@ -262,7 +262,7 @@ describe("orders.create", function(){
             region: "Genève",
             when:okDay
         }
-      , payment={alias:'122',issuer:'postfinance',number:'123'};
+      , payment={alias:'122',issuer:'postfinance card',number:'123'};
 
 
 

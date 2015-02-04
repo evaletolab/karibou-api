@@ -35,7 +35,7 @@ describe("orders.validate.item", function(){
           primary: true,
           region: "GE"
       }
-    , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+    , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
   before(function(done){
 

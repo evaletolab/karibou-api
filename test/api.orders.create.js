@@ -83,7 +83,7 @@ describe("api.orders.create", function(){
       , shipping={
           when:okDay
         }
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
     var order={
       items:items,
@@ -105,7 +105,7 @@ describe("api.orders.create", function(){
  it("POST /v1/orders create new order with some errors on the product selected", function(done){
     var items=[]
       , customer=data.Users[0]
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
 
     data.Products.forEach(function(product){
@@ -140,7 +140,7 @@ describe("api.orders.create", function(){
  it("POST /v1/orders create new order with exceed of stock errors ", function(done){
     var items=[]
       , customer=data.Users[0]
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
     data.Products.forEach(function(product){
       //
@@ -177,7 +177,7 @@ describe("api.orders.create", function(){
  it("POST /v1/orders create new order with wrong date return 400", function(done){
     var items=[]
       , customer=data.Users[0]
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
     data.Products.forEach(function(product){
       //
@@ -215,7 +215,7 @@ describe("api.orders.create", function(){
  it("POST /v1/orders create new order with wrong time return 400", function(done){
     var items=[]
       , customer=data.Users[0]
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
     data.Products.forEach(function(product){
       //

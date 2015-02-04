@@ -69,7 +69,7 @@ describe("orders.create.success", function(){
   it("Checking status after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
-    var payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+    var payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
     var items=[];
     items.push(Orders.prepare(data.Products[0], 2, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))
@@ -130,7 +130,7 @@ describe("orders.create.success", function(){
   it("Checking product stock after creating a new order ", function(done){
     var customer=data.Users[1];
     var shipping=customer.addresses[0];
-    var payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+    var payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
     var items=[];
     items.push(Orders.prepare(data.Products[0], 2, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))

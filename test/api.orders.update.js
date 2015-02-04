@@ -101,8 +101,8 @@ describe("api.orders.create", function(){
     var items=[]
       , customer=data.Users[0]
       , payment={
-        alias:((customer.id+"postfinance").hash().crypt()),
-        issuer:"postfinance",
+        alias:((customer.id+"postfinance card").hash().crypt()),
+        issuer:"postfinance card",
         number:'12xxxxxxx3456'
       };
 

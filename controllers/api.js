@@ -219,17 +219,50 @@ exports.psp=function(req,res){
 }
 
 //
-// empty PSP template 
-exports.pspStd=function(req,res){
-  res.render('pspstd');
-}
-
+// PSP append alias in user.payment[] 
 exports.pspForm=function(req,res){
   payment.for('postfinance card').ecommerceForm(req.user,function (err, form) {
     if(err){
       return res.send(400,errorHelper(err))
     }
-    
+
+
+    // for security reason alias is crypted
+    var alias=(req.user.id+form.issuer.toLowerCase()).hash(), safePayment={}
+    safePayment.alias=method.alias.crypt();
+    safePayment.type=form.issuer.toLowerCase();
+    safePayment.name=form.CN;
+    safePayment.updated=Date.now();
+
+
+      // save card alias
+      Users.findOne({id: id}, function(err,user){
+        if(err){
+          // TODO alias should be removed
+          return callback(err)
+        }
+        if(!user){
+          return callback("Utilisateur inconnu");
+        }
+        if(!user.payments) user.payments=[]
+
+        for (var i in user.payments){
+          if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
+        }
+        user.payments.push(safePayment)
+
+        return user.save(callback)
+      });
+
+
+
     res.json(form)
   })
+}
+
+
+//
+// empty PSP template 
+exports.pspStd=function(req,res){
+  res.render('pspstd');
 }
