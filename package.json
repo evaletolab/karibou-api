@@ -27,7 +27,7 @@
     "mongoose-error-helper": "0.x",
     "mongoose-validate": "x",
     "newrelic": "1.x",
-    "node-postfinance": "https://github.com/evaletolab/node-postfinance/tarball/master",
+    "node-postfinance": "0.12.x",
     "nodemailer": "1.x",
     "nodetime": "0.x",
     "passport": "0.x",

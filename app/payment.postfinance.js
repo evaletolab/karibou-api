@@ -39,6 +39,44 @@ PaymentPostfinance.prototype.alias=function(id,payment){
   return payment.alias;
 }
 
+PaymentPostfinance.prototype.isValidSha=function (payload) {
+  return this.postfinance.isValidSha(payload);
+}
+
+PaymentPostfinance.prototype.ecommerceForm=function(user,callback){
+
+	//
+	// prepare the card
+  var postfinanceCard = {
+    paymentMethod: 'postfinance card',
+    email:user.email.address,
+    firstName: user.name.givenName,
+    lastName: user.name.familyName,
+  };
+
+  // add addresse
+	if(user.addresses.length){
+		postfinanceCard.address1=user.addresses[0].streetAdress;
+		postfinanceCard.zip=user.addresses[0].postalCode
+		postfinanceCard.city=user.addresses[0].region
+	}
+  var card = new postfinance.Card(postfinanceCard);
+  var alias=(user.id+card.issuer.toLowerCase()).hash()
+
+  var options={
+  	alias:alias, 
+  	aliasUsage:'Karibou payment',
+  	title:'Enregistrement de votre carte chez Postfinance',
+  	bgcolor:'#F2F4F2',
+  	tp:"http://localhost:4000/v1/psp/std"
+  }
+
+  // generate form
+  card.publishForEcommerce(options,function(err,res) {
+  	if(!res.alias)res.alias=alias.crypt()
+		return callback(err,res)  		
+  });
+}
 
 
 //

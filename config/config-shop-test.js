@@ -80,7 +80,7 @@ module.exports = {
       cancelreason:["customer", "fraud", "inventory","system","timeout","other"],
       status:["failure","created","reserved","partial","fulfilled"],
       gateway:[ 
-        {label:"postfinance",fees:0.02}, 
+        {label:"postfinance card",fees:0.02}, 
         {label:"american express",fees:0.029}, 
         {label:"visa",fees:0.029}, 
         {label:"mastercard",fees:0.029}, 

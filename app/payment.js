@@ -6,7 +6,7 @@ var Payment=function(){
 }
 
 Payment.prototype.for=function(issuer){
-	if(['postfinance','american express','visa','mastercard','paypal'].indexOf(issuer)!==-1){
+	if(issuer && ['postfinance card','american express','visa','mastercard','paypal'].indexOf(issuer.toLowerCase())!==-1){
 		return this.postfinance;
 	}else if(issuer==='invoice'){
 		return this.invoice;

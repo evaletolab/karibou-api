@@ -6,6 +6,7 @@ var _ = require('underscore'),
     bus=require('../app/bus'),
     sm = require('sitemap'),
     db = require('mongoose'),
+    payment = require('../app/payment'),
     errorHelper = require('mongoose-error-helper').errorHelper;
     origins=[]
 
@@ -142,6 +143,8 @@ exports.robots=function(req,res){
 exports.github=function(req,res){
   var spawn = require('child_process').spawn;
 
+  //
+  // github sig
   function verify(key, body) {
     var str=JSON.stringify(body);
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
@@ -149,14 +152,14 @@ exports.github=function(req,res){
 
 
   //
-  // checks github config 
-  if(!config.admin.github||!config.admin.github.secret){
+  // checks webhook config 
+  if(!config.admin.webhook||!config.admin.webhook.secret){
     return res.send(400)
   }
 
   //
   // checks push release
-  if(req.body.ref.indexOf(config.admin.github.release)===-1){
+  if(req.body.ref.indexOf(config.admin.webhook.release)===-1){
     return res.send(400)    
   }
 
@@ -165,7 +168,7 @@ exports.github=function(req,res){
   var  sig   = req.headers['x-hub-signature']
       ,event = req.headers['x-github-event']
       ,id    = req.headers['x-github-delivery']  
-      ,verify= verify(config.admin.github.secret,req.body)
+      ,verify= verify(config.admin.webhook.secret,req.body)
 
 
   if(!sig||!event||!id){
@@ -177,11 +180,11 @@ exports.github=function(req,res){
     return res.send(400,'sig verification error')
   }
 
-  if (req.body.ref.indexOf(config.admin.github.release)===-1) {
+  if (req.body.ref.indexOf(config.admin.webhook.release)===-1) {
     return res.send(200)
   }
 
-  var child=spawn('node-continuous.sh',[config.admin.github.release,config.express.port],{detached:true})
+  var child=spawn('node-continuous.sh',[config.admin.webhook.release,config.express.port],{detached:true})
   child.stdout.on('data', function (stdout) {
     console.log("github",event,stdout.toString('utf8'))    
   })
@@ -196,6 +199,37 @@ exports.github=function(req,res){
 //
 // PSP callback /v1/psp/:token/webhook
 exports.psp=function(req,res){
-  console.log('-----------------PSP',req.params.token,req.body)
-  res.send('Yeah!')
+
+  //
+  // checks webhook config 
+  if(!config.admin.webhook||!config.admin.webhook.secret){
+    return res.send(400)
+  }
+
+  //
+  // check webhook secret
+  if(config.admin.webhook.secret!==req.params.token){
+    return res.send(400,'PSP token verification error')
+  }
+
+  if(!payment.for(req.body.BRAND).isValidSha(req.body)){
+    return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.")
+  }
+  res.render('pspsuccess');
+}
+
+//
+// empty PSP template 
+exports.pspStd=function(req,res){
+  res.render('pspstd');
+}
+
+exports.pspForm=function(req,res){
+  payment.for('postfinance card').ecommerceForm(req.user,function (err, form) {
+    if(err){
+      return res.send(400,errorHelper(err))
+    }
+    
+    res.json(form)
+  })
 }
