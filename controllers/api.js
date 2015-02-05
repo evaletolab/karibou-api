@@ -198,32 +198,57 @@ exports.github=function(req,res){
 
 //
 // PSP callback /v1/psp/:token/webhook
+// only used for online alias creation
+// we can save POstfinance Card payment method one we get a valid webhook
 exports.psp=function(req,res){
 
   //
   // checks webhook config 
   if(!config.admin.webhook||!config.admin.webhook.secret){
-    return res.send(400)
+    return res.send(401)
   }
 
   //
   // check webhook secret
   if(config.admin.webhook.secret!==req.params.token){
-    return res.send(400,'PSP token verification error')
+    return res.send(401)
   }
 
+  // check action is createAlias
+  if(!req.body.createAlias){
+    return res.send(400,'Unsupported action')
+  }
+
+  //
+  // validate SHA
   if(!payment.for(req.body.BRAND).isValidSha(req.body)){
     return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.")
   }
 
-  db.model('Users').findOne({'payments.$.alias':req.body.ALIAS},function (err,user) {
+  var alias=(req.body.user+req.body.BRAND.toLowerCase()).hash(), safePayment={}
+  safePayment.alias=req.body.ALIAS.crypt();
+  safePayment.type=req.body.BRAND.toLowerCase();
+  safePayment.name=req.body.CN;
+  safePayment.number=req.body.CARDNO;
+  safePayment.expiry=req.body.ED;
+  safePayment.updated=Date.now();
+
+  console.log('--------------',safePayment,alias)
+
+  Users.findOne({id: parseInt(req.body.user)}, function(err,user){
     if(err){
       return res.send(400,errorHelper(err))
     }
+    if(!user){
+      return callback("Utilisateur inconnu");
+    }
 
-  })
+    return user.addAndSavePayment(safePayment,callback)
+  });
 
   res.render('pspsuccess');
+
+
 }
 
 //
@@ -233,31 +258,7 @@ exports.pspForm=function(req,res){
     if(err){
       return res.send(400,errorHelper(err))
     }
-
-    // for security reason alias is crypted
-    var alias=(req.user.id+card.issuer.toLowerCase()).hash(), safePayment={}
-    console.log('-------------------->',form, alias)
-    // safePayment.alias=alias;
-    // safePayment.type=card.issuer.toLowerCase();
-    // safePayment.name=form.CN;
-    // safePayment.updated=Date.now();
-
-
-    // if(!req.user.payments) req.user.payments=[]
-
-    // for (var i in req.user.payments){
-    //   if(req.user.payments[i].alias===safePayment.alias||
-    //      req.user.payments[i].alias===safePayment.alias.crypt()){
-    //     return  res.json(form)
-    //   }
-    // }
-    // req.user.payments.push(safePayment)
-    // req.user.save(function (err,user) {
-    //   res.json(form)
-    // })
     res.json(form)
-
-
   })
 }
 

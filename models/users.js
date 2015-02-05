@@ -695,19 +695,26 @@ UserSchema.statics.addPayment=function(id, method,callback){
         if(!user){
           return callback("Utilisateur inconnu");
         }
-        if(!user.payments) user.payments=[]
 
-        for (var i in user.payments){
-          if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
-        }
-        user.payments.push(safePayment)
-
-        return user.save(callback)
+        return user.addAndSavePayment(safePayment,callback)
       });
 
     })
 
   });
+
+  //
+  // add and save payment method
+  UserSchema.methods.addAndSavePayment=function(payment,callback){
+    var user=this;
+    if(!user.payments) user.payments=[];
+
+    for (var i in user.payments){
+      if(user.payments[i].alias===payment.alias)return callback("Cette méthode de paiement existe déjà")
+    }
+    user.payments.push(payment)
+    return user.save(callback)
+  }
 
 }
 

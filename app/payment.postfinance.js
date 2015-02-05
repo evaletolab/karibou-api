@@ -68,7 +68,8 @@ PaymentPostfinance.prototype.ecommerceForm=function(user,callback){
   	aliasUsage:'Karibou payment',
   	title:'Enregistrement de votre carte chez Postfinance',
   	bgcolor:'#F2F4F2',
-  	tp:"http://api.karibou.evaletolab.ch/v1/psp/std"
+  	tp:"http://api.karibou.evaletolab.ch/v1/psp/std",
+  	paramplus:'createAlias=true&user='+user.email.address,
   }
 
   // generate form
