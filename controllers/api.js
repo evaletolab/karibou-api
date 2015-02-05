@@ -240,13 +240,14 @@ exports.psp=function(req,res){
       return res.send(400,errorHelper(err))
     }
     if(!user){
-      return callback("Utilisateur inconnu");
+      return res.send(400, "Utilisateur inconnu");
     }
 
-    return user.addAndSavePayment(safePayment,callback)
+    return user.addAndSavePayment(safePayment,function (err) {
+      res.render('pspsuccess');
+    })
   });
 
-  res.render('pspsuccess');
 
 
 }
