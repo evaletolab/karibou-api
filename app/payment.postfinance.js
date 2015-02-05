@@ -74,7 +74,7 @@ PaymentPostfinance.prototype.ecommerceForm=function(user,callback){
   // generate form
   card.publishForEcommerce(options,function(err,res) {
   	if(!res.alias)res.alias=alias.crypt()
-		return callback(err,res)  		
+		return callback(err,card, res)  		
   });
 }
 

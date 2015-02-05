@@ -215,48 +215,49 @@ exports.psp=function(req,res){
   if(!payment.for(req.body.BRAND).isValidSha(req.body)){
     return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.")
   }
+
+  db.model('Users').findOne({'payments.$.alias':req.body.ALIAS},function (err,user) {
+    if(err){
+      return res.send(400,errorHelper(err))
+    }
+
+  })
+
   res.render('pspsuccess');
 }
 
 //
 // PSP append alias in user.payment[] 
 exports.pspForm=function(req,res){
-  payment.for('postfinance card').ecommerceForm(req.user,function (err, form) {
+  payment.for('postfinance card').ecommerceForm(req.user,function (err, card, form) {
     if(err){
       return res.send(400,errorHelper(err))
     }
 
-
     // for security reason alias is crypted
-    var alias=(req.user.id+form.issuer.toLowerCase()).hash(), safePayment={}
-    safePayment.alias=method.alias.crypt();
-    safePayment.type=form.issuer.toLowerCase();
-    safePayment.name=form.CN;
-    safePayment.updated=Date.now();
+    var alias=(req.user.id+card.issuer.toLowerCase()).hash(), safePayment={}
+    console.log('-------------------->',form, alias)
+    // safePayment.alias=alias;
+    // safePayment.type=card.issuer.toLowerCase();
+    // safePayment.name=form.CN;
+    // safePayment.updated=Date.now();
 
 
-      // save card alias
-      Users.findOne({id: id}, function(err,user){
-        if(err){
-          // TODO alias should be removed
-          return callback(err)
-        }
-        if(!user){
-          return callback("Utilisateur inconnu");
-        }
-        if(!user.payments) user.payments=[]
+    // if(!req.user.payments) req.user.payments=[]
 
-        for (var i in user.payments){
-          if(user.payments[i].alias===safePayment.alias)return callback("Cette méthode de paiement existe déjà")
-        }
-        user.payments.push(safePayment)
-
-        return user.save(callback)
-      });
-
-
-
+    // for (var i in req.user.payments){
+    //   if(req.user.payments[i].alias===safePayment.alias||
+    //      req.user.payments[i].alias===safePayment.alias.crypt()){
+    //     return  res.json(form)
+    //   }
+    // }
+    // req.user.payments.push(safePayment)
+    // req.user.save(function (err,user) {
+    //   res.json(form)
+    // })
     res.json(form)
+
+
   })
 }
 
