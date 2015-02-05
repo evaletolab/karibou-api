@@ -219,6 +219,7 @@ exports.psp=function(req,res){
     return res.send(400,'Unsupported action')
   }
 
+
   //
   // validate SHA
   if(!payment.for(req.body.BRAND).isValidSha(req.body)){
@@ -233,9 +234,8 @@ exports.psp=function(req,res){
   safePayment.expiry=req.body.ED;
   safePayment.updated=Date.now();
 
-  console.log('--------------',safePayment,alias)
 
-  Users.findOne({id: parseInt(req.body.user)}, function(err,user){
+  Users.findOne({id: req.body.user}, function(err,user){
     if(err){
       return res.send(400,errorHelper(err))
     }

@@ -113,20 +113,45 @@ var Users=exports.Users=[{
     created: "2012-03-27T17:07:34.201Z",
     status: true,
   },{
+    //Users[3]
     _id : new ObjectId(), 
-    status:true,
-    addresses : [], 
-    created : new Date("2013-03-27T17:07:34.201Z"), 
-    invoices : [], 
-    likes : [], 
-    phoneNumbers : [], 
-    roles : [], 
-    shops : [], 
-    tags : [],
-    provider:"twitter",
-    id:312528659,
-    photo:"https: //si0.twimg.com/profile_images/1385850059/oli-avatar-small_normal.png",
+    password: "password",
+    tags: [],
+    shops: [],
     roles:["admin", "mod"],
+    provider: "local",
+    photo: "jpg",
+    phoneNumbers: [
+        {
+            what: "principal",
+            number: "076 3787968"
+        }
+    ],
+    addresses: [
+        {
+            region: "Genève",
+            primary: true,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet"
+        }
+    ],
+    email: {
+        status: true,
+        address: "testpsp@gmail.com"
+    },
+    displayName: "delphine pluck",
+    likes: [],
+    invoices: [],
+    id: 1279482741765243,
+    created: "2012-03-27T17:07:34.201Z",
+    status: true,
   }
 ];
 

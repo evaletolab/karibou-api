@@ -129,7 +129,8 @@ describe("Users", function(){
   
   
   it('should return true if the user has role', function (done) {
-      db.model('Users').findOne({id:312528659},function(err,profile){
+      db.model('Users').findOne({id:1279482741765243},function(err,profile){
+        console.log(err)
         profile.hasRole('admin').should.be.true;
         profile.hasRole('mod').should.be.true;
         done();
@@ -137,7 +138,7 @@ describe("Users", function(){
    });
    
    it('should return false if the user does not have role', function (done) {
-     db.model('Users').findOne({id:312528659},function(err,profile){
+     db.model('Users').findOne({id:1279482741765243},function(err,profile){
        profile.hasRole('astronaut').should.be.false;
        profile.hasRole('cowboy').should.be.false;
        done();

@@ -23,7 +23,7 @@ module.exports = {
   admin:{
     emails:['evaleto@gmail.com'],
     secret: process.env.KARIBOO_SECRET || '1234',
-    github: {release:process.env.KARIBOU_RELEASE||'devel',secret:process.env.KARIBOU_GITHUB||'abc'},
+    webhook: {release:process.env.KARIBOU_RELEASE||'devel',secret:'qawsedr'},
     padding:'0e0e0e0e'
   },
 
@@ -40,7 +40,7 @@ module.exports = {
       pspid:process.env.PSPID||'test',
       apiUser:process.env.PFUSER||'test',
       apiPassword:process.env.PFSECRET||'test',
-      shaSecret:process.env.PFSHA||'test'
+      shaSecret:process.env.PFSHA||'1testpostfinance'
     }
   },
 
@@ -52,7 +52,7 @@ module.exports = {
 
   express: {
     port: process.env.PORT || 4000,
-    views: PATH('views'),
+    views: '/views',
     'view engine': 'jade'
   },
 

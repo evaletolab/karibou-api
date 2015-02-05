@@ -702,20 +702,19 @@ UserSchema.statics.addPayment=function(id, method,callback){
     })
 
   });
+}
 
-  //
-  // add and save payment method
-  UserSchema.methods.addAndSavePayment=function(payment,callback){
-    var user=this;
-    if(!user.payments) user.payments=[];
+//
+// add and save payment method
+UserSchema.methods.addAndSavePayment=function(payment,callback){
+  var user=this;
+  if(!user.payments) user.payments=[];
 
-    for (var i in user.payments){
-      if(user.payments[i].alias===payment.alias)return callback("Cette méthode de paiement existe déjà")
-    }
-    user.payments.push(payment)
-    return user.save(callback)
+  for (var i in user.payments){
+    if(user.payments[i].alias===payment.alias)return callback("Cette méthode de paiement existe déjà")
   }
-
+  user.payments.push(payment)
+  return user.save(callback)
 }
 
 
