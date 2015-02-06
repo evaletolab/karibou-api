@@ -52,6 +52,9 @@ exports.payment=function(payment, alias){
   check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
   check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,50)
   check(payment.number,  "Le numéro de la carte n'est pas valide").isText().len(4,50)
+  check(payment.expiry,  "La date de validité de la carte n'est pas correcte").isText().len(4,10)
+  // type is computed by number
+  // check(payment.type,  "La marque de la carte n'est pas valide").isText().len(4,50)
   ifCheck(payment.csc,  "Le code de vérification de la carte n'est pas valide").isText().len(0,5)
 
 }

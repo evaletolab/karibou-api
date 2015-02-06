@@ -103,7 +103,7 @@ describe("api.users.payment", function(){
   it('user add new payment without number return 400',function(done){
     request(app)
       .post('/v1/users/'+user.id+'/payment')
-      .send({alias:'1234567890',expiry:'0915',name:'TO OLI',type:'mastercard'})
+      .send({expiry:'0915',name:'TO OLI'})
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
@@ -114,9 +114,10 @@ describe("api.users.payment", function(){
   it('user add new payment without name return 400',function(done){
     request(app)
       .post('/v1/users/'+user.id+'/payment')
-      .send({alias:'1234567890',expiry:'0915',number:'TO OLI',type:'mastercard'})
+      .send({expiry:'0915',number:'TO OLI'})
       .set('cookie', cookie)
       .end(function(err,res){
+        res.text.should.include('Le titulaire de la carte ')
         res.should.have.status(400);
         done()
       });
@@ -129,21 +130,57 @@ describe("api.users.payment", function(){
       .send(payment)
       .set('cookie', cookie)
       .end(function(err,res){
+        res.text.should.include('CSC is')
         res.should.have.status(400);
         done()
       });
   });
 
 
-  it('user add new payment return 200',function(done){
-    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc,type:'visa'};
-    var alias=(user.id+payment.type).hash();
-    payment.alias=alias;
+  it('user add new payment without expiry return 400',function(done){
+    var payment={number:VisaCard.number,name:'TO OLI'};
     request(app)
       .post('/v1/users/'+user.id+'/payment')
       .send(payment)
       .set('cookie', cookie)
       .end(function(err,res){
+        res.text.should.include('La date')
+        res.should.have.status(400);
+        done()
+      });
+  });
+
+  //
+  // type is computed with the number 
+  it.skip('user add new payment without type return 400',function(done){
+    // {"name":"test1 test1","number":"4012888888881881","csc":"123","expiry":"10/2018"}
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc};
+    // var alias=(user.id+payment.type).hash();
+    // payment.alias=alias;
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.text.should.include('La marque de la carte')
+        res.should.have.status(400);
+        done()
+      });
+  });
+
+
+
+  it('user add new payment return 200',function(done){
+    var payment={number:VisaCard.number,expiry:'0920',name:'TO OLI',csc:VisaCard.csc};
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        // db.model('Users').findOne({id:user.id},function(err,user) {
+        //   console.log('--------------------',user.payments)
+        //   done();
+        // })
         res.should.have.status(200);
         done()
       });
@@ -234,8 +271,8 @@ describe("api.users.payment", function(){
 
   it('user add new payment (crypt) return 200',function(done){
     var payment={number:MasterCard.number,expiry:'0921',name:'TO OLI',csc:MasterCard.csc,type:'mastercard'};
-    var alias=(user.id+payment.type).hash().crypt();
-    payment.alias=alias;
+    // var alias=(user.id+payment.type).hash().crypt();
+    // payment.alias=alias;
     request(app)
       .post('/v1/users/'+user.id+'/payment')
       .send(payment)

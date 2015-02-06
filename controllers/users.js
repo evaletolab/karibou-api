@@ -208,7 +208,7 @@ exports.update=function(req,res){
 exports.addPayment=function(req,res){
 
   try{
-    var alias="fake alias";
+    var alias="fake alias to avoid error";
     validate.check(req.params.id,"Invalid uid request").isInt();
     validate.payment(req.body, alias);
   }catch(err){

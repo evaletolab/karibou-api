@@ -84,7 +84,7 @@ PaymentPostfinance.prototype.ecommerceForm=function(user,callback){
 // validate a card or alias and get new Card by callback
 PaymentPostfinance.prototype.card=function(payment, callback){
   try{
-  	var isCard=(payment.name&&payment.expiry&&payment.number),
+  	var isCard=(payment.number),
   		method=(isCard)?
   	{
   		name:payment.name,

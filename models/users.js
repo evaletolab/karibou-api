@@ -636,13 +636,13 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
       if(err){
         return callback(err.message)
       }
-
-      card.redact(function(err,result) {
-        if(err){
-          return callback(err.message)
-        }
-        return removeAlias()
-      })
+      removeAlias();
+      // card.redact(function(err,result) {
+      //   if(err){
+      //     return callback(err.message)
+      //   }
+      //   return removeAlias()
+      // })
     })
   }catch(err){
     // get informed about this error
@@ -667,18 +667,18 @@ UserSchema.statics.addPayment=function(id, method,callback){
 
     //
     // check if payment card changed? 
-    if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
-      return callback(new Error("Vous ne pouvez pas changer de type de carte"))
-    } 
+    // if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
+    //   return callback(new Error("Vous ne pouvez pas changer de type de carte"))
+    // } 
 
 
     // for security reason alias is crypted
     var alias=(id+card.issuer.toLowerCase()).hash()
-    safePayment.alias=method.alias.crypt();
+    safePayment.alias=alias.crypt();
     safePayment.type=card.issuer.toLowerCase();
     safePayment.name=method.name;
     safePayment.number=card.hiddenNumber;
-    safePayment.expiry=method.expiry;
+    safePayment.expiry=card.month+'/'+card.year;
     safePayment.updated=Date.now();
 
     card.publish({alias:alias},function(err,res){
