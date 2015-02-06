@@ -219,7 +219,7 @@ exports.psp=function(req,res){
 
   // check action is createAlias
   if(!req.body.createAlias ||!req.body.ALIAS){
-    return res.send(400,'Unsupported action');
+    return res.send(200);
   }
 
 
