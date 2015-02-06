@@ -230,11 +230,13 @@ exports.psp=function(req,res){
   }
 
   var alias=(req.body.user+req.body.BRAND.toLowerCase()).hash(), safePayment={}
+  var month=parseInt(req.body.ED.substring(0,2),10)
+  var year=parseInt(req.body.ED.substring(2,4))+2000;
   safePayment.alias=req.body.ALIAS.crypt();
   safePayment.type=req.body.BRAND.toLowerCase();
   safePayment.name=req.body.CN;
   safePayment.number=req.body.CARDNO;
-  safePayment.expiry=req.body.ED;
+  safePayment.expiry=month+'/'+year;
   safePayment.updated=Date.now();
 
 

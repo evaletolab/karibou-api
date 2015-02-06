@@ -678,7 +678,7 @@ UserSchema.statics.addPayment=function(id, method,callback){
     safePayment.type=card.issuer.toLowerCase();
     safePayment.name=method.name;
     safePayment.number=card.hiddenNumber;
-    safePayment.expiry=card.month+'/'+card.year;
+    safePayment.expiry=card.month+'/'+(2000+card.year);
     safePayment.updated=Date.now();
 
     card.publish({alias:alias},function(err,res){

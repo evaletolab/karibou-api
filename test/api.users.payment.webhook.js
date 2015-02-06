@@ -79,7 +79,7 @@ describe("api.users.payment", function(){
           user.payments[0].type.should.equal(pspWebhook.BRAND.toLowerCase())
           user.payments[0].name.should.equal(pspWebhook.CN)
           user.payments[0].number.should.equal(pspWebhook.CARDNO)
-          user.payments[0].expiry.should.equal(pspWebhook.ED)
+          user.payments[0].expiry.should.equal('7/2019')
           done()
         })
       });
