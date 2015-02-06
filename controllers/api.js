@@ -7,6 +7,7 @@ var _ = require('underscore'),
     sm = require('sitemap'),
     db = require('mongoose'),
     payment = require('../app/payment'),
+    debug = require('debug')('api'),
     errorHelper = require('mongoose-error-helper').errorHelper;
     origins=[]
 
@@ -205,25 +206,27 @@ exports.psp=function(req,res){
   //
   // checks webhook config 
   if(!config.admin.webhook||!config.admin.webhook.secret){
-    return res.send(401)
+    return res.send(401);
   }
 
   //
   // check webhook secret
   if(config.admin.webhook.secret!==req.params.token){
-    return res.send(401)
+    return res.send(401);
   }
 
+  debug("webhook payload ",req.body);
+
   // check action is createAlias
-  if(!req.body.createAlias){
-    return res.send(400,'Unsupported action')
+  if(!req.body.createAlias ||!req.body.ALIAS){
+    return res.send(400,'Unsupported action');
   }
 
 
   //
   // validate SHA
   if(!payment.for(req.body.BRAND).isValidSha(req.body)){
-    return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.")
+    return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.");
   }
 
   var alias=(req.body.user+req.body.BRAND.toLowerCase()).hash(), safePayment={}
