@@ -165,9 +165,12 @@ Orders.statics.print=function(order){
   console.log("---      created       ",  self.created);
   console.log("---      user          ",  self.email);
   console.log("---      rank          ",  self.rank);
-  if(self.items)
-  console.log("---      items         ",  self.items.map(function(i){ return i.sku}).join(','));
-  console.log("---      quantity      ",  self.items.map(function(i){ return i.quantity}).join(','));
+  if(self.items){
+    console.log("---      items           ",  self.items.map(function(i){ return i.sku}).join(','));
+    console.log("---      + finaleprice   ",  self.items.map(function(i){ return i.finalprice}).join(','));
+    console.log("---      + quantity      ",  self.items.map(function(i){ return i.quantity}).join(','));
+    console.log("---      + status        ",  self.items.map(function(i){ return i.fulfillment.status}).join(','));
+  }
   if(self.vendors){
     console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(','));
     console.log("---      collected     ",  self.vendors.map(function(v){ return v.collected}).join(','));
@@ -226,10 +229,14 @@ Orders.methods.getTotalPrice=function(factor){
   this.items&&this.items.forEach(function(item){
     //
     // item should not be failure (fulfillment)
-    if(item.fulfillment!=='failure'){
+    if(item.fulfillment.status!=='failure'){
       total+=item.finalprice;
     }
   });
+
+  // before the payment fees! 
+  // add shipping fees (10CHF)
+  total+=config.shop.marketplace.shipping;
 
   //
   // add gateway fees
@@ -244,8 +251,6 @@ Orders.methods.getTotalPrice=function(factor){
   // add mul factor
   factor&&(total*=factor);
 
-  // add shipping fees (10CHF)
-  total+=config.shop.marketplace.shipping;
 
   return parseFloat((Math.round(total*20)/20).toFixed(2));
 }
@@ -1211,7 +1216,7 @@ Orders.statics.updateItem = function(oid,items, callback){
           // this item has bean removed from the order
           if(item.fulfillment.status==='failure'){
             rollback.push({sku:item.sku,qty:item.quantity})
-            order.items[i].finalprice=item.finalprice=0.0;
+            //order.items[i].finalprice=item.finalprice=0.0;
           }
           itemIds.push(order.items[i].sku);
           break;

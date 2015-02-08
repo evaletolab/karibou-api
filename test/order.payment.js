@@ -28,6 +28,7 @@ describe("orders.payment", function(){
 
 
   before(function(done){
+    config.shop.order.gateway[5].fees=0.02
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.payment.js"],db,function(err){
         should.not.exist(err);
@@ -44,6 +45,7 @@ describe("orders.payment", function(){
 
   
   after(function(done){
+    config.shop.order.gateway[5].fees=0
     dbtools.clean(function(){    
       config.shop.order.timelimitH=timelimitH;
       config.shop.order.timelimit=timelimit;
@@ -51,6 +53,30 @@ describe("orders.payment", function(){
       done();
     });    
   });
+
+
+  it("Compute issuer fees", function(done){
+    payment.issuerFees('postfinance card',1).should.equal(config.shop.order.gateway[0].fees);
+    payment.issuerFees('postfinance card',(1).toFixed(2)).should.equal(config.shop.order.gateway[0].fees);
+    payment.issuerFees('postfinance card',(36.10).toFixed(2)).toFixed(2).should.equal((config.shop.order.gateway[0].fees*36.10).toFixed(2));
+    payment.issuerFees('postfinance card','1.00').should.equal(config.shop.order.gateway[0].fees);
+    payment.issuerFees('american express','10').should.equal(config.shop.order.gateway[1].fees*10);
+    payment.issuerFees('visa',1).should.equal(config.shop.order.gateway[2].fees);
+    payment.issuerFees('paypal',1).should.equal(config.shop.order.gateway[4].fees);
+    payment.issuerFees('invoice',1).should.equal(config.shop.order.gateway[5].fees);
+    payment.issuerFees('bitcoin',1).should.equal(config.shop.order.gateway[6].fees);
+    done();
+  });   
+
+
+  it("Check order amount and fees", function(done){
+    Orders.findOne({oid:2000007}).select('+payment.transaction').exec(function (e,order) {
+      payment.issuerFees(order.payment.issuer,order.getTotalPrice().toFixed(2)).should.equal(0.02*order.getTotalPrice().toFixed(2));
+      // console.log(order.payment.issuer, order.getTotalPrice().toFixed(2))
+      done();
+
+    })
+  })  
 
   // order state is failure
   it("Voided state can not be changed", function(done){

@@ -142,12 +142,10 @@ exports.login_post=function(req, res, next) {
 
   try{
       if(req.user){
-        throw new Error("Une session est déjà ouverte")
+        return res.json(req.user)
       }
-
       validate.authenticate(req.body)
   }catch(err){  
-    console.log("ERROR",err.message)    
     return res.send(400, err.message);
   }  
   

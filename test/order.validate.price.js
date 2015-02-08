@@ -53,7 +53,7 @@ describe("orders.find.shop", function(){
       should.not.exist(err)
       // item!='failure' => E(item.price) + gateway fees + shipping fees
       // this order contains only shipping
-      order[0].getTotalPrice().should.equal(30.6)
+      order[0].getTotalPrice().should.equal(30.85)
       done();
     });
   });
@@ -61,16 +61,26 @@ describe("orders.find.shop", function(){
   it("check order price (postfinance+items+shipping) ", function(done){
     db.model('Orders').find({oid:2000006}, function(err,order){
       should.not.exist(err)
-      order[0].getTotalPrice().should.equal(30.4)
+      order[0].getTotalPrice().should.equal(30.6)
       done();
     });
   });
 
 
+  // it("check order price (postfinance+items(failure)+shipping) ", function(done){
+  //   db.model('Orders').find({oid:2000006}, function(err,order){
+  //     should.not.exist(err)
+  //     order[0].getTotalPrice().should.equal(30.6)
+  //     // order[0].print();
+  //     done();
+  //   });
+  // });
+
   it("check order price (postfinance+items(failure)+shipping) ", function(done){
-    db.model('Orders').find({oid:2000006}, function(err,order){
+    db.model('Orders').find({oid:2000007}, function(err,order){
       should.not.exist(err)
-      order[0].getTotalPrice().should.equal(30.4)
+      // order[0].print();
+      order[0].getTotalPrice().should.equal(20.6)
       done();
     });
   });

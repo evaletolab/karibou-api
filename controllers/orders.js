@@ -360,7 +360,6 @@ exports.create=function(req,res){
           order:order,
           created:order.getDateString(order.created),
           shippingFees:config.shop.marketplace.shipping,
-          subTotal:order.getSubTotal(),
           paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),

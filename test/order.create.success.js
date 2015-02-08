@@ -117,6 +117,14 @@ describe("orders.create.success", function(){
       // check that vendor is correct
       order.vendors.length.should.be.above(1)
 
+      // check subtotal
+      //config.shop.marketplace.shipping
+      //order.payment.issuer
+      order.getSubTotal().should.equal(28.8)
+      // check total with fees
+      order.getTotalPrice().should.equal(39.6)
+
+
       order.rollbackProductQuantityAndSave('timeout',function(err,order){
         should.not.exist(err)
         done();                  
