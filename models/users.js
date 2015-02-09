@@ -90,7 +90,7 @@ validate.postal = function (value) {
     }],
 
     /* preferred products*/
-    likes: [{type: Schema.Types.ObjectId, ref : 'Products'}],
+    likes: [Number],
 
     /* The available Shop for this user */
     shops: [{type: Schema.Types.ObjectId, ref : 'Shops'}],
@@ -180,7 +180,7 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
 
 UserSchema.statics.findByEmail = function(email, success, fail){
-  return this.model('Users').findOne({'email.address':email}).populate('shops').populate('likes').exec(function(err,user){
+  return this.model('Users').findOne({'email.address':email}).populate('shops').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -190,7 +190,7 @@ UserSchema.statics.findByEmail = function(email, success, fail){
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
-  return this.model('Users').findOne({provider:token}).populate('shops').populate('likes').exec(function(err,user){
+  return this.model('Users').findOne({provider:token}).populate('shops').exec(function(err,user){
     if(err){
       fail(err)
     }else{
@@ -273,16 +273,19 @@ UserSchema.methods.hasRole = function (role) {
  return false;
 };
 
-UserSchema.methods.addLikes = function(product, callback){
-  var u=this;
-  u.likes.push(product);
-  u.save(callback);
+UserSchema.methods.addLikes = function(sku, callback){
+  var user=this;
+  user.likes.push(sku);
+  return user.save(callback);
 };
 
-UserSchema.methods.removeLikes = function(product, callback){
-  var u=this;
-  u.likes.pop(product);
-  u.save(callback);
+UserSchema.methods.removeLikes = function(sku, callback){
+  var idx=this.likes.indexOf(parseInt(sku))
+  if(idx===-1){
+    return callback(null,this)
+  }
+  this.likes=this.likes.slice(parseInt(sku),1);
+  return this.save(callback);
 };
 
 //
@@ -290,7 +293,7 @@ UserSchema.methods.removeLikes = function(product, callback){
 UserSchema.statics.like=function(id,sku,callback){
   var Users=this.model('Users'), Products=this.model('Products');
 
-  return Users.findOne({id:id}).populate('likes').exec(function (err, user) {
+  return Users.findOne({id:id}).exec(function (err, user) {
 
     if(err){
       return callback(err);
@@ -299,15 +302,19 @@ UserSchema.statics.like=function(id,sku,callback){
       return callback("Utilisateur inconnu");
     }
 
-    // remove like?
-    var product=_.find(user.likes, function(p){return p.sku==sku});
-    if (product){
-        return user.removeLikes(product,callback)
-    }
 
-    return Products.findOneBySku(sku,function(err,product){
-      return user.addLikes(product,callback)
-    })
+
+    // remove like?
+    // var product=_.find(user.likes, function(p){return p.sku==sku});
+    if (user.likes&&user.likes.indexOf(sku)!==-1){
+        return user.removeLikes(sku,callback)
+    }
+    return user.addLikes(sku,callback)
+
+
+    // return Products.findOneBySku(sku,function(err,product){
+    //   return user.addLikes(product,callback)
+    // })
 
   });
 };
@@ -371,7 +378,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 UserSchema.statics.authenticate=function(email, password, callback) {
   var self=this;
 
-  return this.model('Users').findOne({ 'email.address': email }).populate('shops').populate('likes').exec(function(err,user){
+  return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
 
       // on user is Null
@@ -461,7 +468,7 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 	var Users=this.model('Users');
 
 
-  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').exec(function (err, user) {
     if(err){
       return callback(err);
     }
@@ -498,7 +505,7 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 UserSchema.statics.findAndUpdate=function(id, u,callback){
 	var Users=this.model('Users');
   //http://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
-  return Users.findOne(id).populate('shops').populate('likes').exec(function (err, user) {
+  return Users.findOne(id).populate('shops').exec(function (err, user) {
     if(err){
       return callback(err);
     }

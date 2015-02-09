@@ -55,18 +55,19 @@ exports.ensureMeOrAdmin=function(req, res, next) {
 
 
 exports.me = function (req, res, next)  {
-  res.json(req.user);
-  // Users.findOne({_id:req.user._id}).
-  //   populate('shops','likes').exec(function(err,user){
-  //     res.json(user);
-  // });
+  //
+  // res.json(req.user);
+  Users.findOne({_id:req.user._id}).
+      populate('shops').exec(function(err,user){
+      res.json(user);
+  });
 };
 
 
 exports.list = function (req, res, next)  {
   //
   // TODO add criteria
-  Users.find({}).populate('shops','likes').exec(function(err,users){
+  Users.find({}).populate('shops').exec(function(err,users){
       if (err){
         return res.send(400,errorHelper(err));
       }
@@ -279,7 +280,7 @@ exports.unlike=function(req,res){
 exports.like=function(req,res){
 
   try{
-    validate.check(req.params.sku).isInt();
+    validate.check(req.params.sku,'Invalid SKU').isInt();
   }catch(err){
     return res.send(400, err.message);
   }
@@ -288,7 +289,7 @@ exports.like=function(req,res){
     if (err){
       return res.send(400,errorHelper(err));
     }
-    req.user.likes=user.likes;
+    // req.user.likes=user.likes;
     return res.json(user);
   });
 

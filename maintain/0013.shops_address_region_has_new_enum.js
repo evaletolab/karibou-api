@@ -31,28 +31,28 @@
 exports.execute = function(db, script, callback){
 	console.log(script,"Convert all shop.address.region $ => .*GE$");
   var logs="", count=0;
-  var shops=db.collection('shops');
+  var Shops=db.collection('shops');
   var tosave=false, errs=[],logs=[];
 
 	
-  shops.find( {"address.region":{$not:/GE$/}}).toArray(function (err,u) {
-    if (!u.length){
-      return callback(null, "0 shop have been updated")
+  Shops.find( {"address.region":{$not:/GE$/}}).toArray(function (err,shops) {
+    if (!shops.length){
+      return callback(null, "0 shops have been updated")
     }
-    console.log(script,"updating region addresse: "+u.length );
+    console.log(script,"updating region addresse: "+shops.length );
 
-    u.forEach(function(shop){
+    shops.forEach(function(shop){
       if(!/.*(Genève|France)$/.test(shop.address.region)){
         shop.address.region=shop.address.region+',GE'
-        shops.update({urlpath:shop.urlpath},shop,function(err){
-          if(errs)errs.push(err);
+        Shops.update({urlpath:shop.urlpath},shop,function(err){
+          if(err)errs.push(err);
         })
 
       }
 
     })
 
-    callback(errs.join(','), u.length+" shops have been updated");
+    callback(errs.join(','), shops.length+" shops have been updated");
 
   }); 
 

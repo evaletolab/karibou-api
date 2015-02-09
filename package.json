@@ -23,7 +23,7 @@
     "mocha-lcov-reporter": "0.0.1",
     "moment": "2.x",
     "mongodb": "1.x",
-    "mongoose": "^3.8.x",
+    "mongoose": "3.8.x",
     "mongoose-error-helper": "0.x",
     "mongoose-validate": "x",
     "newrelic": "1.x",

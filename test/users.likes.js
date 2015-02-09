@@ -34,15 +34,15 @@ describe("users.likes", function(){
       },
       function(user,cb){
         db.model('Products').findOneBySku(data.Products[0].sku,function(err,product){
-          user.addLikes(product,function(err){
+          user.addLikes(product.sku,function(err){
             cb(err);
           });
         });
       }
       ,
       function(cb){
-        Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
-          should.exist(user.likes);
+        Users.findOne({"email.address":"evaleto@gluck.com"}).exec(function(err,user){
+          should.exist(user.likes.length);
           //console.log(user);
           cb(null,user);
         });
@@ -51,7 +51,7 @@ describe("users.likes", function(){
       function(err,user){
         should.not.exist(err);
         //FIXME once likes was NULL ??? check this if it repeats
-        user.likes[0].title.should.equal(data.Products[0].title);
+        user.likes[0].should.equal(data.Products[0].sku);
         done();
       });
   });
@@ -60,10 +60,10 @@ describe("users.likes", function(){
     Users.findOne({"email.address":"evaleto@gluck.com"},function(err,user){
         should.exist(user);
         db.model('Products').findOneBySku(data.Products[0].sku,function(err,product){
-          user.removeLikes(product, function(err){
+          user.removeLikes(product.sku, function(err){
             should.not.exist(err)
-            Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
-              (user.likes.length===0).should.equal(true);
+            Users.findOne({"email.address":"evaleto@gluck.com"}).exec(function(err,user){
+              user.likes.length.should.equal(0);
               done();
             });
 
@@ -82,7 +82,7 @@ describe("users.likes", function(){
       },
       function(user,cb){
         db.model('Products').findOneBySku(data.Products[0].sku,function(err,product){
-          user.addLikes(product,function(err){
+          user.addLikes(product.sku,function(err){
             cb(err,user, product);
           });
         });
@@ -94,8 +94,8 @@ describe("users.likes", function(){
           });
       },
       function(user,product,cb){
-          Users.findOne({"email.address":"evaleto@gluck.com"}).populate("likes").exec(function(err,user){
-            (user.likes.length===0).should.equal(true);
+          Users.findOne({"email.address":"evaleto@gluck.com"}).exec(function(err,user){
+            user.likes.length.should.equal(0);
             done();
           });
       }

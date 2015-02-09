@@ -155,6 +155,10 @@ Product.methods.removeCategories=function(cats,callback){
 
 */
 
+Product.post('remove',function (product) {
+  console.log('------------------- remove',product.sku)
+})
+
 Product.methods.getPrice=function(){
   if(this.attributes.discount && this.pricing.discount)
     return this.pricing.discount;

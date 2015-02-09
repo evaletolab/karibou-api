@@ -85,8 +85,8 @@ exports.create=function (req, res) {
 
 
 exports.love=function (req, res) {
-  var skus=_.collect(req.user.likes,function(p){return p.sku;})
-  Products.findBySkus(skus,function(err,products){
+  // var skus=_.collect(req.user.likes,function(p){return p.sku;})
+  Products.findBySkus(req.user.likes,function(err,products){
     if (err) {
       return res.send(400,err);
     }
@@ -274,6 +274,7 @@ exports.remove=function (req, res) {
     return res.send(400, err.message);
   }  
 
+  //TODO remove do not trigger post middleware, use find and remove
   Products.remove({sku:req.params.sku},function(err){
     if (err){
     	res.status(400);
