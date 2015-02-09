@@ -3,7 +3,7 @@
  */
 
 var express = require('express')
-  , mongoStore = require('connect-mongo')(express)
+  , MongoStore = require('connect-mongo')(express)
   , bus = require('../app/bus')
   , methodOverride = require('method-override')
   , helmet=require('helmet')
@@ -147,13 +147,11 @@ var tokenSession=function (req, res, next) {
 
     // express/mongo session storage
     if (config.express.mongoSession){
+      var mongoose=require("mongoose");
       app.use(express.session({
         secret: config.middleware.session.secret,
         maxAge:config.middleware.session.cookie.maxAge,
-        store: new mongoStore({
-          url: config.mongo.name,
-          collection : 'sessions'
-        })
+        store: new MongoStore({db: mongoose.connection.db})
       }))
     }
 

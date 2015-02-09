@@ -41,7 +41,7 @@ var express = require('express')
 
 //
 // open database
-mongoose.connect(config.mongo.name,{server:{auto_reconnect:true}},function(e){  
+mongoose.connect(config.mongo.name,{server:{safe:true, auto_reconnect:true}},function(e){  
     //double check for database drop
     console.log("boot[",new Date(),"] :",mongoose.connection.db.databaseName, config.mongo.name)
 
