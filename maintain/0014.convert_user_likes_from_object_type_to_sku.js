@@ -33,7 +33,7 @@ exports.execute = function(db, script, callback){
   var logs="", count=0,mapping={};
   var Products=db.collection('products');
   var Users=db.collection('users');
-  var tosave=false, errs=['testing'],logs=[];
+  var tosave=false, errs=[],logs=[];
 
   // find all
   db.collection('products').find({}).toArray(function (err,products) {
