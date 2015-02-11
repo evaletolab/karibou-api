@@ -135,6 +135,7 @@ exports.email=function(req,res){
     var content={};
     content.user=req.user;
     content.text=req.body.content;
+    content.product=req.body.product;
     content.origin=req.header('Origin')||config.mail.origin;
 
     //

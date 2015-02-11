@@ -156,7 +156,13 @@ Product.methods.removeCategories=function(cats,callback){
 */
 
 Product.post('remove',function (product) {
-  console.log('------------------- remove',product.sku)
+  //
+  // clean likes for all users
+  db.model('Users').find({'likes':product.sku}).exec(function (err,users) {
+    users.forEach(function (user) {
+      user.removeLikes(product.sku)
+    })
+  })
 })
 
 Product.methods.getPrice=function(){

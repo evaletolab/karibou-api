@@ -275,12 +275,14 @@ exports.remove=function (req, res) {
   }  
 
   //TODO remove do not trigger post middleware, use find and remove
-  Products.remove({sku:req.params.sku},function(err){
+  Products.find({sku:req.params.sku},function(err,product){
     if (err){
     	res.status(400);
       return res.json(err);    
     }
-    return res.send(200);
+    product.remove(function () {
+      return res.send(200);
+    })
   });
 };
 

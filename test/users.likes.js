@@ -89,9 +89,13 @@ describe("users.likes", function(){
       }
       ,
       function(user, product,cb){
-          db.model('Products').remove({},function(err){
-            cb(err,user,product);
-          });
+          db.model('Products').findOne({sku:data.Products[0].sku},function (e,product) {
+            product.remove(function(err){
+              setTimeout(function() {
+                cb(err,user,product);                
+              }, 100);
+            });
+          })
       },
       function(user,product,cb){
           Users.findOne({"email.address":"evaleto@gluck.com"}).exec(function(err,user){

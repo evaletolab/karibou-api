@@ -6,6 +6,7 @@ var _ = require('underscore'),
     bus=require('../app/bus'),
     sm = require('sitemap'),
     db = require('mongoose'),
+    validate = require('./validate/validate'),
     payment = require('../app/payment'),
     debug = require('debug')('api'),
     errorHelper = require('mongoose-error-helper').errorHelper;
@@ -82,6 +83,74 @@ exports.message = function(req, res) {
     res.json({});
 };
 
+
+//
+// TODO multiple implement of send email, refactor it?
+exports.email=function(req,res){
+  try{
+    validate.ifCheck(req.body.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
+    validate.ifCheck(req.body.email,'Le format de l\'email n\'est pas valide').len(3, 164).isEmail();
+    validate.ifCheck(req.body.content,"Le votre message n'est pas valide (entre 1 et 600 caractères)").len(1, 600).isText();
+    validate.ifCheck(req.body.product,"Le nom du produit n'est pas valide (entre 1 et 200 caractères)").len(1, 200).isText();
+    if(!req.user&&!req.body.email)throw new Error("Vous devez avoir une identité");
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  var content={};
+  content.user=req.user&&req.user.name.givenName||'Anonyme';
+  content.email=req.body.email||req.user.email.address;
+  content.text=req.body.text;
+  content.subject=req.body.subject;
+  content.product=req.body.product;
+  content.withHtml=true;
+  content.origin=req.header('Origin')||config.mail.origin;
+
+  //
+  // send email @karibou
+  if(!req.body.shopname){
+    content.mood=req.body.mood;
+    return bus.emit('sendmail',config.mail.info,
+                 "Un utilisateur à une question pour Karibou ",
+                 content,
+                 "karibou-question", function(err, status){
+      if(err){
+        return res.send(400,errorHelper(err));
+      }
+
+      res.json({});
+    })
+
+  }
+
+  //
+  // send email @shop
+  db.model('Shops').findOne({urlpath:req.body.shopname}).populate('owner').exec(function(err,shop){
+    if (err){
+      return res.send(400,errorHelper(err));
+    }
+    if(!shop){
+      return res.send(400,"Cette boutique n'existe pas");
+    }
+
+    //
+    //
+
+    //
+    // send email
+    bus.emit('sendmail',shop.owner.email.address,
+                 "Un utilisateur à une question pour votre boutique "+shop.name,
+                 content,
+                 "karibou-question", function(err, status){
+      if(err){
+        return res.send(400,errorHelper(err));
+      }
+
+      res.json({});
+    })
+
+  });
+}
 
 
 exports.sessions = function(req, res) {
