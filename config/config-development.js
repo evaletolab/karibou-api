@@ -8,6 +8,7 @@ module.exports = {
   mail:{
     from:'james@karibou.io',
     to:['james@karibou.io'],
+    info:'info@karibou.ch',
     validate:{time:24,short:1},
     origin:'http://lo.cal:3000',
     default:'mandril',
@@ -31,6 +32,9 @@ module.exports = {
 
   payment:{
     reserve:1.15,
+    stripe:{
+      key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
+    },
     postfinance:{
       enabled:true,
       sandbox:true,

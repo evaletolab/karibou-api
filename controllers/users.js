@@ -8,7 +8,7 @@ var db = require('mongoose'),
     password = require('password-generator'),
     validate = require('./validate/validate'),
     errorHelper = require('mongoose-error-helper').errorHelper;
-;
+
 
 
 
@@ -69,7 +69,7 @@ exports.list = function (req, res, next)  {
   // TODO add criteria
   Users.find({}).populate('shops').exec(function(err,users){
       if (err){
-        return res.send(400,errorHelper(err));
+        return res.send(400,errorHelper(err.message||err));
       }
       users.forEach(function(user){
         user.populateRoles()
@@ -199,7 +199,7 @@ exports.update=function(req,res){
       if(err.code==11001){
         return res.send(400,"Cette adresse email est déjà utilisée");
       }
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json(user);
   });
@@ -219,7 +219,7 @@ exports.addPayment=function(req,res){
 
   Users.addPayment(req.params.id,req.body,function(err,user){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json(user);
   });
@@ -235,7 +235,7 @@ exports.deletePayment=function(req,res){
 
   Users.deletePayment(req.params.id,req.params.alias,function(err){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json({});
   });
@@ -252,7 +252,7 @@ exports.updatePayment=function(req,res){
 
   Users.updatePayment(req.params.id,req.params.alias, req.body,function(err,payment){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json(payment);
   });
@@ -270,7 +270,7 @@ exports.unlike=function(req,res){
 
   Users.unlike(req.params.id,params.sku,function(err,user){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json(user);
   });
@@ -287,7 +287,7 @@ exports.like=function(req,res){
 
   Users.like(req.user.id, req.params.sku,function(err,user){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     // req.user.likes=user.likes;
     return res.json(user);
@@ -307,7 +307,7 @@ exports.status=function(req,res){
 
   Users.updateStatus({id:req.params.id},req.body.status,function(err,user){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     return res.json(user);
   });
@@ -322,7 +322,7 @@ exports.remove= function(req, res) {
     return res.send(400, err.message);
   }
   Users.findOne({id:req.params.id},function(err,user){
-    if (err){return res.send(400,errorHelper(err))}
+    if (err){return res.send(400,errorHelper(err.message||err))}
 
     if(!user){return res.send(400,"L'utilisateur n'existe pas")}
 
@@ -332,7 +332,7 @@ exports.remove= function(req, res) {
     }
 
     user.remove(function(err){
-      if (err){return res.send(400,errorHelper(err))}
+      if (err){return res.send(400,errorHelper(err.message||err))}
       return res.send(200);
     });
 

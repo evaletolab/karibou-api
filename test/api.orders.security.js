@@ -146,7 +146,7 @@ describe("api.orders.security", function(){
  it("POST new /v1/orders should return 401 for payment that doesn't belongs to logged user", function(done){
     var items=[]
       , customer=data.Users[1]
-      , payment={alias:((customer.id+"postfinance").hash().crypt()),issuer:"postfinance",number:'12xxxxxxx3456'};
+      , payment={alias:((customer.id+"postfinance card").hash().crypt()),issuer:"postfinance card",number:'12xxxxxxx3456'};
 
 
     items.push(Orders.prepare(data.Products[0], 2, ""))

@@ -356,14 +356,15 @@ exports.create=function(req,res){
       .then(function(order){
         //
         // prepare and send mail
+        var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
         var mail={
           order:order,
           created:order.getDateString(order.created),
-          shippingFees:config.shop.marketplace.shipping,
-          paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+          shippingFees:shippingFees,
+          paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),
-          subTotal:order.getSubTotal().toFixed(2),
+          subTotal:subTotal.toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
           withHtml:true
         };
@@ -502,20 +503,20 @@ exports.capture=function(req,res){
       return res.json(400, "La commande "+req.params.oid+" n'existe pas.");
     }
 
-
     payment.for(order.payment.issuer).capture(order)
       .then(function(order){
 
         //
         // prepare and send mail
+        var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
         var mail={
           order:order,
           created:order.getDateString(order.created),
-          shippingFees:config.shop.marketplace.shipping,
-          paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+          shippingFees:shippingFees,
+          paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),
-          subTotal:order.getSubTotal().toFixed(2),
+          subTotal:subTotal.toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
           withHtml:false
         };
@@ -700,6 +701,7 @@ exports.invoicesByUsers=function(req,res){
     }
 
     var amount=0,total=0,shipping=0;
+    var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
 
     //
     // oid, date, customer, amount, fees, fees, total
@@ -709,9 +711,9 @@ exports.invoicesByUsers=function(req,res){
         oid:order.oid,
         shipping:Orders.formatDate(order.shipping.when),
         customer:order.email,
-        amount:order.getSubTotal().toFixed(2),
-        shippingFees:config.shop.marketplace.shipping,
-        paymentFees:payment.issuerFees(order.payment.issuer,order.getTotalPrice()).toFixed(2),
+        amount:subTotal.toFixed(2),
+        shippingFees:shippingFees,
+        paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
         payment:order.payment.status,
         total:order.getTotalPrice().toFixed(2)
       })

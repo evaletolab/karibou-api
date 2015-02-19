@@ -68,7 +68,7 @@ describe("api.users.payment", function(){
 
 
 
-  it('PSP webhook create payment for postfinance card',function(done){
+  it.skip('PSP webhook create payment for postfinance card',function(done){
     request(app)
       .post('/v1/psp/qawsedr/webhook')
       .send(pspWebhook)
@@ -85,7 +85,7 @@ describe("api.users.payment", function(){
       });
   });
 
-  it('second PSP webhook got error payment already exist',function(done){
+  it.skip('second PSP webhook got error payment already exist',function(done){
     request(app)
       .post('/v1/psp/qawsedr/webhook')
       .send(pspWebhook)

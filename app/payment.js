@@ -2,12 +2,15 @@
 
 var Payment=function(){
 	this.postfinance =require('./payment.postfinance')(this)
+	this.stripe =require('./payment.stripe')(this)
 	this.invoice =require('./payment.invoice')(this)
 }
 
 Payment.prototype.for=function(issuer){
-	if(issuer && ['postfinance card','american express','visa','mastercard','paypal'].indexOf(issuer.toLowerCase())!==-1){
+	if(issuer && ['postfinance card','paypal'].indexOf(issuer.toLowerCase())!==-1){
 		return this.postfinance;
+	}else if(issuer && ['american express','visa','mastercard'].indexOf(issuer.toLowerCase())!==-1){
+		return this.stripe;
 	}else if(issuer==='invoice'){
 		return this.invoice;
 	}else if(issuer==='bitcoin'){
@@ -29,9 +32,6 @@ Payment.prototype.issuerFees=function(issuer, amount){
 }
 
 
-Payment.prototype.authorize=function(){
-	
-}
 
 
 module.exports=new Payment()

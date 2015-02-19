@@ -270,6 +270,8 @@ exports.github=function(req,res){
 // PSP callback /v1/psp/:token/webhook
 // only used for online alias creation
 // we can save POstfinance Card payment method one we get a valid webhook
+// FIXME this should be in the postfinance module 
+/*
 exports.psp=function(req,res){
 
   //
@@ -343,3 +345,5 @@ exports.pspForm=function(req,res){
 exports.pspStd=function(req,res){
   res.render('pspstd');
 }
+
+*/

@@ -39,6 +39,7 @@
     "q": "^1.1.2",
     "queue-async": "~1.0.7",
     "sitemap": "^0.7.4",
+    "stripe": "^3.2.0",
     "underscore": "1.x",
     "validator": "3.x"
   },

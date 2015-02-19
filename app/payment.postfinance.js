@@ -25,9 +25,23 @@ var PaymentPostfinance=function(_super){
 
 //
 // verify if an alias belongs to the user
-PaymentPostfinance.prototype.isValidAlias=function(alias, id, method){
-  return ((id+method.toLowerCase()).hash().crypt()===alias);
+PaymentPostfinance.prototype.isValidAlias=function(alias, user, method){
+  return ((user.id+method.toLowerCase()).hash().crypt()===alias);
 }
+
+//
+// verify if an alias is valid and decode it
+PaymentPostfinance.prototype.decodeAlias=function(alias, user, method){
+	try{
+		if((user.id+method).hash().crypt()!==alias){
+			return false;
+		}
+		return {id:user.id,gateway_id:null,card_id:null}
+	}catch(e){
+		return false;
+	}
+}
+
 
 //
 // check if method fields are ok
@@ -36,7 +50,7 @@ PaymentPostfinance.prototype.isPaymentObjectValid=function(payment){
 }
 
 PaymentPostfinance.prototype.alias=function(id,payment){
-  return payment.alias;
+  return (id+payment.issuer.toLowerCase()).hash().crypt();
 }
 
 PaymentPostfinance.prototype.isValidSha=function (payload) {
@@ -111,6 +125,40 @@ PaymentPostfinance.prototype.card=function(payment, callback){
     return callback(e)
   }
 
+
+}
+
+PaymentPostfinance.prototype.addCard=function (user,payment) {
+	var deferred = Q.defer(), self=this, result={};
+
+  // try to build the card
+  return this.card(method,function(err, postfinance, card){
+    
+    if(err){
+      return Q.reject(new Error(err.message))
+    }
+
+
+    // for security reason alias is crypted
+    var alias=(id+card.issuer.toLowerCase()).hash()
+    result.alias=alias.crypt();
+    result.issuer=card.issuer.toLowerCase();
+    result.name=method.name;
+    result.number=card.hiddenNumber;
+    result.expiry=card.month+'/'+(2000+card.year);
+    result.updated=Date.now();
+
+    card.publish({alias:alias},function(err,res){
+      if(err){
+		    return deferred.reject(err.message);
+      }
+
+      return deferred.resolve(result)
+    })
+
+		// return promise
+		return deferred.promise;
+  });
 
 }
 

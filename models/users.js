@@ -105,8 +105,11 @@ validate.postal = function (value) {
     //   name:{type:String},
     //   number:{type:String},
     //   expiry:{type:String},
+    //   id:{type:String,unique:true,required:true},
     //   alias:{type:String,unique:true,required:true}
     // }],
+
+    gateway_id    : {type:String, unique: true, select:false},
 
     /* make user valid/invalid */
     status:{type:Boolean, default: true},
@@ -566,29 +569,26 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
 
 //
 // update user payment
+// TODO implement update payment 
+/*
 UserSchema.statics.updatePayment=function(id, alias, method,callback){
   var Users=this.model('Users');
 
-  payment.postfinance.card(method,function(err, postfinance, card){
-    if(err){
-      return callback(err.message)
-    }
-
     //
-    // check if payment card changed? 
-    if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
-      return callback(new Error("Vous ne pouvez pas changer de type de carte"))
+    // check if payment method as changed? 
+    if(payment.for(method.issuer).alias(id,method)!==method.alias.crypt()){
+      return callback(new Error("Vous ne pouvez pas changer de méthode de paiement"))
     } 
 
     var result={
-      type:card.issuer.toLowerCase(),
-      name:payment.name,
-      number:card.hiddenNumber,
-      expiry:payment.expiry
+      issuer:method.issuer.toLowerCase(),
+      name:method.name,
+      number:method.number,
+      expiry:method.expiry
     }
     // update user data
     return Users.update({id: id,'payments.alias':alias.crypt()}, {'$set': {
-      'payments.$.type': result.type,
+      'payments.$.issuer': result.issuer,
       'payments.$.name': result.name,
       'payments.$.number': result.number,
       'payments.$.expiry': result.expiry,
@@ -602,18 +602,160 @@ UserSchema.statics.updatePayment=function(id, alias, method,callback){
       return callback(err,result)
     });
 
-  })
-
 }
+*/
 
 //
 // verify if an alias belongs to this user
 UserSchema.methods.isValidAlias=function(alias, method){
-  return ((this.id+method.toLowerCase()).hash().crypt()===alias);
+  return payment.for(method).isValidAlias(alias,this, method)
 }
 
-UserSchema.statics.isValidAliasWithId=function(alias, id, method){
-  return ((id+method.toLowerCase()).hash().crypt()===alias);
+
+//
+// delete user payment
+UserSchema.statics.deletePayment=function(id, alias,callback){
+  var Users=this.model('Users'), aliasDecrypted;
+  Users.findOne({id: id}).select('+gateway_id').exec(function(err,user){
+    if(err){return callback(err)}
+    if(!user){return callback("Utilisateur inconnu");}
+    payment.stripe.removeCard(user, alias).then(function (confirmation) {
+      Users.update({id: id, 'payments.alias':alias},{$pull: {payments:{alias:alias}}},{safe:true},
+      function(err, n,stat){
+        if(n===0){
+          bus.emit('system.message',"[karibou-danger] update user after deleting payment: ",{stat:stat,user:id, alias:alias});
+        }
+        return callback()
+      });
+    })
+    .fail(function(err) {
+      bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:alias});
+      return callback(err)
+    })
+  });
+
+}
+
+//
+// add payment
+UserSchema.statics.addPayment=function(id, method,callback){
+  var Users=this.model('Users'), safePayment={};
+  Users.findOne({id: id}).select('+gateway_id').exec(function(err,user){
+    if(err){return callback(err)}
+    if(!user){return callback("Utilisateur inconnu");}
+
+    if(user.checkDuplicatePaymentIssuer(method.issuer)){
+      return callback("Cette méthode de paiement existe déjà");
+    }
+
+    // user has an id?
+    payment.for(method.issuer).addCard(user, method).then(function (card, customer_id) {
+
+      // for security reason alias is crypted
+      safePayment.alias=card.alias;
+      safePayment.issuer=card.issuer;
+      safePayment.name=card.name;
+      safePayment.number=card.number;
+      safePayment.expiry=card.expiry;
+      safePayment.updated=Date.now();
+
+      //
+      // save gateway id 
+      if(!user.gateway_id) user.gateway_id=customer_id;
+      return user.addAndSavePayment(safePayment,callback)
+
+    })
+    .fail(function (error) {
+      return callback(error)
+    })
+  
+    
+
+  });
+
+}
+
+//
+//
+UserSchema.methods.checkDuplicatePaymentIssuer=function  (issuer) {
+  var user=this;
+  if(!user.payments) return false;
+
+
+  for (var i in user.payments){
+    if(user.payments[i]&&user.payments[i].issuer===issuer.toLowerCase())return true;
+  }
+
+  return false;
+}
+
+//
+// add and save payment method
+UserSchema.methods.addAndSavePayment=function(payment,callback){
+  var user=this;
+
+  if(user.checkDuplicatePaymentIssuer(payment.issuer)){
+    return callback("Cette méthode de paiement existe déjà");
+  }
+
+  if(!user.payments) user.payments=[];
+  user.payments.push(payment)
+  return user.save(callback)
+}
+
+
+/** IMPLEMENTATION FOR POSTFINANCE **/
+/*
+//
+// add payment
+UserSchema.statics.addPayment=function(id, method,callback){
+  var Users=this.model('Users'), safePayment={};
+
+
+  // try to build the card
+  payment.postfinance.card(method,function(err, postfinance, card){
+    
+    if(err){
+      return callback(err.message)
+    }
+
+    //
+    // check if payment card changed? 
+    // if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
+    //   return callback(new Error("Vous ne pouvez pas changer de type de carte"))
+    // } 
+
+
+    // for security reason alias is crypted
+    var alias=(id+card.issuer.toLowerCase()).hash()
+    safePayment.alias=alias.crypt();
+    safePayment.issuer=card.issuer.toLowerCase();
+    safePayment.name=method.name;
+    safePayment.number=card.hiddenNumber;
+    safePayment.expiry=card.month+'/'+(2000+card.year);
+    safePayment.updated=Date.now();
+
+    card.publish({alias:alias},function(err,res){
+      if(err){
+        return callback(err.message)
+      }
+
+      // save card alias
+      Users.findOne({id: id}, function(err,user){
+        if(err){
+          // TODO alias should be removed
+          return callback(err)
+        }
+        if(!user){
+          return callback("Utilisateur inconnu");
+        }
+
+        return user.addAndSavePayment(safePayment,callback)
+      });
+
+    })
+
+  });
 }
 
 
@@ -659,71 +801,50 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
 
 }
 
+
 //
-// add payment
-UserSchema.statics.addPayment=function(id, method,callback){
-  var Users=this.model('Users'), safePayment={};
+// update user payment
+UserSchema.statics.updatePayment=function(id, alias, method,callback){
+  var Users=this.model('Users');
 
-
-  // try to build the card
   payment.postfinance.card(method,function(err, postfinance, card){
-    
     if(err){
       return callback(err.message)
     }
 
     //
     // check if payment card changed? 
-    // if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
-    //   return callback(new Error("Vous ne pouvez pas changer de type de carte"))
-    // } 
+    if((id+card.issuer.toLowerCase()).hash().crypt()!==method.alias.crypt()){
+      return callback(new Error("Vous ne pouvez pas changer de type de carte"))
+    } 
 
+    var result={
+      issuer:card.issuer.toLowerCase(),
+      name:card.name,
+      number:card.hiddenNumber,
+      expiry:card.expiry
+    }
+    // update user data
+    return Users.update({id: id,'payments.alias':alias.crypt()}, {'$set': {
+      'payments.$.issuer': result.issuer,
+      'payments.$.name': result.name,
+      'payments.$.number': result.number,
+      'payments.$.expiry': result.expiry,
+      'payments.$.updated': Date.now(),
+    }}, function(err, n, stat){
 
-    // for security reason alias is crypted
-    var alias=(id+card.issuer.toLowerCase()).hash()
-    safePayment.alias=alias.crypt();
-    safePayment.type=card.issuer.toLowerCase();
-    safePayment.name=method.name;
-    safePayment.number=card.hiddenNumber;
-    safePayment.expiry=card.month+'/'+(2000+card.year);
-    safePayment.updated=Date.now();
-
-    card.publish({alias:alias},function(err,res){
-      if(err){
-        return callback(err.message)
+      if(n===0){
+        return callback("Invalid request")
       }
 
-      // save card alias
-      Users.findOne({id: id}, function(err,user){
-        if(err){
-          // TODO alias should be removed
-          return callback(err)
-        }
-        if(!user){
-          return callback("Utilisateur inconnu");
-        }
+      return callback(err,result)
+    });
 
-        return user.addAndSavePayment(safePayment,callback)
-      });
+  })
 
-    })
-
-  });
 }
 
-//
-// add and save payment method
-UserSchema.methods.addAndSavePayment=function(payment,callback){
-  var user=this;
-  if(!user.payments) user.payments=[];
-
-  for (var i in user.payments){
-    if(user.payments[i].alias===payment.alias)return callback("Cette méthode de paiement existe déjà")
-  }
-  user.payments.push(payment)
-  return user.save(callback)
-}
-
+*/
 
 
 UserSchema.set('autoIndex', config.mongo.ensureIndex);

@@ -14,11 +14,19 @@ PaymentInvoice.prototype.card=function(payment, callback){
 
 //
 // verify if an alias belongs to the user
-PaymentInvoice.prototype.isValidAlias=function(alias, id, method){
+PaymentInvoice.prototype.isValidAlias=function(alias, user, method){
 	// no special check for now
   return true;
 }
 
+//
+// verify if an alias is valid and decode it
+PaymentInvoice.prototype.decodeAlias=function(alias, user){
+    return {id:user.id,gateway_id:null,card_id:null}
+}
+
+//
+// 
 PaymentInvoice.prototype.alias=function(id,payment){
   return ((id+payment.issuer).hash().crypt());
 }

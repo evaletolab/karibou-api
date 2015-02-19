@@ -9,6 +9,7 @@ module.exports = {
   mail:{
     from:'james@karibou.evaletolab.ch',
     to:['delphine.cluzel@gmail.com','evaleto@gmail.com'],
+    info:'info@karibou.ch',
     validate:{time:24,short:1},
     origin:'http://karibou.evaletolab.ch',
     default:'mandril',
@@ -33,6 +34,9 @@ module.exports = {
 
   payment:{
     reserve:1.15,
+    stripe:{
+      key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
+    },
     postfinance:{
       enabled:false,
       sandbox:true,

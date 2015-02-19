@@ -51,7 +51,9 @@ module.exports = function(app, config, passport) {
   //
   // user
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
-  app.get('/v1/users/:id/psp', users.ensureMe, api.pspForm);
+
+  //PSP 
+  //app.get('/v1/users/:id/psp', users.ensureMe, api.pspForm);
   app.get('/v1/users', auth.ensureAdmin, users.list);
   app.get('/v1/users/sessions', auth.ensureAdmin,api.sessions);
   app.post('/v1/users/:id', users.ensureMe,users.update);
@@ -89,8 +91,9 @@ module.exports = function(app, config, passport) {
   app.post('/v1/message/:key', api.message);
   app.post('/v1/github/webhook',api.github)
 
-  app.get ('/v1/psp/std',api.pspStd)
-  app.post('/v1/psp/:token/webhook',api.psp)
+  // PSP gateway
+  // app.get ('/v1/psp/std',api.pspStd)
+  // app.post('/v1/psp/:token/webhook',api.psp)
   
   //
   // email validation

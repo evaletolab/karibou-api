@@ -843,7 +843,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       return callback("Votre commande est incomplète, l'ordre ne peut pas êtree passé")
     } 
 
-    if(!payment.for(paymentData.issuer).isValidAlias(paymentData.alias,customer.id, paymentData.issuer)){
+    if(!payment.for(paymentData.issuer).isValidAlias(paymentData.alias,customer, paymentData.issuer)){
       return callback("Votre méthode de paiement est invalide, l'ordre ne peut pas être passé")
     }
 
@@ -935,7 +935,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       //
       // adding paymentData
       order.payment={
-        alias:payment.for(paymentData.issuer).alias(customer.id,paymentData),
+        alias:paymentData.alias,
         number:paymentData.number,
         issuer:paymentData.issuer
       };
@@ -1129,7 +1129,7 @@ Orders.statics.onCancel = function(oid, reason, callback){
     // make sure that payment issuer belongs to this customer
     try{
 
-      if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer.id, order.payment.issuer)){
+      if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer, order.payment.issuer)){
         return callback("Votre méthode de paiement est invalide, l'action ne peut pas être passée")
       }
 
