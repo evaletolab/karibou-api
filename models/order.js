@@ -63,7 +63,7 @@ var Orders = new Schema({
       number:{type:String, required:false},
       issuer:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'},
-
+      logs:[String],
       /*for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
    },
