@@ -228,7 +228,7 @@ exports.addPayment=function(req,res){
 exports.deletePayment=function(req,res){
   try{
     validate.check(req.params.id,"Invalid uid request").isInt();
-    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(3, 256)
+    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
   }catch(err){
     return res.send(400, err.message);
   }
@@ -240,6 +240,30 @@ exports.deletePayment=function(req,res){
     return res.json({});
   });
 };
+
+exports.checkPaymentMethod=function (req,res) {
+  try{
+    validate.check(req.params.id,"Invalid uid request").isInt();
+    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
+    req.body.alias&&req.body.alias.forEach(function (alias) {
+      validate.check(alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
+    })
+  }catch(err){
+    return res.send(400, err.message);
+  }
+  var alias=[req.params.alias]
+  if(req.body.alias && Array.isArray(req.body.alias)){
+    req.body.alias.forEach(function (a) {
+      alias.push(a)
+    })
+  }
+  Users.checkPaymentMethod(req.params.id,alias,function(err,result){
+    if (err){
+      return res.send(400,errorHelper(err.message||err));
+    }
+    return res.json(result);
+  });
+}
 
 exports.updatePayment=function(req,res){
   try{

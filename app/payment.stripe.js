@@ -7,6 +7,47 @@ var stripe = require("stripe")(config.payment.stripe.key);
 //config.payment.stripe.key
 var settings={};
 
+function parseError(err) {
+	var errorMessages = {
+	  incorrect_number: "Le numéro de carte est incorrect.",
+	  invalid_number: "The card number is not a valid credit card number.",
+	  invalid_expiry_month: "The card's expiration month is invalid.",
+	  invalid_expiry_year: "The card's expiration year is invalid.",
+	  invalid_cvc: "The card's security code is invalid.",
+	  expired_card: "The card has expired.",
+	  incorrect_cvc: "The card's security code is incorrect.",
+	  incorrect_zip: "The card's zip code failed validation.",
+	  card_declined: "The card was declined.",
+	  missing: "There is no card on a customer that is being charged.",
+	  processing_error: "An error occurred while processing the card.",
+	  rate_limit:  "An error occurred due to requests hitting the API too quickly. Please let us know if you're consistently running into this error."
+	};
+
+	//
+	// get an email on error
+  bus.emit('system.message',"[karibou-danger] stripe error: ",{error:err.message,type:err.type, param:err.param,code:err.code});
+
+	switch (err.type) {
+	  case 'StripeCardError':
+	    // A declined card error
+	    return errorMessages[ err.code ]
+	  case 'StripeInvalidRequestError':
+	    // Invalid parameters were supplied to Stripe's API
+	    break;
+	  case 'StripeAPIError':
+	    // An error occurred internally with Stripe's API
+	    break;
+	  case 'StripeConnectionError':
+	    // Some kind of error occurred during the HTTPS communication
+	    break;
+	  case 'StripeAuthenticationError':
+	    // You probably used an incorrect API key
+	    break;
+	}	
+	return err.message
+}
+
+
 var PaymentStripe=function(_super){
 	this.stripe=stripe;
 	this._super=_super;
@@ -54,6 +95,49 @@ PaymentStripe.prototype.alias=function(user_id,customer_id,card_id){
 
 
 
+//
+// check stripe customer
+PaymentStripe.prototype.checkCard=function(user,alias){
+	var deferred = Q.defer(), stripePromise, self=this, result={};
+
+
+	//
+	// check alias
+	var handleStripe=this.decodeAlias(alias,user);
+	if(!handleStripe){
+    return Q.reject(new Error("Impossible de trouver une carte pour cet alias"))
+	}
+
+	if(handleStripe.gateway_id!==user.gateway_id){
+    return Q.reject(new Error("Cette carte n'est plus attachée à notre système"))		
+	}
+	//
+	// check customer binding
+	// stripe.customers.retrieve(user.gateway_id, function(err, customer) {
+	// 	if(err){
+	// 		user.gateway_id=null;
+	// 		user.save()
+	// 	}
+	// });	
+
+	//
+	// check card binding
+	stripe.customers.retrieveCard(
+		handleStripe.gateway_id, 
+		handleStripe.card_id,
+	  function(err, card) {
+	    if(err){
+	    	return deferred.reject(parseError(err));
+	    }
+	    deferred.resolve(card);
+	  }
+	);
+
+	// return promise
+	return deferred.promise;
+
+}
+
 
 //
 // validate a card or alias and get new Card by callback
@@ -87,7 +171,7 @@ PaymentStripe.prototype.removeCard=function(user, alias){
 		handleStripe.gateway_id, 
 		handleStripe.card_id,
 	function (err, confirmation) {
-    if(err)return deferred.reject(err);
+    if(err)return deferred.reject(parseError(err));
     deferred.resolve(confirmation);
 		// callback(err,confirmation)
 	})
@@ -95,7 +179,6 @@ PaymentStripe.prototype.removeCard=function(user, alias){
 	// return promise
 	return deferred.promise;
 }
-
 
 //
 // validate a card or alias and get new Card by callback
@@ -134,7 +217,7 @@ PaymentStripe.prototype.addCard=function(user, payment){
 	    customer.id, {card: payment.id}, //"tok_25UMttBTMLb4og7PRQfVQ9RH"
 	    function(err, card) {
 	    	if(err){
-			    return deferred.reject(err);
+			    return deferred.reject(parseError(err));
 	    		// return callback(err)
 	    	}
 	    	// save customer id
@@ -145,15 +228,15 @@ PaymentStripe.prototype.addCard=function(user, payment){
 	    		issuer:card.brand.toLowerCase(),
 	    		name:card.name,
 	    		expiry:card.exp_month+'/'+card.exp_year,
-	    		updated:Date.now()
+	    		updated:Date.now(),
+	    		provider:'stripe'
 	    	};
 	    	// return callback(err,result)
 		    return deferred.resolve(result, customer.id);
 	    }
 	  );
 	},function (error) {
-		console.log('stripe',error)
-    deferred.reject(error);
+    deferred.reject(parseError(error));
 		// return callback(error)
 	})
 
@@ -190,11 +273,11 @@ PaymentStripe.prototype.authorize=function(order){
 	  customer:handleStripe.gateway_id,
 	  card: handleStripe.card_id, 
 	  capture:false, /// ULTRA IMPORTANT HERE!
-	  description: "Commande ("+order.oid+") for "+order.customer.email.address
+	  description: "#"+order.oid+" for "+order.customer.email.address
 	}, function(err, charge) {
 	  if(err){
 		  return order.rollbackProductQuantityAndSave("system",function(e){
-		    deferred.reject(err);
+		    deferred.reject(parseError(err));
 		  })		  				  
 	  }
 	  //
@@ -247,8 +330,7 @@ PaymentStripe.prototype.cancel=function(order,reason){
 		order.payment.transaction.decrypt(),{},
 	function(err, refund) {
   	if(err){
-    	console.log(err.message,err,order.payment.transaction.decrypt())
-  		return deferred.reject(err);		
+  		return deferred.reject(parseError(err));		
   	}
   	if(!order.payment.logs)order.payment.logs=[]
 	  order.fulfillments.status='failure';
@@ -301,7 +383,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
   if(amount){params.amount=amount*100}
 	stripe.charges.createRefund(order.payment.transaction.decrypt(),params,function(err, refund) {
   	if(err){
-  		return deferred.reject(err);		
+  		return deferred.reject(parseError(err));		
   	}
 
 	  order.fulfillments.status='failure';
@@ -353,7 +435,7 @@ PaymentStripe.prototype.capture=function(order,reason){
 		{amount:order.getTotalPrice()*100},
 	function(err, charge) {
   	if(err){
-  		return deferred.reject(err);		
+  		return deferred.reject(parseError(err));		
   	}
   	order.payment.logs.push('paid '+charge.amount/100+' the '+new Date(charge.created))
     order.payment.status="paid";

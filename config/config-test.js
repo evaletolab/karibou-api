@@ -35,7 +35,7 @@ module.exports = {
   payment:{
     reserve:1.15,
     stripe:{
-      key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
+      key:"sk_test_MqnGMPYmsEMyR5vjPuCs5Nnq"
     },
     postfinance:{
       enabled:false,

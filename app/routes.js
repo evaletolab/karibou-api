@@ -65,6 +65,7 @@ module.exports = function(app, config, passport) {
   //
   // manage payment
   app.post('/v1/users/:id/payment', users.ensureMe,users.addPayment);
+  app.post('/v1/users/:id/payment/:alias/check', users.ensureMe,users.checkPaymentMethod);
   app.post('/v1/users/:id/payment/:alias/delete', users.ensureMe,users.deletePayment);
   app.post('/v1/users/:id/payment/:alias/update', users.ensureMe,users.updatePayment);
 

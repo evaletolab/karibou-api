@@ -5,7 +5,8 @@ var db = require('mongoose')
   , validate = require('mongoose-validate')
 	, passport = require('passport')
   , payment = require('../app/payment')
-  , bus=require('../app/bus')
+  , bus = require('../app/bus')
+  , Q = require('q')
   , _ = require('underscore');
 
 //var	bcrypt = require('bcrypt');
@@ -105,7 +106,7 @@ validate.postal = function (value) {
     //   name:{type:String},
     //   number:{type:String},
     //   expiry:{type:String},
-    //   id:{type:String,unique:true,required:true},
+    //   provider:{type:String,unique:true,required:true},
     //   alias:{type:String,unique:true,required:true}
     // }],
 
@@ -568,17 +569,25 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
 
 
 //
+// verify if an alias belongs to this user
+UserSchema.methods.isValidAlias=function(alias, method){
+  return payment.for(method).isValidAlias(alias,this, method)
+}
+
+
+//
 // update user payment
 // TODO implement update payment 
-/*
 UserSchema.statics.updatePayment=function(id, alias, method,callback){
   var Users=this.model('Users');
 
     //
     // check if payment method as changed? 
-    if(payment.for(method.issuer).alias(id,method)!==method.alias.crypt()){
-      return callback(new Error("Vous ne pouvez pas changer de méthode de paiement"))
-    } 
+    // if(payment.for(method.issuer).alias(id,method)!==method.alias.crypt()){
+    //   return callback(new Error("Vous ne pouvez pas changer de méthode de paiement"))
+    // } 
+
+    return callback(new Error("Not implemented"))
 
     var result={
       issuer:method.issuer.toLowerCase(),
@@ -603,14 +612,39 @@ UserSchema.statics.updatePayment=function(id, alias, method,callback){
     });
 
 }
-*/
 
 //
-// verify if an alias belongs to this user
-UserSchema.methods.isValidAlias=function(alias, method){
-  return payment.for(method).isValidAlias(alias,this, method)
-}
+// check one or more payment method
+UserSchema.statics.checkPaymentMethod=function(id,alias,callback){
+  var Users=this.model('Users'), promises=[];
+  Users.findOne({id: id}).select('+gateway_id').exec(function(err,user){
+    if(err){return callback(err)}
+    if(!user){return callback("Utilisateur inconnu");}
 
+    //
+    // run promise for each alias
+    alias.forEach(function (alias) {
+      promises.push(payment.stripe.checkCard(user,alias))
+    })
+
+    //
+    // collect result
+    Q.allSettled(promises).then(function (results) {
+      // map result
+      var ret={}
+      for (var i = 0;i<results.length; i++) {
+        if(results[i].state!=="fulfilled"){
+          ret[alias[i]]=result.reason
+        }
+        // else if(i===0){
+        //  ret[alias[i]]='Card prout!' 
+        // }
+      };
+      callback(null, ret)
+    })
+
+  });
+}
 
 //
 // delete user payment
@@ -619,7 +653,8 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
   Users.findOne({id: id}).select('+gateway_id').exec(function(err,user){
     if(err){return callback(err)}
     if(!user){return callback("Utilisateur inconnu");}
-    payment.stripe.removeCard(user, alias).then(function (confirmation) {
+    payment.stripe.removeCard(user, alias)
+    .fin(function () {
       Users.update({id: id, 'payments.alias':alias},{$pull: {payments:{alias:alias}}},{safe:true},
       function(err, n,stat){
         if(n===0){
@@ -657,6 +692,7 @@ UserSchema.statics.addPayment=function(id, method,callback){
       safePayment.name=card.name;
       safePayment.number=card.number;
       safePayment.expiry=card.expiry;
+      safePayment.provider=card.provider;
       safePayment.updated=Date.now();
 
       //
