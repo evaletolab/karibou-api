@@ -228,7 +228,7 @@ exports.addPayment=function(req,res){
 exports.deletePayment=function(req,res){
   try{
     validate.check(req.params.id,"Invalid uid request").isInt();
-    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
+    validate.check(req.params.alias,  "Ce mode de paiement est inconnu").isText().len(6, 256)
   }catch(err){
     return res.send(400, err.message);
   }
@@ -244,9 +244,9 @@ exports.deletePayment=function(req,res){
 exports.checkPaymentMethod=function (req,res) {
   try{
     validate.check(req.params.id,"Invalid uid request").isInt();
-    validate.check(req.params.alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
+    validate.check(req.params.alias,  "Ce mode de paiement est inconnu").isText().len(6, 256)
     req.body.alias&&req.body.alias.forEach(function (alias) {
-      validate.check(alias,  "L'alias de la carte n'est pas valide").isText().len(6, 256)
+      validate.check(alias,  "Ce mode de paiement est inconnu").isText().len(6, 256)
     })
   }catch(err){
     return res.send(400, err.message);

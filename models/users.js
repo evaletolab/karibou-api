@@ -110,7 +110,7 @@ validate.postal = function (value) {
     //   alias:{type:String,unique:true,required:true}
     // }],
 
-    gateway_id    : {type:String, unique: true, select:false},
+    gateway_id    : {type:String, unique: true, select:false,sparse: true},
 
     /* make user valid/invalid */
     status:{type:Boolean, default: true},
@@ -624,7 +624,8 @@ UserSchema.statics.checkPaymentMethod=function(id,alias,callback){
     //
     // run promise for each alias
     alias.forEach(function (alias) {
-      promises.push(payment.stripe.checkCard(user,alias))
+      var p=user.getPaymentMethodByAlias(alias);
+      promises.push(payment.for(p.issuer).checkCard(user,alias))
     })
 
     //
@@ -653,7 +654,15 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
   Users.findOne({id: id}).select('+gateway_id').exec(function(err,user){
     if(err){return callback(err)}
     if(!user){return callback("Utilisateur inconnu");}
-    payment.stripe.removeCard(user, alias)
+    //
+    // retrieve payment method
+    var p=user.getPaymentMethodByAlias(alias);
+    if(!p){
+      return callback("Ce mode de paiement est inconnu")
+    }
+    //
+    // remove card
+    payment.for(p.issuer).removeCard(user, alias)
     .fin(function () {
       Users.update({id: id, 'payments.alias':alias},{$pull: {payments:{alias:alias}}},{safe:true},
       function(err, n,stat){
@@ -682,7 +691,6 @@ UserSchema.statics.addPayment=function(id, method,callback){
     if(user.checkDuplicatePaymentIssuer(method.issuer)){
       return callback("Cette méthode de paiement existe déjà");
     }
-
     // user has an id?
     payment.for(method.issuer).addCard(user, method).then(function (card, customer_id) {
 
@@ -724,6 +732,20 @@ UserSchema.methods.checkDuplicatePaymentIssuer=function  (issuer) {
 
   return false;
 }
+
+//
+//
+UserSchema.methods.getPaymentMethodByAlias=function  (alias) {
+  var user=this;
+  if(!alias) return false;
+
+  for (var i in user.payments){
+    if(user.payments[i]&&user.payments[i].alias===alias)return user.payments[i];
+  }
+
+  return false;
+}
+
 
 //
 // add and save payment method

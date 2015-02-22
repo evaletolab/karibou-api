@@ -86,6 +86,7 @@ module.exports = {
         {label:"mastercard",fees:0.029}, 
         {label:"paypal",fees:0.034}, 
         {label:"invoice",fees:0.0}, 
+        {label:"tester",fees:0.02}, 
         {label:"bitcoin",fees:0.0}
       ],
 

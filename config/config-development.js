@@ -32,6 +32,7 @@ module.exports = {
 
   payment:{
     reserve:1.15,
+    provider:'stripe',
     stripe:{
       key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
     },

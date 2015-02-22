@@ -56,22 +56,23 @@ describe("orders.payment", function(){
 
 
   it("Compute issuer fees", function(done){
-    payment.issuerFees('postfinance card',1).should.equal(config.shop.order.gateway[0].fees);
-    payment.issuerFees('postfinance card',(1).toFixed(2)).should.equal(config.shop.order.gateway[0].fees);
-    payment.issuerFees('postfinance card',(36.10).toFixed(2)).toFixed(2).should.equal((config.shop.order.gateway[0].fees*36.10).toFixed(2));
-    payment.issuerFees('postfinance card','1.00').should.equal(config.shop.order.gateway[0].fees);
-    payment.issuerFees('american express','10').should.equal(config.shop.order.gateway[1].fees*10);
-    payment.issuerFees('visa',1).should.equal(config.shop.order.gateway[2].fees);
-    payment.issuerFees('paypal',1).should.equal(config.shop.order.gateway[4].fees);
-    payment.issuerFees('invoice',1).should.equal(config.shop.order.gateway[5].fees);
-    payment.issuerFees('bitcoin',1).should.equal(config.shop.order.gateway[6].fees);
+    // payment.fees('postfinance card',1).should.equal(config.shop.order.gateway[0].fees);
+    // payment.fees('postfinance card',(1).toFixed(2)).should.equal(config.shop.order.gateway[0].fees);
+    // payment.fees('postfinance card',(36.10).toFixed(2)).toFixed(2).should.equal((config.shop.order.gateway[0].fees*36.10).toFixed(2));
+    // payment.fees('postfinance card','1.00').should.equal(config.shop.order.gateway[0].fees);
+    payment.fees('american express','10').should.equal(config.shop.order.gateway[1].fees*10);
+    payment.fees('visa',1).should.equal(config.shop.order.gateway[2].fees);
+    payment.fees('paypal',1).should.equal(config.shop.order.gateway[4].fees);
+    payment.fees('invoice',1).should.equal(config.shop.order.gateway[5].fees);
+    payment.fees('tester',1).should.equal(config.shop.order.gateway[6].fees);
+    payment.fees('bitcoin',1).should.equal(config.shop.order.gateway[7].fees);
     done();
   });   
 
 
   it("Check order amount and fees", function(done){
     Orders.findOne({oid:2000007}).select('+payment.transaction').exec(function (e,order) {
-      payment.issuerFees(order.payment.issuer,order.getTotalPrice().toFixed(2)).should.equal(0.02*order.getTotalPrice().toFixed(2));
+      payment.fees(order.payment.issuer,order.getTotalPrice().toFixed(2)).should.equal(0.02*order.getTotalPrice().toFixed(2));
       // console.log(order.payment.issuer, order.getTotalPrice().toFixed(2))
       done();
 

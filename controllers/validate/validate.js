@@ -49,7 +49,7 @@ var user= exports.user = function(u, lean){
 }
 
 exports.payment=function(payment, alias){
-  check(alias,  "L'alias de la carte n'est pas valide").isText().len(4,256)
+  check(alias,  "Ce mode de paiement est inconnu").isText().len(6,256)
   check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,50)
   check(payment.expiry,  "La date de validité de la carte n'est pas correcte").isText().len(4,10)
   // type is computed by number

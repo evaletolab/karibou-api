@@ -33,7 +33,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"voided"
@@ -84,7 +84,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"refunded"
@@ -135,7 +135,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"voided"
@@ -186,7 +186,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"authorized"
@@ -398,7 +398,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"authorized"
@@ -504,7 +504,7 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"pending"

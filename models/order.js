@@ -1148,7 +1148,7 @@ Orders.statics.onCancel = function(oid, reason, callback){
     //
     // TODO should be abel cancel fraud 
     payment.for(order.payment.issuer).cancel(order,reason)
-      .then(function(order){
+      .then(function(transaction){
         bus.emit('order.cancel',order)
         //
         // TODO rollback items on cancel or delete

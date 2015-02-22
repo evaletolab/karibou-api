@@ -35,7 +35,7 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"voided"
         },
 
@@ -86,7 +86,7 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"refunded"
         },
 
@@ -137,7 +137,7 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"voided"
         },
 
@@ -186,9 +186,10 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "invoice",
+            issuer: "tester",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
+            transaction:2000007,
             status:"authorized"
         },
 
@@ -294,7 +295,7 @@ exports.Orders=[
         payment: {
             issuer: "visa",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"authorized"
         },
 
@@ -400,7 +401,7 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"authorized"
         },
 
@@ -506,7 +507,7 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
             status:"pending"
         },
 

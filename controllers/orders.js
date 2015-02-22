@@ -361,7 +361,7 @@ exports.create=function(req,res){
           order:order,
           created:order.getDateString(order.created),
           shippingFees:shippingFees,
-          paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
+          paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),
           subTotal:subTotal.toFixed(2),
@@ -513,7 +513,7 @@ exports.capture=function(req,res){
           order:order,
           created:order.getDateString(order.created),
           shippingFees:shippingFees,
-          paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
+          paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
           shippingWhen:order.getDateString(),
           subTotal:subTotal.toFixed(2),
@@ -713,7 +713,7 @@ exports.invoicesByUsers=function(req,res){
         customer:order.email,
         amount:subTotal.toFixed(2),
         shippingFees:shippingFees,
-        paymentFees:payment.issuerFees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
+        paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
         payment:order.payment.status,
         total:order.getTotalPrice().toFixed(2)
       })

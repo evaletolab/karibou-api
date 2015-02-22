@@ -32,14 +32,13 @@ PaymentPostfinance.prototype.isValidAlias=function(alias, user, method){
 //
 // verify if an alias is valid and decode it
 PaymentPostfinance.prototype.decodeAlias=function(alias, user, method){
-	try{
-		if((user.id+method).hash().crypt()!==alias){
-			return false;
-		}
-		return {id:user.id,gateway_id:null,card_id:null}
-	}catch(e){
-		return false;
-	}
+  try{
+    if((user.id+method.toLowerCase()).hash().crypt()===alias){
+      return {id:user.id,gateway_id:null,card_id:null}
+    }
+  }catch(e){}
+  
+  return false;
 }
 
 
