@@ -7,7 +7,7 @@ var should = require("should");
 var data = dbtools.fixtures(["Users.js"]);
 
 //http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm
-describe("api.users.payment", function(){
+describe("api.users.payment.postfinance.webhook", function(){
   var request= require('supertest');
 
   var _=require('underscore');

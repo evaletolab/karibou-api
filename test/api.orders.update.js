@@ -101,8 +101,8 @@ describe("api.orders.create", function(){
     var items=[]
       , customer=data.Users[0]
       , payment={
-        alias:((customer.id+"postfinance card").hash().crypt()),
-        issuer:"postfinance card",
+        alias:((customer.id+"").hash().crypt()),
+        issuer:"tester",
         number:'12xxxxxxx3456'
       };
 
@@ -131,19 +131,20 @@ describe("api.orders.create", function(){
       .send(order)
       .set('cookie', cookie)
       .end(function(err,res){
-        res.should.have.status(200);        
+        res.should.have.status(200);                
         should.not.exist(err)
+        should.not.exist(res.body.payment.transaction)
         should.not.exist(res.body.errors)
         should.not.exist(res.body.cancel)
         should.not.exist(res.body.closed)
         res.body.payment.status.should.equal('authorized')
         res.body.fulfillments.status.should.equal('reserved')
-        var tx=JSON.parse(res.body.payment.transaction.decrypt())
-        tx.should.have.property('operation')
-        tx.should.have.property('payId')
-        tx.should.have.property('orderId')
-        tx.should.have.property('email')
-        tx.should.have.property('amount')
+        // var tx=JSON.parse(res.body.payment.transaction.decrypt())
+        // tx.should.have.property('operation')
+        // tx.should.have.property('payId')
+        // tx.should.have.property('orderId')
+        // tx.should.have.property('email')
+        // tx.should.have.property('amount')
         // db.model('Orders').print(res.body)
         orderId=res.body.oid
         done()

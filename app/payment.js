@@ -82,6 +82,8 @@ var Payment=function(){
 		        bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
 					  return deferred.reject(err);
 			    }
+			    // do not export it!
+			    order.payment.transaction=undefined;
 			    return deferred.resolve(order);
 			  })
 
@@ -125,6 +127,8 @@ var Payment=function(){
 		        bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
 					  return deferred.reject(err);
 			    }
+			    // do not export it!
+			    order.payment.transaction=undefined;
 			    return deferred.resolve(order);
 		    })
 		  });
@@ -165,6 +169,8 @@ var Payment=function(){
 		        bus.emit('system.message',"[order-danger] save:",{error:err.message,order:order.oid,customer:order.email});
 					  return deferred.reject(err);
 			    }
+			    // do not export it!
+			    order.payment.transaction=undefined;
 			    return deferred.resolve(order);
 		    })
 		  });
@@ -207,7 +213,7 @@ var Payment=function(){
 
 
 
-	this.postfinance =require('./payment.postfinance')(privatePayment)
+	// this.postfinance =require('./payment.postfinance')(privatePayment)
 	this.stripe =require('./payment.stripe')(privatePayment)
 	this.invoice =require('./payment.invoice')(privatePayment)
 	this.tester =require('./payment.test')(privatePayment)
@@ -217,8 +223,8 @@ var Payment=function(){
 // get provider in regard of issuer 
 Payment.prototype.for=function(issuer){
 	var map={
-		'postfinance card':this.postfinance,
-		'paypal':this.postfinance,
+		// 'postfinance card':this.postfinance,
+		// 'paypal':this.postfinance,
 		'american express':this.stripe,
 		'visa':this.stripe,
 		'mastercard':this.stripe,	

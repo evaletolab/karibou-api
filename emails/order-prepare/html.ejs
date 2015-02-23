@@ -76,7 +76,7 @@ Tu trouveras ci-dessous les commandes à préparer pour le <u><%= shippingWhen %
 	<% for(var i=0; i<items.length; i++) {%>
 	<tr>
 		<td style="text-align:center"><b><%= items[i].rank %></b> </td>
-		<td><%= items[i].name.familyName %> </td>
+		<td><a href="mailto:<%= items[i].email.address %>"><%= items[i].name.familyName %></a> </td>
 		<td style="text-align:right"><%= items[i].quantity %>x </td>
 		<td><%= items[i].title %> (<%= items[i].part %>)</td>
 		<td><%= items[i].price.toFixed(2) %> </td>
