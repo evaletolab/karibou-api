@@ -177,7 +177,7 @@ module.exports = function(app, config, passport) {
   app.post('/v1/orders/:oid/remove', auth.ensureAdmin, orders.remove);
 
   // post order items to shopname
-  app.post('/v1/orders/:shopname/email',orders.ensureOwnerOrAdmin,orders.informShopToOrders);
+  app.post('/v1/orders/:shopname/email',shops.ensureOwnerOrAdmin,orders.informShopToOrders);
 
   // shopper update logistic
   app.post('/v1/orders/:oid/shipping', auth.ensureLogisticOrAdmin, orders.updateShipping);
