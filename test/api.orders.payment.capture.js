@@ -125,7 +125,7 @@ describe("api.orders.payment.capture", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('méthode de paiement est invalide')
+        res.text.should.include("La référence de la carte n'est pas compatible avec le service de paiement")
         done();
       });
   });  

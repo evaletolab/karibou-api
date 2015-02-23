@@ -635,11 +635,8 @@ UserSchema.statics.checkPaymentMethod=function(id,alias,callback){
       var ret={}
       for (var i = 0;i<results.length; i++) {
         if(results[i].state!=="fulfilled"){
-          ret[alias[i]]=result.reason
+          ret[alias[i]]=results[i].reason.message||results[i].reason
         }
-        // else if(i===0){
-        //  ret[alias[i]]='Card prout!' 
-        // }
       };
       callback(null, ret)
     })

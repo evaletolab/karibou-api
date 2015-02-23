@@ -49,7 +49,7 @@ PaymentInvoice.prototype.checkCard=function(user,alias){
   // check alias
   var handleStripe=this.decodeAlias(alias,user);
   if(!handleStripe){
-    return Q.reject(new Error("Impossible de trouver une carte pour cet alias"))
+    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
   }
 
   var payment=user.getPaymentMethodByAlias(alias);
@@ -72,7 +72,7 @@ PaymentInvoice.prototype.removeCard=function(user, alias){
     // check alias
     var handleStripe=self.decodeAlias(alias,user);
     if(!handleStripe){
-      return Q.reject(new Error("Impossible de supprimer une carte pour cet alias"))
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
     }
 
 
@@ -123,7 +123,7 @@ PaymentInvoice.prototype.authorize=function(order){
     // check alias
     var handleStripe=self.decodeAlias(order.payment.alias,order.customer);
     if(!handleStripe){
-      return Q.reject(new Error("Impossible d'autoriser une commande pour cet alias"))
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
     }
 
     var result={
@@ -150,7 +150,7 @@ PaymentInvoice.prototype.cancel=function(order,reason){
   var _cancel=function (deferred, callback) {
 
     if(!self.isValidAlias(order.payment.alias, order.customer)){
-      return Q.reject(new Error('Votre méthode de paiement est invalide (stripe)'));
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
     if(!order.payment.transaction){
       return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
@@ -181,7 +181,7 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
   // create full refund 
   var _refund=function (deferred, callback) {
     if(!self.isValidAlias(order.payment.alias, order.customer)){
-      return Q.reject(new Error('Votre méthode de paiement est invalide (stripe)'));
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
 
     if(!order.payment.transaction){
@@ -212,7 +212,7 @@ PaymentInvoice.prototype.capture=function(order,reason){
   var self=this;
   var _capture=function (deferred, callback) {
     if(!self.isValidAlias(order.payment.alias, order.customer)){
-      return Q.reject(new Error('Votre méthode de paiement est invalide (stripe)'));
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
 
     if(!order.payment.transaction){
