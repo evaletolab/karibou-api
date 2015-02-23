@@ -1,8 +1,20 @@
-Bonjour <%= shop.owner.name.givenName %>,<br/>
+Bonjour <%= shop.owner.name.givenName %>,
 
-Tu trouveras ci-dessous les commandes à préparer pour le <%= shippingWhen %>. L'équipe Karibou passera collecter les produits le matin avant 11h00.<br/>
 
-* <%= origin %>/admin/orders?view=all
+Vous trouverez ci-dessous les commandes à préparer pour le <%= shippingWhen %>. La collecte s'effectuera entre 10h30 et 14h00 au plus tard.
+<% for(var i=0; i<items.length; i++) {%>
+* [<%= items[i].rank %>, <%= items[i].name.familyName %>] <%= items[i].quantity %>x<%= items[i].title %> (<%= items[i].part %>) *<%= items[i].finalprice.toFixed(2) %>*<% } %>
 
+N'oubliez-pas d'inscrire le numéro de sac sur l'emballage.
+Vous pouvez suivre les commandes ici <%= origin %>/admin/orders 
 Avec mes meilleurs messages,
-James
+
+Delphine
+<pre style="font-size:10px">
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+</pre>    
+tel : +4179.377.21.13
