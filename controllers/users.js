@@ -59,6 +59,7 @@ exports.me = function (req, res, next)  {
   // res.json(req.user);
   Users.findOne({_id:req.user._id}).
       populate('shops').exec(function(err,user){
+      user.populateRoles()
       res.json(user);
   });
 };
