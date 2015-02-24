@@ -2,6 +2,9 @@ var Q=require('q');
 
 
 var Payment=function(){
+	function parseError (err) {
+		return err.message||err
+	}
 	//
 	// commons
 	var privatePayment={

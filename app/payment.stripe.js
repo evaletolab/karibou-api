@@ -165,7 +165,7 @@ PaymentStripe.prototype.removeCard=function(user, alias){
 		function (err, confirmation) {
 	    if(err)return deferred.reject(parseError(err));
 	    deferred.resolve(confirmation);
-			// callback(err,confirmation)
+			// callback(parseError(err),confirmation)
 		})
 
 		// return promise
@@ -213,7 +213,7 @@ PaymentStripe.prototype.addCard=function(user, payment){
 		    function(err, card) {
 		    	if(err){
 				    return deferred.reject(parseError(err));
-		    		// return callback(err)
+		    		// return callback(parseError(err))
 		    	}
 		    	// save customer id
 		    	user.gateway_id=customer.id;
@@ -226,13 +226,13 @@ PaymentStripe.prototype.addCard=function(user, payment){
 		    		updated:Date.now(),
 		    		provider:'stripe'
 		    	};
-		    	// return callback(err,result)
+		    	// return callback(null,result)
 			    return deferred.resolve(result, customer.id);
 		    }
 		  );
 		},function (error) {
 	    deferred.reject(parseError(error));
-			// return callback(error)
+			// return callback(parseError(error))
 		})
 		return deferred.promise;
 	}
@@ -265,7 +265,7 @@ PaymentStripe.prototype.authorize=function(order){
 		  capture:false, /// ULTRA IMPORTANT HERE!
 		  description: "#"+order.oid+" for "+order.customer.email.address
 		}, function(err, charge) {
-			if(err){ return callback(err)}
+			if(err){ return callback(parseError(err))}
 
 	  	var result={
 	  		log:'authorized amount '+(charge.amount/100)+' the '+new Date(charge.created),
@@ -274,7 +274,7 @@ PaymentStripe.prototype.authorize=function(order){
 	  		provider:'stripe'
 	  	};
 
-			callback(err,result)
+			callback(null,result)
 		});	  
 
 		// return a promise
@@ -302,14 +302,14 @@ PaymentStripe.prototype.cancel=function(order,reason){
 		stripe.charges.createRefund(
 			order.payment.transaction.decrypt(),{},
 		function(err, refund) {
-			if(err){ return callback(err)}
+			if(err){ return callback(parseError(err))}
 	  	var result={
 	  		log:'cancel authorization the '+new Date(refund.created),
 	  		transaction:refund.id.crypt(),
 	  		updated:Date.now(),
 	  		provider:'stripe'
 	  	};
-			callback(err,result)
+			callback(null,result)
 		});
 
 		return deferred.promise;
@@ -340,7 +340,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 			order.payment.transaction.decrypt(),
 			params,
 		function(err, refund) {
-			if(err){ return callback(err)}
+			if(err){ return callback(parseError(err))}
 			// align data here
 	  	var result={
 	  		log:'refund '+refund.amount/100+' the '+new Date(refund.created),
@@ -348,7 +348,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 	  		updated:Date.now(),
 	  		provider:'stripe'
 	  	};
-			callback(err,result)
+			callback(null,result)
 	  });
 
 		return deferred.promise;
@@ -375,14 +375,14 @@ PaymentStripe.prototype.capture=function(order,reason){
 			order.payment.transaction.decrypt(),
 			{amount:order.getTotalPrice()*100},
 		function(err, charge) {
-			if(err){ return callback(err)}
+			if(err){ return callback(parseError(err))}
 	  	var result={
 	  		log:'capture '+charge.amount/100+' the '+new Date(charge.created),
 	  		transaction:charge.id.crypt(),
 	  		updated:Date.now(),
 	  		provider:'stripe'
 	  	};
-			callback(err,result)
+			callback(null,result)
 		});	  
 
 		return deferred.promise;
