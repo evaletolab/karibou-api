@@ -302,7 +302,7 @@ PaymentStripe.prototype.cancel=function(order,reason){
 			order.payment.transaction.decrypt(),{},
 		function(err, refund) {
 	  	var result={
-	  		log:'cancel authorization the '+new Date(charge.created),
+	  		log:'cancel authorization the '+new Date(refund.created),
 	  		transaction:refund.id.crypt(),
 	  		updated:Date.now(),
 	  		provider:'stripe'
