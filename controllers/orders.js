@@ -627,6 +627,7 @@ exports.informShopToOrders=function(req,res){
         order.items.forEach(function(item){
           item.rank=order.rank;
           item.name=order.customer.name;
+          item.email=order.customer.email.address;
           items.push(item)
         })
       })    
