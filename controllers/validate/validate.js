@@ -131,12 +131,12 @@ exports.product = function(req){
 
     if (req.body.info){
       req.body.info.active && check(req.body.info.active).isBoolean();
-      req.body.info.comment && check(req.body.info.comment,"Le format du commentaire doit contenir entre 6 et 300 caractères").len(6, 300).isText();
+      req.body.info.comment && check(req.body.info.comment,"Vous devez définir un commentaire de 3 à 300 caractères").len(6, 300).isText();
     }
 
     for (var i in req.body.faq){
-      check(req.body.faq[i].q,"La question doit contenir entre 3 et 150 caractères").len(3, 150).isText();
-      check(req.body.faq[i].a,"La réponse doit contenir entre 3 et 400 caractères").len(3, 400).isText()
+      check(req.body.faq[i].q,"Vous devez écrire un question qui doit contenir entre 3 et 150 caractères").len(3, 150).isText();
+      check(req.body.faq[i].a,"Vous devez écrire un réponse qui doit contenir entre 3 et 400 caractères").len(3, 400).isText()
     }
 
 }
@@ -150,7 +150,7 @@ var order_items = exports.orderItems = function(items, update){
       check(items[i].vendor,      "Le vendeur doit contenir entre 3 et 200 caractères").isText().len(3, 200);
       check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
       check(items[i].price,       "Le prix n'est pas valable").isFloat()
-      check(items[i].part,        "La portion du produit être entre 1 et 50 caractères").isText().len(1, 50);
+      check(items[i].part,        "Vous devez écrire une portion du produit qui doit être entre 1 et 50 caractères").isText().len(1, 50);
     }
     ifCheck(items[i].note,        "Le commentaire doit contenir entre 1 et 500 caractères").isText().len(0, 500);
     check(items[i].finalprice,  "Le prix final n'est pas valide").isFloat()

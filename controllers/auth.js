@@ -204,16 +204,13 @@ exports.register_post= function(req, res,next) {
                 reg,
         function(err,user){
           if(err&&err.code==11000){
-            console.log("ERROR [register] ", "Cet adresse email est déjà utilisée")
             return res.send(400,"Cet adresse email est déjà utilisée");    
           }else
           if (err){
-            console.log("ERROR",errorHelper(err))    
             return res.send(400,errorHelper(err));    
           }
 
           if (!user){
-            console.log("ERROR","[register] Ooooppss!!")
             return res.send(400,"Erreur inconnue lors de la création du compte");    
           }
           //

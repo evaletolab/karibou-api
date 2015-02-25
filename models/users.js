@@ -381,6 +381,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
 
 UserSchema.statics.authenticate=function(email, password, callback) {
   var self=this;
+  email=email.toLowerCase();
 
   return this.model('Users').findOne({ 'email.address': email }).populate('shops').exec(function(err,user){
       if (err) { return callback(err); }
@@ -413,6 +414,8 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ex
   // check signature
   if(callback===undefined && typeof extend==='function' )
     callback=extend;
+
+  email=email.toLowerCase();
 
 	var Users=this.model('Users'),
       uid=email.hash(new Date());

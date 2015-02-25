@@ -41,7 +41,7 @@ describe("api.users.create", function(){
 
   it('POST /register should return 200 ',function(done){
     var r={
-      email:"reg1@test.com",
+      email:"Reg1@test.com",
       firstname:"first",
       lastname:"last",
       password:"123456",
