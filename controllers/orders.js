@@ -343,7 +343,7 @@ exports.create=function(req,res){
   Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment,
     function(err,order){
     if(err){
-      return res.send(400, errorHelper(err));
+      return res.send(400, errorHelper(err.message||err));
     }
 
     // items issue?
@@ -458,7 +458,7 @@ exports.cancel=function(req,res){
   }
   db.model('Orders').onCancel(req.params.oid,req.body.reason,function(err,order){
     if(err){
-      return res.send(400, errorHelper(err));
+      return res.send(400, errorHelper(err.message||err));
     }
 
     //
@@ -495,7 +495,7 @@ exports.capture=function(req,res){
 
   db.model('Orders').findOne({oid:req.params.oid}).select('+payment.transaction').exec(function(err,order){
     if(err){
-      return res.send(400, errorHelper(err));
+      return res.send(400, errorHelper(err.message||err));
     }
 
     // items issue?
@@ -555,7 +555,7 @@ exports.remove=function(req,res){
   return Orders.findOne({oid:req.params.oid}).exec(function(err,order){
 
     if(err){
-      return res.send(400, errorHelper(err));
+      return res.send(400, errorHelper(err.message||err));
     }
 
     if(!order){
@@ -569,7 +569,7 @@ exports.remove=function(req,res){
 
     // delete
     order.remove(function(err){
-      if(err)return res.json(400,errorHelper(err))
+      if(err)return res.json(400,errorHelper(err.message||err))
       return res.json(200,{})
     });
 
@@ -594,7 +594,7 @@ exports.informShopToOrders=function(req,res){
   // TODO using promise would be better!
   db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     if(!shop){
       return res.send(400,"Cette boutique n'existe pas");
@@ -613,9 +613,12 @@ exports.informShopToOrders=function(req,res){
 
     Orders.findByCriteria(criteria, function(err,orders){
       if(err){
-        return res.send(400,errorHelper(err));
+        return res.send(400,errorHelper(err.message||err));
       }
 
+      if(!orders.length){
+        return res.json({})
+      }
 
       //
       // get items
@@ -644,10 +647,10 @@ exports.informShopToOrders=function(req,res){
                    "order-prepare", function(err, status){
         if(err){
           console.log('---------------------------prepare',err)
-          return res.send(400,errorHelper(err));
+          return res.send(400,errorHelper(err.message||err));
         }
 
-        res.json(200);
+        res.json(content);
       })
     })
 
@@ -685,7 +688,7 @@ exports.invoicesByUsers=function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     // sort by date and customer
     function byDateAndUser(o1,o2){
@@ -783,7 +786,7 @@ exports.invoicesByShops=function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
 
     //

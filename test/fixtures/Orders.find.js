@@ -508,8 +508,8 @@ exports.Shops=[{
     name: "Un autre shop",
     description:"cool ce shop",
     urlpath:"un-autre-shop",
-    catalog:c.Categories[0]._id,
-    owner:u.Users[0]._id,
+    catalog:c.Categories[0]._id, 
+    owner:u.Users[0]._id,  //evaleto@gluck.com
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
@@ -518,10 +518,10 @@ exports.Shops=[{
     _id:ObjectId('515ec12e56a8d5961e000005'),
     status:true,
     name: "mon shop",
-    description:"cool ce shop",
+    description:"cool ce shop", 
     urlpath:"mon-shop",
     catalog:c.Categories[0]._id,
-    owner:u.Users[1]._id,
+    owner:u.Users[1]._id, //evaleto@gmail.com
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
