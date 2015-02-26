@@ -52,8 +52,18 @@ var Product = new Schema({
    attributes:{
       home:{type:Boolean, default:false},
       available:{type:Boolean, default:true},
-      comment:{type:Boolean, default:false}, 
+      comment:{type:Boolean, default:false},
       discount:{type:Boolean, default:false}
+   },
+
+   quantity:{
+      display:{type:Boolean, default:false},
+      comment:String
+   },
+
+   shelflife:{
+      display:{type:Boolean, default:false},
+      comment:String
    },
 
    pricing: {
