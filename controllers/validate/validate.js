@@ -123,11 +123,22 @@ exports.product = function(req){
       throw new Error("Vous devez définir une photo");
     }
 
+    if (req.body.quantity){
+      req.body.quantity.display && check(req.body.quantity.display).isBoolean();
+      req.body.quantity.comment && check(req.body.quantity.comment,"Vous devez définir un text de 3 à 300 caractères").len(6, 300).isText();
+    }
+
+    if (req.body.shelflife){
+      req.body.shelflife.display && check(req.body.shelflife.display).isBoolean();
+      req.body.shelflife.comment && check(req.body.shelflife.comment,"Vous devez définir un text de 3 à 300 caractères").len(6, 300).isText();
+    }
+
 
     if (req.body.available){
       req.body.available.active && check(req.body.available.active).isBoolean();
       req.body.available.comment && check(req.body.available.comment,"Le format du commentaire n'est pas valide").isText();
     }
+
 
     if (req.body.info){
       req.body.info.active && check(req.body.info.active).isBoolean();
