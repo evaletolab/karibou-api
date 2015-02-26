@@ -123,14 +123,14 @@ exports.product = function(req){
       throw new Error("Vous devez définir une photo");
     }
 
-    if (req.body.quantity){
-      req.body.quantity.display && check(req.body.quantity.display).isBoolean();
-      req.body.quantity.comment && check(req.body.quantity.comment,"Vous devez définir un text de 3 à 300 caractères").len(6, 300).isText();
+    if (req.body.quantity &&req.body.quantity.display){
+      check(req.body.quantity.display).isBoolean();
+      check(req.body.quantity.comment,"Vous devez définir une description des quantitées de 3 à 100 caractères").len(6, 100).isText();
     }
 
-    if (req.body.shelflife){
-      req.body.shelflife.display && check(req.body.shelflife.display).isBoolean();
-      req.body.shelflife.comment && check(req.body.shelflife.comment,"Vous devez définir un text de 3 à 300 caractères").len(6, 300).isText();
+    if (req.body.shelflife &&req.body.shelflife.display ){
+      check(req.body.shelflife.display).isBoolean();
+      check(req.body.shelflife.comment,"Vous devez définir un text de péremption de 3 à 100 caractères").len(6, 100).isText();
     }
 
 
