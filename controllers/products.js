@@ -128,7 +128,7 @@ exports.list=function (req, res) {
   
   if(!req.user||!req.user.isAdmin()){
     req.query.status=true;
-    //WTF is this shit req.query.status=req.user.shops??
+    //FIXME WTF is this shit req.query.status=req.user.shops??
     if(req.user)req.query.status=req.user.shops;
   }
   

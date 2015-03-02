@@ -33,7 +33,13 @@ var Config = new Schema({
     noshipping:[{
       reason:{type: String},
       when:{type:Date}
-    }]
+    }],
+
+    //
+    // defines keys
+    keys:{
+      pubStripe:String
+    }
 });
 
 Config.statics.getMain=function(cb) {
