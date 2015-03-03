@@ -15,7 +15,7 @@ Vous trouverez ci-dessous le détail de votre commande
 Récapitulatif
 -------------
 Numéro de commande: <%= order.oid %>
-Méthode de paiement: Bulletin de versement
+Méthode de paiement: <%= order.payment.issuer %>
 Montant total provisoire: <%= totalWithFees %> CHF
 Date de livraison: Le <%= shippingWhen %> 
 Adresse de livraison: 

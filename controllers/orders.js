@@ -485,6 +485,43 @@ exports.cancel=function(req,res){
 
 
 //
+// cancel order 
+exports.refund=function(req,res){
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+  }catch(err){
+    return res.send(400, err.message);
+  }
+  db.model('Orders').onRefund(req.params.oid,function(err,order){
+    if(err){
+      return res.send(400, errorHelper(err.message||err));
+    }
+
+    //
+    // prepare and send mail
+    var mail={
+      order:order,
+      created:order.getDateString(order.created),
+      origin:req.header('Origin')||config.mail.origin,
+      totalWithFees:order.getTotalPrice().toFixed(2),
+      withHtml:true
+    };
+    bus.emit('sendmail',  
+        order.email,
+        'Remboursement de votre commande Karibou '+order.oid,
+        mail,
+        'order-refund',
+        function(err,status){
+          //TODO log activities
+          if(err)console.log('---------------------------refund',order.oid,err)
+        })
+
+    return res.json(200,order)
+  })
+}
+
+
+//
 // capture current order with finalprice
 exports.capture=function(req,res){
   try{

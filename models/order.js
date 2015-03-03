@@ -1127,14 +1127,8 @@ Orders.statics.onCancel = function(oid, reason, callback){
 
     // early test
     // make sure that payment issuer belongs to this customer
-    try{
-
-      if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer, order.payment.issuer)){
-        return callback("Votre méthode de paiement est invalide, l'action ne peut pas être passée")
-      }
-
-    }catch(error){
-      return callback(error.message)    
+    if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer, order.payment.issuer)){
+      return callback("Votre méthode de paiement est invalide, l'action ne peut pas être passée")
     }
 
 
@@ -1166,6 +1160,41 @@ Orders.statics.onCancel = function(oid, reason, callback){
     // status=fulfilled, payment=paid
     if(reason!=='customer'){
     }
+  });
+}
+
+Orders.statics.onRefund = function(oid, callback){
+  assert(oid);
+
+  db.model('Orders').findOne({oid:oid}).select('+payment.transaction').exec(function(err,order){
+    if(err){
+      return callback(err)
+    }
+    if(!order){
+      return callback("Impossible de trouver la commande: "+oid);
+    }
+
+
+    // early test
+    // make sure that payment issuer belongs to this customer
+    if(!payment.for(order.payment.issuer).isValidAlias(order.payment.alias,order.customer, order.payment.issuer)){
+      return callback("Votre méthode de paiement est invalide, l'action ne peut pas être passée")
+    }
+
+
+    //
+    // TODO should be abel cancel fraud 
+    payment.for(order.payment.issuer).refund(order)
+      .then(function(transaction){
+        bus.emit('order.refund',order)
+        //
+        // TODO rollback items on cancel or delete
+        return callback(null,order)
+      })
+      .fail(function(err){
+        return callback(err.message||err,order)
+      })
+
   });
 }
 

@@ -363,6 +363,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 PaymentStripe.prototype.capture=function(order,reason){
 	var self=this;
 	var _capture=function (deferred, callback) {
+
 	  if(!self.isValidAlias(order.payment.alias, order.customer)){
 	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
 	  }
