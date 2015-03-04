@@ -1,0 +1,32 @@
+Bonjour <%= order.customer.name.givenName %>,<br/><br/>
+
+Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <%= created %>.<br/>
+Veuillez utiliser cette référence pour le paiement avant le 30.12.2014:
+(1) - Compte:	CH76 0900 0000 1461 5643 8 / BIC: POFICHBEXXX<br/>
+(2) - Montant à payer, <%= totalWithFees %> CHF<br/>
+(4) - Versement pour:	Karibou Delphine Cluzel Evalet et Olivier Evalet, CH-1208 Genève<br/>
+
+<pre>
+*<% for(var i=0; i<order.items.length; i++) {%>
+* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <% } %>
+* ------------------
+* Sous total  <%= subTotal %> CHF
+* Frais de livraison <%= shippingFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF
+* ------------------
+* Montant total <%= totalWithFees %> CHF
+*
+</pre style="font-size:10px">
+
+Pour toute question, veuillez répondre à ce mail.<br/>
+Avec nos meilleurs messages,<br/>
+<pre style="font-size:10px">
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+</pre>    
+
+----<br/>
+Toutes vos commandes <%= origin %>/account/orders
