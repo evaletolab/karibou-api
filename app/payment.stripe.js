@@ -7,7 +7,7 @@ var stripe = require("stripe")(config.payment.stripe.key);
 //config.payment.stripe.key
 var settings={};
 
-function parseError(err) {
+function parseError(err, from) {
 	var errorMessages = {
 	  incorrect_number: "Le numéro de carte est incorrect.",
 	  invalid_number: "The card number is not a valid credit card number.",
@@ -25,7 +25,8 @@ function parseError(err) {
 
 	//
 	// get an email on error
-  bus.emit('system.message',"[karibou-danger] stripe error: ",{error:err.message,type:err.type, param:err.param,code:err.code});
+	var context=(from.oid)?('order.oid:'+from.oid):((from.id)?('user.id:'+from.id):from)
+  bus.emit('system.message',"[karibou-danger] stripe error: ",{error:err.message,type:err.type, param:err.param,code:err.code, context:context});
 
 	switch (err.type) {
 	  case 'StripeCardError':
@@ -127,7 +128,7 @@ PaymentStripe.prototype.checkCard=function(user,alias){
 		handleStripe.card_id,
 	  function(err, card) {
 	    if(err){
-	    	return deferred.reject(parseError(err));
+	    	return deferred.reject(parseError(err,user));
 	    }
 	    deferred.resolve(card);
 	  }
@@ -163,7 +164,7 @@ PaymentStripe.prototype.removeCard=function(user, alias){
 			handleStripe.gateway_id, 
 			handleStripe.card_id,
 		function (err, confirmation) {
-	    if(err)return deferred.reject(parseError(err));
+	    if(err)return deferred.reject(parseError(err,user));
 	    deferred.resolve(confirmation);
 			// callback(parseError(err),confirmation)
 		})
@@ -212,7 +213,7 @@ PaymentStripe.prototype.addCard=function(user, payment){
 		    customer.id, {card: payment.id}, //"tok_25UMttBTMLb4og7PRQfVQ9RH"
 		    function(err, card) {
 		    	if(err){
-				    return deferred.reject(parseError(err));
+				    return deferred.reject(parseError(err,user));
 		    		// return callback(parseError(err))
 		    	}
 		    	// save customer id
@@ -265,7 +266,7 @@ PaymentStripe.prototype.authorize=function(order){
 		  capture:false, /// ULTRA IMPORTANT HERE!
 		  description: "#"+order.oid+" for "+order.customer.email.address
 		}, function(err, charge) {
-			if(err){ return callback(parseError(err))}
+			if(err){ return callback(parseError(err,order))}
 
 	  	var result={
 	  		log:'authorized amount '+(charge.amount/100)+' the '+new Date(charge.created),
@@ -302,7 +303,7 @@ PaymentStripe.prototype.cancel=function(order,reason){
 		stripe.charges.createRefund(
 			order.payment.transaction.decrypt(),{},
 		function(err, refund) {
-			if(err){ return callback(parseError(err))}
+			if(err){ return callback(parseError(err,order))}
 	  	var result={
 	  		log:'cancel authorization the '+new Date(refund.created),
 	  		transaction:refund.id.crypt(),
@@ -340,7 +341,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 			order.payment.transaction.decrypt(),
 			params,
 		function(err, refund) {
-			if(err){ return callback(parseError(err))}
+			if(err){ return callback(parseError(err,order))}
 			// align data here
 	  	var result={
 	  		log:'refund '+refund.amount/100+' the '+new Date(refund.created),
@@ -376,7 +377,7 @@ PaymentStripe.prototype.capture=function(order,reason){
 			order.payment.transaction.decrypt(),
 			{amount:order.getTotalPrice()*100},
 		function(err, charge) {
-			if(err){ return callback(parseError(err))}
+			if(err){ return callback(parseError(err,order))}
 	  	var result={
 	  		log:'capture '+charge.amount/100+' the '+new Date(charge.created),
 	  		transaction:charge.id.crypt(),

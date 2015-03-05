@@ -8,15 +8,18 @@ exports.check   = check;
 exports.ifCheck = ifCheck;
 
 var user_address = exports.address =  function(address){
+      check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 100)
+      check(address.streetAdress,"La rue de votre adresse n'est pas valide").isText().len(4, 200)
+      check(address.floor,     "L'étage n'est pas valide").isText().len(1, 50)
+      check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
+
+      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 200)
       ifCheck(address.region,    "La région n'est pas valide").isText().len(2, 100)
       ifCheck(address.primary,   "Ooops votre adresse n'est pas valide").isBoolean()
-      check(address.geo.lng,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
-      check(address.geo.lat,     "Ooops, erreur de réseau de geolocalisation, recommencez plus tard").isFloat()
-      check(address.postalCode,  "Votre numéro postal n'est pas valide").isNumeric()
-      ifCheck(address.floor,     "L'étage n'est pas valide").isText().len(1, 50)
-      check(address.streetAdress,"L'adresse n'est pas valide").isText().len(4, 200)
-      ifCheck(address.note,        "Votre note n'est pas valide").isText().len(0, 200)
-      check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 100)
+      if(address.geo){
+        check(address.geo.lng,     "Erreur de données de geolocalisation 1").isFloat()
+        check(address.geo.lat,     "Erreur de données de geolocalisation 2").isFloat()        
+      }
 }
 
 /**
@@ -38,8 +41,8 @@ var user= exports.user = function(u, lean){
     }
 
     for( var i in u.phoneNumbers){
-      check(u.phoneNumbers[i].what,   "Votre téléphone n'est pas valide").isText().len(4, 30)
-      check(u.phoneNumbers[i].number, "Votre téléphone n'est pas valide").isText().len(10, 30)
+      check(u.phoneNumbers[i].what,   "Votre libélé de téléphone n'est pas valide").isText().len(4, 30)
+      check(u.phoneNumbers[i].number, "Votre numéro téléphone n'est pas valide").isText().len(10, 30)
     }
 
     for( var i in u.addresses){
