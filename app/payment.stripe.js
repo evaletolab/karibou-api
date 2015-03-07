@@ -14,7 +14,7 @@ function parseError(err, from) {
 	  invalid_expiry_month: "Le mois d'expiration de votre carte n'est plus valide.",
 	  invalid_expiry_year: "L'année d'expiration de votre carte n'est plus valide.",
 	  invalid_cvc: "Le code de sécurité de votre carte (CVC) est invalide.",
-	  expired_card: "Vard otre carte a expirée.",
+	  expired_card: "Votre carte a expirée.",
 	  incorrect_cvc: "The card's security code is incorrect.",
 	  incorrect_zip: "The card's zip code failed validation.",
 	  card_declined: "The card was declined.",
@@ -31,7 +31,7 @@ function parseError(err, from) {
 	switch (err.type) {
 	  case 'StripeCardError':
 	    // A declined card error
-	    return new Error(errorMessages[ err.code ])||err
+	    return new Error(errorMessages[ err.code ]||err.message)
 	  case 'StripeInvalidRequestError':
 	    // Invalid parameters were supplied to Stripe's API
 	    break;

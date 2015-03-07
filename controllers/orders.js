@@ -380,7 +380,7 @@ exports.create=function(req,res){
         return res.json(order)
       })
       .fail(function(err){
-        bus.emit('system.message',"[order-danger] :",{error:err.message,order:order.oid,customer:order.email});
+        bus.emit('system.message',"[order-create] :",{error:err.message,order:order.oid,customer:order.email});
         return res.json(400,err.message)        
       })
   });
@@ -571,7 +571,7 @@ exports.capture=function(req,res){
         return res.json(order)
       })
       .fail(function(err){
-        bus.emit('system.message',"[order-danger] :",{error:err.message,order:order.oid,customer:order.email});
+        bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});
         return res.json(400,err.message)        
       })
 
