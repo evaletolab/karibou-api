@@ -44,7 +44,7 @@ var Product = new Schema({
       cold:{type:Boolean, default:false},          // Fresh food
       homemade:{type:Boolean, default:false},      // Home made
       natural:{type:Boolean, default:false},       // Synthetic Pesticide & Fertilizer Free
-      local:{type:Boolean, default:false},         // Locally Grown
+      local:{type:Boolean, default:false},         // Produit dans notre ferme
       bio:{type:Boolean, default:false},           // Certified Organic
       biodegradable:{type:Boolean, default:false}, //  
    },  

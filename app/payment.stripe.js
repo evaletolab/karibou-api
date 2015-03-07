@@ -10,11 +10,11 @@ var settings={};
 function parseError(err, from) {
 	var errorMessages = {
 	  incorrect_number: "Le numéro de carte est incorrect.",
-	  invalid_number: "The card number is not a valid credit card number.",
-	  invalid_expiry_month: "The card's expiration month is invalid.",
-	  invalid_expiry_year: "The card's expiration year is invalid.",
-	  invalid_cvc: "The card's security code is invalid.",
-	  expired_card: "The card has expired.",
+	  invalid_number: "Le numéro de carte n'est pas compatible avec le format 'credit card'.",
+	  invalid_expiry_month: "Le mois d'expiration de votre carte n'est plus valide.",
+	  invalid_expiry_year: "L'année d'expiration de votre carte n'est plus valide.",
+	  invalid_cvc: "Le code de sécurité de votre carte (CVC) est invalide.",
+	  expired_card: "Vard otre carte a expirée.",
 	  incorrect_cvc: "The card's security code is incorrect.",
 	  incorrect_zip: "The card's zip code failed validation.",
 	  card_declined: "The card was declined.",
@@ -26,12 +26,12 @@ function parseError(err, from) {
 	//
 	// get an email on error
 	var context=(from.oid)?('order.oid:'+from.oid):((from.id)?('user.id:'+from.id):from)
-  bus.emit('system.message',"[karibou-danger] stripe error: ",{error:err.message,type:err.type, param:err.param,code:err.code, context:context});
+  bus.emit('system.message',"[karibou-danger] stripe error: ",{message:err.message,type:err.type, param:err.param,code:err.code, context:context});
 
 	switch (err.type) {
 	  case 'StripeCardError':
 	    // A declined card error
-	    return errorMessages[ err.code ]
+	    return new Error(errorMessages[ err.code ])||err
 	  case 'StripeInvalidRequestError':
 	    // Invalid parameters were supplied to Stripe's API
 	    break;
@@ -45,7 +45,7 @@ function parseError(err, from) {
 	    // You probably used an incorrect API key
 	    break;
 	}	
-	return err.message
+	return err
 }
 
 
