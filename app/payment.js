@@ -1,9 +1,10 @@
 var Q=require('q');
+var bus = require('../app/bus');
 
 
 var Payment=function(){
 	function parseError (err) {
-		return err.message||err
+		return err
 	}
 	//
 	// commons
