@@ -264,8 +264,7 @@ exports.github=function(req,res){
   })
 
   child.stderr.on('data', function (error) {
-    console.log(error.toString('utf8'))
-    //return bus.emit('system.message',"[karibou-github error] : ",error.toString('utf8'));
+    console.log("end of CI",error.toString('utf8'))
   });
 }
 
