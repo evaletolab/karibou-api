@@ -260,12 +260,14 @@ exports.github=function(req,res){
   var child=spawn('node-continuous.sh',[config.admin.webhook.release,config.express.port],{detached:true})
   child.stdout.on('data', function (stdout) {
     console.log("github",event,stdout.toString('utf8'))    
-    return res.send(200)
   })
 
   child.stderr.on('data', function (error) {
     console.log("end of CI",error.toString('utf8'))
   });
+
+  // CI done
+  return res.send(200)
 }
 
 
