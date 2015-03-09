@@ -555,7 +555,7 @@ exports.capture=function(req,res){
           shippingWhen:order.getDateString(),
           subTotal:subTotal.toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
-          withHtml:false
+          withHtml:true
         };
         bus.emit('sendmail',  
             order.email,
