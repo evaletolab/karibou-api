@@ -254,9 +254,9 @@ exports.github=function(req,res){
     return res.send(200)
   }
 
-  console.log('===========')
+  console.log('============')
   console.log('= github CI',config.admin.webhook.release,config.express.port)
-  console.log('===========')
+  console.log('============')
   var child=spawn('node-continuous.sh',[config.admin.webhook.release,config.express.port],{detached:true})
   child.stdout.on('data', function (stdout) {
     console.log("github",event,stdout.toString('utf8'))    
