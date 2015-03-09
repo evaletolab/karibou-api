@@ -260,11 +260,13 @@ exports.github=function(req,res){
   var child=spawn('node-continuous.sh',[config.admin.webhook.release,config.express.port],{detached:true})
   child.stdout.on('data', function (stdout) {
     console.log("github",event,stdout.toString('utf8'))    
+    return res.send(200)
   })
 
   child.stderr.on('data', function (error) {
     console.log(error.toString('utf8'))
     //return bus.emit('system.message',"[karibou-github error] : ",error.toString('utf8'));
+    return res.send(400,'CI error (4): '+error.toString('utf8'))
   });
 }
 
