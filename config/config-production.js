@@ -23,7 +23,7 @@ module.exports = {
   admin:{
     emails:['evaleto@gmail.com', 'delphine.cluzel@gmail.com'],
     secret: process.env.KARIBOU_SECRET,
-    github: {release:process.env.KARIBOU_RELEASE,secret:process.env.KARIBOU_GITHUB},
+    webhook: {release:process.env.KARIBOU_RELEASE,secret:process.env.KARIBOU_GITHUB},
     padding:'0e0e0e0e'    
   },
 
