@@ -56,21 +56,23 @@ exports.create=function (req, res) {
   }  
   
   
-
-  Shops.findByUser({id:req.user.id},function (err,shops){
+  //
+  // this is not true for admin user
+  Shops.findOneShop({urlpath:req.params.shopname},function (err,shop){
     if (err){
       return res.send(400, errorHelper(err));    
     }
-    
-
-    var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
-    if (!s){
-      return res.send(400, "Vous devez utiliser une boutique qui vous appartient");    
+    if(!shop){
+      return res.send(400, 'Vous devez utiliser une boutique qui vous appartient');          
     }
+    // var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
+    // if (!s){
+    //   return res.send(400, "Vous devez utiliser une boutique qui vous appartient");    
+    // }
 
     //
     // ready to create one product
-    Products.create(req.body,s, function(err,product){
+    Products.create(req.body,shop, function(err,product){
         if(err){
           return res.send(400, errorHelper(err));    
         }
