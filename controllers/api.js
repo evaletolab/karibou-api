@@ -224,13 +224,13 @@ exports.github=function(req,res){
   //
   // checks webhook config 
   if(!config.admin.webhook||!config.admin.webhook.secret){
-    return res.send(400)
+    return res.send(400,'CI error (1)')
   }
 
   //
   // checks push release
   if(req.body.ref.indexOf(config.admin.webhook.release)===-1){
-    return res.send(400)    
+    return res.send(400,'CI error (2)')    
   }
 
   //
@@ -242,12 +242,12 @@ exports.github=function(req,res){
 
 
   if(!sig||!event||!id){
-    return res.send(400)
+    return res.send(400,'CI error (3)')
   }
 
   if(sig!==verify){
     console.log('gihub sig verification error',sig,verify)
-    return res.send(400,'sig verification error')
+    return res.send(400,'CI verification error')
   }
 
   if (req.body.ref.indexOf(config.admin.webhook.release)===-1) {
