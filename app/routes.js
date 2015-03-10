@@ -85,6 +85,7 @@ module.exports = function(app, config, passport) {
   //
   // system
   app.get ('/v1/config', cached, api.config);
+  app.get ('/v1/cdn/image/:size', cached, api.imagecdn);
   app.post('/v1/config', auth.ensureAdmin, api.saveConfig);
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/comment', api.email);
