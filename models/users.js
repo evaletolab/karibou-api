@@ -85,8 +85,8 @@ validate.postal = function (value) {
           },
           primary:{ type: Boolean, required : true, default:false},
           geo:{
-            lat:{type:Number, required: true},
-            lng:{type:Number, required: true}
+            lat:{type:Number, required: false},
+            lng:{type:Number, required: false}
           }
     }],
 
