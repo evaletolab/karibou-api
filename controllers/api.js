@@ -48,7 +48,7 @@ exports.imagecdn =function(req, res) {
     var size=req.params.size+'/';
     var options = {
         host: "cdn.filter.to",
-        path: "/"+size+req.query.source
+        path: "/"+size+encodeURI(req.query.source)
     };
 
     var callback = function(response) {
