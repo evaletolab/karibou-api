@@ -44,12 +44,16 @@ exports.imagecdn =function(req, res) {
     // cdn url format
     // http://cdn.filter.to/75x75/http://yoursite.com/path/to/my/picture.jpg
     // 375x1000/?uri=http://karibou-filepicker.s3-website-eu-west-1.amazonaws.com/Y8sMyOkzRvWgRwb0mBBJ_entrecote.jpg
-    var source='http://karibou-filepicker.s3-website-eu-west-1.amazonaws.com/';
+    // var source='http://karibou-filepicker.s3-website-eu-west-1.amazonaws.com/';
     // var source="//s3-eu-west-1.amazonaws.com/karibou-filepicker/";
+    var source=encodeURI(req.query.source);
+    if(source.indexOf('http:')!==0){
+      source='http:'+source;
+    }
     var size=req.params.size+'/';
     var options = {
         host: "cdn.filter.to",
-        path: "/"+size+encodeURI(req.query.source)
+        path: "/"+size+source
     };
 
     var callback = function(response) {
