@@ -236,6 +236,7 @@ exports.update=function(req,res){
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
     validate.shop(req.body);
   }catch(err){
+      console.log('-----------------0',err)
     return res.send(400, err.message);
   }
 
@@ -256,8 +257,8 @@ exports.update=function(req,res){
 
   Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
     if (err){
-    	res.status(400);
-      return res.send(err);
+      console.log('-----------------1',err)
+      return res.send(400,err);
     }
     return res.json(shop);
   });

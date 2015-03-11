@@ -119,9 +119,9 @@ exports.product = function(req){
     }
 
     if (req.body.photo){
-      req.body.photo.bg && check(req.body.photo.bg,"Erreur system p6").len(6, 164).isUrl();
-      req.body.photo.fg && check(req.body.photo.fg,"Erreur system p7").len(6, 164).isUrl();
-      req.body.photo.owner && check(req.body.photo.owner,"Erreur system p8").len(6, 164).isUrl();
+      req.body.photo.bg && check(req.body.photo.bg,"Erreur system p6").len(6, 164).isImgUrl();
+      req.body.photo.fg && check(req.body.photo.fg,"Erreur system p7").len(6, 164).isImgUrl();
+      req.body.photo.owner && check(req.body.photo.owner,"Erreur system p8").len(6, 164).isImgUrl();
     }else{
       throw new Error("Vous devez définir une photo");
     }
@@ -203,12 +203,12 @@ exports.shop=function(shop){
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
     }
 
-    if(shop.url) check(shop.url).len(6, 164).isUrl();
+    if(shop.url) check(shop.url,"Erreur system p9").len(6, 164).isImgUrl();
 
     if (shop.photo){
-      shop.photo.bg && check(shop.photo.bg).len(6, 164).isUrl();
-      shop.photo.fg && check(shop.photo.fg).len(6, 164).isUrl();
-      shop.photo.owner && check(shop.photo.owner).len(6, 164).isUrl();
+      shop.photo.bg && check(shop.photo.bg,"Erreur system p9").len(6, 164).isImgUrl();
+      shop.photo.fg && check(shop.photo.fg,"Erreur system p9").len(6, 164).isImgUrl();
+      shop.photo.owner && check(shop.photo.owner,"Erreur system p9").len(6, 164).isImgUrl();
     }
 
     if (shop.details){

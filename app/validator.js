@@ -31,6 +31,13 @@ validator.extend('isSlug', function (str) {
     return slug.test(str)
 });
 
+//
+// validate image url
+validator.extend('isImgUrl', function (str) {
+    // var start=str.indexOf('http')
+    return validator.isText(str)
+});
+
 /**
  * wrapp validator function in object
  * https://github.com/ctavan/express-validator
@@ -85,6 +92,7 @@ Wrapper.prototype.isFloat = constructWrapper('isFloat');
 Wrapper.prototype.isInt = constructWrapper('isInt');
 Wrapper.prototype.isBoolean = constructWrapper('isBoolean');
 Wrapper.prototype.isUrl = constructWrapper('isURL');
+Wrapper.prototype.isImgUrl = constructWrapper('isImgUrl');
 Wrapper.prototype.isSlug = constructWrapper('isSlug');
 Wrapper.prototype.isAlphanumeric=constructWrapper('isAlphanumeric');
 Wrapper.prototype.is=constructWrapper('matches');
