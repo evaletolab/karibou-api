@@ -111,7 +111,7 @@ exports.product = function(req){
       check(req.body.pricing.stock, "Entrez une valeur de stock valide").isInt();
       check(req.body.pricing.part, "La valeur d'une portion doit contenir entre 2 et 10 caractères").len(2, 10);
 
-      if(req.body.attributes.discount&&!req.body.pricing.discount){
+      if(req.body.attributes&&req.body.attributes.discount&&!req.body.pricing.discount){
         throw new Error("Vous avez activé la promotion sans définir le prix");  
       }
     }else{
