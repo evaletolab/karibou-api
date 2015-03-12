@@ -1072,7 +1072,6 @@ Orders.statics.findByCriteria = function(criteria, callback){
     // q["email"]=criteria.user
     q["payment.status"]=criteria.payment;
   }
-
   debug("find criteria ",q)
   var query=Orders.find(q).sort({created: -1});
 

@@ -150,8 +150,11 @@ function parseCriteria(criteria, req){
   }
 
 
-  if (req.query.fulfillments &&
-      config.shop.order.status.indexOf(req.query.fulfillments)!=-1){
+  if (req.query.fulfillments){
+    // check all status? generate error?
+    req.query.fulfillments.split(',').forEach(function (fulfillment) {
+      // (config.shop.order.status.indexOf(fulfillment)!=-1)
+    })
     criteria.fulfillment=req.query.fulfillments
   }
 
