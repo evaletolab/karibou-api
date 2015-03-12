@@ -129,9 +129,9 @@ var Orders = new Schema({
       floor:{type:String, required:true},
       postalCode:{type:String, required:true},
       region:{type:String, required:true},
-      geo:{
-        lat:{type:Number, required: true},
-        lng:{type:Number, required: true}
+      geo:{ // geo is not mandatory
+        lat:{type:Number, required: false},
+        lng:{type:Number, required: false}
       },
       shipped:{type:Boolean,default:false}
    }
@@ -1058,7 +1058,8 @@ Orders.statics.findByCriteria = function(criteria, callback){
   }
 
   if(criteria.fulfillment){
-    q["fulfillments.status"]=criteria.fulfillment;
+    var multiple=criteria.fulfillment.split(',');
+    q["fulfillments.status"]=(multiple.length>1)?{$in:multiple}:criteria.fulfillment;
   }
 
   if(criteria.reason){
