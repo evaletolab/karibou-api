@@ -1366,9 +1366,10 @@ Orders.statics.updateLogistic = function(query,options, callback){
         }
 
 
-        if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
-          return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
-        }
+        // TODO this is not needed
+        // if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
+        //   return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
+        // }
 
 
         var statusShopper=Boolean(options.status)

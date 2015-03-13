@@ -60,7 +60,7 @@ describe("api.orders.find", function(){
     })
   });
 
-  it('mark order shipped get an error when order is not fulfilled',function(done){
+  it.skip('mark order shipped get an error when order is not fulfilled',function(done){
     Orders.updateLogistic({oid:2000016}, {status:true},function (err, orders) {
       should.exist(err)
       err.should.include('Impossible de livrer une commande avec le status')
