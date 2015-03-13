@@ -1304,7 +1304,7 @@ Orders.statics.updateItem = function(oid,items, callback){
 Orders.statics.updateLogistic = function(query,options, callback){
   assert(query);
   assert(options);
-  var saveTasks=[], Q=require('q'), deferred = Q.defer();
+  var saveTasks=[], Q=require('q');
 
   if(options.status === undefined){
     return callback("Ooops error updateLogistic missing param");          
@@ -1350,6 +1350,8 @@ Orders.statics.updateLogistic = function(query,options, callback){
       //
       // fill an array of promises
       saveTasks.push((function(order) {
+        var deferred = Q.defer();
+
         //
         // check order status
         if(order.closed){
@@ -1389,12 +1391,12 @@ Orders.statics.updateLogistic = function(query,options, callback){
           order.shipping.shipped=statusShopper;
         }
 
-        return order.save()
-        // order.save(function (err,order) {
-        //   if(err){return deferred.reject(err);}
-        //   deferred.resolve(order)
-        // })
-        // return deferred.promise;
+        // return order.save()
+        order.save(function (err,order) {
+          if(err){return deferred.reject(err);}
+          deferred.resolve(order)
+        })
+        return deferred.promise;
       })(orders[i]));
     }
     //
