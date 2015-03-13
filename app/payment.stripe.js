@@ -336,7 +336,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 	  }
 
 	  var params={}
-	  if(amount){params.amount=amount*100}
+	  if(amount){params.amount=Math.round(amount*100)}
 		stripe.charges.createRefund(
 			order.payment.transaction.decrypt(),
 			params,
@@ -375,7 +375,7 @@ PaymentStripe.prototype.capture=function(order,reason){
 
 		stripe.charges.capture(
 			order.payment.transaction.decrypt(),
-			{amount:order.getTotalPrice()*100},
+			{amount:Math.round(order.getTotalPrice()*100)},
 		function(err, charge) {
 			if(err){ return callback(parseError(err,order))}
 	  	var result={
