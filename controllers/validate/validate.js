@@ -93,7 +93,7 @@ exports.product = function(req){
 
 
     if(req.body.details){
-      check(req.body.details.description,"Le description doit contenir au max 300 caractères").len(3, 300).isText();
+      check(req.body.details.description,"Le description doit contenir au max 500 caractères").len(3, 500).isText();
       req.body.details.bio && check(req.body.details.bio,"Erreur system p1").isBoolean();
       req.body.details.homemade && check(req.body.details.homemade,"Erreur system p2").isBoolean();
       req.body.details.natural && check(req.body.details.natural,"Erreur system p3").isBoolean();
@@ -101,7 +101,7 @@ exports.product = function(req){
       req.body.details.cold && check(req.body.details.cold,"Erreur system p5").isBoolean();
 
     }else{
-      throw new Error("Vous devez définir une description de 3 à 300 caractères");
+      throw new Error("Vous devez définir une description de 3 à 500 caractères");
     }
 
     if(req.body.pricing){
@@ -145,7 +145,7 @@ exports.product = function(req){
 
     if (req.body.info){
       req.body.info.active && check(req.body.info.active).isBoolean();
-      req.body.info.comment && check(req.body.info.comment,"Vous devez définir un commentaire de 3 à 300 caractères").len(6, 300).isText();
+      req.body.info.comment && check(req.body.info.comment,"Vous devez définir un commentaire de 3 à 500 caractères").len(6, 500).isText();
     }
 
     for (var i in req.body.faq){
@@ -158,7 +158,7 @@ exports.product = function(req){
 var order_items = exports.orderItems = function(items, update){
   for (var i in items){
     check(items[i].sku).isNumeric()
-    check(items[i].title,       "Le description doit contenir entre 6 et 300 caractères").isText().len(3, 300);
+    check(items[i].title,       "Le description doit contenir entre 6 et 500 caractères").isText().len(3, 500);
     if(update!==true){
       check(items[i].categories,  "La catégorie doit contenir entre 6 et 200 caractères").isText().len(3, 200);
       check(items[i].vendor,      "Le vendeur doit contenir entre 3 et 200 caractères").isText().len(3, 200);
@@ -199,7 +199,7 @@ exports.shop=function(shop){
 
     if(shop.name) check(shop.name,"Le nom doit contenir entre 3 et 60 caractères").len(3, 60).isText()
     if(shop.description){
-      check(shop.description,"La description doit contenir entre 3 et 400 caractères").len(3, 400).isText()
+      check(shop.description,"La description doit contenir entre 3 et 500 caractères").len(3, 500).isText()
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
     }
 
