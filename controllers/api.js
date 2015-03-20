@@ -243,6 +243,8 @@ exports.robots=function(req,res){
   rb+="Disallow: /\n";
   rb+="Allow: /v1/config\n";
   rb+="Allow: /v1/products\n";
+  rb+="Allow: /v1/category\n";
+  rb+="Allow: /v1/cdn\n";
   rb+="Allow: /v1/shops\n";
   res.send(200,rb);
 }
