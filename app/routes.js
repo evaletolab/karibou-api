@@ -32,6 +32,11 @@ module.exports = function(app, config, passport) {
     return next();
   }
 	
+  function longcached(req, res, next) {
+    res.setHeader('Cache-Control', 'public, max-age=120000');
+    return next();
+  }
+  
 	
   //
   // auth 
@@ -85,7 +90,7 @@ module.exports = function(app, config, passport) {
   //
   // system
   app.get ('/v1/config', cached, api.config);
-  app.get ('/v1/cdn/image/:size', cached, api.imagecdn);
+  app.get ('/v1/cdn/image/:size', longcached, api.imagecdn);
   app.post('/v1/config', auth.ensureAdmin, api.saveConfig);
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/comment', api.email);

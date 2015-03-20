@@ -239,7 +239,12 @@ exports.sitemap=function(req,res){
 
 exports.robots=function(req,res){
   res.type('text/plain');
-  res.send(200,'User-agent: *\nDisallow: /\n');
+  var rb='User-agent: *\n';
+  rb+="Disallow: /\n";
+  rb+="Allow: /v1/config\n";
+  rb+="Allow: /v1/products\n";
+  rb+="Allow: /v1/shops\n";
+  res.send(200,rb);
 }
 
 
