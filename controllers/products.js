@@ -214,10 +214,7 @@ exports.getSEO=function (req, res) {
     var model={ 
       product: product, 
       user: req.user, 
-      _:_,
-      getPrice=function(p) {
-        p.getPrice()
-      }
+      _:_
     };
 
     return res.render('product', model);
