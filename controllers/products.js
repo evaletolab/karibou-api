@@ -199,6 +199,31 @@ exports.get=function (req, res) {
   });
 };
 
+//
+// get product SEO
+exports.getSEO=function (req, res) {
+  return Products.findOneBySku(req.params.sku, function (err, product) {
+    if (err) {
+      return res.send(400,errorHelper(err));
+    }
+    if(!product){
+      return res.send(400,"Ce produit n'existe pas");
+    }
+    //
+    // setup the model 
+    var model={ 
+      product: product, 
+      user: req.user, 
+      _:_,
+      getPrice=function(p) {
+        p.getPrice()
+      }
+    };
+
+    return res.render('product', model);
+  });
+};
+
 
 // PUT to UPDATE
 

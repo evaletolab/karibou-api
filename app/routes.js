@@ -88,6 +88,10 @@ module.exports = function(app, config, passport) {
   app.get ('/v1', api.index(app));
 
   //
+  // SEO
+  app.get('/products/:sku',products.getSEO);
+
+  //
   // system
   app.get ('/v1/config', cached, api.config);
   app.get ('/v1/cdn/image/:size', longcached, api.imagecdn);
@@ -97,6 +101,7 @@ module.exports = function(app, config, passport) {
   // temporary path for subscription
   app.post('/v1/message/:key', api.message);
   app.post('/v1/github/webhook',api.github)
+
 
   // PSP gateway
   // app.get ('/v1/psp/std',api.pspStd)
