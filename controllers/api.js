@@ -241,6 +241,8 @@ exports.robots=function(req,res){
   res.type('text/plain');
   var rb='User-agent: *\n';
   rb+="Disallow: /\n";
+  rb+="Allow: /products\n";
+  rb+="Allow: /seo\n";
   rb+="Allow: /v1/config\n";
   rb+="Allow: /v1/products\n";
   rb+="Allow: /v1/category\n";
