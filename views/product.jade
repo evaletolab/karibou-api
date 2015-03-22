@@ -1,0 +1,29 @@
+!!! 5
+html
+  head
+    // http://schema.org/Product
+    title: =product.sku+' - '+product.title
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(itemprop='sku' content='#{product.sku}')
+  body(itemscope itemtype="http://schema.org/Product")
+    h1(itemprop="name"): =product.title
+    div(itemprop="description"): =product.details.description
+    div: =product.details.origin
+    div(itemprop="offers" itemscope itemtype="http://schema.org/Offer")
+      span(span itemprop="price"): =product.getPrice()+' CHF'
+    div 
+      img( itemprop='image' src='#{product.photo.url}')
+    h1 Catégorie
+    div: =product.categories.name
+    h1 Boutique
+    div(itemprop='owns')
+      span(itemprop="name"): =product.vendor.address.name 
+      <br/>
+      span(itemprop="url")<a href="/shops/#{product.vendor.urlpath}">#{product.vendor.name}</a>
+
+    h1 En vente sur le marché
+- each place in product.vendor.marketplace
+    li: =place
+
+
+
