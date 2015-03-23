@@ -223,8 +223,10 @@ exports.sitemap=function(req,res){
       urls.push({url:prefix+product.sku, changefreq: 'weekly', priority: 1.0 })
     })
 
+    //
+    // yeah, google bot doesn't like 301 permanent redirection
     sitemap = sm.createSitemap ({
-      hostname: config.mail.origin,
+      hostname: config.mail.origin.replace('https','http'),
       cacheTime: (12*3600000),        // 12h - cache purge period
       urls: urls
     });
