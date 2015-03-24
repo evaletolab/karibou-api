@@ -88,6 +88,8 @@ module.exports = {
   },
 
 	auth:{
+    uploadcare:{pub:'5b16536eaebe4756a76d',pk:'fabaa56c23c18c1ad9ff'}
+  ,
     fb: {
         appId: '111565172259433'
       , appSecret: '85f7e0a0cc804886180b887c1f04a3c1'
