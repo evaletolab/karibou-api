@@ -214,7 +214,13 @@ exports.getSEO=function (req, res) {
     var model={ 
       product: product, 
       user: req.user, 
-      _:_
+      _:_,
+      prependUrlImage:function (url) {
+        if(url&&url.indexOf('//')===0){
+          url='https:'+url;
+        }
+        return url;
+      }
     };
 
     return res.render('product', model);

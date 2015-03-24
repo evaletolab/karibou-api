@@ -15,7 +15,7 @@ html(itemscope itemtype="http://schema.org/Product")
     // Schema.org markup for Google+ 
     meta( itemprop="name" content="#{product.title}")
     meta( itemprop="description" content="#{product.details.description}")
-    meta( itemprop="image" content="#{product.photo.url}")
+    meta( itemprop="image" content="#{prependUrlImage(product.photo.url)}")
 
     // Twitter Card data 
     meta( name="twitter:card" content="product")
@@ -23,7 +23,7 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( name="twitter:title" content="#{product.title}")
     meta( name="twitter:description" content="#{product.details.description}")
     //meta( name="twitter:creator" content="@author_handle")
-    meta( name="twitter:image" content="#{product.photo.url}")
+    meta( name="twitter:image" content="#{prependUrlImage(product.photo.url)}")
     meta( name="twitter:data1" content="#{product.getPrice().toFixed(2)}")
     meta( name="twitter:label1" content="Price")
 
@@ -31,7 +31,7 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( property="og:title" content="#{product.title}" )
     meta( property="og:type" content="article" )
     meta( property="og:url" content="https://karibou.ch/products/#{product.sku}" )
-    meta( property="og:image" content="#{product.photo.url}" )
+    meta( property="og:image" content="#{prependUrlImage(product.photo.url)}" )
     meta( property="og:description" content="#{product.details.description}" )
     meta( property="og:site_name" content="https://karibou.ch" )
     meta( property="og:price:amount" content="#{product.getPrice().toFixed(2)}" )
@@ -44,7 +44,7 @@ html(itemscope itemtype="http://schema.org/Product")
     div(itemprop="offers" itemscope itemtype="http://schema.org/Offer")
       span: =product.getPrice().toFixed(2)+' CHF'
     div 
-      img(src='#{product.photo.url}')
+      img(src='#{prependUrlImage(product.photo.url)}')
     h1 Catégorie
     div: =product.categories.name
     h1 Boutique
