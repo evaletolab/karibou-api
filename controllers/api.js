@@ -243,6 +243,7 @@ exports.robots=function(req,res){
   res.type('text/plain');
   var rb='User-agent: *\n';
   rb+="Disallow: /\n";
+  rb+="Allow: /#!/\n";
   rb+="Allow: /sitemap.xml\n";
   rb+="Allow: /products\n";
   rb+="Allow: /seo\n";
