@@ -43,7 +43,11 @@ exports.update = function(db, callback){
 
 			//
 			// get version of the script
-			var versionScript = parseInt(script.match(new RegExp(/(\d+)\..+/))[1]);
+			var match=script.match(new RegExp(/(\d+)\..+/))
+			if(!match||!match.length){
+				return eachcb();
+			}
+			var versionScript = parseInt(match[1]);
 
 			// continue if there are no more recent scripts
 			if(versionDone >= versionScript){
