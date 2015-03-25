@@ -216,7 +216,7 @@ exports.sitemap=function(req,res){
     if(err){
       return req.send(400,errorHelper(err))
     }
-    var prefix="/#!/products/";
+    var prefix="/products/";
     var urls=[];
     products.forEach(function(product){
       // use lastmod wit product update date ??
