@@ -49,6 +49,7 @@ module.exports = function(app, config, passport) {
   //
   // sitemap
   app.get ('/sitemap.xml', api.sitemap);
+  app.get ('/seo/sitemap.xml', api.sitemap);
   app.get ('/robots.txt', api.robots);
   
   
