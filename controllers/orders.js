@@ -571,7 +571,7 @@ exports.capture=function(req,res){
             })
 
 
-        return res.json(order)
+        return res.json(_.extend({mail:mail},order.toObject))
       })
       .fail(function(err){
         bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});

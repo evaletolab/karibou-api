@@ -260,7 +260,7 @@ Orders.methods.getSubTotal=function(){
   this.items&&this.items.forEach(function(item){
     //
     // item should not be failure (fulfillment)
-    if(item.fulfillment!=='failure'){
+    if(item.fulfillment.status!=='failure'){
       total+=item.finalprice;
     }
   });
@@ -531,22 +531,52 @@ Orders.statics.jumpToNextWeekDay=function(date, jump) {
 
 /* return array of one week of shipping days available for customers*/
 Orders.statics.findOneWeekOfShippingDay=function(){
-  var next=this.findNextShippingDay(), all=[next], nextDate
+  var next=this.findNextShippingDay(), all=[], nextDate=next
 
-  config.shop.order.weekdays.forEach(function(day){
-    // next = 2
-    // all=[1,2,4]
-    // result =[2,4,1]
-    if(day<next.getDay()){
-        nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
-        if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
-          all.push(nextDate)
-    }else if(day>=next.getDay()){
-        nextDate=new Date((day-next.getDay())*86400000+next.getTime())
-        if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
-          all.push(nextDate)
-    }
-  })
+  // get current day in the array
+  var idxDay=config.shop.order.weekdays.indexOf(next.getDay());
+
+  //
+  // end of week
+  for (var i = idxDay; i < config.shop.order.weekdays.length; i++) {
+    nextDate=new Date((config.shop.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
+    nextDate.setHours(next.getHours(),0,0,0)
+    all.push(nextDate)
+  };
+
+  //
+  // ellapsed time before the end of week
+  nextDate=new Date((7-nextDate.getDay())*86400000+nextDate.getTime());
+
+  //
+  // next week
+  for (var i = 0; i < idxDay; i++) {
+    nextDate=new Date((config.shop.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
+    nextDate.setHours(next.getHours(),0,0,0)
+    all.push(nextDate)
+  };
+
+
+
+  // config.shop.order.weekdays.forEach(function(day){
+  //   // next = 2
+  //   // all=[1,2,4]
+  //   // result =[2,4,1]
+  //   console.log('day, next day--------',day, next.getDay())
+  //   if(day<next.getDay()){
+  //     // 7-5+1=3 => 5+3=(8%)
+  //       nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
+  //       nextDate.setHours(next.getHours(),0,0,0)
+  //       console.log('before-----------',nextDate.getDay())
+  //       if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+  //         all.push(nextDate)
+  //   }else if(day>=next.getDay()){
+  //       nextDate=new Date((day-next.getDay())*86400000+next.getTime())
+  //       nextDate.setHours(next.getHours(),0,0,0)
+  //       if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+  //         all.push(nextDate)
+  //   }
+  // })
 
   return all.sort(function(a,b){
     // Turn your strings into dates, and then subtract them

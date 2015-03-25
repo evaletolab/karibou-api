@@ -167,7 +167,10 @@ describe("orders.date", function(){
     var today=new Date(), all=Orders.findOneWeekOfShippingDay()
 
     config.shop.order.timelimit.should.not.be.above((all[0].getTime()-Date.now())/3600000)
-    all.forEach(function(n){
+
+    parseFloat((all[all.length-1].getTime()-all[0].getTime())/86400000).should.be.below(7)
+
+    all.forEach(function(n,i){
       // deprecated use containEql(n.getDay())
       n.getHours().should.not.be.above(config.shop.order.timelimitH)
       config.shop.order.weekdays.should.include(n.getDay())

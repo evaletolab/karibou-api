@@ -188,12 +188,13 @@ exports.Orders=[
         payment: {
             issuer: "tester",
             number:'98xxxxxxx4123',
-            alias:'01234567890',
+            alias:((u.Users[1].id+'').hash().crypt()),
+            transaction:'yes',
             status:"authorized"
         },
 
         fulfillments: {
-            status: "reserved"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
@@ -242,7 +243,7 @@ exports.Orders=[
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "failure"
                 }
             },
             {
@@ -252,12 +253,12 @@ exports.Orders=[
                 price: 3,
                 part: "100gr",
                 note: "",
-                finalprice: 3,
+                finalprice: 9,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -272,7 +273,7 @@ exports.Orders=[
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             }
         ],
