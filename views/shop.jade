@@ -17,7 +17,7 @@ html(itemscope itemtype="http://schema.org/LocalBusiness")
     meta( itemprop="url" content="https://karibou.ch/shop/#{shop.urlpath}" )
 
     // Twitter Card data 
-    meta( name="twitter:card" content="business")
+    meta( name="twitter:card" content="article")
     //meta( name="twitter:site" content="@publisher_handle")
     meta( name="twitter:title" content="#{shop.name}")
     meta( name="twitter:description" content="#{shop.description}")
@@ -26,7 +26,6 @@ html(itemscope itemtype="http://schema.org/LocalBusiness")
 
     // Open Graph data
     meta( property="og:title" content="#{shop.name}" )
-    meta( property="og:locale" content="fr_CH" )
     meta( property="og:url" content="https://karibou.ch/shop/#{shop.urlpath}" )
     meta( property="og:image" content="#{prependUrlImage(shop.photo.fg)}" )
     meta( property="og:description" content="#{shop.description}" )
