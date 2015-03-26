@@ -1,0 +1,56 @@
+!!! 5
+html(itemscope itemtype="http://schema.org/LocalBusiness")
+  head
+    // http://schema.org/LocalBusiness
+    title: =shop.name
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(name='robots' content='index,follow')
+
+
+    // Place this data between the <head> tags of your website 
+    meta( name="description" content="#{shop.description}")
+
+    // Schema.org markup for Google+ 
+    meta( itemprop="name" content="#{shop.name}")
+    meta( itemprop="description" content="#{shop.description}")
+    meta( itemprop="image" content="#{prependUrlImage(shop.photo.fg)}")
+    meta( itemprop="url" content="https://karibou.ch/shop/#{shop.urlpath}" )
+
+    // Twitter Card data 
+    meta( name="twitter:card" content="business")
+    //meta( name="twitter:site" content="@publisher_handle")
+    meta( name="twitter:title" content="#{shop.name}")
+    meta( name="twitter:description" content="#{shop.description}")
+    //meta( name="twitter:creator" content="@author_handle")
+    meta( name="twitter:image" content="#{prependUrlImage(shop.photo.fg)}")
+
+    // Open Graph data
+    meta( property="og:title" content="#{shop.name}" )
+    meta( property="og:locale" content="fr_CH" )
+    meta( property="og:url" content="https://karibou.ch/shop/#{shop.urlpath}" )
+    meta( property="og:image" content="#{prependUrlImage(shop.photo.fg)}" )
+    meta( property="og:description" content="#{shop.description}" )
+    meta( property="og:site_name" content="https://karibou.ch" )
+
+  body
+    h1: =shop.name
+    div: =shop.description
+    div 
+      img(src='#{prependUrlImage(shop.photo.fg)}')
+    h1 Boutique
+    div(itemprop='owns')
+      div(itemprop="name"): =shop.address.name 
+      div(itemprop="url")<a href="/shops/#{shop.urlpath}">#{shop.name}</a>
+
+    h1 En vente sur le marché
+- each place in shop.marketplace
+    li: =place
+
+    div( itemscope itemtype="http://schema.org/Organization")
+- each phone in shop.owner.phoneNumbers
+        div(itemprop="telephone"): =phone.number
+    div(itemscope itemtype="http://schema.org/PostalAddress")
+        div( itemprop="name"): =shop.address.name
+        div( itemprop="streetAddress"): =shop.address.streetAdress
+        div( itemprop="addressRegion"): =shop.address.region
+        div( itemprop="postalCode"): =shop.address.postalCode

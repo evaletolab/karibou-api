@@ -110,6 +110,44 @@ exports.get=function (req, res) {
 };
 
 //
+// get for SEO
+exports.getSEO=function (req, res) {
+  //
+  // check shop owner
+  try{
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  Shops.findOneShop({urlpath:req.params.shopname}).exec(function (err,shop){
+    if (err){
+      return res.send(400,errorHelper(err));
+    }
+
+    if (!shop){
+      return res.send(400,"Cannot find the shop "+req.params.shopname);
+    }
+
+    //
+    // setup the model 
+    var model={ 
+      shop: shop, 
+      user: req.user, 
+      _:_,
+      prependUrlImage:function (url) {
+        if(url&&url.indexOf('//')===0){
+          url='https:'+url;
+        }
+        return url;
+      }
+    };
+
+    return res.render('shop', model);
+  });
+};
+
+//
 // TODO multiple implement of send email, refactor it?
 exports.email=function(req,res){
   try{
