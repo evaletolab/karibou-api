@@ -1,0 +1,15 @@
+!!! 5
+html
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(name='robots' content='index,follow')
+    
+  body
+    h1 En vente sur le marché
+    ol
+        - each product in products
+            li
+                a( href="/products/#{product.sku}"): =product.title
+
+
+
