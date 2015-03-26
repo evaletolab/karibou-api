@@ -58,4 +58,8 @@ html(itemscope itemtype="http://schema.org/Product")
     li: =place
 
 
-
+    div(itemscope itemtype="http://schema.org/PostalAddress")
+       div( itemprop="name"): =product.vendor.address.name
+       div( itemprop="streetAddress"): =product.vendor.address.streetAdress
+       div( itemprop="addressRegion"): =product.vendor.address.region
+       div( itemprop="postalCode"): =product.vendor.address.postalCode
