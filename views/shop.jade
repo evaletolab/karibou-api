@@ -43,11 +43,11 @@ html(itemscope itemtype="http://schema.org/LocalBusiness")
       div(itemprop="url")<a href="/shops/#{shop.urlpath}">#{shop.name}</a>
 
     h1 En vente sur le marché
-- each place in shop.marketplace
-    li: =place
+    - each place in shop.marketplace
+        li: =place
 
     div( itemscope itemtype="http://schema.org/Organization")
-        div(itemprop="telephone"): =shop.phone
+        div(itemprop="telephone"): =shop.address.phone
     div(itemscope itemtype="http://schema.org/PostalAddress")
         div( itemprop="name"): =shop.address.name
         div( itemprop="streetAddress"): =shop.address.streetAdress
