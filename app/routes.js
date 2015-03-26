@@ -47,10 +47,11 @@ module.exports = function(app, config, passport) {
   app.post('/register', queued(auth.register_post));
 
   //
-  // sitemap
+  // sitemap & robots
   app.get ('/sitemap.xml', api.sitemap);
   app.get ('/seo/sitemap.xml', api.sitemap);
   app.get ('/robots.txt', api.robots);
+  app.get ('/seo/robots.txt', api.robots);
   
   
 
