@@ -47,8 +47,7 @@ html(itemscope itemtype="http://schema.org/LocalBusiness")
     li: =place
 
     div( itemscope itemtype="http://schema.org/Organization")
-- each phone in shop.owner.phoneNumbers
-        div(itemprop="telephone"): =phone.number
+        div(itemprop="telephone"): =shop.phone
     div(itemscope itemtype="http://schema.org/PostalAddress")
         div( itemprop="name"): =shop.address.name
         div( itemprop="streetAddress"): =shop.address.streetAdress
