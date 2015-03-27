@@ -39,7 +39,7 @@ html(itemscope itemtype="http://schema.org/LocalBusiness")
     h1 Boutique
     div(itemprop='owns')
       div(itemprop="name"): =shop.address.name 
-      div(itemprop="url")<a href="/shops/#{shop.urlpath}">#{shop.name}</a>
+      div(itemprop="url")<a href="/shop/#{shop.urlpath}">#{shop.name}</a>
 
     h1 En vente sur le marché
     - each place in shop.marketplace
