@@ -46,7 +46,8 @@ html(itemscope itemtype="http://schema.org/Product")
     div 
       img(src='#{prependUrlImage(product.photo.url)}')
     h2:  =product.categories.name
-    div: Genève
+    div 
+       région de Genève
     h1 Boutique
     div(itemprop='owns')
       span(itemprop="name"): =product.vendor.address.name 
@@ -54,13 +55,12 @@ html(itemscope itemtype="http://schema.org/Product")
       span(itemprop="url")<a href="/shop/#{product.vendor.urlpath}">#{product.vendor.name}</a>
 
     h1 En vente sur le marché
-- each place in product.vendor.marketplace
-    li: =place
+    - each place in product.vendor.marketplace
+      li: =place
 
 
     div(itemscope itemtype="http://schema.org/PostalAddress")
        div( itemprop="name"): =product.vendor.address.name
        div( itemprop="streetAddress"): =product.vendor.address.streetAdress
-       div( itemprop="addressRegion"): =product.vendor.address.region
-       div( itemprop="addressRegion"): Genève
+       div( itemprop="addressRegion"): =product.vendor.address.region.replace('GE','Genève')
        div( itemprop="postalCode"): =product.vendor.address.postalCode
