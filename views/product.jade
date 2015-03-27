@@ -45,8 +45,8 @@ html(itemscope itemtype="http://schema.org/Product")
       span: =product.getPrice().toFixed(2)+' CHF'
     div 
       img(src='#{prependUrlImage(product.photo.url)}')
-    h1 Catégorie
-    div: =product.categories.name
+    h2:  =product.categories.name
+    div: Genève
     h1 Boutique
     div(itemprop='owns')
       span(itemprop="name"): =product.vendor.address.name 
@@ -62,4 +62,5 @@ html(itemscope itemtype="http://schema.org/Product")
        div( itemprop="name"): =product.vendor.address.name
        div( itemprop="streetAddress"): =product.vendor.address.streetAdress
        div( itemprop="addressRegion"): =product.vendor.address.region
+       div( itemprop="addressRegion"): Genève
        div( itemprop="postalCode"): =product.vendor.address.postalCode
