@@ -242,7 +242,7 @@ exports.sitemap=function(req,res){
 exports.robots=function(req,res){
   res.type('text/plain');
   var rb='User-agent: *\n';
-  rb+="Disallow: /\n";
+  // rb+="Disallow: /\n";
   rb+="Allow: /sitemap.xml\n";
   rb+="Allow: /shop\n";
   rb+="Allow: /products\n";
