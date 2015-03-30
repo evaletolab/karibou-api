@@ -195,6 +195,15 @@ function parseCriteria(criteria, req){
     criteria.to.setHours(23,0,0,0);    
   }
 
+  //
+  // specify the padding option to add one week after the "to" date
+  if(req.query.padding){
+    criteria.padding=true
+  }
+
+  if(month){
+    console.log('from month',month,' ----------',criteria.from,'----',criteria.to,' - padding:',criteria.padding)
+  }
 
 
 }
