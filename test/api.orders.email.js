@@ -12,7 +12,8 @@ var Products=db.model('Products'),
 describe("api.orders.email", function(){
   var request= require('supertest');
   var _ = require("underscore");
-  var nextWeekDay=Orders.jumpToNextWeekDay(new Date(),1)
+  var oneweek=Orders.findOneWeekOfShippingDay();
+  var nextWeekDay=oneweek[oneweek.length-1]
   var currentShippingDay=Orders.findCurrentShippingDay();
   var sellerDay=Orders.findCurrentShippingDay();
 
@@ -87,6 +88,7 @@ describe("api.orders.email", function(){
 
 
   it('POST /v1/orders/super-shop/email  send email return 200 and empty {} for wrong date',function(done){
+
     request(app)
       .post('/v1/orders/super-shop/email')
       .send({when:nextWeekDay})
@@ -104,11 +106,13 @@ describe("api.orders.email", function(){
       .send({when:sellerDay})
       .set('cookie', cookie)      
       .expect(200,function(err,res){
+        var when=Orders.formatDate(sellerDay)
         should.not.exist(err)
         should.exist(res.body.items)
         res.body.items.map(function (item) {
           return item.sku
         })[0].should.equal(1000001)
+        res.body.shippingWhen.should.equal(when)
         // res.body.oid.should.equal(2000008)
         //res.body.length.should.equal(3)
         done()

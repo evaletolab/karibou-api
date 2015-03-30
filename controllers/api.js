@@ -151,7 +151,7 @@ exports.email=function(req,res){
         return res.send(400,errorHelper(err));
       }
 
-      res.json({});
+      res.json(content);
     })
 
   }
@@ -179,7 +179,7 @@ exports.email=function(req,res){
         return res.send(400,errorHelper(err));
       }
 
-      res.json({});
+      res.json(content);
     })
 
   });
