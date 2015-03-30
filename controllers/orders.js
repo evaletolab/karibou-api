@@ -201,9 +201,6 @@ function parseCriteria(criteria, req){
     criteria.padding=true
   }
 
-  if(month){
-    console.log('from month',month,' ----------',criteria.from,'----',criteria.to,' - padding:',criteria.padding)
-  }
 
 
 }
@@ -580,7 +577,7 @@ exports.capture=function(req,res){
             })
 
 
-        return res.json(_.extend({mail:mail},order.toObject))
+        return res.json(_.extend({mail:mail},order.toObject()))
       })
       .fail(function(err){
         bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});
@@ -809,14 +806,29 @@ exports.invoicesByShops=function(req,res){
 
   //
   // restrict to a shop name
-  if(req.query.shops){
-    if(req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
-    //req.query.shops.split(',')
+  // 0) no shops given => you should be admin
+  // 1) a list of shops is given => you should be admin
+  // 2) user shops  => is the default
+  if(req.user.isAdmin()){
+    // admin can specify the shops
+    if(req.query.shops){
+      criteria.shop=req.query.shops
+    }
+
   }else{
-    if(!req.user.isAdmin() ){
-      return res.send(401)
-    }    
+    // not admin and having almost one shop
+    criteria.shop=req.user.shops.map(function(i){ return i.urlpath})      
   }
+
+
+  // if(req.query.shops){
+  //   if(req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+  //   //req.query.shops.split(',')
+  // }else{
+  //   if(!req.user.isAdmin() ){
+  //     return res.send(401)
+  //   }    
+  // }
 
 
 
