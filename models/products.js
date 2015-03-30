@@ -401,13 +401,13 @@ Product.statics.findByCriteria = function(criteria, callback){
       //
       // only available products ?
       if(criteria.available!==undefined){
-        query=query.where("attributes.available",Boolean(criteria.available));
+        query=query.where("attributes.available",(criteria.available));
       }
 
       //
       // available at home ?
       if(criteria.home!==undefined){
-        query=query.where("attributes.home",Boolean(criteria.home));
+        query=query.where("attributes.home",(criteria.home));
       }
       
       if(callback){
