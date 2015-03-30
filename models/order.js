@@ -1074,6 +1074,8 @@ Orders.statics.findByCriteria = function(criteria, callback){
       criteria.to=new Date(criteria.to.getTime()+7*86400000)
     }
     var sd=new Date(criteria.from.getFullYear(), criteria.from.getUTCMonth(), criteria.from.getUTCDate());
+    //
+    // do not remove the time limit of the ending date!
     var ed=new Date(criteria.to);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
