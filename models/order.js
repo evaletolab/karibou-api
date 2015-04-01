@@ -1061,7 +1061,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   //
   // filter by date (24h = today up to tonight)
   if(criteria.when){
-    var sd=new Date(criteria.when.getFullYear(), criteria.when.getUTCMonth(), criteria.when.getUTCDate()),
+    var sd=new Date(criteria.when.getFullYear(), criteria.when.getMonth(), criteria.when.getDate()),
         ed=new Date(sd.getTime()+86400000-60000);
     q["shipping.when"]={"$gte": sd, "$lt": ed};
   }
@@ -1073,7 +1073,8 @@ Orders.statics.findByCriteria = function(criteria, callback){
     if(criteria.padding===true){
       criteria.to=new Date(criteria.to.getTime()+7*86400000)
     }
-    var sd=new Date(criteria.from.getFullYear(), criteria.from.getUTCMonth(), criteria.from.getUTCDate());
+
+    var sd=new Date(criteria.from.getFullYear(), criteria.from.getMonth(), criteria.from.getDate());
     //
     // do not remove the time limit of the ending date!
     var ed=new Date(criteria.to);
