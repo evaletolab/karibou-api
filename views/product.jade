@@ -4,53 +4,52 @@ html(itemscope itemtype="http://schema.org/Product")
     // http://schema.org/Product
     title: =product.title+' ('+product.pricing.part+')'
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
-    meta(name='robots' content='index,follow')
-    meta(name='revised' content='#{product.updated}')
+    meta(name='robots', content='index,follow')
+    meta(name='revised', content='#{product.updated}')
     meta(itemprop='sku' content='#{product.sku}')
 
 
     // Place this data between the <head> tags of your website 
-    meta( name="description" content="#{product.details.description}")
+    meta( name="description", content="#{product.details.description}")
 
     // Schema.org markup for Google+ 
-    meta( itemprop="name" content="#{product.title}")
-    meta( itemprop="description" content="#{product.details.description}")
-    meta( itemprop="image" content="#{prependUrlImage(product.photo.url)}")
+    meta( itemprop="name", content="#{product.title}")
+    meta( itemprop="description", content="#{product.details.description}")
+    meta( itemprop="image", content="#{prependUrlImage(product.photo.url)}")
 
     // Twitter Card data 
-    meta( name="twitter:card" content="product")
-    //meta( name="twitter:site" content="@publisher_handle")
-    meta( name="twitter:title" content="#{product.title}")
-    meta( name="twitter:description" content="#{product.details.description}")
-    //meta( name="twitter:creator" content="@author_handle")
-    meta( name="twitter:image" content="#{prependUrlImage(product.photo.url)}")
-    meta( name="twitter:data1" content="#{product.getPrice().toFixed(2)}")
-    meta( name="twitter:label1" content="Price")
+    meta( name="twitter:card", content="product")
+    //meta( name="twitter:site", content="@publisher_handle")
+    meta( name="twitter:title", content="#{product.title}")
+    meta( name="twitter:description", content="#{product.details.description}")
+    //meta( name="twitter:creator", content="@author_handle")
+    meta( name="twitter:image", content="#{prependUrlImage(product.photo.url)}")
+    meta( name="twitter:data1", content="#{product.getPrice().toFixed(2)}")
+    meta( name="twitter:label1", content="Price")
 
     // Open Graph data
-    meta( property="og:title" content="#{product.title}" )
-    meta( property="og:type" content="article" )
-    meta( property="og:url" content="https://karibou.ch/products/#{product.sku}" )
-    meta( property="og:image" content="#{prependUrlImage(product.photo.url)}" )
-    meta( property="og:description" content="#{product.details.description}" )
-    meta( property="og:site_name" content="https://karibou.ch" )
-    meta( property="og:price:amount" content="#{product.getPrice().toFixed(2)}" )
-    meta( property="og:price:currency" content="CHF" )
+    meta( property="og:title", content="#{product.title}" )
+    meta( property="og:type", content="article" )
+    meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
+    meta( property="og:image", content="#{prependUrlImage(product.photo.url)}" )
+    meta( property="og:description", content="#{product.details.description}" )
+    meta( property="og:site_name", content="https://karibou.ch" )
+    meta( property="og:price:amount", content="#{product.getPrice().toFixed(2)}" )
+    meta( property="og:price:currency", content="CHF" )
 
   body
     h1: =product.title
     div: =product.details.description
     div: =product.details.origin
-    div(itemprop="offers" itemscope itemtype="http://schema.org/Offer")
-      span: =product.getPrice().toFixed(2)+' CHF'
+    div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
+      span(itemprop="price"): =product.getPrice().toFixed(2)+' CHF'
     div 
       img(src='#{prependUrlImage(product.photo.url)}')
     h2:  =product.categories.name
-    div 
-       région de Genève
+    div: |région de Genève
     h1 Boutique
     div(itemprop='owns')
-      span(itemprop="name"): =product.vendor.address.name 
+      span(itemprop="name"): =product.vendor.name 
       <br/>
       span(itemprop="url")<a href="/shop/#{product.vendor.urlpath}">#{product.vendor.name}</a>
 

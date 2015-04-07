@@ -286,9 +286,14 @@ exports.update=function (req, res) {
   req.body.updated=Date.now();
 
   delete(req.body._id);
+  //
+  //body clean (avoid mongo warn !) 
+  req.body.$promise && delete(req.body.$promise);
+  req.body.$resolved && delete(req.body.$resolved);
+  
   Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){
     if (err){
-      return res.send(400,errorHelper(err));    
+      return res.send(400,err.message||errorHelper(err));    
     }
     return res.json(product);  
   });
