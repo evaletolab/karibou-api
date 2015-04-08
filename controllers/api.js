@@ -212,15 +212,16 @@ exports.sitemap=function(req,res){
   }
 
   // else
-  require('mongoose').model('Products').findByCriteria({'query.status':true},function(err,products){
+  require('mongoose').model('Products').findByCriteria({'query.status':true,'available':true},function(err,products){
     if(err){
       return req.send(400,errorHelper(err))
     }
     var prefix="/products/";
-    var urls=[];
+    var urls=[], lastm;
     products.forEach(function(product){
       // use lastmod wit product update date ??
-      urls.push({url:prefix+product.sku, changefreq: 'weekly', priority: 1.0 })
+      lastm=new Date(product.updated)
+      urls.push({url:prefix+product.sku, changefreq: 'daily', lastmod: lastm.toLocaleDateString(), priority: 1.0 })
     })
 
     //
