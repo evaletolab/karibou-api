@@ -37,6 +37,7 @@ var express = require('express')
   , env = process.env.NODE_ENV || 'development'
   , config = require('./app/config')
   , mongoose = require('mongoose')
+  , _ = require('underscore');
 
 
 //
@@ -69,8 +70,11 @@ for(var i in files) {
 
 // extend config right after db is ready
 mongoose.model('Config').getMain(function(err,c){
-  if(err)console.log('Ooops error when reading stored config')
-  config.shop.global=c;
+  if(err){
+    console.log('Ooops error when reading stored config',err)
+    process.exit(1)    
+  }
+  _.extend(config.shop,c)
 })
 
 var app = express()

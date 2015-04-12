@@ -17,6 +17,9 @@ try {
   }else{
     config = '../config/config-' + env;
   }
+
+  //
+  // make the configuration visible  
   global.config= require(config);
 
   config = '../config/config-shop'+test;

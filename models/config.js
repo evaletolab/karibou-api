@@ -38,7 +38,11 @@ var Config = new Schema({
     //
     // defines keys
     keys:{
-      pubStripe:String
+      pubStripe:String,
+      pubGithub:String,
+      pubUpcare:String,
+      pubMap:String,
+      pubDisqus:String
     }
 });
 
@@ -63,7 +67,7 @@ Config.statics.saveMain=function(c, cb) {
     if(e){return cb(err)};
     _.extend(conf,c);
     conf.save(function(e,c) {
-      config.shop.global=c;
+      _.extend(config.shop,conf.toObject())
       cb(e,c)
     })
   });
