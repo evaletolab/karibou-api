@@ -60,6 +60,10 @@ exports.me = function (req, res, next)  {
   Users.findOne({_id:req.user._id}).
       populate('shops').exec(function(err,user){
       user.populateRoles()
+      user.context={};
+      if(config.disqus){
+        user.context.disqus=user.getDisquSSO();
+      }
       res.json(user);
   });
 };
