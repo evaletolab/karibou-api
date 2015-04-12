@@ -37,6 +37,8 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( property="og:price:amount", content="#{product.getPrice().toFixed(2)}" )
     meta( property="og:price:currency", content="CHF" )
 
+    // Full example with review and price
+    // https://schema.org/price
   body
     h1: =product.title
     div: =product.details.description
