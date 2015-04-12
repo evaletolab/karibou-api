@@ -834,7 +834,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
 
   //
   // check shipping maintenance
-  if(config.shop.global.maintenance.active){
+  if(config.shop.maintenance.active){
     return callback("Les livraisons ne sont pas possibles pour l'instant")    
   }
 
