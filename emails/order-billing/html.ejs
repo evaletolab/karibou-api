@@ -2,9 +2,9 @@ Bonjour <%= order.customer.name.givenName %>,<br/><br/>
 
 Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <%= created %>.<br/>
 
-<pre>
+<div style="font-size:10px;font-family: monospace;white-space: pre-wrap;white-space: -moz-pre-wrap !important;white-space: -o-pre-wrap;word-wrap: break-word;">
 *<% for(var i=0; i<order.items.length; i++) {%>
-* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <% } %>
+* <%if (order.items[i].fulfillment.status==='failure') {%><span style="text-decoration:line-through;"><%}%><%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].fulfillment.status==='failure') {%></span><%}%><% } %>
 * ------------------
 * Sous total  <%= subTotal %> CHF
 * Frais de livraison <%= shippingFees %> CHF
@@ -12,7 +12,7 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 * ------------------
 * Montant total <%= totalWithFees %> CHF
 *
-</pre>
+</div>
 
 Pour toute question, veuillez répondre à ce mail.<br/>
 Avec nos meilleurs messages,<br/>
