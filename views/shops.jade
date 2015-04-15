@@ -1,0 +1,11 @@
+extends homeseo
+
+block content
+    h1: | Liste des boutiques
+    ol
+        - each shop in shops
+            li
+                a( href="/shop/#{shop.urlpath}", title="#{shop.name}"): =shop.name
+
+
+

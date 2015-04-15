@@ -1,0 +1,11 @@
+extends homeseo
+
+block content
+    h1: | Liste des produits
+    ol
+        - each product in products
+            li
+                a( href="/products/#{product.sku}", title="#{product.title}"): =product.title
+
+
+
