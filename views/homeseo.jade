@@ -3,26 +3,32 @@ html
   head
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
     meta(name='robots', content='index,follow')
-    title: Karibou Genève - un marché alimentaire composé d'artisans, de producteurs et de petits commerçants
-    meta(name="title", content="Karibou Genève - un marché alimentaire composé d'artisans, de producteurs et de petits commerçants")
+    title: |Karibou - producteurs, artisans et épiciers online!
+    meta(name="title", content="Karibou - producteurs, artisans et épiciers online!")
     meta(charset="utf-8")
-    meta(name="description",  content="Karibou Genève - un marché alimentaire composé d'artisans, de producteurs et de petits commerçants")
+    meta(name="description",  content="Karibou - Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!")
     meta(name="author", content="karibou team")
     link(rel="canonical", href="https://karibou.ch/")
     link(rel="icon", type="image/png", href="/img/k-small.png" )
     meta(property="og:type", content="website")
     meta(property="og:image", content="/img/k-small.png")
     meta(property="og:title", content="Karibou")
-    meta(property="og:description", content="Karibou Genève - un marché alimentaire composé d'artisans, de producteurs et de petits commerçants" )
+    meta(property="og:description", content="Karibou - Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!" )
     meta(property="og:site_name", content="Karibou")
     meta(property="og:url", content="https://Karibou.ch")
     meta(name="twitter:site", content="@kariboulab")
   body
-    h1 En vente sur le marché à genève
-    ol
-        - each product in products
-            li
-                a( href="/products/#{product.sku}", title="#{product.title}"): =product.title
+    h1 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
+    ul
+        li
+            a(href="/page/about"): |Comment ça marche
+        li
+            a(href="/page/la-charte"): |Notre charte
+        li
+            a(href="/shops"): |Les boutiques
+        li
+            a(href="/products"): |Les produits
 
+    block content
 
 

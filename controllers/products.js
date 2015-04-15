@@ -228,6 +228,40 @@ exports.getSEO=function (req, res) {
 };
 
 
+//
+// get product SEO
+exports.allSEO=function (req, res) {
+
+  var query={
+    status:true,
+    available:true
+  }
+  return Products.findByCriteria(query,function (err, products) {
+    if (err) {
+      return res.send(400,errorHelper(err));
+    }
+    if(!products.length){
+      return res.send(400,"Aucun produit disponible");
+    }
+    //
+    // setup the model 
+    var model={ 
+      products: products, 
+      user: req.user, 
+      _:_,
+      prependUrlImage:function (url) {
+        if(url&&url.indexOf('//')===0){
+          url='https:'+url;
+        }
+        return url;
+      }
+    };
+
+    return res.render('products', model);
+  });
+};
+
+
 // PUT to UPDATE
 
 // Bulk update

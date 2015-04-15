@@ -147,6 +147,39 @@ exports.getSEO=function (req, res) {
   });
 };
 
+
+//
+// get product SEO
+exports.allSEO=function (req, res) {
+
+  var query={
+    status:true
+  }
+  return db.model('Shops').find(query,function (err, shops) {
+    if (err) {
+      return res.send(400,errorHelper(err));
+    }
+    if(!shops.length){
+      return res.send(400,"Aucune boutique disponible");
+    }
+    //
+    // setup the model 
+    var model={ 
+      shops: shops, 
+      user: req.user, 
+      _:_,
+      prependUrlImage:function (url) {
+        if(url&&url.indexOf('//')===0){
+          url='https:'+url;
+        }
+        return url;
+      }
+    };
+
+    return res.render('shops', model);
+  });
+};
+
 //
 // TODO multiple implement of send email, refactor it?
 exports.email=function(req,res){
