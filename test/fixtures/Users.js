@@ -74,7 +74,7 @@ var Users=exports.Users=[{
     password:'password'
   },{
     //Users[2]
-    _id : new ObjectId(), 
+    _id : new ObjectId('55426067776683c6593fe76c'), 
     password: "password",
     tags: [],
     shops: [],

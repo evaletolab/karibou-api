@@ -50,7 +50,7 @@ describe("api.products", function(){
   });
   
   describe("with auth", function(){
-    var cookie;
+    var cookie, delphine, gluck;
     before(function(done){
 	    // login
       request(app)
@@ -65,6 +65,34 @@ describe("api.products", function(){
           done();        
       });
     });	   
+
+    it("loggin non admin delphine", function(done){
+      request(app)
+        .post('/login')
+        .send({ email: "delphine@gmail.com", password:'password',provider:'local' })
+        .end(function(err,res){
+          res.should.have.status(200);
+          //res.headers.location.should.equal('/');
+          res.body.email.address.should.equal("delphine@gmail.com");
+          delphine = res.headers['set-cookie'];
+          should.exist(delphine);
+          done();        
+      });
+    });     
+
+    it("loggin non admin gluck", function(done){
+      request(app)
+        .post('/login')
+        .send({ email: "evaleto@gluck.com", password:'password',provider:'local' })
+        .end(function(err,res){
+          res.should.have.status(200);
+          //res.headers.location.should.equal('/');
+          res.body.email.address.should.equal("evaleto@gluck.com");
+          gluck = res.headers['set-cookie'];
+          should.exist(gluck);
+          done();        
+      });
+    });     
 
     it("Should be loged-in", function(done){
       request(app)
@@ -95,47 +123,9 @@ describe("api.products", function(){
         });
     });    
 
-    it('POST /v1/shops should return 200 ',function(done){
-    
-
-      var s={
-        name: "Bicycle and rocket",
-        description:"cool ce shop",
-        catalog:data.Categories[0]._id,
-        photo:{ 
-          bg:"http://image.truc.io/bg-01123.jp",
-          fg:"http://image.truc.io/fg-01123.jp"      
-        },
-        address:{
-                region: "Genève",
-                geo: {
-                    lng: 6.1692497,
-                    lat: 46.1997473
-                },
-                postalCode: "1204",
-                floor: "1",
-                streetAdress: "rue de carouge",
-                note: "",
-                name: "famille delphine evalet",
-                phone:"0123456"
-            }  
-      };
-      
-      //
-      // create new shop 'bicycle-and-rocket'
-      request(app)
-        .post('/v1/shops')
-        .set('Content-Type','application/json')
-        .set('cookie', cookie)
-        .send(s)
-        .end(function(err,res){
-          res.should.have.status(200);
-          done();        
-        });
-    });    
      
  
-    it('POST /v1/shops/bicycle-and-rocket/products  should return 200 ',function(done){
+    it('POST /v1/shops/un-autre-shop/products  should return 200 ',function(done){
       // shop must be managed
       //p.manufacturer={_id:maker._id};
       var p=_.clone(data.Products[0]);
@@ -147,9 +137,9 @@ describe("api.products", function(){
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
-        .post('/v1/shops/bicycle-and-rocket/products')
+        .post('/v1/shops/un-autre-shop/products')
         .set('Content-Type','application/json')
-        .set('cookie', cookie)
+        .set('cookie', gluck)
         .send(p)
         .end(function(err,res){
           // console.log(res.text)
@@ -162,7 +152,7 @@ describe("api.products", function(){
         });
     });    
 
-    it('POST /v1/shops/bicycle-and-rocket/products category as object should return 200 ',function(done){
+    it('POST /v1/shops/un-autre-shop/products category as object should return 200 ',function(done){
       // shop must be managed
       //p.manufacturer={_id:maker._id};
       var p=_.clone(data.Products[0]);
@@ -174,7 +164,7 @@ describe("api.products", function(){
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
-        .post('/v1/shops/bicycle-and-rocket/products')
+        .post('/v1/shops/un-autre-shop/products')
         .set('Content-Type','application/json')
         .set('cookie', cookie)
         .send(p)
@@ -187,7 +177,8 @@ describe("api.products", function(){
           done();        
         });
     }); 
-    it('POST /v1/shops/bicycle-and-rocket/products check sku should return 200 ',function(done){
+
+    it('POST /v1/shops/un-autre-shop/products check sku should return 200 ',function(done){
       // shop must be managed
       //p.manufacturer={_id:maker._id};
       var p=_.clone(data.Products[0]);
@@ -199,7 +190,7 @@ describe("api.products", function(){
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
-        .post('/v1/shops/bicycle-and-rocket/products')
+        .post('/v1/shops/un-autre-shop/products')
         .set('Content-Type','application/json')
         .set('cookie', cookie)
         .send(p)
@@ -212,9 +203,89 @@ describe("api.products", function(){
           done();        
         });
     });    
+
+
+    it('POST update /v1/products/1000002 non owner return 401  ',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      delete(p.sku);
+      p.categories=data.Categories[2]._id;
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      p.photo={url:""}
+      request(app)
+        .post('/v1/products/1000002')
+        .set('Content-Type','application/json')
+        .set('cookie', delphine)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(401);
+          done();        
+        });
+    });    
+
+
+
+    it('POST update /v1/products/1000002 home field should return 401 for not admin ',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      delete(p.sku);
+      p.categories=data.Categories[2]._id;
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      p.attributes.home=true;
+      p.photo={url:""}
+      request(app)
+        .post('/v1/products/1000002')
+        .set('Content-Type','application/json')
+        .set('cookie', gluck)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(401);
+          done();        
+        });
+    });    
+
+    it('POST update /v1/products/1000002 change sku field should not be affected',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      p.sku=123456;
+      p.categories=data.Categories[2]._id;
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.attributes.home=false;
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      p.photo={url:""}
+      request(app)
+        .post('/v1/products/1000002')
+        .set('Content-Type','application/json')
+        .set('cookie', gluck)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(200);
+          res.body.sku.should.equal(1000002);
+          res.body.categories.should.be.an.array;
+          res.body.vendor.should.be.an.instanceOf(Object)
+          //res.body.categories.length.should.equal(2);
+          done();        
+        });
+    });    
       
+  
+
   });
-    
+      
   
     
 

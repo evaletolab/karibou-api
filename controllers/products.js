@@ -26,9 +26,11 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
    
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
-      console.log("isUserProductOwner",req.body.sku)
-      //return (!_.any(req.user.shops,function(s){return s.sku===req.params.sku}));
-      return true;
+      var vendor=(req.body.vendor._id||req.body.vendor)+'';
+      return (_.any(req.user.shops,function(s){
+        return s._id.equals(vendor);
+        // return (s._id+'')===vendor;
+      }));
     }
     //
     // ensure owner
@@ -308,11 +310,6 @@ exports.update=function (req, res) {
     return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
   }
 
-  // if not admin  
-  if(!req.user.isAdmin() && req.body.attributes && req.body.attributes.home){
-    delete req.body.attributes.home;
-  }
-
   //
   //normalize ref
   req.body.vendor=normalizeRef('vendor');
@@ -320,16 +317,36 @@ exports.update=function (req, res) {
   req.body.updated=Date.now();
 
   delete(req.body._id);
+  delete(req.body.sku);
   //
   //body clean (avoid mongo warn !) 
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
   
-  Products.findOneAndUpdate({sku:req.params.sku},req.body).populate('vendor').exec(function(err,product){
-    if (err){
-      return res.send(400,err.message||errorHelper(err));    
+  Products.findOne({sku:req.params.sku}).populate('vendor').exec(function(err,product){
+    if (!product){
+      return res.send(400,'Ooops, unknow product '+req.params.sku);    
     }
-    return res.json(product);  
+
+    // if not admin  
+    if(!req.user.isAdmin() && req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
+      return res.send(401, "Your are not allowed to do that, arch!");    
+    }
+
+    if(!product.vendor._id.equals(req.body.vendor)){
+      return res.send(400,'Ooops, unknow product vendor ',req.body.vendor);          
+    }
+    delete(req.body.vendor);
+
+    // do the update
+    _.extend(product,req.body)
+
+    product.save(function (err) {
+      if (err){
+        return res.send(400,err.message||errorHelper(err));    
+      }
+      return res.json(product);  
+    })
   });
 };
 
