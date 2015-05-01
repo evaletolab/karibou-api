@@ -93,7 +93,7 @@ exports.product = function(req){
 
 
     if(req.body.details){
-      check(req.body.details.description,"Le description doit contenir au max 500 caractères").len(3, 500).isText();
+      check(req.body.details.description,"Le description doit contenir au max 1'000 caractères").len(3, 1000).isText();
       req.body.details.bio && check(req.body.details.bio,"Erreur system p1").isBoolean();
       req.body.details.homemade && check(req.body.details.homemade,"Erreur system p2").isBoolean();
       req.body.details.natural && check(req.body.details.natural,"Erreur system p3").isBoolean();
@@ -101,7 +101,7 @@ exports.product = function(req){
       req.body.details.cold && check(req.body.details.cold,"Erreur system p5").isBoolean();
 
     }else{
-      throw new Error("Vous devez définir une description de 3 à 500 caractères");
+      throw new Error("Vous devez définir une description de 3 à 1'000 caractères");
     }
 
     if(req.body.pricing){
@@ -150,7 +150,7 @@ exports.product = function(req){
 
     for (var i in req.body.faq){
       check(req.body.faq[i].q,"Vous devez écrire un question qui doit contenir entre 3 et 150 caractères").len(3, 150).isText();
-      check(req.body.faq[i].a,"Vous devez écrire un réponse qui doit contenir entre 3 et 400 caractères").len(3, 400).isText()
+      check(req.body.faq[i].a,"Vous devez écrire un réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
 }
