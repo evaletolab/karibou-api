@@ -93,7 +93,7 @@ exports.product = function(req){
 
 
     if(req.body.details){
-      check(req.body.details.description,"Le description doit contenir au max 1'000 caractères").len(3, 1000).isText();
+      check(req.body.details.description,"Le description doit contenir au max 1'200 caractères").len(3, 1200).isText();
       req.body.details.bio && check(req.body.details.bio,"Erreur system p1").isBoolean();
       req.body.details.homemade && check(req.body.details.homemade,"Erreur system p2").isBoolean();
       req.body.details.natural && check(req.body.details.natural,"Erreur system p3").isBoolean();
