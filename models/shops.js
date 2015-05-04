@@ -67,6 +67,9 @@ var Shops = new Schema({
     
     available:{
       active:{type: Boolean,default:false},
+      from:Date,
+      to:Date,
+      weekdays:[Number],
       comment:{type: String}
     },
 

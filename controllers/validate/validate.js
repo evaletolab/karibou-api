@@ -224,8 +224,15 @@ exports.shop=function(shop){
     }
 
     if (shop.available){
-      shop.available.active && check(shop.available.active).isBoolean();
+      shop.available.active && check(shop.available.active,"Erreur system p10").isBoolean();
       shop.available.comment && check(shop.available.comment,"Le commentaire doit contenir entre 6 et 264 caractères").len(6, 264).isText();
+
+      //      
+      // date should be mentioned here
+      if(shop.available.active===true){
+        check(shop.available.active.from,"La date de fermeture doit être mentionnée").isDate();        
+        check(shop.available.active.to,"La date de réouverture doit être mentionnée").isDate();        
+      }
     }
 
     if (shop.info){

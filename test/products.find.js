@@ -138,9 +138,6 @@ describe("products.find:", function(){
 
   });
 
-  it.skip("Product can be enabled or disabled", function(done){
-  });
-
   it.skip("Product could have a related products", function(done){
   });
 

@@ -390,6 +390,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg6="Ce produit n'est pas disponible car la boutique est momentanément fermée"
     , msg7="La quantité souhaitée n'est pas disponible "
     , msg8="Ce produit n'est plus en stock "
+    , msg9="Ce jour de livraison n'est pas disponible pour la boutique "
 
 
   assert(item.sku==product.sku)
@@ -423,9 +424,28 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     return cb(msg5,item)
   }
 
+  //
+  // check that vendor is open for the date: shipping.when
   if(product.vendor.available&&product.vendor.available.active===true){
-    return cb(msg6,item)
+    // if one of the date doesn't exist, we force the store to be closed
+    var forceClosed=!product.vendor.available.from||!product.vendor.available.to;
+    var from = new Date(product.vendor.available.from);
+    var to=new Date(product.vendor.available.to);
+    from.setHours(1,0,0,0);
+    to.setHours(1,0,0,0);
+    if((shipping.when>=from && shipping.when<=to) ||forceClosed){
+      return cb(msg6,item)      
+    }
   }
+
+  //
+  // check that vendor shipping day is available for: config.shop.order.weekdays
+  if (product.vendor.weekdays&&product.vendor.weekdays.indexOf(shipping.when.getDay())==-1){
+    return callback(msg9+product.vendor.name)
+  }
+
+
+
 
   if((typeof item.vendor) !=='object' ){
     assert(product.vendor._id.toString()===item.vendor.toString())
@@ -602,7 +622,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
       // a valid day is at least>=timelimit 
       next=new Date(now.getTime()+86400000*(day-now.getDay()))      
       next.setHours(timelimitH,0,0,0)
-      console.log('----- this week -- delta 1',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
+      // console.log('----- this week -- delta 1',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
       if(((next.getTime()-now.getTime())/3600000)>timelimit){
         //console.log('return this',next)
         return next;
@@ -616,7 +636,7 @@ Orders.statics.findNextShippingDay=function(tl,th){
     if(day<now.getDay()){
       next=new Date((7-now.getDay()+day)*86400000+now.getTime());
       next.setHours(timelimitH,0,0,0)
-      console.log('----- next week -- delta 2',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
+      // console.log('----- next week -- delta 2',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
       if(((next.getTime()-now.getTime())/3600000)>timelimit){
         //console.log('for next week',next)
         return next;

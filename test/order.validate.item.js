@@ -11,6 +11,7 @@ var Products=db.model('Products')
   , weekdays=config.shop.order.weekdays
   , today=new Date()
   , toshortDay
+  , toNextDay
   , okDay;
 
 
@@ -43,16 +44,17 @@ describe("orders.validate.item", function(){
     toshortDay=Orders.findCurrentShippingDay();
     okDay=Orders.findNextShippingDay();
     okDay.setHours(11,0,0,0)
-    shipping.when=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0]);
+    shipping.when=toNextDay=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0]);
+    toNextDay.setHours(11,0,0,0)
 
 
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);
         // Orders.printInfo()
-        // Orders.find({}).exec(function(e,os){
-        //   os.forEach(function(o){o.print()})
-        // })
+        Orders.find({}).exec(function(e,os){
+          os.forEach(function(o){o.print()})
+        })
         done();
       });
     });      
@@ -160,7 +162,7 @@ describe("orders.validate.item", function(){
     });
 
   });    
-  it("Error:this product is not available because the shop is closed by kariboo", function(done){
+  it("Error:this product is not available because the shop is closed by karibou", function(done){
     shipping.when=okDay
 
     items=[]
@@ -176,12 +178,32 @@ describe("orders.validate.item", function(){
       done();          
     });
   });    
+ 
 
-  it("Error:this product is not available because the shop is closed by the owner", function(done){
-    shipping.when=okDay
+  it("Error:this product is available even if shop is closed (with date) by the owner", function(done){
+    shipping.when=toNextDay;//toNextDay
 
     items=[]
     items.push(Orders.prepare(data.Products[2], 1, ""))
+
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      order.errors.length.should.equal(1);
+      order.errors[0]['1000003'].should.include("Ce produit n'est plus disponible")
+      done();          
+    });
+  });  
+
+  it("Error:this product is not available because the shop is closed (with date) by the owner", function(done){
+    shipping.when=okDay;
+
+    items=[]
+    items.push(Orders.prepare(data.Products[2], 1, ""))
+
 
 
     //
@@ -194,6 +216,7 @@ describe("orders.validate.item", function(){
       done();          
     });
   });    
+
 
   it("Error:this product is no more available in the shop", function(done){
     shipping.when=okDay

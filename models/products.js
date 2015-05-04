@@ -307,7 +307,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       Shops=this.model('Shops');
       
       
-  var query=Products.find({});
+  var query=Products.find({}).populate('vendor');
   
 
   //console.log(criteria)
@@ -317,8 +317,27 @@ Product.statics.findByCriteria = function(criteria, callback){
       //
       // by available shops
       if (criteria.status){
-        Shops.find({status:true},function(err,available){
+        // specify the date 
+        var now=new Date();
+        var q={'$or':[
+          {'$and':[{status:true},{'$or':[
+            {'available.active':{'$ne':true}},
+            {'available.from':{'$gte':now}}
+          ]}]},
+          {'$and':[{status:true},{'$or':[
+            {'available.active':{'$ne':true}},
+            {'available.to':{'$lte':now}}
+          ]}]},
+          {'$and':[{status:true},{'available.active':{'$exists':false}}]}
+        ]};
+
+
+        Shops.find(q).select('_id').exec(function(err,available){
+          available=available.map(function (a) {
+            return a._id;
+          })
           if (Array.isArray(criteria.status)){
+            console('FIXME --------------->',criteria.status)
             criteria.status.forEach(function(s){
               available.push(s._id)
             })            
@@ -366,7 +385,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       
       //
       // shop && available && available.find(shop._id)
-      if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s._id)}))){        
+      if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s)}))){        
         query=query.where("vendor",shop._id);
       }else 
       

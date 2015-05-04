@@ -1,7 +1,15 @@
 var ObjectId = require('mongodb').ObjectID;
 var c=require('./Categories');
 var u=require('./Users');
+var Orders=require('mongoose').model('Orders');
+var okDay=Orders.findNextShippingDay();
+var when1=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[2]);
+var when2=new Date(when1.getTime()+86400000*2);
 
+
+console.log('---------------ok',okDay);
+console.log('---------------when1',when1);
+console.log('---------------when2',when2);
 
 exports.Orders=[
     {
@@ -216,7 +224,9 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:true
+      active:true,
+      from:when1,
+      to:when2
     }
   }
 ];
