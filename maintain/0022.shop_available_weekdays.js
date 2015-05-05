@@ -37,7 +37,7 @@ exports.execute = function(db, script, callback){
 	    return callback(null, "0 shop have been updated")
 	  }
     console.log(script,"migrating "+s.length +" shops");
-    shops.update({}, { $set: { "available.weekdays": [2,5] } } ,function(err){
+    shops.update({}, { $set: { "available.weekdays": [2,5] } },{ multi: true } ,function(err,res){
       callback(err, s.length+" shops have been updated");
     })
 
