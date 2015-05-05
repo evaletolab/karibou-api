@@ -10,16 +10,17 @@ var more=require('./Users');
 //product 5 available , shop was closed in past
 
 var Orders=require('mongoose').model('Orders');
-var closed=new Date();
-var when1=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[2]);
-var when2=new Date(when1.getTime()+86400000*2);
+var closed=Orders.findNextShippingDay();
+closed.setHours(0,1,0,0);
+var when1=Orders.jumpToNextWeekDay(closed,config.shop.order.weekdays[2]);
+var when2=new Date(when1.getTime()+86400000*10);
 var when3=new Date(when1.getTime()-86400000*20);
 var when4=new Date(when1.getTime()-86400000*19);
 
 
-console.log('---------------closed',closed);
-console.log('---------------when1',when1);
-console.log('---------------when2',when2);
+// console.log('---------------closed',closed);
+// console.log('---------------when1',when1);
+// console.log('---------------when2',when2);
 
 exports.Products=[{
     _id : new ObjectId(), 

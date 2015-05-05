@@ -12,6 +12,7 @@ var assert = require("assert");
 var _=require('underscore');
 
 var mongoose = require('mongoose')
+  , Orders = mongoose.model('Orders')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId;
   
@@ -318,15 +319,18 @@ Product.statics.findByCriteria = function(criteria, callback){
       // by available shops
       if (criteria.status){
         // specify the date 
-        var now=new Date();
+        var nextShippingDays=Orders.findOneWeekOfShippingDay();
+        nextShippingDays[0].setHours(1,0,0,0);
+        nextShippingDays[nextShippingDays.length-1].setHours(1,0,0,0);
+        // console.log('filter date',nextShippingDays)
         var q={'$or':[
           {'$and':[{status:true},{'$or':[
             {'available.active':{'$ne':true}},
-            {'available.from':{'$gte':now}}
+            {'available.from':{'$gte':nextShippingDays[0]}} 
           ]}]},
           {'$and':[{status:true},{'$or':[
             {'available.active':{'$ne':true}},
-            {'available.to':{'$lte':now}}
+            {'available.to':{'$lte':nextShippingDays[nextShippingDays.length-1]}}
           ]}]},
           {'$and':[{status:true},{'available.active':{'$exists':false}}]}
         ]};

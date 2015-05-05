@@ -40,7 +40,7 @@ describe("products.find.disabled:", function(){
     Products.findByCriteria({status:true,available:true},function(err,products){
       should.not.exist(err);
       should.exist(products);
-      // console.log('find',products.map(function (p) {return p.sku;}));
+      console.log('find',products.map(function (p) {return p.sku;}));
       products.length.should.equal(2)
       products[0].sku.should.equal(1000004);
       products[1].sku.should.equal(1000005);
