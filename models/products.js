@@ -341,7 +341,7 @@ Product.statics.findByCriteria = function(criteria, callback){
             return a._id;
           })
           if (Array.isArray(criteria.status)){
-            console('FIXME --------------->',criteria.status)
+            console.log('FIXME --------------->',criteria.status)
             criteria.status.forEach(function(s){
               available.push(s._id)
             })            
