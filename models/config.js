@@ -32,7 +32,8 @@ var Config = new Schema({
     // select no shipping dates
     noshipping:[{
       reason:{type: String},
-      when:{type:Date}
+      from:{type:Date},
+      to:{type:Date}
     }],
 
     //

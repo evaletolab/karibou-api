@@ -440,8 +440,9 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
   //
   // check that vendor shipping day is available for: config.shop.order.weekdays
-  if (product.vendor.weekdays&&product.vendor.weekdays.indexOf(shipping.when.getDay())==-1){
-    return callback(msg9+product.vendor.name)
+
+  if (product.vendor.available.weekdays&&product.vendor.available.weekdays.indexOf(shipping.when.getDay())==-1){
+    return cb(msg9+product.vendor.name,item)
   }
 
 
@@ -865,6 +866,22 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   }
   // be sure that is a Date object
   shipping.when=new Date(shipping.when)
+
+  if(config.shop.noshipping&&config.shop.noshipping.length){
+    config.shop.noshipping.forEach(function (noshipping) {
+      var from = new Date(noshipping.from);
+      var to=new Date(noshipping.to);
+      var msg="Les livraisons sont interrompues jusqu'au "+Orders.formatDate(to);
+      from.setHours(1,0,0,0);
+      to.setHours(1,0,0,0);
+      if((shipping.when>=from && shipping.when<to)){
+        return callback(noshipping.reason||msg)      
+      }
+    })
+  }
+
+
+
 
   //
   // check that shipping day is available on: config.shop.order.weekdays

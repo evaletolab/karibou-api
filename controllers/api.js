@@ -80,6 +80,12 @@ exports.config = function(req, res) {
 
 
 exports.saveConfig = function(req, res) {
+  try{
+    validate.config(req.body);
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
   db.model('Config').saveMain(req.body,function(err,conf) {
     res.json(config.shop);
   })

@@ -478,6 +478,10 @@ exports.Shops=[{
     urlpath:"un-autre-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,
+    available:{
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
+    },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
@@ -495,7 +499,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
@@ -506,7 +511,8 @@ exports.Shops=[{
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
@@ -525,7 +531,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   }
 ];

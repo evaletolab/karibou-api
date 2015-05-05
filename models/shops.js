@@ -181,6 +181,9 @@ Shops.statics.update=function(id,s,callback){
     }
     
     //
+    // if shop is not available, set the date correctly  
+
+    //
     // get catalog from object._id or _id
     s.owner&&delete(s.owner);
     _.extend(shop,s);

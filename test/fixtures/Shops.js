@@ -19,6 +19,10 @@ exports.Shops=[{
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
     },
+    available:{
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
+    },
     address:{
             region: "Genève",
             geo: {
@@ -43,6 +47,10 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
+    },
+    available:{
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     },
     address:{
             region: "Genève",
@@ -71,6 +79,10 @@ exports.Shops=[{
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
     },
+    available:{
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
+    },
     address:{
             region: "Genève",
             geo: {
@@ -95,7 +107,8 @@ exports.Shops=[{
     catalog:Categories.Categories[0]._id,
     owner:data.Users[0]._id,    
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",

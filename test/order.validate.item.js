@@ -81,6 +81,7 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
+
       should.exist(order.errors)
       order.errors[0]['1000001'].should.include('Le prix de votre produit')
       done();          
@@ -205,7 +206,6 @@ describe("orders.validate.item", function(){
     items.push(Orders.prepare(data.Products[2], 1, ""))
 
 
-
     //
     // starting process of order,
     //  - items, customer, shipping
@@ -216,6 +216,7 @@ describe("orders.validate.item", function(){
       done();          
     });
   });    
+
 
 
   it("Error:this product is no more available in the shop", function(done){
@@ -236,6 +237,29 @@ describe("orders.validate.item", function(){
   });    
 
 
+  it("Error:this product is not available because the shop doesn't provide shipping for this day", function(done){
+    shipping.when=okDay;
+
+    items=[]
+    items.push(Orders.prepare(data.Products[0], 1, ""))
+
+    db.model('Shops').findOne({urlpath:'premier-shop'},function (e,shop) {
+      //
+      // remove the shipping day from the list of available days
+      shop.available.weekdays.splice(shop.available.weekdays.indexOf(okDay.getDay()));
+      shop.save(function () {
+
+        Orders.create(items, customer, shipping, payment, function(err,order){
+          should.exist(order.errors)
+          order.errors[0]['1000001'].should.include("pas disponible pour la boutique Premier shop")
+          done();          
+        });
+
+      })
+
+    })
+
+  });    
    
 
 });

@@ -4,12 +4,12 @@ var u=require('./Users');
 var Orders=require('mongoose').model('Orders');
 var okDay=Orders.findNextShippingDay();
 var when1=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[2]);
-var when2=new Date(when1.getTime()+86400000*2);
+var when2=new Date(when1.getTime()+86400000*3);
 
 
-console.log('---------------ok',okDay);
-console.log('---------------when1',when1);
-console.log('---------------when2',when2);
+// console.log('---------------ok',okDay);
+// console.log('---------------when1',when1);
+// console.log('---------------when2',when2);
 
 exports.Orders=[
     {
@@ -86,8 +86,8 @@ exports.Orders=[
             {
                 /* shop status=available=true */
                 ref: ObjectId('515ec12e56a8d5961e000004'),
-                slug: "un-autre-shop",
-                name: "Un autre shop",
+                slug: "premier-shop",
+                name: "Premier shop",
                 address: "TODO",
             },
             {
@@ -116,7 +116,7 @@ exports.Orders=[
                 note: "",
                 finalprice: 2.5,
                 category: "Viande",
-                vendor:"un-shop",
+                vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
                     status: "created"
@@ -131,7 +131,7 @@ exports.Orders=[
                 note: "",
                 finalprice: 3,
                 category: "Fruits",
-                vendor:"un-autre-shop",
+                vendor:"premier-shop",
                 fulfillment: {
                     shipping: "grouped",
                     status: "created"
@@ -146,7 +146,7 @@ exports.Orders=[
                 note: "",
                 finalprice: 7.6,
                 category: "Poissons",
-                vendor:"un-autre-shop",
+                vendor:"premier-shop",
                 fulfillment: {
                     shipping: "grouped",
                     status: "created"
@@ -169,9 +169,9 @@ exports.Orders=[
 exports.Shops=[{
     _id:ObjectId('515ec12e56a8d5961e000004'),
     status:true,
-    name: "Un autre shop",
+    name: "Premier shop",
     description:"cool ce shop",
-    urlpath:"un-autre-shop",
+    urlpath:"premier-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,
     photo:{ 
@@ -179,11 +179,12 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000005'),
-    status:false,
+    status:true,
     name: "mon shop",
     description:"cool ce shop",
     urlpath:"mon-shop",
@@ -194,7 +195,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
@@ -205,8 +207,11 @@ exports.Shops=[{
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     },
+
+
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
@@ -226,7 +231,8 @@ exports.Shops=[{
     available:{
       active:true,
       from:when1,
-      to:when2
+      to:when2,
+      weekdays:[0,1,2,3,4,5,6]
     }
   }
 ];
@@ -305,7 +311,7 @@ exports.Products=[{
         discount:false
      },
      pricing: {
-        stock:10, 
+        stock:15, 
         price:3.80,
         discount:3.0,
         part:'0.75L'
@@ -355,7 +361,7 @@ exports.Products=[{
         discount:false
      },
      pricing: {
-        stock:5, 
+        stock:15, 
         price:3.80,
         discount:3.0,
         part:'0.75L'

@@ -172,7 +172,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000005'),
@@ -187,7 +188,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:false
+      active:false,
+      weekdays:[0,1,2,3,4,5,6]
     }
   },{
     _id:ObjectId('515ec12e56a8d5961e000006'),
@@ -214,7 +216,8 @@ exports.Shops=[{
       fg:"http://image.truc.io/fg-01123.jp"      
     },
     available:{
-      active:true
+      active:true,
+      weekdays:[0,1,2,3,4,5,6]
     }
   }
 ];

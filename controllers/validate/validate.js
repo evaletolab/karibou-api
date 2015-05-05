@@ -7,6 +7,14 @@ var db = require('mongoose'),
 exports.check   = check;
 exports.ifCheck = ifCheck;
 
+exports.config = function(conf){
+  for( var i in conf.noshipping){
+    check(conf.noshipping[i].from,"La date de fermeture n'est pas valide").isDate();
+    check(conf.noshipping[i].to,"La date de réouverture n'est pas valide").isDate();
+    check(conf.noshipping[i].reason,"La description pour l'interruption des livraisons n'est pas valide").isText().len(2, 300);
+  }
+}
+
 var user_address = exports.address =  function(address){
       check(address.name,        "Le nom ou le prénom de l'adresse n'est pas valide").isText().len(2, 100)
       check(address.streetAdress,"La rue de votre adresse n'est pas valide").isText().len(4, 200)
