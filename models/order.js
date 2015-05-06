@@ -868,7 +868,8 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   shipping.when=new Date(shipping.when)
 
   if(config.shop.noshipping&&config.shop.noshipping.length){
-    config.shop.noshipping.forEach(function (noshipping) {
+    for (var i = config.shop.noshipping.length - 1; i >= 0; i--) {
+      var noshipping=config.shop.noshipping[i];
       var from = new Date(noshipping.from);
       var to=new Date(noshipping.to);
       var msg="Les livraisons sont interrompues jusqu'au "+Orders.formatDate(to);
@@ -877,7 +878,8 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       if((shipping.when>=from && shipping.when<to)){
         return callback(noshipping.reason||msg)      
       }
-    })
+
+    };
   }
 
 
