@@ -44,7 +44,7 @@ describe("orders.validate.item", function(){
     toshortDay=Orders.findCurrentShippingDay();
     okDay=Orders.findNextShippingDay();
     okDay.setHours(11,0,0,0)
-    shipping.when=toNextDay=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0]);
+    shipping.when=toNextDay=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[3]);
     toNextDay.setHours(11,0,0,0)
 
 
@@ -188,6 +188,7 @@ describe("orders.validate.item", function(){
     items.push(Orders.prepare(data.Products[2], 1, ""))
 
 
+    // console.log('----------------next day',toNextDay)
 
     //
     // starting process of order,
@@ -206,13 +207,14 @@ describe("orders.validate.item", function(){
     items.push(Orders.prepare(data.Products[2], 1, ""))
 
 
+    // console.log('----------------ok day',okDay)
     //
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
       should.exist(order.errors)
-      order.errors[0]['1000003'].should.include("la boutique est momentanément fermée")
+      order.errors[0]['1000003'].should.include("la boutique sera fermée ce jour là")
       done();          
     });
   });    
