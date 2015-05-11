@@ -109,6 +109,9 @@ var Orders = new Schema({
 
    vendors:[{
     ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+    //
+    // only displayed for owner and admin
+    fees:{type:Number,select:false, requiered:true},
     slug:{type:String, required:true},
     name:{type:String, required:true},
     fullName:{type:String, required:false},
@@ -447,7 +450,6 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
 
 
-
   if((typeof item.vendor) !=='object' ){
     assert(product.vendor._id.toString()===item.vendor.toString())
     item.vendor=product.vendor.urlpath;
@@ -487,6 +489,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
         slug:product.vendor.urlpath,
         name:product.vendor.name,
         address:address,
+        fees:product.vendor.account.fees,
         geo:geo
     };
   }
@@ -670,7 +673,7 @@ Orders.statics.checkItems = function(shipping, items, callback){
 
   items=_.sortBy(items,function(i){return i.sku});
   var skus=items.map(function(item){return item.sku});
-  Products.findBySkus(skus).sort("sku").exec(function(err,products){
+  Products.findBySkus(skus).populate('vendor','+account.fees').sort("sku").exec(function(err,products){
     if(skus.length!==products.length){
       return callback("Certains produits sélectionnés n'existe pas, vérifier votre panier")
     }

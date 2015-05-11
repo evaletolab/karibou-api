@@ -8,7 +8,6 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
   
-
 var EnumPlace=config.shop.marketplace.list;
 var EnumRegion=config.shop.region.list;
 
@@ -81,6 +80,13 @@ var Shops = new Schema({
     //
     // type Date on pending, set true on active, false on deleted
     status:Schema.Types.Mixed,
+    // secret value for the business model
+    // - > is available/displayed for shop owner and admin ONLY
+    // - > is saved on each order to compute bill 
+    account:{
+      fees:{type:Number,select:false, default:config.shop.generalFees},
+      updated:{type:Date, default: Date.now}
+    },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
     created:{type:Date, default: Date.now}
 });
