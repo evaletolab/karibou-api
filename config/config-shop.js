@@ -12,10 +12,16 @@ module.exports = {
       types:['Category', 'Catalog']
     },
 
+    shipping:{
+      average:115, // average 
+      free:0,    // 180 full price 11.7@18% & 9.75@15%
+      half:145,  // half price 5.4@18% & 4.5@15%
+      price:10, // shipping price
+    },
+
     //
     // collect place
     marketplace:{
-      shipping:10, // shipping price
       list:[
         {name:"Marché de Plainpalais le mardi",lat:46.19838,lng:6.14083, d:2},
         {name:"Marché de Plainpalais le vendredi",lat:46.19838,lng:6.14083, d:5},

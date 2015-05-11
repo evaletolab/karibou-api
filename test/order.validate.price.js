@@ -58,7 +58,7 @@ describe("orders.find.shop", function(){
     });
   });
 
-  it("check order price (postfinance+items+shipping) ", function(done){
+  it("check order price (+items+shipping) ", function(done){
     db.model('Orders').find({oid:2000006}, function(err,order){
       should.not.exist(err)
       order[0].getTotalPrice().should.equal(30.6)
@@ -67,24 +67,48 @@ describe("orders.find.shop", function(){
   });
 
 
-  // it("check order price (postfinance+items(failure)+shipping) ", function(done){
-  //   db.model('Orders').find({oid:2000006}, function(err,order){
-  //     should.not.exist(err)
-  //     order[0].getTotalPrice().should.equal(30.6)
-  //     // order[0].print();
-  //     done();
-  //   });
-  // });
-
-  it("check order price (postfinance+items(failure)+shipping) ", function(done){
+  it("check order price (+items(failure)+ full shipping) ", function(done){
     db.model('Orders').find({oid:2000007}, function(err,order){
       should.not.exist(err)
-      // order[0].print();
-      order[0].getTotalPrice().should.equal(20.6)
+      order[0].getSubTotal().should.equal(10);
+      order[0].getTotalPrice().should.equal(20.6);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price);
       done();
     });
   });
 
+
+  it("check order shipping half shipping price ", function(done){
+    db.model('Orders').find({oid:2000008}, function(err,order){
+      should.not.exist(err)
+      order[0].getSubTotal().should.equal(145);
+      order[0].getTotalPrice().should.equal(153);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price/2);
+      done();
+    });
+  });
+
+  it("check order shipping free shipping price ", function(done){
+    db.model('Orders').find({oid:2000009}, function(err,order){
+      should.not.exist(err)
+      order[0].getSubTotal().should.equal(180);
+      order[0].getTotalPrice().should.equal(183.6);
+      order[0].getShippingPrice().should.equal(0);
+      done();
+    });
+  });
+
+  it("check order shipping half shipping price even with 180CHF", function(done){
+    config.shop.shipping.free=0;
+    db.model('Orders').find({oid:2000009}, function(err,order){
+      should.not.exist(err)
+      order[0].getSubTotal().should.equal(180);
+      order[0].getTotalPrice().should.equal(188.7);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price/2);
+      config.shop.shipping.free=180;
+      done();
+    });
+  });
 
 
 

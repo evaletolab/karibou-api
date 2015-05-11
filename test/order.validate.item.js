@@ -212,7 +212,7 @@ describe("orders.validate.item", function(){
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-      //console.log(err)
+      // console.log(order.errors)
       should.exist(order.errors)
       order.errors[0]['1000003'].should.include("la boutique sera fermée ce jour là")
       done();          

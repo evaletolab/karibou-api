@@ -32,7 +32,7 @@ var Payment=function(){
 
 		},
 
-		//
+		//5
 		// validate a card or alias and get new Card by callback
 		addCard:function(provider, user, payment){
 			var deferred = Q.defer()
@@ -57,7 +57,6 @@ var Payment=function(){
 		// authorize a new payment for this order
 		authorize:function(provider, order){
 			var deferred = Q.defer()
-
 
 			// only partial and reserved has status auth
 			if(["reserved"].indexOf(order.fulfillments.status)===-1){

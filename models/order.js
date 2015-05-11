@@ -63,7 +63,13 @@ var Orders = new Schema({
       number:{type:String, required:false},
       issuer:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'},
+      handle:{type:String,default:config.admin.handle},
+      provider:{type:String,default:config.payment.provider},
       logs:[String],
+      fees:{
+        charge:Number,
+        shipping:Number
+      },
       /*for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
    },
@@ -218,6 +224,34 @@ Orders.statics.prepare=function(product, quantity, note, shops){
   return copy;
 }
 
+Orders.methods.getShippingPrice=function(factor){
+  // check if value exist, (after creation) 
+  if(this.payment.fees&&this.payment.fees.shipping){
+    return this.payment.fees.shipping;
+  }
+  // now compute shipping from several sources,
+  // 1) coupon for freeshipping
+  //   --> this.payment.coupons
+
+
+  // 2) amount depend on price
+  // 3) amount depend on grouped orders
+
+  
+  // implement 3) get free shipping!
+  if (config.shop.shipping.free&&this.getSubTotal()>=config.shop.shipping.free){
+    return 0;
+  }
+
+  // implement 3) get half shipping!
+  else if (config.shop.shipping.half&&this.getSubTotal()>=config.shop.shipping.half){
+    return config.shop.shipping.price/2;
+  }
+
+
+  return config.shop.shipping.price;
+}
+
 /**
  * total price
  *  - some of item finalprice ()
@@ -236,7 +270,7 @@ Orders.methods.getTotalPrice=function(factor){
 
   // before the payment fees! 
   // add shipping fees (10CHF)
-  total+=config.shop.marketplace.shipping;
+  total+=this.getShippingPrice();
 
   //
   // add gateway fees
@@ -433,6 +467,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     var to=new Date(product.vendor.available.to);
     from.setHours(1,0,0,0);
     to.setHours(1,0,0,0);
+    // console.log('TESTING',shipping.when.toLocaleString(),from.toLocaleString(),to.toLocaleString())
     if((shipping.when>=from && shipping.when<=to) ||forceClosed){
       return cb(msg6,item)      
     }
@@ -1006,13 +1041,15 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       order.payment={
         alias:paymentData.alias,
         number:paymentData.number,
-        issuer:paymentData.issuer
+        issuer:paymentData.issuer,
+        fees:{shipping:0}
       };
 
       //
       // ready to create one order
       var dborder =new Orders(order);
 
+      dborder.payment.fees.shipping=dborder.getShippingPrice()
 
       //
       // update product stock

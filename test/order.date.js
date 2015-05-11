@@ -8,6 +8,7 @@ var Orders=db.model('Orders');
 describe("orders.date", function(){
   var _ = require("underscore"),
       now=new Date(),
+      hours=now.getHours(),
       timelimitH,
       timelimit,
       timeoutAndNotPaid,
@@ -49,9 +50,10 @@ describe("orders.date", function(){
     config.shop.order.timelimitH=23
     var today=new Date(), nextSeller=Orders.findCurrentShippingDay()
 
+
     //
     // sunday is off 
-    if (today.getDay()==0){
+    if (today.getDay()==0||hours===23){
       nextSeller.getDay().should.equal((today.getDay()+1))      
     }else{
       today.getDay().should.equal(nextSeller.getDay())      
@@ -67,8 +69,8 @@ describe("orders.date", function(){
     //console.log('------> today %d, nextSeller day %d',today.getDay(),nextSeller.getDay())
 
     //
-    // sunday is off 
-    if (today.getDay()==0){
+    // sunday is off OR our time limit is 23h
+    if (today.getDay()==0||hours===23){
       nextSeller.getDay().should.equal((today.getDay()+1)%7)      
     }else{
       nextSeller.getDay().should.equal(today.getDay()+0)      
@@ -86,7 +88,7 @@ describe("orders.date", function(){
 
     //
     // sunday is off 
-    if (today.getDay()==6){
+    if (today.getDay()==6||hours===23){
       nextSeller.getDay().should.equal((today.getDay()+2)%7)      
     }else{
       nextSeller.getDay().should.equal(today.getDay()+1)      
@@ -118,8 +120,8 @@ describe("orders.date", function(){
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
-    // sunday is off 
-    if (today.getDay()==5){
+    // sunday is off BUT if current test time is > 23 then computed value is wrong
+    if (today.getDay()==5||hours===23){
       nextSeller.getDay().should.equal((today.getDay()+3)%7)      
     }else{
       nextSeller.getDay().should.equal((today.getDay()+2)%7)      

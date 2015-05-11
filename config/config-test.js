@@ -22,6 +22,7 @@ module.exports = {
   },
 
   admin:{
+    handle:'secret',
     emails:['evaleto@gmail.com'],
     secret: process.env.KARIBOO_SECRET || '1234',
     webhook: {release:process.env.KARIBOU_RELEASE||'devel',secret:'qawsedr'},

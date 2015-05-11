@@ -92,6 +92,10 @@ describe("orders.create.success", function(){
       order.fulfillments.status.should.equal('reserved')
 
       //
+      // check shipping fees
+      order.payment.fees.shipping.should.equal(config.shop.shipping.price)
+
+      //
       // check financial status after creation
       // this value is set by the payment gateway
       should.not.exist(order.financial_status)

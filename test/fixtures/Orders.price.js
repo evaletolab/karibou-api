@@ -289,6 +289,7 @@ exports.Orders=[
         /* shipping adresse*/
         shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: sellerDay, geo: { lat: 46.1997473, lng: 6.1692497}},
 
+
         /* vendors */
         vendors: [
             {
@@ -310,26 +311,26 @@ exports.Orders=[
             {
                 sku: 1000004,
                 title: "Product 4 with cat",
-                quantity: 1,
-                price: 2.5,
+                quantity: 20,
+                price: 5,
                 part: "1pce",
                 note: "",
-                finalprice: 2.5,
+                finalprice: 100,
                 category: "Viande",
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "failure"
                 }
             },
             {
                 sku: 1000002,
                 title: "Product 2 with cat",
-                quantity: 3,
-                price: 3,
+                quantity: 20,
+                price: 5,
                 part: "100gr",
                 note: "",
-                finalprice: 9,
+                finalprice: 100,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -341,10 +342,10 @@ exports.Orders=[
                 sku: 1000003,
                 title: "Product 3 with cat",
                 quantity: 2,
-                price: 7.6,
+                price: 22.5,
                 part: "0.75L",
                 note: "",
-                finalprice: 15,
+                finalprice: 45,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -353,8 +354,6 @@ exports.Orders=[
                 }
             }
         ],
-
-
         created: new Date()
 
     },{
@@ -395,6 +394,7 @@ exports.Orders=[
             name: "famille delphine evalet 4"
         },
 
+
         /* vendors */
         vendors: [
             {
@@ -416,26 +416,26 @@ exports.Orders=[
             {
                 sku: 1000004,
                 title: "Product 4 with cat",
-                quantity: 1,
-                price: 2.5,
+                quantity: 20,
+                price: 5,
                 part: "1pce",
                 note: "",
-                finalprice: 2.5,
+                finalprice: 100,
                 category: "Viande",
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "failure"
                 }
             },
             {
                 sku: 1000002,
                 title: "Product 2 with cat",
-                quantity: 3,
-                price: 3,
+                quantity: 20,
+                price: 5,
                 part: "100gr",
                 note: "",
-                finalprice: 3,
+                finalprice: 100,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -446,11 +446,11 @@ exports.Orders=[
             {
                 sku: 1000003,
                 title: "Product 3 with cat",
-                quantity: 2,
-                price: 7.6,
+                quantity: 4,
+                price: 20,
                 part: "0.75L",
                 note: "",
-                finalprice: 7.6,
+                finalprice: 80,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
@@ -459,7 +459,6 @@ exports.Orders=[
                 }
             }
         ],
-
 
         created: new Date()
 

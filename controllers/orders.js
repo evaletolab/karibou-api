@@ -365,7 +365,7 @@ exports.create=function(req,res){
       .then(function(order){
         //
         // prepare and send mail
-        var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
+        var subTotal=order.getSubTotal(),shippingFees=order.getShippingPrice();
         var mail={
           order:order,
           created:order.getDateString(order.created),
@@ -554,7 +554,7 @@ exports.capture=function(req,res){
 
         //
         // prepare and send mail
-        var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
+        var subTotal=order.getSubTotal(),shippingFees=order.getShippingPrice();
         var mail={
           order:order,
           created:order.getDateString(order.created),
@@ -751,12 +751,13 @@ exports.invoicesByUsers=function(req,res){
     }
 
     var amount=0,total=0,shipping=0;
-    var subTotal=order.getSubTotal(),shippingFees=config.shop.marketplace.shipping;
 
     //
     // oid, date, customer, amount, fees, fees, total
     result.push(['oid','shipping','customer','amount','sfees','pfees','status','total'])
     orders.sort(byDateAndUser).forEach(function(order){
+      var subTotal=order.getSubTotal();
+      var shippingFees=order.getShippingPrice();
       result.push({
         oid:order.oid,
         shipping:Orders.formatDate(order.shipping.when),
@@ -769,7 +770,7 @@ exports.invoicesByUsers=function(req,res){
       })
       total+=parseFloat(order.getTotalPrice().toFixed(2));
       amount+=parseFloat(order.getSubTotal().toFixed(2));
-      shipping+=config.shop.marketplace.shipping;
+      shipping+=shippingFees;
     })
     result.push(['','','',amount,shipping,'','',total])
 
@@ -793,6 +794,7 @@ exports.invoicesByShops=function(req,res){
 
 
   criteria.closed=true;
+  criteria.fulfillment='fulfilled';
 
   parseCriteria(criteria,req)
 
@@ -801,7 +803,6 @@ exports.invoicesByShops=function(req,res){
     criteria.to=new Date(criteria.from);
     criteria.to.setDate(criteria.from.daysInMonth());
     criteria.to.setHours(23,0,0,0);
-    criteria.fulfillment='fulfilled';
   }
 
   //
