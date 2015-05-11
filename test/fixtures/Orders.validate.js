@@ -7,7 +7,7 @@ var Orders=require('mongoose').model('Orders');
 // use the same dates in the test and this fixture
 config.shop.order.weekdays=[0,1,2,3,4,5,6];
 var okDay=Orders.findNextShippingDay();
-var when1=Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[2]);
+var when1=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[1]);
 var when2=new Date(when1.getTime()+86400000*3);
 
 
