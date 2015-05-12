@@ -6,6 +6,7 @@ var _=require('underscore');
 
 var mongoose = require('mongoose')
   , bus = require('../app/bus')
+  , format=require('./lib/order.format')
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
@@ -1043,7 +1044,6 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
 // find the last order for a shop
 Orders.statics.findByCriteria = function(criteria, callback){
   assert(criteria);
-  assert(callback);
   var db=this
     , Orders=db.model('Orders')
     , Products=db.model('Products');
@@ -1154,7 +1154,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   var query=Orders.find(q).sort({created: -1});
 
   //
-  // get plain javascript object
+  // FIXME get plain javascript object
   if(criteria.shop){
     query=query.lean()
   }
@@ -1494,6 +1494,45 @@ Orders.statics.updateLogistic = function(query,options, callback){
 }
 
 
+
+Orders.statics.generateRepportForShop=function(criteria,cb) {
+  var Orders=this;
+
+  //
+  // force thoses fields
+  criteria.fulfillment='fulfilled';
+  criteria.closed=true;
+
+  Orders.findByCriteria(criteria).select('+vendors.fees').exec(function(err,orders){
+    if(err){
+      return cb(err);
+    }
+    if(!orders.length){
+      return cb(null,{})
+    }
+
+    //
+    // filter only when needed
+    if(criteria.shop){
+      orders=Orders.filterByShop(orders,criteria.shop);
+    }
+
+
+    //
+    // get shops details
+    var slugs=Orders.getVendorsSlug(orders)
+    return db.model('Shops').findAllBySlug(slugs,function(err,shops) {
+      cb(null,Orders.convertOrdersToRepportForShop(criteria.from, criteria.to, orders, shops,criteria.showAll))
+    });
+
+
+  });
+
+
+};
+
+//
+// TODO need a comment here!
 Orders.statics.getStatsByOrder=function(query){
   query=query||{ closed: { '$exists': false } };
 
@@ -1518,6 +1557,11 @@ Orders.statics.getStatsByOrder=function(query){
      ]
   )
 }
+
+// import API
+Orders.statics.sortByDateAndUser=format.sortByDateAndUser;
+Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForShop;
+
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
 exports.Orders = mongoose.model('Orders', Orders);

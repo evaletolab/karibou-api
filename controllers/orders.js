@@ -7,7 +7,6 @@ require('../app/config');
 
 var db = require('mongoose'),
     _=require('underscore'),
-    formatOrder=require('./format/order'),
     Orders = db.model('Orders'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
@@ -805,6 +804,12 @@ exports.invoicesByShops=function(req,res){
   }
 
   //
+  // do not hide !fulfilled items
+  if(req.query.all){
+    criteria.showAll=true;
+  }
+
+  //
   // restrict to a shop name
   // 0) no shops given => you should be admin
   // 1) a list of shops is given => you should be admin
@@ -820,51 +825,11 @@ exports.invoicesByShops=function(req,res){
     criteria.shop=req.user.shops.map(function(i){ return i.urlpath})      
   }
 
-
-  // if(req.query.shops){
-  //   if(req.user&&req.user.shops)criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
-  //   //req.query.shops.split(',')
-  // }else{
-  //   if(!req.user.isAdmin() ){
-  //     return res.send(401)
-  //   }    
-  // }
-
-
-
-  // sort by date and customer
-  criteria.byDateAndUser=function(o1,o2){
-    // asc date
-    if(o1.shipping.when!==o2.shipping.when){
-      if (o1.shipping.when > o2.shipping.when) return 1;
-      if (o1.shipping.when < o2.shipping.when) return -1;
-      return 0;
-    }
-    // asc email
-    return o1.customer.displayName.localeCompare(o2.customer.displayName)
-  }
-
-
-
-  Orders.findByCriteria(criteria, function(err,orders){
+  Orders.generateRepportForShop(criteria,function(err,repport){
     if(err){
       return res.send(400,errorHelper(err.message||err));
     }
-
-    //
-    // filter only when needed
-    if(criteria.shop){
-      orders=Orders.filterByShop(orders,criteria.shop);
-    }
-
-
-    //
-    // get shops details
-    var slugs=Orders.getVendorsSlug(orders)
-    return db.model('Shops').findAllBySlug(slugs,function(err,shops) {
-      res.json(formatOrder.invoicesByShopsJSON(req, criteria, orders, shops))
-    });
-
-
+    res.json(repport)
   });
+
 }
