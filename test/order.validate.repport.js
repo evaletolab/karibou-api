@@ -55,11 +55,11 @@ describe("orders.validate.repport", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.1.js"],db,function(err){
         should.not.exist(err);
-        // Orders.find({}).exec(function(e,os){
-        //   os.forEach(function(o){
-        //     o.print();
-        //   })
-        // })
+        Orders.find({}).exec(function(e,os){
+          os.forEach(function(o){
+            o.print();
+          })
+        })
         done();
       });
     });      
@@ -72,7 +72,7 @@ describe("orders.validate.repport", function(){
     });    
   });
 
-  it("get repport ", function(done){
+  it("validate repport content ", function(done){
 
     Orders.generateRepportForShop(criteria,function(err,repport){
       should.not.exist(err)
@@ -81,10 +81,10 @@ describe("orders.validate.repport", function(){
 
       })
 
-      repport.shops['mon-shop'].monthitems.should.equal(1);
-      repport.shops['mon-shop'].monthamount.should.equal(2.5);
-      repport.shops['mon-shop'].monthorder.should.equal(1);
-      repport.shops['mon-shop'].monthfees.should.equal(0.38);
+      repport.shops['mon-shop'].monthitems.should.equal(2);
+      repport.shops['mon-shop'].monthamount.should.equal(5);
+      repport.shops['mon-shop'].monthorder.should.equal(2);
+      repport.shops['mon-shop'].monthfees.should.equal(0.75);
       repport.shops['mon-shop'].details.fees.should.equal(0.15);
 
       repport.shops['super-shop'].monthitems.should.equal(3);
@@ -93,11 +93,16 @@ describe("orders.validate.repport", function(){
       repport.shops['super-shop'].monthfees.should.equal(1.6);
       repport.shops['super-shop'].details.fees.should.equal(0.16);
 
-      repport.shops['un-autre-shop'].monthitems.should.equal(11);
-      repport.shops['un-autre-shop'].monthamount.should.equal(44);
-      repport.shops['un-autre-shop'].monthorder.should.equal(3);
-      repport.shops['un-autre-shop'].monthfees.should.equal(6.16);
+      repport.shops['un-autre-shop'].monthitems.should.equal(16);
+      repport.shops['un-autre-shop'].monthamount.should.equal(54.6);
+      repport.shops['un-autre-shop'].monthorder.should.equal(4);
+      repport.shops['un-autre-shop'].monthfees.should.equal(7.64);
       repport.shops['un-autre-shop'].details.fees.should.equal(0.14);
+      repport.monthamount.should.equal(69.6);
+      repport.monthca.should.equal(9.99);
+      repport.monthitems.should.equal(21);
+      repport.monthorders.should.equal(4);
+
 
 
       // item!='failure' => E(item.price) + gateway fees + shipping fees

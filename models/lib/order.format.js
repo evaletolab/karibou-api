@@ -25,6 +25,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       shipping=0, 
       monthamount=0,
       monthitems=0, 
+      monthorders=0,
       monthorder=[],
       monthca=0,
       products={}, 
@@ -38,6 +39,8 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       return s.urlpath===slug
     })
   }
+
+  monthorders=orders.length;
 
   //
   // group by shops
@@ -60,7 +63,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       if(item.fulfillment.status==='fulfilled'){
         // compute order/mont for this shop
         monthorder.push(item.oid);
-
+        console.log(item.oid)
         // customer item
         if(!result.users[item.customer.displayName][item.sku]){
           result.users[item.customer.displayName][item.sku]={count:0,amount:0,title:item.title}
@@ -116,10 +119,10 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
 
   })
 
-  //FIXME fees should not be hardcoded ;( 
   result.monthamount=monthamount;
   result.monthca=monthca;
   result.monthitems=monthitems;
+  result.monthorders=monthorders;
 
   //
   // pivot on user

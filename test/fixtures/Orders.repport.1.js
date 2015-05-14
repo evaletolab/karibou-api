@@ -15,15 +15,19 @@ var orders = require('mongoose').model('Orders');
 //  -
 
 var oneweek=orders.findOneWeekOfShippingDay();
-var sellerDay=orders.findCurrentShippingDay();
-var lastDayOfMonth=new Date(sellerDay);
+var firstDayOfMonth=orders.findCurrentShippingDay();
+var lastDayOfMonth=new Date(firstDayOfMonth);
 var customerDay=oneweek[0];
 
 var passedday=new Date(customerDay.getTime()-86400000*7)
 
 lastDayOfMonth.setDate(lastDayOfMonth.daysInMonth());
+lastDayOfMonth.setHours(11,0,0,0);
 
+firstDayOfMonth.setDate(1);
+firstDayOfMonth.setHours(16,0,0,0);
 
+console.log('shipping -------------',lastDayOfMonth)
 exports.Orders=[
     {
         _id: ObjectId("52f12f09a328f285313bda10"),
@@ -129,7 +133,7 @@ exports.Orders=[
         },
 
         /* shipping adresse*/
-        shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: sellerDay, geo: { lat: 46.1997473, lng: 6.1692497}},
+        shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: firstDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}},
 
         /* vendors */
         vendors: [
@@ -210,7 +214,12 @@ exports.Orders=[
         },
 
         /* shipping adresse*/
-        shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: sellerDay, geo: { lat: 46.1997473, lng: 6.1692497}},
+        shipping: { 
+            name: "famille olivier evalet 1", 
+            note: "123456", 
+            streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", 
+            when: firstDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}
+        },
 
         /* vendors */
         vendors: [
@@ -306,7 +315,12 @@ exports.Orders=[
         },
 
         /* shipping adresse*/
-        shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: sellerDay, geo: { lat: 46.1997473, lng: 6.1692497}},
+        shipping: { 
+            name: "famille olivier evalet 1", 
+            note: "123456", 
+            streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", 
+            when: lastDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}
+        },
 
         /* vendors */
         vendors: [
@@ -485,7 +499,8 @@ exports.Orders=[
         ],
 
 
-        created: new Date()
+        created: new Date(),
+        closed:passedday      
 
     }
 ];

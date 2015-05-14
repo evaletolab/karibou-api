@@ -59,6 +59,26 @@ describe("api.shops", function(){
       });
   });
 
+  it('GET /v1/shops/un-autre-shop should return 200 (SHOW ACCOUNT FEE)',function(done){
+    request(app)
+      .get('/v1/shops/un-autre-shop')
+      .set('cookie', cookie)
+      .end(function(err,res){      
+        res.should.have.status(200);
+        should.exist(res.body.account.fees)
+        done();        
+      });
+  });  
+
+  it('GET /v1/shops/un-autre-shop should return 200 (HIDE ACCOUNT FEE)',function(done){
+    request(app)
+      .get('/v1/shops/un-autre-shop')
+      .end(function(err,res){      
+        res.should.have.status(200);
+        should.not.exist(res.body.account.fees)
+        done();        
+      });
+  });  
    
   it('POST /v1/shops/un-autre-shop should return 200 (you are admin)',function(done){
     var s=data.Shops[0]
@@ -68,6 +88,20 @@ describe("api.shops", function(){
       .set('cookie', cookie)
       .end(function(err,res){      
         res.should.have.status(200);
+        should.exist(res.body.account.fees)
+        done();        
+      });
+  });     
+
+  it.skip('POST /v1/shops/un-autre-shop should return 200 (you are owner)',function(done){
+    var s=data.Shops[0]
+    request(app)
+      .post('/v1/shops/un-autre-shop')
+      .send(s)
+      .set('cookie', cookie)
+      .end(function(err,res){      
+        res.should.have.status(200);
+        should.not.exist(res.body.account.fees)
         done();        
       });
   });     

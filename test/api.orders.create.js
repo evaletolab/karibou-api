@@ -47,6 +47,12 @@ describe("api.orders.create", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.validate.js"],db,function(err){
         should.not.exist(err);
+        //
+        // this vendor id is conflict with others tests
+        Products.findOne({sku:1000003}).exec(function (e,p) {
+          p.vendor='515ec12e56a8d5961e000006';
+          p.save();
+        })
         done();
       });
     });      
@@ -92,6 +98,7 @@ describe("api.orders.create", function(){
       payment:payment
     }
 
+
     request(app)
       .post('/v1/orders')
       .send(order)
@@ -123,6 +130,8 @@ describe("api.orders.create", function(){
       shipping:shipping,
       payment:payment
     }
+
+
 
     request(app)
       .post('/v1/orders')
