@@ -1507,9 +1507,6 @@ Orders.statics.generateRepportForShop=function(criteria,cb) {
     if(err){
       return cb(err);
     }
-    if(!orders.length){
-      return cb(null,{})
-    }
 
     //
     // filter only when needed

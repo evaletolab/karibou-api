@@ -21,6 +21,18 @@ describe("orders.validate.repport", function(){
   var sellerDay=Orders.findCurrentShippingDay();
   var customerDay=oneweek[0];
 
+  function setCriteriaDateByMonthAndYear (criteria,month,year) {
+    criteria.from=new Date()
+    criteria.from.setDate(1)
+    criteria.from.setMonth(month)
+    if(year)criteria.from.setMonth(year);
+    criteria.from.setHours(1,0,0,0)    
+
+    criteria.to=new Date(criteria.from);
+    criteria.to.setDate(criteria.from.daysInMonth());
+    criteria.to.setHours(23,0,0,0);    
+
+  }
   //price depends on:
   //-> item fullfilment != failure
   //-> item finalprice
@@ -28,14 +40,7 @@ describe("orders.validate.repport", function(){
   //-> shipping
 
   before(function(done){
-    criteria.from=new Date()
-    criteria.from.setDate(1)
-    criteria.from.setMonth(sellerDay.getMonth())
-    criteria.from.setHours(1,0,0,0)    
-
-    criteria.to=new Date(criteria.from);
-    criteria.to.setDate(criteria.from.daysInMonth());
-    criteria.to.setHours(23,0,0,0);    
+    setCriteriaDateByMonthAndYear(criteria,sellerDay.getMonth())
 
     // show !fulfilled items
     criteria.showAll=false;
@@ -55,11 +60,11 @@ describe("orders.validate.repport", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.1.js"],db,function(err){
         should.not.exist(err);
-        Orders.find({}).exec(function(e,os){
-          os.forEach(function(o){
-            o.print();
-          })
-        })
+        // Orders.find({}).exec(function(e,os){
+        //   os.forEach(function(o){
+        //     o.print();
+        //   })
+        // })
         done();
       });
     });      
@@ -83,19 +88,19 @@ describe("orders.validate.repport", function(){
 
       repport.shops['mon-shop'].monthitems.should.equal(2);
       repport.shops['mon-shop'].monthamount.should.equal(5);
-      repport.shops['mon-shop'].monthorder.should.equal(2);
+      repport.shops['mon-shop'].monthorders.should.equal(2);
       repport.shops['mon-shop'].monthfees.should.equal(0.75);
       repport.shops['mon-shop'].details.fees.should.equal(0.15);
 
       repport.shops['super-shop'].monthitems.should.equal(3);
       repport.shops['super-shop'].monthamount.should.equal(10);
-      repport.shops['super-shop'].monthorder.should.equal(1);
+      repport.shops['super-shop'].monthorders.should.equal(1);
       repport.shops['super-shop'].monthfees.should.equal(1.6);
       repport.shops['super-shop'].details.fees.should.equal(0.16);
 
       repport.shops['un-autre-shop'].monthitems.should.equal(16);
       repport.shops['un-autre-shop'].monthamount.should.equal(54.6);
-      repport.shops['un-autre-shop'].monthorder.should.equal(4);
+      repport.shops['un-autre-shop'].monthorders.should.equal(4);
       repport.shops['un-autre-shop'].monthfees.should.equal(7.64);
       repport.shops['un-autre-shop'].details.fees.should.equal(0.14);
       repport.monthamount.should.equal(69.6);
@@ -110,6 +115,26 @@ describe("orders.validate.repport", function(){
       done();
     });
   });
+
+
+  it("validate repport content for unknown year ", function(done){
+    setCriteriaDateByMonthAndYear(criteria,sellerDay.getMonth(),1989)
+
+    Orders.generateRepportForShop(criteria,function(err,repport){
+      should.not.exist(err)
+
+      repport.monthamount.should.equal(0);
+      repport.monthca.should.equal(0);
+      repport.monthitems.should.equal(0);
+      repport.monthorders.should.equal(0);
+
+
+      // item!='failure' => E(item.price) + gateway fees + shipping fees
+      // this order contains only shipping
+      done();
+    });
+  });
+
 
 
 

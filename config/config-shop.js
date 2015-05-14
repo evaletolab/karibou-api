@@ -12,6 +12,7 @@ module.exports = {
       types:['Category', 'Catalog']
     },
 
+    shipping:{price:10},
     //
     // collect place
     marketplace:{

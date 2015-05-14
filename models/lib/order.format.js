@@ -63,7 +63,6 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       if(item.fulfillment.status==='fulfilled'){
         // compute order/mont for this shop
         monthorder.push(item.oid);
-        console.log(item.oid)
         // customer item
         if(!result.users[item.customer.displayName][item.sku]){
           result.users[item.customer.displayName][item.sku]={count:0,amount:0,title:item.title}
@@ -101,7 +100,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
     shop=findShopBySlug(shops,slug)
     result.shops[slug].monthitems=count;
     result.shops[slug].monthamount=parseFloat((total).toFixed(2));
-    result.shops[slug].monthorder=_.uniq(monthorder).length;
+    result.shops[slug].monthorders=_.uniq(monthorder).length;
     result.shops[slug].details=oshops[slug].details;
     result.shops[slug].streetAdress=shop.address.streetAdress;
     result.shops[slug].region=shop.address.region;
