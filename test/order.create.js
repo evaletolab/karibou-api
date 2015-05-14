@@ -316,6 +316,8 @@ describe("orders.create", function(){
   it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
 
     shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
+    shipping.when.setHours(11,0,0,0);
+
     items=[]
     items.push(Orders.prepare(data.Products[0], 1, ""))
 

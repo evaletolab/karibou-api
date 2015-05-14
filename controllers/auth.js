@@ -182,7 +182,10 @@ exports.register_post= function(req, res,next) {
       validate.register(req.body)
       //
       // validate addresses (with force)
-      validate.user(req.body, true)
+      for( var i in req.body.addresses){
+        validate.address(req.body.addresses[i])
+      }
+
 
     }catch(err){
       console.log("ERROR [register] ", err.message)

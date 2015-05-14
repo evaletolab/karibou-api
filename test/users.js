@@ -130,7 +130,6 @@ describe("Users", function(){
   
   it('should return true if the user has role', function (done) {
       db.model('Users').findOne({id:1279482741765243},function(err,profile){
-        console.log(err)
         profile.hasRole('admin').should.be.true;
         profile.hasRole('mod').should.be.true;
         done();

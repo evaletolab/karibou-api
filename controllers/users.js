@@ -197,16 +197,32 @@ exports.update=function(req,res){
     return res.send(400, err.message);
   }
 
+  //
+  // normalize ref _id
+  for (var i = req.body.shops.length - 1; i >= 0; i--) {
+    req.body.shops[i]=(req.body.shops[i]._id)?req.body.shops[i]._id:req.body.shops[i];
+  };
 
-  Users.findAndUpdate({id:req.params.id},req.body,function(err,user){
-
-    if (err){
-      if(err.code==11001){
-        return res.send(400,"Cette adresse email est déjà utilisée");
-      }
-      return res.send(400,errorHelper(err.message||err));
+  Users.findOne({id:req.params.id}).exec(function(err,user){
+    // if not admin silently fix   
+    if(!req.user.isAdmin()){
+      req.body.id=user.id;
+      req.body.status=user.status;
+      req.body.shops=user.shops;
+      req.body.roles=user.roles;
     }
-    return res.json(user);
+    // do the update
+    _.extend(user,req.body);
+
+    user.save(function (err,user) {
+      if (err){
+        if(err.code==11001){
+          return res.send(400,"Cette adresse email est déjà utilisée");
+        }
+        return res.send(400,errorHelper(err.message||err));
+      }
+      return res.json(user);
+    })
   });
 
 };

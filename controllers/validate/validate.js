@@ -34,6 +34,9 @@ var user_address = exports.address =  function(address){
  *
  */
 var user= exports.user = function(u, lean){
+    if(!u.id||!u.created){
+      throw new Error('Hmmm, ceci n\'est pas un utilisateur!')
+    }
 
     if(u.email){
       ifCheck(u.email.address,   "Votre adresse email n'est pas valide").len(6, 64).isEmail();
@@ -43,8 +46,7 @@ var user= exports.user = function(u, lean){
       ifCheck(u.name.familyName, "Votre nom de famille n'est pas valide").len(2, 100).isText();
       ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 100).isText();
     }
-
-    if(!lean && !u.phoneNumbers.length){
+    if(!lean && (!u.phoneNumbers||!u.phoneNumbers.length)){
       throw new Error("Vous devez définir au moins un téléphone");
     }
 
@@ -53,7 +55,13 @@ var user= exports.user = function(u, lean){
       check(u.phoneNumbers[i].number, "Votre numéro téléphone n'est pas valide").isText().len(10, 30)
     }
 
+    // check addresses and primary unicity 
+    var primary;
     for( var i in u.addresses){
+      if(u.addresses[i].primary===true && primary===true){
+        throw new Error('Vous pouvez avoir qu\'une seule addresse principale')
+      }
+      primary=u.addresses[i].primary;
       user_address(u.addresses[i])
     }
 

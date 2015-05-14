@@ -13,7 +13,6 @@ var when1=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[1]);
 var when2=new Date(when1.getTime()+86400000*3);
 config.shop.order.weekdays=weekdays;
 
-
 // console.log('---------------ok',okDay);
 // console.log('---------------when1',when1);
 // console.log('---------------when2',when2);

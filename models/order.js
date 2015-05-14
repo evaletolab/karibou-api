@@ -6,6 +6,7 @@ var _=require('underscore');
 
 var mongoose = require('mongoose')
   , bus = require('../app/bus')
+  , format=require('./lib/order.format')
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
@@ -115,6 +116,9 @@ var Orders = new Schema({
 
    vendors:[{
     ref:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true},
+    //
+    // only displayed for owner and admin
+    fees:{type:Number,select:false, requiered:true},
     slug:{type:String, required:true},
     name:{type:String, required:true},
     fullName:{type:String, required:false},
@@ -229,7 +233,11 @@ Orders.methods.getShippingPrice=function(factor){
   if(this.payment.fees&&this.payment.fees.shipping){
     return this.payment.fees.shipping;
   }
-  // now compute shipping from several sources,
+  //
+  // this should be always true, if fulfillment exist then shipping is stored
+  assert(!this.fulfillment)
+
+  // now compute shipping value to store in order. Several sources:
   // 1) coupon for freeshipping
   //   --> this.payment.coupons
 
@@ -482,7 +490,6 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
 
 
-
   if((typeof item.vendor) !=='object' ){
     assert(product.vendor._id.toString()===item.vendor.toString())
     item.vendor=product.vendor.urlpath;
@@ -522,6 +529,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
         slug:product.vendor.urlpath,
         name:product.vendor.name,
         address:address,
+        fees:product.vendor.account.fees,
         geo:geo
     };
   }
@@ -705,7 +713,7 @@ Orders.statics.checkItems = function(shipping, items, callback){
 
   items=_.sortBy(items,function(i){return i.sku});
   var skus=items.map(function(item){return item.sku});
-  Products.findBySkus(skus).sort("sku").exec(function(err,products){
+  Products.findBySkus(skus).populate('vendor','+account.fees').sort("sku").exec(function(err,products){
     if(skus.length!==products.length){
       return callback("Certains produits sélectionnés n'existe pas, vérifier votre panier")
     }
@@ -1077,7 +1085,6 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
 // find the last order for a shop
 Orders.statics.findByCriteria = function(criteria, callback){
   assert(criteria);
-  assert(callback);
   var db=this
     , Orders=db.model('Orders')
     , Products=db.model('Products');
@@ -1188,7 +1195,7 @@ Orders.statics.findByCriteria = function(criteria, callback){
   var query=Orders.find(q).sort({created: -1});
 
   //
-  // get plain javascript object
+  // FIXME get plain javascript object
   if(criteria.shop){
     query=query.lean()
   }
@@ -1528,6 +1535,42 @@ Orders.statics.updateLogistic = function(query,options, callback){
 }
 
 
+
+Orders.statics.generateRepportForShop=function(criteria,cb) {
+  var Orders=this;
+
+  //
+  // force thoses fields
+  criteria.fulfillment='fulfilled';
+  criteria.closed=true;
+
+  Orders.findByCriteria(criteria).select('+vendors.fees').exec(function(err,orders){
+    if(err){
+      return cb(err);
+    }
+
+    //
+    // filter only when needed
+    if(criteria.shop){
+      orders=Orders.filterByShop(orders,criteria.shop);
+    }
+
+
+    //
+    // get shops details
+    var slugs=Orders.getVendorsSlug(orders)
+    return db.model('Shops').findAllBySlug(slugs,function(err,shops) {
+      cb(null,Orders.convertOrdersToRepportForShop(criteria.from, criteria.to, orders, shops,criteria.showAll))
+    });
+
+
+  });
+
+
+};
+
+//
+// TODO need a comment here!
 Orders.statics.getStatsByOrder=function(query){
   query=query||{ closed: { '$exists': false } };
 
@@ -1552,6 +1595,11 @@ Orders.statics.getStatsByOrder=function(query){
      ]
   )
 }
+
+// import API
+Orders.statics.sortByDateAndUser=format.sortByDateAndUser;
+Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForShop;
+
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
 exports.Orders = mongoose.model('Orders', Orders);

@@ -6,6 +6,7 @@ var db = require('mongoose')
 	, passport = require('passport')
   , payment = require('../app/payment')
   , bus = require('../app/bus')
+  , validator = require('../app/validator')
   , Q = require('q')
   , _ = require('underscore');
 
@@ -20,7 +21,8 @@ var db = require('mongoose')
 // validate URL
 validate.url = function (value) {
   try {
-   check(value).len(10, 200).regex(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/);
+   if(value==='')return true;
+   validator.ifCheck(value).len(0, 200).regex(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/);
   } catch(err) {
    return false;
   }
@@ -30,7 +32,7 @@ validate.url = function (value) {
 // validate postal code
 validate.postal = function (value) {
   try {
-   check(value).isAlpha();
+   validator.ifCheck(value).isAlpha();
   } catch(err) {
    return false;
   }

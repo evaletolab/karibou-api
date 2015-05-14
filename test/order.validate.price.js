@@ -13,7 +13,7 @@ var Products=db.model('Products')
   , okDay;
 
 
-describe("orders.find.shop", function(){
+describe("orders.validate.price", function(){
   var _ = require("underscore");
 
 

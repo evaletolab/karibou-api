@@ -101,6 +101,12 @@ describe("orders.create.success", function(){
       should.not.exist(order.financial_status)
 
       //
+      // verify shipping time
+      // console.log('-shipping time',config.shop.order.shippingtimes)
+      // console.log('-shipping time',order.shipping.when)
+      Object.keys(config.shop.order.shippingtimes)[0].should.equal('11');
+      order.shipping.when.getHours().should.equal(11);
+      //
       // check items fields, price and finalprice
       should.exist(order.items[0].part)
       //

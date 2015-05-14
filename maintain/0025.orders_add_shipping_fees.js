@@ -3,8 +3,7 @@
  * http://docs.mongodb.org/manual/reference/operator/#AdvancedQueries-%24type
  * 
  * 
- *  find all product where photo is a string
- *   - convert the field photo:string => photo:{url:string}
+ * find all shop.options and rename it to shop.details 
  *
  * Use case
  * 1) How to change the type of a field?
@@ -29,20 +28,14 @@
 
 
 exports.execute = function(db, script, callback){
-	console.log(script,"Convert all user.addresses.region GE => Genève");
+	console.log(script,"Store the shipping cost in order payment");
   var logs="", count=0;
-  var users=db.collection('users');
+  var orders=db.collection('orders');
 
+  // this is not possible, waiting for $$ operator 
+  // see here https://jira.mongodb.org/browse/SERVER-1243
+  orders.update({'payment.fees':{$ne:true}} , {$set: {"payment.fees": {shipping:10}}},{multi:true}, function(err,count){
+    callback(err, count+" orders have been updated");
+  })
 	
-  users.find( {"addresses.region":"GE"}).toArray(function (err,u) {
-    if (!u.length){
-      return callback(null, "0 shop have been updated")
-    }
-    console.log(script,"updating region addresse: "+u.length );
-    users.update({"addresses.region":"GE"} , {$set: {"addresses.$.region": "Genève"}}, {multi:true} ,function(err,count){
-      callback(err, count+" users have been updated");
-    })
-
-  }); 
-
 }

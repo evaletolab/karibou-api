@@ -37,8 +37,8 @@ exports.execute = function(db, script, callback){
 	    return callback(null, "0 shop have been updated")
 	  }
     console.log(script,"migrating "+s.length +" shops");
-    shops.update({}, { $rename: { "location": "address.location" } } ,function(err){
-      callback(err, s.length+" shops have been updated");
+    shops.update({'location':{$type:2 } }, { $rename: { "location": "address.location" } }, {multi:true}  ,function(err,count){
+      callback(err, count+" shops have been updated");
     })
 
   });	

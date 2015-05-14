@@ -2,6 +2,7 @@
 
 module.exports = {
   shop:{
+    generalFees:0.15,
     system:{
       password:{len:5},
       post:{limitMS:10}

@@ -13,6 +13,10 @@ var app=require('../app/config'),
     ObjectId = db.Types.ObjectId;
 
 
+function isUserShopOwner(req){
+  if(!req.user)return false;
+  return (_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname}));
+}
 
 exports.ensureShopLimit=function(req, res, next) {
   if (!req.user.isAdmin() && req.user.shops.length>0){
@@ -22,9 +26,6 @@ exports.ensureShopLimit=function(req, res, next) {
 }
 
 exports.ensureOwnerOrAdmin=function(req, res, next) {
-  function isUserShopOwner(){
-    return (_.any(req.user.shops,function(s){return s.urlpath===req.params.shopname}));
-  }
 
   //
   // ensure auth
@@ -38,7 +39,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
   //
   // ensure owner
-	if(!isUserShopOwner()){
+	if(!isUserShopOwner(req)){
     return res.send(401, "Your are not the owner of this shop");
 	}
 
@@ -96,7 +97,13 @@ exports.get=function (req, res) {
     return res.send(400, err.message);
   }
 
-  Shops.findOneShop({urlpath:req.params.shopname},function (err,shop){
+  var query=Shops.findOneShop({urlpath:req.params.shopname});
+
+  if(req.user&&req.user.isAdmin() || isUserShopOwner(req)){
+    query.select('+account.fees');
+  }
+
+  query.exec(function (err,shop){
     if (err){
       return res.send(400,errorHelper(err));
     }
@@ -307,32 +314,56 @@ exports.update=function(req,res){
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
     validate.shop(req.body);
   }catch(err){
-      console.log('-----------------0',err)
     return res.send(400, err.message);
   }
+
+  //
+  //quick body clean (avoid mongo warn !) 
+  req.body.$promise && delete(req.body.$promise);
+  req.body.$resolved && delete(req.body.$resolved);
 
 
   //
   // check for only admin updates
-  if (!req.user.isAdmin()){
-      req.body.status&&delete(req.body.status);
-  }
 
   //
   // with angular in UI we got some issue with the _id value
   function normalizeRef(field){
-    return req.body[field]=(req.body[field]&&req.body[field]._id)?req.body[field]._id:req.body[field];
+    return req.body[field]=(req.body[field]&&req.body[field]._id)?ObjectId(req.body[field]._id):ObjectId(req.body[field]);
   }
   req.body.catalog=normalizeRef('catalog');
+  req.body.owner=normalizeRef('owner');
 
 
-  Shops.update({urlpath:req.params.shopname},req.body,function(err,shop){
+
+
+  Shops.findOne({urlpath:req.params.shopname}).select('+account.fees').exec(function(err,shop){
     if (err){
-      console.log('-----------------1',err)
       return res.send(400,err);
     }
-    return res.json(shop);
+
+    if (!shop){
+      return res.send(400,'Ooops, unknow shop '+req.params.shopname);    
+    }
+
+    // if not admin silently fix   
+    if(!req.user.isAdmin()){
+      req.body.status=shop.status;
+      req.body.account=shop.account;
+    }
+
+    // do the update
+    _.extend(shop,req.body)
+
+    shop.save(function (err) {
+      if (err){
+        return res.send(400,err.message||errorHelper(err));    
+      }
+      return res.json(shop);  
+    })
   });
+
+
 
 };
 

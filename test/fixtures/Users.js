@@ -26,7 +26,12 @@ var Users=exports.Users=[{
     email : { 
       address : "evaleto@gluck.com", status : true
     },
-    phoneNumbers : [], 
+    phoneNumbers: [
+        {
+            number: "076 3787968",
+            what: "principal"
+        }
+    ],
     photo : "jpg", 
     provider : "local", 
     roles : [], 
