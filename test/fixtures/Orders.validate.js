@@ -9,7 +9,7 @@ var weekdays=config.shop.order.weekdays;
 
 config.shop.order.weekdays=[0,1,2,3,4,5,6];
 var okDay=Orders.findNextShippingDay();
-var when1=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[1]);
+var when1=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[2]);
 var when2=new Date(when1.getTime()+86400000*3);
 config.shop.order.weekdays=weekdays;
 

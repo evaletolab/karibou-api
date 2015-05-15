@@ -58,7 +58,7 @@ describe("orders.validate.repport", function(){
 
 
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.1.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.js"],db,function(err){
         should.not.exist(err);
         // Orders.find({}).exec(function(e,os){
         //   os.forEach(function(o){
