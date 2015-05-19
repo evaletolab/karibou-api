@@ -32,11 +32,19 @@ body {
   border-top: 1px solid #e5e5e5;
 }
 
+.list-group-item{
+  padding: 20px 15px;
+}
+
 /* Customize container */
 @media (min-width: 768px) {
   .container {
     max-width: 730px;
   }
+
+  .list-group-item{
+    padding: 10px 15px;
+  }  
 }
 .container-narrow > hr {
   margin: 30px 0;
