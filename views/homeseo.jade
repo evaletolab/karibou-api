@@ -17,18 +17,33 @@ html
     meta(property="og:site_name", content="Karibou")
     meta(property="og:url", content="https://Karibou.ch")
     meta(name="twitter:site", content="@kariboulab")
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+    link(href="/css/style.css", rel="stylesheet")
   body
-    h1 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
-    ul
-        li
-            a(href="/page/about"): |Comment ça marche
-        li
-            a(href="/page/la-charte"): |Notre charte
-        li
-            a(href="/shops"): |Les boutiques
-        li
-            a(href="/products"): |Les produits
+    div(class="container")
+      div(class="header clearfix")
+        nav
+          ul(class="nav nav-pills pull-right")
+            li(role="presentation" class="_active hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): | La charte
+            li(role="presentation", class="hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |A propos
+        h3( class="text-muted"): |Karibou Marketplace
 
-    block content
+
+      div(class="jumbotron")
+        h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
+        img(src="/img/karibou.jpg", class="img-responsive")
+      ul(class="list-group")
+          li(class="list-group-item")
+              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
+          li(class="list-group-item")
+              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
+          li(class="list-group-item")
+              a(href="/shops"): |Les boutiques
+          li(class="list-group-item")
+              a(href="/products"): |Les produits
+
+      block content
 
 

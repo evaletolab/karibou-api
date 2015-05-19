@@ -29,35 +29,53 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
     meta( property="og:image", content="#{prependUrlImage(shop.photo.fg)}" )
     meta( property="og:description", content="#{shop.description}" )
     meta( property="og:site_name", content="https://karibou.ch" )
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+    link(href="/css/style.css", rel="stylesheet")
 
   body
-    ul
-        li
-            a(href="/page/about"): Comment ça marche
-        li
-            a(href="/page/la-charte"): Notre charte
-        li
-            a(href="/shops"): Les boutiques
-        li
-            a(href="/products"): Les produits
+    div(class="container")
+      div(class="header clearfix")
+        nav
+          ul(class="nav nav-pills pull-right")
+            li(role="presentation" class="_active hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): | La charte
+            li(role="presentation", class="hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |A propos
+        h3( class="text-muted"): |Karibou Marketplace
 
-    h1: =shop.name
-    div: =shop.description
-    div 
-      img(src='#{prependUrlImage(shop.photo.fg)}')
-    h1 Boutique
-    div(itemprop='owns')
-      div(itemprop="name"): =shop.address.name 
-      div(itemprop="url")<a href="/shop/#{shop.urlpath}">#{shop.name}</a>
 
-    h1 En vente sur le marché
-    - each place in shop.marketplace
-        li: =place
+      div(class="jumbotron")
+        h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
+      ul(class="list-group")
+          li(class="list-group-item")
+              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
+          li(class="list-group-item")
+              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
+          li(class="list-group-item")
+              a(href="/shops"): |Les boutiques
+          li(class="list-group-item")
+              a(href="/products"): |Les produits
 
-    div( itemscope, itemtype="http://schema.org/Organization")
-        div(itemprop="telephone"): =shop.address.phone
-    div(itemscope, itemtype="http://schema.org/PostalAddress")
-        div( itemprop="name"): =shop.address.name
-        div( itemprop="streetAddress"): =shop.address.streetAdress
-        div( itemprop="addressRegion"): =shop.address.region
-        div( itemprop="postalCode"): =shop.address.postalCode
+      h1: =shop.name
+      div: =shop.description
+      div 
+        img(src='#{prependUrlImage(shop.photo.fg)}', class="img-responsive")
+      h1 Boutique
+      div(itemprop='owns')
+        div(itemprop="name"): =shop.address.name 
+        div(itemprop="url")<a href="/shop/#{shop.urlpath}">#{shop.name}</a>
+
+      h2 En vente sur le marché
+      ul(class="list-group")
+      - each place in shop.marketplace
+          li(class="list-group-item"): =place
+
+
+      h2 Contact
+      ul(class="list-group", itemscope, itemtype="http://schema.org/Organization")
+          li(class="list-group-item",itemprop="telephone"): =shop.address.phone
+      ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
+          li(class="list-group-item", itemprop="name"): =shop.address.name
+          li(class="list-group-item", itemprop="streetAddress"): =shop.address.streetAdress
+          li(class="list-group-item", itemprop="addressRegion"): =shop.address.region
+          li(class="list-group-item", itemprop="postalCode"): =shop.address.postalCode
