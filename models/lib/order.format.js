@@ -46,7 +46,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
   // group by shops
   oshops=Orders.groupByShop(orders);
   Object.keys(oshops).forEach(function(slug){
-    total=amount=count=ocount=0; monthorder=[];
+    total=amount=count=totalfees=0; monthorder=[];
     result.shops[slug]={items:[]};
     //
     // repport by shop
@@ -90,6 +90,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       if(item.fulfillment.status==='fulfilled'){
         count+=parseFloat(item.quantity);
         total+=parseFloat(item.finalprice.toFixed(2));
+        totalfees+=item.finalprice*item.fees;
         amount+=parseFloat(item.price.toFixed(2));          
         if(!products[item.sku])products[item.sku]={count:0,amount:0,title:item.title+'('+item.part+')'}
         products[item.sku].count+=item.quantity  
@@ -107,7 +108,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
     result.shops[slug].postalCode=shop.address.postalCode;
     result.shops[slug].geo=shop.address.geo;
     
-    result.shops[slug].monthfees=parseFloat((total*oshops[slug].details.fees).toFixed(2));
+    result.shops[slug].monthfees=parseFloat((totalfees).toFixed(2));
 
     monthamount+=result.shops[slug].monthamount;
     monthitems+=result.shops[slug].monthitems;
