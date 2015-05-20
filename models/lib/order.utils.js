@@ -249,9 +249,7 @@ exports.groupByShop=function(orders){
       if(!shops[item.vendor]){
         shops[item.vendor]={items:[],details:null}
       }
-      if(!shops[item.vendor].details){
-        shops[item.vendor].details=findOneVendor(order,item.vendor)
-      }
+      shops[item.vendor].details=findOneVendor(order,item.vendor)
       // add item to this shop
       item.rank=order.rank;
       item.oid=order.oid;
