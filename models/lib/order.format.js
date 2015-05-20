@@ -90,8 +90,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
       if(item.fulfillment.status==='fulfilled'){
         count+=parseFloat(item.quantity);
         total+=parseFloat(item.finalprice.toFixed(2));
-        totalfees+=(item.finalprice*item.fees);
-        console.log('--------',item.vendor,item.finalprice,item.fees,(item.finalprice*item.fees))
+        totalfees+=parseFloat((item.finalprice*item.fees).toFixed(2));
         amount+=parseFloat(item.price.toFixed(2));          
         if(!products[item.sku])products[item.sku]={count:0,amount:0,title:item.title+'('+item.part+')'}
         products[item.sku].count+=item.quantity  
