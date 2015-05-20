@@ -91,6 +91,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
         count+=parseFloat(item.quantity);
         total+=parseFloat(item.finalprice.toFixed(2));
         totalfees+=(item.finalprice*item.fees);
+        console.log('--------',item.vendor,item.finalprice,item.fees,(item.finalprice*item.fees))
         amount+=parseFloat(item.price.toFixed(2));          
         if(!products[item.sku])products[item.sku]={count:0,amount:0,title:item.title+'('+item.part+')'}
         products[item.sku].count+=item.quantity  
@@ -119,8 +120,8 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
 
   })
 
-  result.monthamount=monthamount;
-  result.monthca=monthca;
+  result.monthamount=parseFloat(monthamount.toFixed(2));
+  result.monthca=parseFloat(monthca.toFixed(2));
   result.monthitems=monthitems;
   result.monthorders=monthorders;
 
