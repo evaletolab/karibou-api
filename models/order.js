@@ -455,14 +455,14 @@ Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
 
   //
   // accepted payment status for rollback
-  if(["pending","refund",'voided'].indexOf(self.payment.status)===-1){
-    return callback("Impossible d'annuler une commande avec le status: "+self.fulfillments.status);
+  if(["refund",'voided'].indexOf(self.payment.status)===-1){
+    return callback("Impossible d'effectué un rollback sur une commande avec le status: "+self.fulfillments.status);
   }
 
   //
   // accepted payment status for rollback
-  if(["fulfilled","reserved"].indexOf(self.fulfillments.status)===-1){
-    return callback("Impossible d'annuler une commande avec le status: "+self.fulfillments.status);
+  if(["failure"].indexOf(self.fulfillments.status)===-1){
+    return callback("Impossible d'effectué un rollback sur une commande avec le status: "+self.fulfillments.status);
   }
 
   this.items.forEach(function (item) {
@@ -477,17 +477,18 @@ Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
   return Q.all(tasks).then(function(result) {
     //
     // after rollback order is no more available
-    self.fulfillments.status="failure";
+    // self.fulfillments.status="failure";
 
     //
     // status is canceled
-    self.cancel.reason=reason;
-    self.cancel.when=new Date();
-    self.closed=new Date();
+    // self.cancel.reason=reason;
+    // self.cancel.when=new Date();
+    // self.closed=new Date();
 
     //
     // this checking generate a list of products
     return self.save(callback)
+    // return callback(null,self);
 
   },function (err) {
     //
@@ -914,14 +915,6 @@ Orders.statics.onCancel = function(oid, reason, callback){
         return callback(err.message||err,order)
       })
 
-    //
-    // === admin cancel ===
-    // 2) from admin => reason=fraud|inventory|other(|timeout|system)
-    // status=created|reserved, payment=pending|authorized
-    // status=fulfilled, payment=authorized
-    // status=fulfilled, payment=paid
-    if(reason!=='customer'){
-    }
   });
 }
 
