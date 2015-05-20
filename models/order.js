@@ -1180,7 +1180,7 @@ Orders.statics.generateRepportForShop=function(criteria,cb) {
   criteria.fulfillment='fulfilled';
   criteria.closed=true;
 
-  Orders.findByCriteria(criteria).select('+vendors.fees').exec(function(err,orders){
+  Orders.findByCriteria(criteria).select('+vendors.fees').sort("created").exec(function(err,orders){
     if(err){
       return cb(err);
     }
