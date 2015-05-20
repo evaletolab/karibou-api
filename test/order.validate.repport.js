@@ -86,11 +86,16 @@ describe("orders.validate.repport", function(){
 
       })
 
+
       repport.shops['mon-shop'].monthitems.should.equal(2);
       repport.shops['mon-shop'].monthamount.should.equal(5);
       repport.shops['mon-shop'].monthorders.should.equal(2);
-      repport.shops['mon-shop'].monthfees.should.equal(0.75);
-      repport.shops['mon-shop'].details.fees.should.equal(0.15);
+
+      // fees are changing for mon-shop
+      //-------- mon-shop 2.5 0.15 0.375
+      //last day mon-shop 2.5 0.3 0.75
+      repport.shops['mon-shop'].monthfees.should.equal(1.13);
+      repport.shops['mon-shop'].details.fees.should.equal(0.3);
 
       repport.shops['super-shop'].monthitems.should.equal(3);
       repport.shops['super-shop'].monthamount.should.equal(10);
@@ -104,7 +109,9 @@ describe("orders.validate.repport", function(){
       repport.shops['un-autre-shop'].monthfees.should.equal(7.64);
       repport.shops['un-autre-shop'].details.fees.should.equal(0.14);
       repport.monthamount.should.equal(69.6);
-      repport.monthca.should.equal(9.99);
+      // fees are changing for mon-shop
+      //-------- mon-shop total was 9.99 + 0.375
+      repport.monthca.should.equal(10.37);
       repport.monthitems.should.equal(21);
       repport.monthorders.should.equal(4);
 
