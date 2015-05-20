@@ -249,18 +249,19 @@ exports.groupByShop=function(orders){
       if(!shops[item.vendor]){
         shops[item.vendor]={items:[],details:null}
       }
-      // add item to this shop
-      item.rank=order.rank
-      item.oid=order.oid
-      item.email=order.email
-      item.customer=order.customer
-      item.created=order.created
-      item.shipping=order.shipping
-      item.fulfillments=order.fulfillments
-      shops[item.vendor].items.push(item);
       if(!shops[item.vendor].details){
         shops[item.vendor].details=findOneVendor(order,item.vendor)
       }
+      // add item to this shop
+      item.rank=order.rank;
+      item.oid=order.oid;
+      item.email=order.email;
+      item.customer=order.customer;
+      item.created=order.created;
+      item.shipping=order.shipping;
+      item.fulfillments=order.fulfillments;
+      item.fees=shops[item.vendor].details.fees;
+      shops[item.vendor].items.push(item);
     })
   })
   return shops
