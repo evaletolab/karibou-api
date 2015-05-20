@@ -336,7 +336,7 @@ exports.Orders=[
                 slug: "mon-shop",
                 name: "mon shop",
                 address: "TODO",
-                fees:.15
+                fees:.30
             }
         ],
         /* items */
@@ -389,7 +389,7 @@ exports.Orders=[
         ],
 
 
-        created: new Date(),
+        created: lastDayOfMonth,
         closed:passedday      
 
     },{
