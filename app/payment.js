@@ -125,7 +125,7 @@ var Payment=function(){
 		    order.cancel.reason=reason;
 		    order.cancel.when=new Date();
 		    order.closed=new Date();
-		    return order.save(function(err){
+		    return order.rollbackProductQuantityAndSave(reason, function(err){
 			    if(err){
 			    	// never be there!!
 		        bus.emit('system.message',"[cancel-danger] save:",{error:err.message,order:order.oid,customer:order.email});

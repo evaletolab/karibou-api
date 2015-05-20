@@ -122,6 +122,8 @@ describe("orders.create.race", function(){
 
           require('async').eachLimit(orders,1,function(o,cb){
             o.print()
+            o.fulfillments.status='failure';
+            o.payment.status='voided';
             o.rollbackProductQuantityAndSave("timeout",function(err,o){
 
               //

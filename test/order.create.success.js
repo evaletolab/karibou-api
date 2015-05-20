@@ -134,6 +134,10 @@ describe("orders.create.success", function(){
       // check total with fees
       order.getTotalPrice().should.equal(39.6)
 
+      // roolback only 
+      order.fulfillments.status='failure';
+      order.payment.status='voided';
+
 
       order.rollbackProductQuantityAndSave('timeout',function(err,order){
         should.not.exist(err)
@@ -215,10 +219,14 @@ describe("orders.create.success", function(){
         // create on test   2000001 1396791546324 'pending', closed null
         //                  2000000 1396791546291 'pending', closed null
         // created on load. 2000006 1396791545738 'pending', closed null
-        orders.length.should.equal(2)
-        var oids=[2000001,2000006];
+        // console.log("order to rollback",orders.map(function (o) {
+        //           return o.oid;
+        //         }))
+        orders.length.should.equal(3)
+        var oids=[2000000,2000001,2000006];
         oids.should.include(orders[0].oid)
         oids.should.include(orders[1].oid)
+        oids.should.include(orders[2].oid)
         done();
       })
     },config.shop.order.timeoutAndNotPaid*1000+10)
