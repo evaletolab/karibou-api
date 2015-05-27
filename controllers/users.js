@@ -192,7 +192,6 @@ exports.update=function(req,res){
   if(req.body.password){delete(req.body.password);}
   if(req.body.hash){delete(req.body.hash);}
   if(req.body.salt){delete(req.body.salt);}
-  if(req.body.email&&req.body.email.status){delete(req.body.email.status);}
 
 
   //
@@ -208,6 +207,9 @@ exports.update=function(req,res){
       req.body.status=user.status;
       req.body.shops=user.shops;
       req.body.roles=user.roles;
+    }
+    if(req.body.email.address===user.email.address){
+      delete (req.body.email);
     }
     // do the update
     _.extend(user,req.body);
