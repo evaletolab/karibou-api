@@ -337,4 +337,29 @@ describe("api.orders.create", function(){
   });
 
 
+
+  it.skip("POST /v1/orders/:id cancel order restore stocks", function(done){
+    var items=[]
+    data.Products.forEach(function(product){
+      var e=Orders.prepare(product, 1, "",data.Shops);
+      if([1000007].indexOf(e.sku)!==-1){
+          e.fulfillment.status='fulfilled'
+          items.push(e)
+      }
+    });
+
+    request(app)
+      .post('/v1/orders/'+orderId+'/items')
+      .set('Content-Type','application/json')
+      .send(items)
+      .set('cookie', cookie)
+      .expect(400,function(err,res){
+        should.not.exist(err)
+        res.text.should.include('modifier une commande avec le status: fulfilled')
+        done()
+      });
+  });
+
+
+
 });

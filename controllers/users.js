@@ -157,32 +157,22 @@ exports.password=function(req,res){
 
       //
       // check password
-      if(req.user.hash||true){
-        user.verifyPassword(req.body.current, function(err, passwordCorrect) {
-          if (err) {
-            return res.send(400,err);
-          }
-          if (!passwordCorrect) {
-            return res.send(400,stderr+" (2)");
-          }
+      user.verifyPassword(req.body.current, function(err, passwordCorrect) {
+        if (err) {
+          return res.send(400,err);
+        }
+        if (!passwordCorrect) {
+          return res.send(400,stderr+" (2)");
+        }
 
-          //
-          // change the password
-          user.password=req.body.new;
-          user.save(function(err){
-            if(err)return res.send(400,err);
-            return res.json({});
-          });
-        });
-      }else{
         //
-        // set the password
+        // change the password
         user.password=req.body.new;
         user.save(function(err){
           if(err)return res.send(400,err);
           return res.json({});
         });
-      }
+      });
 
   });
 
@@ -196,6 +186,13 @@ exports.update=function(req,res){
   }catch(err){
     return res.send(400, err.message);
   }
+
+  //
+  // silently remove some fields
+  if(req.body.password){delete(req.body.password);}
+  if(req.body.hash){delete(req.body.hash);}
+  if(req.body.salt){delete(req.body.salt);}
+
 
   //
   // normalize ref _id

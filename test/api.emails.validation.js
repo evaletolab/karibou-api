@@ -140,6 +140,7 @@ describe("api.validate", function(){
   it('GET /v1/validate/<uid>/evaleto@gluck.com should return 200 ',function(done){
     request(app)
       .get('/v1/validate/'+uid+'/evaleto@gluck.com')
+      .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(200);        
         done()
@@ -155,6 +156,25 @@ describe("api.validate", function(){
         done()
       });
   });
+
+  it('GET re with session /v1/validate/<uid>/evaleto@gluck.com should return 400 ',function(done){
+    request(app)
+      .get('/v1/validate/'+uid+'/evaleto@gluck.com')
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);        
+        res.text.should.include('n\'est plus disponible')
+        done()
+      });
+  });
+
+  it('POST re with session /v1/validate/<uid>/evaleto@gluck.com should return 400 ',function(done){
+    request(app)
+      .post('/v1/validate/'+uid+'/evaleto@gluck.com')
+      .set('cookie', cookie)
+      .expect(404,done);
+  });
+  
   
   it('GET /v1/validate should return 200 ad 0 validation',function(done){
     request(app)

@@ -188,6 +188,25 @@ describe("api.users", function(){
       .expect(200,done);
   });
 
+
+  it('POST /v1/users/12345 update hacked password fields should return 200 without changing password',function(done){
+    var u=_.extend({},data.Users[0]);
+    u.password={new:'1234567',copy:'password' }
+    request(app)
+      .post('/v1/users/12345')      
+      .send(u)
+      .set('cookie', cookie)
+      .expect(200,done);
+  });
+
+  it('POST /login should return 400',function(done){  
+    request(app)
+      .post('/login')
+      .send({ email:"evaleto@gluck.com", provider:'local', password:'1234567' })
+      .expect(400,done);
+  });
+
+
   it('valid user contains DISQUS SSO',function(done){
     request(app)
       .get('/v1/users/me')
