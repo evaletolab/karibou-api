@@ -192,6 +192,7 @@ exports.update=function(req,res){
   if(req.body.password){delete(req.body.password);}
   if(req.body.hash){delete(req.body.hash);}
   if(req.body.salt){delete(req.body.salt);}
+  if(req.body.email&&req.body.email.status){delete(req.body.email.status);}
 
 
   //
