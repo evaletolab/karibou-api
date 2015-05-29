@@ -36,7 +36,8 @@ exports.Orders=[
             issuer: "visa",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"voided"
+            status:"voided",
+            fees:{shipping:0}
         },
 
         /* shipping adresse*/

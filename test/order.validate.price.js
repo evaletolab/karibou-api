@@ -48,12 +48,12 @@ describe("orders.validate.price", function(){
     });    
   });
 
-  it("check order price (visa+items+shipping) ", function(done){
+  it("check order price (visa+items+shipping saved with 0) ", function(done){
     db.model('Orders').find({oid:2100000}, function(err,order){
       should.not.exist(err)
       // item!='failure' => E(item.price) + gateway fees + shipping fees
       // this order contains only shipping
-      order[0].getTotalPrice().should.equal(30.85)
+      order[0].getTotalPrice().should.equal(20.6)
       done();
     });
   });

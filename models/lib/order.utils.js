@@ -82,7 +82,7 @@ exports.prepare=function(product, quantity, note, shops){
 
 exports.getShippingPrice=function(factor){
   // check if value exist, (after creation) 
-  if(this.payment.fees&&this.payment.fees.shipping){
+  if(this.payment.fees&&(this.payment.fees.shipping!==undefined)){
     return this.payment.fees.shipping;
   }
   //
