@@ -70,7 +70,7 @@ var Orders = new Schema({
       logs:[String],
       fees:{
         charge:Number,
-        shipping:Number
+        shipping:{type:Number}
       },
       /*for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
@@ -694,7 +694,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         alias:paymentData.alias,
         number:paymentData.number,
         issuer:paymentData.issuer,
-        fees:{shipping:0}
+        fees:{shipping:null}
       };
 
       //
