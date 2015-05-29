@@ -86,7 +86,6 @@ describe("orders.validate.repport", function(){
 
       })
 
-
       repport.shops['mon-shop'].monthitems.should.equal(2);
       repport.shops['mon-shop'].monthamount.should.equal(5);
       repport.shops['mon-shop'].monthorders.should.equal(2);

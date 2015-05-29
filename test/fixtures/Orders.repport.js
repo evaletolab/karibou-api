@@ -417,7 +417,7 @@ exports.Orders=[
         /* shipping adresse*/
         shipping: {
             region: "Genève",
-            when: customerDay,
+            when: lastDayOfMonth,
             geo: {
                 lng: 6.1692497,
                 lat: 46.1997473
