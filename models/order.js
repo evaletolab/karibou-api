@@ -309,7 +309,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
   //
   // check that variant exist
-  if(item.variant){
+  if(item.variant&&item.variant.title){
     var find=product.variants.filter(function (variant) {
       return (item.variant.title!=null && 
               variant.title===item.variant.title)
