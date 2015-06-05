@@ -169,6 +169,11 @@ exports.product = function(req){
       check(req.body.faq[i].a,"Vous devez écrire un réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
+    for (var i in req.body.variants){
+      check(req.body.variants[i].title,"Vous devez spécifier une variation longue valide ").len(3, 100).isText();
+      check(req.body.variants[i].short,"Vous devez spécifier une variation courte valide").len(3, 50).isText()
+    }
+
 }
 
 var order_items = exports.orderItems = function(items, update){

@@ -102,7 +102,7 @@ var Orders = new Schema({
       // product variation is not yet implemented
       variant:{
         id:{type:String, required:false},
-        name:{type:String, required:false}
+        title:{type:String, required:false}
       },
 
       /* where is the product now? */
@@ -199,6 +199,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg7="La quantité souhaitée n'est pas disponible "
     , msg8="Ce produit n'est plus en stock "
     , msg9="Ce jour de livraison n'est pas disponible pour la boutique "
+    , msg10="La variation de ce produit n'est plus disponible "
 
 
   assert(item.sku==product.sku)
@@ -306,6 +307,18 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     return cb(msg2,item)
   }
 
+  //
+  // check that variant exist
+  if(item.variant){
+    var find=product.variants.filter(function (variant) {
+      return (item.variant.title!=null && 
+              variant.title===item.variant.title)
+    });
+    if(!find.length){
+      return cb(msg10,item)
+    }
+  }
+
   // check if item.quantity <1
   if(item.quantity<1){
     return cb(msg4,item)
@@ -355,17 +368,21 @@ Orders.statics.checkItems = function(shipping, items, callback){
     , Products=db.model('Products')
 
   items=_.sortBy(items,function(i){return i.sku});
-  var skus=items.map(function(item){return item.sku});
+  var skus=_.uniq(items.map(function(item){return item.sku}));
   Products.findBySkus(skus).populate('vendor','+account.fees').sort("sku").exec(function(err,products){
+    //
+    // check SKU
     if(skus.length!==products.length){
       return callback("Certains produits sélectionnés n'existe pas, vérifier votre panier")
     }
 
-    var vendors=[], errors=[];
+    var vendors=[], errors=[], product;
     for (var i = 0; i <items.length; i++) {
+      // get product by sku
+      product=_.findWhere(products,{sku:items[i].sku});
       //
       // check an item
-      Orders.checkItem(shipping, items[i],products[i],function(err,item, vendor){
+      Orders.checkItem(shipping, items[i],product,function(err,item, vendor){
         if(vendor)vendors.push(vendor);
         var error={}; error[item.sku]=err;
         //
@@ -996,6 +1013,10 @@ Orders.statics.updateItem = function(oid,items, callback){
           if(item.finalprice) order.items[i].finalprice=item.finalprice;
           if(item.note)       order.items[i].note=item.note;
           if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
+
+          //
+          // take care of variant
+          if(item.variant)       order.items[i].variant=item.variant;
 
           // this item has bean removed from the order
           if(item.fulfillment.status==='failure'){

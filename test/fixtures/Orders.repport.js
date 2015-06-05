@@ -184,6 +184,24 @@ exports.Orders=[
                     shipping: "grouped",
                     status: "fulfilled"
                 }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 1,
+                price: 3,
+                part: "100gr",
+                note: "",
+                finalprice: 1,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                variant:{
+                    title:'Variation A'
+                },
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "fulfilled"
+                }
             }
         ],
 
@@ -626,6 +644,9 @@ exports.Products=[{
         comment:false, 
         discount:false
      },
+     variants:[
+        {title:'Variation A'}
+     ],     
      pricing: {
         stock:10, 
         price:3.80,

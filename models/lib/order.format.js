@@ -40,6 +40,12 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
     })
   }
 
+  function itemGetTitle (item) {
+    var title=item.title;
+    if(item.variant)
+      item.title=item.title+' ('+item.variant.title+')';
+    return title;
+  }
   monthorders=orders.length;
 
   //
@@ -77,7 +83,7 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
           shipping:Orders.formatDate(item.shipping.when),
           customer:item.customer.displayName,
           quantity:item.quantity,
-          title:item.title,
+          title:itemGetTitle(item),
           part:item.part,
           price:item.price.toFixed(2),
           finalprice:item.finalprice.toFixed(2),

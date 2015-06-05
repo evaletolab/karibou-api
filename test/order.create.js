@@ -48,7 +48,7 @@ describe("orders.create", function(){
     okDayBadTime.setHours(14,0,0,0)
 
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Products.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Products.js","../fixtures/Shops.js"],db,function(err){
         should.not.exist(err);
         done();
       });
@@ -383,5 +383,42 @@ describe("orders.create", function(){
       done();          
     });
   });  
+
+  it("Error:selected products doesn't contains this variant", function(done){
+    shipping={
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1208",
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            },
+            primary: true,
+            region: "Genève",
+            when:okDay
+        };
+    items=[]
+
+
+    Products.findOne({sku:12346}).populate('categories').populate('vendor').exec(function (e,product) {
+      items.push(Orders.prepare(product, 1, ""))
+      items[0].variant={title:'Super ce variant'}
+
+      //
+      // starting process of order,
+      //  - items, customer, shipping
+      Orders.create(items, customer, shipping, payment, function(err,order){
+        should.exist(order.errors)
+        order.errors[0]['12346'].should.include("variation de ce produit n'est")
+
+        done();          
+      });
+
+    })
+
+  });  
+
 });
 

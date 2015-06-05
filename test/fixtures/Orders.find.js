@@ -590,6 +590,9 @@ exports.Products=[{
         comment:false, 
         discount:true
      },
+     variants:[
+        {title:'Variation A'}
+     ],
 
      pricing: {
         stock:10, 

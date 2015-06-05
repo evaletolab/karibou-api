@@ -79,6 +79,10 @@ describe("orders.validate.repport", function(){
 
   it("validate repport content ", function(done){
 
+    //
+    // order 2000006 contains variation on
+    // -> item 1000002 [un-autre-shop] + 1.-
+
     Orders.generateRepportForShop(criteria,function(err,repport){
       should.not.exist(err)
       Object.keys(repport.shops).forEach(function (slug) {
@@ -102,16 +106,16 @@ describe("orders.validate.repport", function(){
       repport.shops['super-shop'].monthfees.should.equal(1.6);
       repport.shops['super-shop'].details.fees.should.equal(0.16);
 
-      repport.shops['un-autre-shop'].monthitems.should.equal(16);
-      repport.shops['un-autre-shop'].monthamount.should.equal(54.6);
+      repport.shops['un-autre-shop'].monthitems.should.equal(17);
+      repport.shops['un-autre-shop'].monthamount.should.equal(55.6);
       repport.shops['un-autre-shop'].monthorders.should.equal(4);
-      repport.shops['un-autre-shop'].monthfees.should.equal(7.64);
+      repport.shops['un-autre-shop'].monthfees.should.equal(7.78);
       repport.shops['un-autre-shop'].details.fees.should.equal(0.14);
-      repport.monthamount.should.equal(69.6);
+      repport.monthamount.should.equal(70.6);
       // fees are changing for mon-shop
       //-------- mon-shop total was 9.99 + 0.375
-      repport.monthca.should.equal(10.37);
-      repport.monthitems.should.equal(21);
+      repport.monthca.should.equal(10.51);
+      repport.monthitems.should.equal(22);
       repport.monthorders.should.equal(4);
 
 

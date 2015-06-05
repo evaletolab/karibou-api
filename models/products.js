@@ -67,6 +67,11 @@ var Product = new Schema({
       comment:String
    },
 
+   variants:[{
+      title:String,
+      short:String
+   }],
+
    pricing: {
       stock:{type:Number, min:0, requiered:true}, 
       price:{type:Number, min:0, requiered:true},

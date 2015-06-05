@@ -76,8 +76,14 @@ describe("orders.create.success", function(){
     };
     var items=[];
     items.push(Orders.prepare(data.Products[0], 2, ""))
+    items.push(Orders.prepare(data.Products[0], 1, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))
     items.push(Orders.prepare(data.Products[3], 3, ""))
+
+    //
+    // add variant to item 0
+    items[0].variant={title:'Variation A'}
+    // items[1].variant={title:'Variation B'}
 
     shipping.when=okDay
     // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
@@ -113,6 +119,13 @@ describe("orders.create.success", function(){
       //
       // check items fields, price and finalprice
       should.exist(order.items[0].part)
+
+
+      //
+      // check variant on item
+      should.exist(order.items[0].variant)
+      order.items[0].variant.title.should.equal('Variation A')
+
       //
       // checking discount price
       order.items[0].quantity.should.equal(2)
@@ -120,8 +133,8 @@ describe("orders.create.success", function(){
 
       //
       // checking normal price
-      order.items[1].quantity.should.equal(3)
-      order.items[1].finalprice.should.equal(data.Products[0].pricing.price*3)
+      order.items[2].quantity.should.equal(3)
+      order.items[2].finalprice.should.equal(data.Products[0].pricing.price*3)
 
       // checking item reservation
       order.items.forEach(function(o,i){
@@ -134,9 +147,9 @@ describe("orders.create.success", function(){
       // check subtotal
       //config.shop.marketplace.shipping
       //order.payment.issuer
-      order.getSubTotal().should.equal(28.8)
+      order.getSubTotal().should.equal(31.8)
       // check total with fees
-      order.getTotalPrice().should.equal(39.6)
+      order.getTotalPrice().should.equal(42.65)
 
       // roolback only 
       order.fulfillments.status='failure';
@@ -185,9 +198,8 @@ describe("orders.create.success", function(){
       //
       // verify items quantity and product stock
       var skus=_.collect(items,function(item){return item.sku});
-      Products.findBySkus(skus).exec(function(err,products){
+      Products.findBySkus(skus).sort('sku').exec(function(err,products){
         products.every(function(product, i){
-            // console.log(data.Products[i].sku,items[i].sku,product.sku)
             items[i].sku.should.equal(product.sku)
 
             //
