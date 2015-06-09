@@ -4,7 +4,8 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 
 <div style="font-size:10px;font-family: monospace;white-space: pre-wrap;white-space: -moz-pre-wrap !important;white-space: -o-pre-wrap;word-wrap: break-word;">
 *<% for(var i=0; i<order.items.length; i++) {%>
-* <%if (order.items[i].fulfillment.status==='failure') {%><span style="text-decoration:line-through;"><%}%><%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].fulfillment.status==='failure') {%></span><%}%><% } %>
+* <%if (order.items[i].fulfillment.status==='failure') {%><span style="text-decoration:line-through;"><%}%><%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].fulfillment.status==='failure') {%></span><%}%><%if (order.items[i].variant.title) {%>
+*     option: <%= order.items[i].variant.title %><% } %><% } %>
 * ------------------
 * Sous total  <%= subTotal %> CHF
 * Frais de livraison <%= shippingFees %> CHF
