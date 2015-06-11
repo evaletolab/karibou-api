@@ -159,6 +159,7 @@ Orders.methods.print=function(order){
 Orders.statics.print=utils.print;
 Orders.statics.printInfo=utils.printInfo;
 Orders.statics.prepare=utils.prepare;
+Orders.methods.equalItem=utils.equalItem;
 Orders.methods.getShippingPrice=utils.getShippingPrice;
 Orders.methods.getTotalPrice=utils.getTotalPrice;
 Orders.methods.getSubTotal=utils.getSubTotal;
@@ -1015,7 +1016,8 @@ Orders.statics.updateItem = function(oid,items, callback){
     items.forEach(function(item){
       assert(item.sku)
       for(var i in order.items){
-        if(order.items[i].sku===item.sku){
+        if(order.equalItem(order.items[i],item)){
+        // if(order.items[i].sku===item.sku){
           if(item.finalprice) order.items[i].finalprice=item.finalprice;
           if(item.note)       order.items[i].note=item.note;
           if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;

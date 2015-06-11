@@ -80,6 +80,20 @@ exports.prepare=function(product, quantity, note, shops){
   return copy;
 }
 
+exports.equalItem=function (oldItem,newItem) {
+  if(!oldItem||!newItem){
+    return false;
+  }
+  var bSku=(oldItem.sku===newItem.sku);
+  if(!newItem.variant){
+    return bSku;
+  }
+
+  return(oldItem.variant &&
+         oldItem.variant.title==newItem.variant.title &&
+         bSku);
+};
+
 exports.getShippingPrice=function(factor){
   // check if value exist, (after creation) 
   if(this.payment.fees &&
