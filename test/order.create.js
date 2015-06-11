@@ -378,7 +378,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include(" produits sélectionnés n'existe pas")
+      err.should.include(" produits sélectionnés n'existent plus")
 
       done();          
     });

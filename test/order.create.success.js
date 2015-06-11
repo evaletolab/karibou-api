@@ -83,7 +83,7 @@ describe("orders.create.success", function(){
     //
     // add variant to item 0
     items[0].variant={title:'Variation A'}
-    // items[1].variant={title:'Variation B'}
+    items[1].variant={title:'Variation A'}
 
     shipping.when=okDay
     // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
@@ -174,6 +174,8 @@ describe("orders.create.success", function(){
     items.push(Orders.prepare(data.Products[0], 2, ""))
     items.push(Orders.prepare(data.Products[1], 3, ""))
     items.push(Orders.prepare(data.Products[3], 3, ""))
+
+    items[0].variant={title:'Variation A'}
 
     shipping.when=okDay
     // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
