@@ -200,7 +200,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg8="Ce produit n'est plus en stock "
     , msg9="Ce jour de livraison n'est pas disponible pour la boutique "
     , msg10="La variation de ce produit n'est plus disponible "
-    , msg11="Vous n'avez pas sélectionné une des options liée à ce produit"
+    , msg11="Vous n'avez pas sélectionné une des options liée à ce produit. Merci de l'enlever de votre panier!"
 
 
   assert(item.sku==product.sku)
