@@ -62,7 +62,7 @@ Nous vous remercions pour votre commande du <u><%= created %></u>. <br/>
 Vous trouverez ci-dessous le détail de votre commande<br/>
 <pre style="font-size:10px">
 *<% for(var i=0; i<order.items.length; i++) {%>
-* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].variant.title) {%>
+* <%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].variant&&order.items[i].variant.title) {%>
 *    option: <%= order.items[i].variant.title %><% } %><% } %>
 * ------------------
 * Sous total  <%= subTotal %> CHF
