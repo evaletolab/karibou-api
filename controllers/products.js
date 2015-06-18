@@ -238,6 +238,10 @@ exports.allSEO=function (req, res) {
     status:true,
     available:true
   }
+  if(req.params.category){
+    query.category=req.params.category;
+  }
+  
   return Products.findByCriteria(query,function (err, products) {
     if (err) {
       return res.send(400,errorHelper(err));
@@ -245,21 +249,28 @@ exports.allSEO=function (req, res) {
     if(!products.length){
       return res.send(400,"Aucun produit disponible");
     }
-    //
-    // setup the model 
-    var model={ 
-      products: products, 
-      user: req.user, 
-      _:_,
-      prependUrlImage:function (url) {
-        if(url&&url.indexOf('//')===0){
-          url='https:'+url;
-        }
-        return url;
-      }
-    };
 
-    return res.render('products', model);
+    //
+    // get the list of cats
+    db.model('Categories').find({},function (err,cats) {
+      //
+      // setup the model 
+      var model={ 
+        categories:cats,
+        products: products, 
+        user: req.user, 
+        _:_,
+        prependUrlImage:function (url) {
+          if(url&&url.indexOf('//')===0){
+            url='https:'+url;
+          }
+          return url;
+        }
+      };
+
+      return res.render('products', model);
+    })
+
   });
 };
 

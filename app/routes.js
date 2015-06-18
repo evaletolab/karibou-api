@@ -95,6 +95,7 @@ module.exports = function(app, config, passport) {
   app.get('/seo',home.SEO);
   app.get('/seo/shops',shops.allSEO);
   app.get('/seo/products',products.allSEO);
+  app.get('/seo/products/category/:category',products.allSEO);
   app.get('/seo/products/:sku',products.getSEO);
 
   // app.get('/shop/:shopname', shops.getSEO);

@@ -34,15 +34,22 @@ html
       div(class="jumbotron")
         h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
         img(src="/img/karibou.jpg", class="img-responsive")
-      ul(class="list-group")
-          li(class="list-group-item")
-              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
-          li(class="list-group-item")
-              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
-          li(class="list-group-item")
-              a(href="/shops"): |Les boutiques
-          li(class="list-group-item")
-              a(href="/products"): |Les produits
+
+      // remove this, its useless 
+        ul(class="list-group")
+            li(class="list-group-item")
+                a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
+            li(class="list-group-item")
+                a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
+            li(class="list-group-item")
+                a(href="/shops"): |Les boutiques
+            li(class="list-group-item")
+                a(href="/products"): |Les produits
+
+
+      div(class="list-group")
+      - each cat in categories
+            a(href="/products/category/#{cat.slug}" class="list-group-item link"): =cat.name
 
       block content
 

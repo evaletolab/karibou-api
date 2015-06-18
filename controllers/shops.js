@@ -169,21 +169,27 @@ exports.allSEO=function (req, res) {
     if(!shops.length){
       return res.send(400,"Aucune boutique disponible");
     }
-    //
-    // setup the model 
-    var model={ 
-      shops: shops, 
-      user: req.user, 
-      _:_,
-      prependUrlImage:function (url) {
-        if(url&&url.indexOf('//')===0){
-          url='https:'+url;
-        }
-        return url;
-      }
-    };
 
-    return res.render('shops', model);
+    //
+    // get the list of cats
+    db.model('Categories').find({},function (err,cats) {
+      //
+      // setup the model 
+      var model={ 
+        categories:cats,
+        shops: shops, 
+        user: req.user, 
+        _:_,
+        prependUrlImage:function (url) {
+          if(url&&url.indexOf('//')===0){
+            url='https:'+url;
+          }
+          return url;
+        }
+      };
+
+      return res.render('shops', model);
+    })
   });
 };
 

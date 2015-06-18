@@ -30,6 +30,26 @@ exports.welcome = function(req,res){
 
 
 exports.SEO = function(req,res){
-    res.render('homeseo');
+  
+    //
+    // get the list of cats
+    db.model('Categories').find({},function (err,cats) {
+      //
+      // setup the model 
+      var model={ 
+        categories:cats,
+        user: req.user, 
+        _:_,
+        prependUrlImage:function (url) {
+          if(url&&url.indexOf('//')===0){
+            url='https:'+url;
+          }
+          return url;
+        }
+      };
+
+      return res.render('homeseo', model);
+    })
+
 };
 

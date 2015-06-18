@@ -46,15 +46,11 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
 
       div(class="jumbotron")
         h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
-      ul(class="list-group")
-          li(class="list-group-item")
-              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
-          li(class="list-group-item")
-              a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
-          li(class="list-group-item")
-              a(href="/shops"): |Les boutiques
-          li(class="list-group-item")
-              a(href="/products"): |Les produits
+      div(class="list-group")
+          a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md" class="list-group-item"): |Comment ça marche
+          a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md" class="list-group-item"): |Notre charte
+          a(href="/shops" class="list-group-item"): |Les boutiques
+          a(href="/products" class="list-group-item"): |Les produits
 
       h1: =shop.name
       div: =shop.description
