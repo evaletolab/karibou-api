@@ -2,10 +2,8 @@ extends homeseo
 
 block content
     h1: | Liste des produits
-    ol
-        - each product in products
-            li
-                a( href="/products/#{product.sku}", title="#{product.title}"): =product.title
-
+    div(class="list-group")
+    - each product in products
+          a(href="/products/#{product.sku}", class="list-group-item link", title="#{product.title}"): =product.title
 
 
