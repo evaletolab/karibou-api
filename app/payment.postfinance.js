@@ -190,7 +190,9 @@ PaymentPostfinance.prototype.authorize=function(order){
 	}catch(err){
 	  //
 	  // cancel order and rollback product item from stocks
-	  order.rollbackProductQuantityAndSave("system",function(e){
+    order.fulfillments.status="failure";
+    order.payment.status='voided';
+	  order.rollbackProductQuantityAndClose("system",function(e){
 	    deferred.reject(err);
 	  })
     return deferred.promise;
@@ -199,7 +201,9 @@ PaymentPostfinance.prototype.authorize=function(order){
 
 	transaction.process(card, function(err,result){
 	  if(err){
-	    return order.rollbackProductQuantityAndSave("system",function(e){
+      order.fulfillments.status="failure";
+      order.payment.status='voided';
+	    return order.rollbackProductQuantityAndClose("system",function(e){
 		  	deferred.reject(err);
 	    });
 	  }

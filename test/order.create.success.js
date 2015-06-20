@@ -43,11 +43,11 @@ describe("orders.create.success", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
         should.not.exist(err);
-        // Orders.find({}).exec(function(e,os){
-        //   os.forEach(function(o){
-        //     o.print();
-        //   })
-        // })
+        Orders.find({}).exec(function(e,os){
+          os.forEach(function(o){
+            o.print();
+          })
+        })
 
         done();
       });
@@ -151,16 +151,13 @@ describe("orders.create.success", function(){
       // check total with fees
       order.getTotalPrice().should.equal(42.65)
 
-      // roolback only 
-      order.fulfillments.status='failure';
+      order.fulfillments.status="failure";
       order.payment.status='voided';
 
-
-      order.rollbackProductQuantityAndSave('timeout',function(err,order){
+      order.rollbackProductQuantityAndClose('timeout', function(err,order){
         should.not.exist(err)
         done();                  
       })
-      // console.log(order.oid)
       // console.log(JSON.stringify(order))
     });
   });   
@@ -219,7 +216,6 @@ describe("orders.create.success", function(){
       order.items[0].quantity.should.equal(2)
       order.items[1].quantity.should.equal(3)
 
-      // console.log(order.oid)
 
     });
   }); 
@@ -240,11 +236,11 @@ describe("orders.create.success", function(){
         // console.log("order to rollback",orders.map(function (o) {
         //           return o.oid;
         //         }))
-        orders.length.should.equal(3)
-        var oids=[2000000,2000001,2000006];
+        orders.length.should.equal(2)
+        var oids=[2000001,2000006]; // 2000000 has been closed right after rollback
+        // oids.should.include(orders[0].oid)
         oids.should.include(orders[0].oid)
         oids.should.include(orders[1].oid)
-        oids.should.include(orders[2].oid)
         done();
       })
     },config.shop.order.timeoutAndNotPaid*1000+10)

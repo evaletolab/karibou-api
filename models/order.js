@@ -467,10 +467,10 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
 
 //
 // status == reserved||fulfilled, payment==pending||refund||voided 
-Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
+Orders.methods.rollbackProductQuantityAndClose=function(reason, callback){
   assert(callback)
   var Q=require('q'),deferred = Q.defer(), tasks=[];
-  var self=this
+  var self=this;
 
 
   if(EnumCancelReason.indexOf(reason)===-1){
@@ -499,15 +499,14 @@ Orders.methods.rollbackProductQuantityAndSave=function(reason, callback){
     })(item));
   })
   return Q.all(tasks).then(function(result) {
-    //
-    // after rollback order is no more available
-    // self.fulfillments.status="failure";
+
 
     //
     // status is canceled
-    // self.cancel.reason=reason;
-    // self.cancel.when=new Date();
-    // self.closed=new Date();
+    self.cancel={};
+    self.cancel.reason=reason;
+    self.cancel.when=new Date();
+    self.closed=new Date();
 
     //
     // this checking generate a list of products

@@ -124,7 +124,7 @@ describe("orders.create.race", function(){
             o.print()
             o.fulfillments.status='failure';
             o.payment.status='voided';
-            o.rollbackProductQuantityAndSave("timeout",function(err,o){
+            o.rollbackProductQuantityAndClose("timeout",function(err,o){
 
               //
               // after rollback order status is failure

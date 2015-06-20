@@ -70,7 +70,9 @@ var Payment=function(){
 			return provider(deferred, function(err, charge) {
 			  if(err){
 	        bus.emit('system.message',"[authorize-danger] save:",{error:err.message,order:order.oid,customer:order.email});
-				  return order.rollbackProductQuantityAndSave("system",function(e){
+			    order.fulfillments.status="failure";
+			    order.payment.status='voided';
+				  return order.rollbackProductQuantityAndClose("system",function(e){
 				    deferred.reject(parseError(err));
 				  })		  				  
 			  }
@@ -121,11 +123,7 @@ var Payment=function(){
 		  	order.payment.logs.push(refund.log)
 		    order.payment.status="voided";
 		    order.payment.transaction=refund.transaction
-		    order.cancel={}
-		    order.cancel.reason=reason;
-		    order.cancel.when=new Date();
-		    order.closed=new Date();
-		    return order.rollbackProductQuantityAndSave(reason, function(err){
+		    return order.rollbackProductQuantityAndClose(reason, function(err){
 			    if(err){
 			    	// never be there!!
 		        bus.emit('system.message',"[cancel-danger] save:",{error:err.message,order:order.oid,customer:order.email});
