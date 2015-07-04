@@ -109,15 +109,15 @@ exports.product = function(req){
 
 
     if(req.body.details){
-      check(req.body.details.description,"Le description doit contenir au max 1'200 caractères").len(3, 1200).isText();
+      check(req.body.details.description,"Le description doit contenir au max 1'300 caractères").len(3, 1300).isText();
       req.body.details.bio && check(req.body.details.bio,"Erreur system p1").isBoolean();
       req.body.details.homemade && check(req.body.details.homemade,"Erreur system p2").isBoolean();
       req.body.details.natural && check(req.body.details.natural,"Erreur system p3").isBoolean();
       req.body.details.local && check(req.body.details.local,"Erreur system p4").isBoolean();
       req.body.details.cold && check(req.body.details.cold,"Erreur system p5").isBoolean();
-
+      req.body.details.gluten && check(req.body.details.gluten,"Erreur system p6").isBoolean();
     }else{
-      throw new Error("Vous devez définir une description de 3 à 1'000 caractères");
+      throw new Error("Vous devez définir une description de 3 à 1'300 caractères");
     }
 
     if(req.body.pricing){
