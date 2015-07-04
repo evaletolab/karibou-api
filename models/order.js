@@ -577,6 +577,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   // be sure that is a Date object
   shipping.when=new Date(shipping.when)
 
+
   if(config.shop.noshipping&&config.shop.noshipping.length){
     for (var i = config.shop.noshipping.length - 1; i >= 0; i--) {
       var noshipping=config.shop.noshipping[i];
@@ -604,6 +605,11 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
   if(Math.abs((when-now.getTime())/3600000) < config.shop.order.timelimit){
     return callback("Cette date de livraison n'est plus disponible.")
+  }
+
+  // if shipping time is defined (important for differents timezone)
+  if(shipping.hours){
+    shipping.when.setHours(shipping.hours,0,0,0)    
   }
 
   //
