@@ -51,9 +51,7 @@ Categories.statics.create = function(cats, callback){
 	var cat=((typeof cats) ==="string")?({name:cats}):(cats);
 	cat.slug=cat.name.slug();
   var c =new  Categories(cat);   
-  c.save(function (err) {
-     callback(err,c);
-  });  
+  c.save(callback);  
 
 }; 
 
