@@ -135,9 +135,9 @@ exports.product = function(req){
     }
 
     if (req.body.photo){
-      req.body.photo.bg && check(req.body.photo.bg,"Erreur system p6").len(6, 164).isImgUrl();
-      req.body.photo.fg && check(req.body.photo.fg,"Erreur system p7").len(6, 164).isImgUrl();
-      req.body.photo.owner && check(req.body.photo.owner,"Erreur system p8").len(6, 164).isImgUrl();
+      req.body.photo.bg && check(req.body.photo.bg,"Erreur system p7").len(6, 164).isImgUrl();
+      req.body.photo.fg && check(req.body.photo.fg,"Erreur system p8").len(6, 164).isImgUrl();
+      req.body.photo.owner && check(req.body.photo.owner,"Erreur system p9").len(6, 164).isImgUrl();
     }else{
       throw new Error("Vous devez définir une photo");
     }
@@ -220,7 +220,7 @@ exports.shop=function(shop){
 
     if(shop.name) check(shop.name,"Le nom doit contenir entre 3 et 60 caractères").len(3, 60).isText()
     if(shop.description){
-      check(shop.description,"La description doit contenir entre 3 et 500 caractères").len(3, 500).isText()
+      check(shop.description,"La description doit contenir entre 3 et 600 caractères").len(3, 600).isText()
       // shop.description=sanitize(shop.description,"La description n'est pas valide").xss();
     }
 
