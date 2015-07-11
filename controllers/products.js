@@ -26,6 +26,9 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
    
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
+      if(!req.body){
+        return false;
+      }
       var vendor=(req.body.vendor._id||req.body.vendor)+'';
       return (_.any(req.user.shops,function(s){
         return s._id.equals(vendor);

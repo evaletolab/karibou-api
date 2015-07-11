@@ -409,6 +409,9 @@ exports.list=function (req, res) {
       query=query.or(filter);
     }
 
+    if(req.user&&(req.user.isAdmin()||req.user.hasRole('logistic'))){
+      query=query.populate('owner');      
+    }
 
     query.populate('catalog').exec(function (err,shops){
       if (err){
