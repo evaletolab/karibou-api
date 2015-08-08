@@ -463,6 +463,112 @@ exports.Orders=[
 
         created: new Date()
 
+    },{
+
+        _id: ObjectId("52f12f09a328f285313bda04"),
+        oid: 2000010,
+        /* customer */
+        customer: u.Users[1],
+
+        /* email customer */
+        email: "evaleto@gmail.com",
+
+        /* payment */
+        payment: {
+            issuer: "tester",
+            number:'98xxxxxxx4123',
+            alias:'01234567890',
+            status:"paid"
+        },
+
+        fulfillments: {
+            status: "partial"
+        },
+
+        /* shipping adresse*/
+        shipping: {
+            region: "Genève",
+            when: customerDay,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1219",
+            location: "Genève-Ville",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet 4"
+        },
+
+
+        /* vendors */
+        vendors: [
+            {
+                ref: ObjectId('515ec12e56a8d5961e000004'),
+                slug: "un-autre-shop",
+                name: "Un autre shop",
+                address: "TODO",
+            },
+            {
+                /*shop status !=true */
+                ref: ObjectId('515ec12e56a8d5961e000005'),
+                slug: "mon-shop",
+                name: "mon shop",
+                address: "TODO",
+            }
+        ],
+        /* items */
+        items: [
+            {
+                sku: 1000004,
+                title: "Product 4 with cat",
+                quantity: 20,
+                price: 5,
+                part: "1pce",
+                note: "",
+                finalprice: 100,
+                category: "Viande",
+                vendor:"mon-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "failure"
+                }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 20,
+                price: 5,
+                part: "100gr",
+                note: "",
+                finalprice: 100,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            },
+            {
+                sku: 1000003,
+                title: "Product 3 with cat",
+                quantity: 4,
+                price: 20,
+                part: "0.75L",
+                note: "",
+                finalprice: 45,
+                category: "Poissons",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "created"
+                }
+            }
+        ],
+
+        created: new Date()
+
     }
 ];
 

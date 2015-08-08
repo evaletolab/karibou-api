@@ -72,7 +72,7 @@ describe("orders.validate.price", function(){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(10);
       order[0].getTotalPrice().should.equal(20.6);
-      order[0].getShippingPrice().should.equal(config.shop.shipping.price);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter);
       done();
     });
   });
@@ -83,7 +83,7 @@ describe("orders.validate.price", function(){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
       order[0].getTotalPrice().should.equal(153);
-      order[0].getShippingPrice().should.equal(config.shop.shipping.price/2);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter/2);
       done();
     });
   });
@@ -99,18 +99,27 @@ describe("orders.validate.price", function(){
   });
 
   it("check order shipping half shipping price even with 180CHF", function(done){
-    config.shop.shipping.free=0;
+    config.shop.shipping.discountB=0;
     db.model('Orders').find({oid:2000009}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
       order[0].getTotalPrice().should.equal(188.7);
-      order[0].getShippingPrice().should.equal(config.shop.shipping.price/2);
-      config.shop.shipping.free=180;
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter/2);
+      config.shop.shipping.discountB=180;
       done();
     });
   });
 
-
+  it("check order shipping half shipping price when postalCode is 1219 ", function(done){
+    db.model('Orders').find({oid:2000010}, function(err,order){
+      var halfPeriphery=config.shop.shipping.price.periphery/2;
+      should.not.exist(err)
+      order[0].getSubTotal().should.equal(145);
+      order[0].getTotalPrice().should.equal(157.05); //3.10=roundCHF((145+8.95)*10.02) 
+      order[0].getShippingPrice().should.equal(halfPeriphery);
+      done();
+    });
+  });
 
 });
 

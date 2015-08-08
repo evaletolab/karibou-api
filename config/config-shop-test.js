@@ -18,6 +18,20 @@ module.exports = {
       price:10, // shipping price
     },
 
+    shipping:{
+      average:115, // average 
+      discountA:145,  // half price 5.4@18% & 4.5@15%
+      discountB:180,    // 180 full price 11.7@18% & 9.75@15%
+      price:{
+        hypercenter:10,
+        periphery:17.90
+      }, // shipping price
+      priceA:0.5,
+      priceB:0.0,
+      periphery:["1219"]
+    },
+
+
     marketplace:{
       list:[
         {name:"Marché de Plainpalais le mardi",lat:46.19838,lng:6.14083, d:2},

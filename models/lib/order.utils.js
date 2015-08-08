@@ -94,7 +94,26 @@ exports.equalItem=function (oldItem,newItem) {
          bSku);
 };
 
+var roundCHF=exports.roundCHF=function (value) {
+  return parseFloat((Math.round(value*20)/20).toFixed(2))
+}
+
 exports.getShippingPrice=function(factor){
+  //
+  // get the base of price depending the shipping sector
+  function getShippingSectorPrice(postalCode) {
+    if(config.shop.shipping.periphery.indexOf(postalCode)!==-1){
+      return 'periphery';
+    }
+    return 'hypercenter';
+  }
+  
+  //
+  // get the base of price depending the shipping sector
+  var distance=getShippingSectorPrice(this.shipping.postalCode);
+  var price=config.shop.shipping.price[distance];
+
+
   // check if value exist, (after creation) 
   if(this.payment.fees &&
      this.payment.fees.shipping!=null){
@@ -114,17 +133,17 @@ exports.getShippingPrice=function(factor){
 
   
   // implement 3) get free shipping!
-  if (config.shop.shipping.free&&this.getSubTotal()>=config.shop.shipping.free){
-    return 0;
+  if (config.shop.shipping.discountB&&this.getSubTotal()>=config.shop.shipping.discountB){
+    return roundCHF(config.shop.shipping.priceB*price);
   }
 
   // implement 3) get half shipping!
-  else if (config.shop.shipping.half&&this.getSubTotal()>=config.shop.shipping.half){
-    return config.shop.shipping.price/2;
+  else if (config.shop.shipping.discountA&&this.getSubTotal()>=config.shop.shipping.discountA){
+    return roundCHF(config.shop.shipping.priceA*price);
   }
 
 
-  return config.shop.shipping.price;
+  return price;
 }
 
 /**
@@ -161,7 +180,7 @@ exports.getTotalPrice=function(factor){
   factor&&(total*=factor);
 
 
-  return parseFloat((Math.round(total*20)/20).toFixed(2));
+  return roundCHF(total);
 }
 
 exports.getSubTotal=function(){
@@ -174,7 +193,7 @@ exports.getSubTotal=function(){
     }
   });
 
-  return parseFloat((Math.round(total*20)/20).toFixed(2));
+  return roundCHF(total);
 }
 
 //

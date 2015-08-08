@@ -14,9 +14,15 @@ module.exports = {
 
     shipping:{
       average:115, // average 
-      free:0,    // 180 full price 11.7@18% & 9.75@15%
-      half:145,  // half price 5.4@18% & 4.5@15%
-      price:10, // shipping price
+      discountA:145,  // half price 5.4@18% & 4.5@15%
+      discountB:0,    // 180 full price 11.7@18% & 9.75@15%
+      price:{
+        hypercenter:10,
+        periphery:17.90
+      }, // shipping price
+      priceA:0.9,
+      priceB:0.8,
+      periphery:["1219"]
     },
 
     //
@@ -33,7 +39,7 @@ module.exports = {
     },
     user:{
       location:{
-        list:["1201","1202","1203","1204","1205","1206","1207","1208","1227"]
+        list:["1201","1202","1203","1204","1205","1206","1207","1208","1227","1219"]
       },
       region:{
         list:["Genève", "Carouge,GE"]

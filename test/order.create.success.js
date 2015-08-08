@@ -103,7 +103,7 @@ describe("orders.create.success", function(){
 
       //
       // check shipping fees
-      order.payment.fees.shipping.should.equal(config.shop.shipping.price)
+      order.payment.fees.shipping.should.equal(config.shop.shipping.price.hypercenter)
 
       //
       // check financial status after creation
