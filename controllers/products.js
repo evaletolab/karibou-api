@@ -93,6 +93,22 @@ exports.create=function (req, res) {
 
 exports.love=function (req, res) {
   // var skus=_.collect(req.user.likes,function(p){return p.sku;})
+  var criteria={
+    email:req.user.email.address,
+    likes:req.user.likes
+  }
+
+  //
+  // we ask for popular 
+  if(req.query.popular){
+    return Products.findPopularByUser(criteria,function (err,products) {
+      if (err) {
+        return res.send(400,err);
+      }
+      return res.json(products)    
+    }) 
+  }
+
   Products.findBySkus(req.user.likes,function(err,products){
     if (err) {
       return res.send(400,err);

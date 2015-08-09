@@ -269,6 +269,103 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
+/**
+ *
+  #prefered product for a user
+  db.orders.aggregate(
+       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
+       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
+                 items:1,
+       }},
+       { $match: { 'month': {$gt:6,$lte:8 } } },     
+       {$unwind: '$items' },
+       {$group:
+           {
+             _id:"$items.sku",
+             month:{$first:"$month"},
+             hit: { $sum: 1 }
+           }
+       },
+       {$sort:{month:-1}}
+  ).forEach(function(result){print(result._id+' m:'+result.month);})
+  --
+  db.orders.aggregate(
+       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
+       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
+                 items:1,
+       }},
+       {$unwind: '$items' },
+       {$group:
+           {
+             _id:"$items.sku",
+             month:{$first:"$month"},
+             hit: { $sum: 1 }
+           }
+       },
+       { $match: { 'hit': {$gt:2 } } },     
+       {$sort:{hit:-1}}
+  ).forEach(function(result){print(result._id+' h:'+result.hit);})
+
+ */
+
+
+Product.statics.findPopularByUser = function(criteria, callback){
+  assert(criteria.email);
+
+  var skus=[], today=new Date();
+  var cb=function(err, products){
+    callback(err,products);
+  };
+  if (typeof callback !== 'function') {
+    cb=undefined;
+  }
+
+
+  //
+  // get items last 3 month sku by 
+  this.model('Orders').aggregate(
+     { $match: { 'payment.status': 'paid', email:criteria.email  } },
+     {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
+         items:1,
+     }},
+     { $match: { 'month': {$gt:today.getMonth()-2,$lte:today.getMonth()+1 } } },     
+     {$unwind: '$items' },
+     {$group:
+       {
+         _id:"$items.sku",
+         month:{$first:"$month"},
+         hit: { $sum: 1 }
+       }
+    },
+    {$sort:{month:-1}},
+  function (err, result) {
+    // console.log('result',err,result)
+    if(result&&result.length){
+      result.forEach(function (item) {
+        skus.push(item._id)
+      })
+    }
+
+    //
+    // append likes
+    if(criteria.likes&&criteria.likes.length){
+      criteria.likes.forEach(function (item) {
+        skus.push(item)
+      })
+    }
+
+    //
+    // get products
+    var query=mongoose.model('Products').find({sku:{
+      $in:skus
+    }}).populate(['vendor','vendor.owner','categories']);
+  
+    return query.exec(cb)      
+  })
+
+};
+
+
 Product.statics.findBySkus = function(skus, callback){
   var cb=function(err, products){
     callback(err,products);
