@@ -337,6 +337,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
          hit: { $sum: 1 }
        }
     },
+    {$match: { 'hit': {$gte:parseInt(criteria.minhit)||1 } } },     
     {$sort:{month:-1}},
   function (err, result) {
     // console.log('result',err,result)

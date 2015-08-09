@@ -95,7 +95,8 @@ exports.love=function (req, res) {
   // var skus=_.collect(req.user.likes,function(p){return p.sku;})
   var criteria={
     email:req.user.email.address,
-    likes:req.user.likes
+    likes:req.user.likes,
+    minhit:req.query.minhit||1
   }
 
   //
