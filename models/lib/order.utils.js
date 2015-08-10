@@ -134,12 +134,12 @@ exports.getShippingPrice=function(factor){
   
   // implement 3) get free shipping!
   if (config.shop.shipping.discountB&&this.getSubTotal()>=config.shop.shipping.discountB){
-    return roundCHF(config.shop.shipping.priceB*price);
+    return roundCHF(price-config.shop.shipping.priceB);
   }
 
   // implement 3) get half shipping!
   else if (config.shop.shipping.discountA&&this.getSubTotal()>=config.shop.shipping.discountA){
-    return roundCHF(config.shop.shipping.priceA*price);
+    return roundCHF(price-config.shop.shipping.priceA);
   }
 
 

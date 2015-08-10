@@ -83,7 +83,7 @@ describe("orders.validate.price", function(){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
       order[0].getTotalPrice().should.equal(153);
-      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter/2);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter-config.shop.shipping.priceA);
       done();
     });
   });
@@ -92,8 +92,8 @@ describe("orders.validate.price", function(){
     db.model('Orders').find({oid:2000009}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
-      order[0].getTotalPrice().should.equal(183.6);
-      order[0].getShippingPrice().should.equal(0);
+      order[0].getTotalPrice().should.equal(193.8);
+      order[0].getShippingPrice().should.equal(10);
       done();
     });
   });
@@ -104,7 +104,7 @@ describe("orders.validate.price", function(){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
       order[0].getTotalPrice().should.equal(188.7);
-      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter/2);
+      order[0].getShippingPrice().should.equal(config.shop.shipping.price.hypercenter-config.shop.shipping.priceA);
       config.shop.shipping.discountB=180;
       done();
     });
@@ -112,11 +112,12 @@ describe("orders.validate.price", function(){
 
   it("check order shipping half shipping price when postalCode is 1219 ", function(done){
     db.model('Orders').find({oid:2000010}, function(err,order){
-      var halfPeriphery=config.shop.shipping.price.periphery/2;
+      var discountPeriphery=config.shop.shipping.price.periphery;
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
-      order[0].getTotalPrice().should.equal(157.05); //3.10=roundCHF((145+8.95)*10.02) 
-      order[0].getShippingPrice().should.equal(halfPeriphery);
+      order[0].getTotalPrice().should.equal(161.05); //3.10=roundCHF((145+17.90-5)*1.02) 
+      // 17.90 -5.0
+      order[0].getShippingPrice().should.equal(parseFloat((discountPeriphery-config.shop.shipping.priceA).toFixed(2)));
       done();
     });
   });

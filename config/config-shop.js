@@ -20,8 +20,8 @@ module.exports = {
         hypercenter:10,
         periphery:17.90
       }, // shipping price
-      priceA:0.9,
-      priceB:0.8,
+      priceA:5,
+      priceB:5,
       periphery:["1219"]
     },
 
