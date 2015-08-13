@@ -549,8 +549,8 @@ Product.statics.findByCriteria = function(criteria, callback){
 
       //
       // only available products ?
-      if(criteria.instock===true){
-        query=query.where("pricing.stock",{$gt:0});
+      if(criteria.instock!==undefined){
+        query=query.where("pricing.stock").gt(0);
       }
 
       //
