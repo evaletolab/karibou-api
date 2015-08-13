@@ -290,7 +290,7 @@ UserSchema.methods.removeLikes = function(sku, callback){
   if(idx===-1){
     return callback(null,this)
   }
-  this.likes=this.likes.slice(parseInt(sku),1);
+  this.likes=this.likes.splice(idx,1);
   return this.save(callback);
 };
 
