@@ -285,6 +285,7 @@ UserSchema.methods.addLikes = function(sku, callback){
   return user.save(callback);
 };
 
+// TODO should better test for removeLikes
 UserSchema.methods.removeLikes = function(sku, callback){
   var idx=this.likes.indexOf(parseInt(sku))
   if(idx===-1){
