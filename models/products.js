@@ -366,7 +366,6 @@ Product.statics.findPopularByUser = function(criteria, callback){
       filters.instock=true;
     }
 
-    console.log('skus -->',skus)
     var query=mongoose.model('Products').findByCriteria(filters,cb);
                 // .populate(['vendor','vendor.owner','categories']);
 
@@ -546,6 +545,12 @@ Product.statics.findByCriteria = function(criteria, callback){
       // only available products ?
       if(criteria.available!==undefined){
         query=query.where("attributes.available",(criteria.available));
+      }
+
+      //
+      // only available products ?
+      if(criteria.instock===true){
+        query=query.where("pricing.stock",{$gt:0});
       }
 
       //
