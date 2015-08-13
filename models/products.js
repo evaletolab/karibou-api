@@ -357,11 +357,26 @@ Product.statics.findPopularByUser = function(criteria, callback){
 
     //
     // get products
-    var query=mongoose.model('Products').find({sku:{
-      $in:skus
-    }}).populate(['vendor','vendor.owner','categories']);
+    var filters={
+      skus:skus
+    };
+    if(criteria.available){
+      filters.status=true;
+      filters.available=true;
+      filters.instock=true;
+    }
+
+    console.log('skus -->',skus)
+    var query=mongoose.model('Products').findByCriteria(filters,cb);
+                // .populate(['vendor','vendor.owner','categories']);
+
+    // var query=mongoose.model('Products')
+    //             .find({})
+    //             .where('sku')
+    //               .in(skus)
+    //             .populate(['vendor','vendor.owner','categories']);
   
-    return query.exec(cb)      
+    // return query.exec(cb)      
   })
 
 };
@@ -402,6 +417,8 @@ Product.statics.findOneBySku = function(sku, callback){
  *   category:slug,
  *   details:details
  *   valid:true|false,
+ *   available:true|false // match product.attributes.available
+ *   status:true|false // match shop status within the week of orders (TODO testit more!)
  *   sort:----
  * }
  */
@@ -411,7 +428,8 @@ Product.statics.findByCriteria = function(criteria, callback){
       Shops=this.model('Shops');
       
       
-  var query=Products.find({}).populate('vendor');
+  var query=Products.find({})
+              .populate(['vendor','vendor.owner','categories']);
   
 
   //console.log(criteria)
@@ -531,11 +549,18 @@ Product.statics.findByCriteria = function(criteria, callback){
       }
 
       //
+      // filter by SKUs
+      if(criteria.skus&&criteria.skus.length){
+        query=query.where("sku").in(criteria.skus)
+      }
+
+      //
       // available at home ?
       if(criteria.home!==undefined){
         query=query.where("attributes.home",(criteria.home));
       }
-      
+
+
       if(callback){
         //.populate({path:'categories',select:'weight name'})
         return query.populate('vendor')
