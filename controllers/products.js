@@ -96,7 +96,8 @@ exports.love=function (req, res) {
   var criteria={
     email:req.user.email.address,
     likes:req.user.likes,
-    minhit:req.query.minhit||1
+    minhit:req.query.minhit||1,
+    available:req.query.available
   }
 
   //
