@@ -312,7 +312,7 @@ Product.statics.create = function(p,s,callback){
 Product.statics.findPopularByUser = function(criteria, callback){
   assert(criteria.email);
 
-  var skus=[], today=new Date();
+  var skus=[], today=new Date(), windowtime=(parseInt(criteria.windowtime)||2)-1;
   var cb=function(err, products){
     callback(err,products);
   };
@@ -328,7 +328,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
-     { $match: { 'month': {$gt:today.getMonth()-2,$lte:today.getMonth()+1 } } },     
+     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 } } },     
      {$unwind: '$items' },
      {$group:
        {
