@@ -37,10 +37,10 @@ module.exports = function (app) {
     var str=this.valueOf(), cipher=require('crypto').
               createCipher('aes-256-cbc',config.admin.secret);
 
-    var blocks=str.split(config.admin.padding);
+    var code = str.substring(0, str.lastIndexOf(config.admin.padding));
 
 
-    if(blocks.length==2){
+    if(code){
       return str;
     }              
 
@@ -64,10 +64,9 @@ module.exports = function (app) {
     }
 
 
-    var blocks=str.split(config.admin.padding);
-
-    if(blocks.length==2){
-      return dc(blocks[0])
+    var code = str.substring(0, str.lastIndexOf(config.admin.padding) );
+    if(code){
+      return dc(code)
     }
     
     return dc(str);
