@@ -23,6 +23,18 @@ describe("system", function(){
         done()
     });
 
+
+    it("DeCrypt string without padding", function(done){
+        "6faad2f00aa175cafb0e0cb425f3ba9b7433379b88a443acd675a13b20db6642".decrypt().should.equal("ch_16aUeYBTMLb4og7PSbvQwVpl")
+        done()
+    });
+
+
+    it("DeCrypt string with padding in code", function(done){
+        "ch_16aUeYBTMLb4og7PSbvQwVpl".crypt().decrypt().should.equal("ch_16aUeYBTMLb4og7PSbvQwVpl")
+        done()
+    });
+
     it("crypt already crypted string", function(done){
         "olivier".crypt().crypt().crypt().decrypt().should.equal("olivier")
         done()
