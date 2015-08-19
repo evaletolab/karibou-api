@@ -150,7 +150,7 @@ exports.email=function(req,res){
   if(!req.body.shopname){
     content.mood=req.body.mood;
     return bus.emit('sendmail',config.mail.info,
-                 "Un utilisateur à une question pour Karibou ",
+                 "Un utilisateur a une question pour Karibou.ch ",
                  content,
                  "karibou-question", function(err, status){
       if(err){
