@@ -14,7 +14,7 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 * Montant total <%= totalWithFees %> CHF
 *
 </div>
-<%if (order.items[i].payment.issuer==='invoice') {%>
+<%if (order.payment.issuer==='invoice') {%>
 <div>
 Veuillez effectuer le virement bancaire dans les 10 jours:
 (1) - Compte:	CH76 0900 0000 1461 5643 8 / BIC: POFICHBEXXX<br/>
