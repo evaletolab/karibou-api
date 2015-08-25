@@ -39,7 +39,7 @@ var Payment=function(){
 			if(user.email&&user.email.status!==true){
 		    return Q.reject(new Error("Votre email doit être validé pour ajouter une méthode de paiement"))
 			}
-
+			console.log('user', user)
 			if(!user.status){
 		    return Q.reject(new Error("Votre compte est désactivé"))
 			}

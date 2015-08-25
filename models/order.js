@@ -693,6 +693,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       // adding customer info and email (check validity)
       order.customer={
         id:customer.id,
+        merchant:customer.merchant,
         displayName:customer.displayName,
         created:customer.created,
         status:customer.status,

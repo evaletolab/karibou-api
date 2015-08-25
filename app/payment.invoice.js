@@ -11,14 +11,14 @@ var PaymentInvoice=function(_super){
 //
 // verify if an alias belongs to the user
 PaymentInvoice.prototype.isValidAlias=function(alias, user, method){
-  return ((user.id+'').hash().crypt()===alias);
+  return ((user.id+'invoice').hash().crypt()===alias);
 }
 
 //
 // verify if an alias is valid and decode it
 PaymentInvoice.prototype.decodeAlias=function(alias, user, method){
   try{
-    if((user.id+method.toLowerCase()).hash().crypt()===alias){
+    if((user.id+'invoice').hash().crypt()===alias){
       return {id:user.id,gateway_id:null,card_id:null}
     }
   }catch(e){}
@@ -33,7 +33,7 @@ PaymentInvoice.prototype.alias=function(user_id,payment){
 //
 // check if method fields are ok
 PaymentInvoice.prototype.isPaymentObjectValid=function(payment){
-  return (payment&&payment.alias&&payment.issuer&&payment.number);
+  return (payment&&payment.alias&&payment.issuer);
 }
 
 
@@ -110,7 +110,7 @@ PaymentInvoice.prototype.addCard=function(user, payment){
 
 
   // return promise
-  return this._super.addCard(user,payment);
+  return this._super.addCard(_addCard,user,payment);
 }
 
 
@@ -128,7 +128,7 @@ PaymentInvoice.prototype.authorize=function(order){
 
     var result={
       log:'authorized amount '+(Math.round(order.getTotalPrice(config.payment.reserve)))+' the '+new Date(),
-      transaction:order.oid.crypt(),
+      transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };
@@ -158,7 +158,7 @@ PaymentInvoice.prototype.cancel=function(order,reason){
 
     var result={
       log:'cancel '+(Math.round(order.getTotalPrice(config.payment.reserve)))+' the '+new Date(),
-      transaction:order.oid.crypt(),
+      transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };
@@ -191,7 +191,7 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
     var refund=amount||(Math.round(order.getTotalPrice(config.payment.reserve)))
     var result={
       log:'refund '+refund+' the '+new Date(),
-      transaction:order.oid.crypt(),
+      transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };
@@ -222,7 +222,7 @@ PaymentInvoice.prototype.capture=function(order,reason){
     var amount=order.getTotalPrice()
     var result={
       log:'capture '+amount+' the '+new Date(),
-      transaction:order.oid.crypt(),
+      transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };

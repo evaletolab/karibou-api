@@ -129,7 +129,7 @@ exports.getShippingPrice=function(factor){
 
   //
   // TODO TESTING MERCHANT ACCOUNT
-  if (this.merchant===true){
+  if (this.customer.merchant===true){
     return roundCHF(price-config.shop.shipping.priceB);
   }
 

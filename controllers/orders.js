@@ -199,10 +199,33 @@ function parseCriteria(criteria, req){
   if(req.query.padding){
     criteria.padding=true
   }
-
-
-
 }
+
+/**
+ * get products
+ */
+ /**
+exports.list = function(req,res){
+  db.orders.aggregate(
+       { $match: { 'payment.status': 'paid' } },
+       {$project:{week: { $week: "$shipping.when"}, year: { $year: "$shipping.when" },
+                 oid:1,
+                 items:1,
+                 email:1,
+                 shipping:1
+       }},
+       {$group:
+           {
+             _id:"$email",
+             items:{$addToSet:"$items.sku"},
+           }
+       },
+       {$sort:{_id:1}}
+  ).forEach(function(result){
+    print(result._id+', '+result.items.sort());
+  });
+}; */
+
 /**
  * get orders by criteria
  */

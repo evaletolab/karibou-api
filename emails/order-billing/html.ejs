@@ -14,6 +14,14 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 * Montant total <%= totalWithFees %> CHF
 *
 </div>
+<%if (order.items[i].payment.issuer==='invoice') {%>
+<div>
+Veuillez effectuer le virement bancaire dans les 10 jours:
+(1) - Compte:	CH76 0900 0000 1461 5643 8 / BIC: POFICHBEXXX<br/>
+(2) - Montant à payer, <%= totalWithFees %> CHF<br/>
+(4) - Versement pour:	Karibou Delphine Cluzel Evalet et Olivier Evalet, CH-1208 Genève<br/>
+</div>
+<% } %>
 
 Pour toute question, veuillez répondre à ce mail.<br/>
 Avec nos meilleurs messages,<br/>
