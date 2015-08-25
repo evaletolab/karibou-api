@@ -8,6 +8,7 @@ var mongoose = require('mongoose')
   , bus = require('../app/bus')
   , format=require('./lib/order.format')
   , utils=require('./lib/order.utils')
+  , stats=require('./lib/order.stats')
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
@@ -178,6 +179,10 @@ Orders.statics.filterByShop=utils.filterByShop;
 Orders.statics.sortByDateAndUser=format.sortByDateAndUser;
 Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForShop;
 
+//
+// import stats API
+Orders.statics.getStatsByOrder=stats.getStatsByOrder;
+Orders.statics.favoriteProducts=stats.favoriteProducts;
 
 
 
@@ -1240,32 +1245,6 @@ Orders.statics.generateRepportForShop=function(criteria,cb) {
 
 };
 
-//
-// TODO need a comment here!
-Orders.statics.getStatsByOrder=function(query){
-  query=query||{ closed: { '$exists': false } };
-
-  return db.model('Orders').aggregate(
-     [
-       { $match: query },
-       {$project:{week: { $week: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 items:1,
-                 shipping:1,
-                 oid:1
-       }},
-       {$unwind: '$items'}, 
-       {$group:
-           {
-             _id:"$oid",
-             week:{$first:"$week"},
-             totalAmount: { $sum: "$items.finalprice" },
-             count: { $sum: "$items.quantity" }
-           }
-       },
-       {$sort:{week:-1}}
-     ]
-  )
-}
 
 
 Orders.set('autoIndex', config.mongo.ensureIndex);

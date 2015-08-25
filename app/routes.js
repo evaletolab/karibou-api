@@ -180,6 +180,11 @@ module.exports = function(app, config, passport) {
   app.get('/v1/orders/users/:id', users.ensureMeOrAdmin, orders.list);
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
 
+  //
+  // stats
+  app.get('/v1/orders/stats/favorite', orders.statsFavoriteProducts);
+
+
   app.post('/v1/orders/items/verify',orders.verifyItems)
   
   // only valid user with valid alias can create new order

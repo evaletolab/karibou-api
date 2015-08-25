@@ -204,27 +204,14 @@ function parseCriteria(criteria, req){
 /**
  * get products
  */
- /**
-exports.list = function(req,res){
-  db.orders.aggregate(
-       { $match: { 'payment.status': 'paid' } },
-       {$project:{week: { $week: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 oid:1,
-                 items:1,
-                 email:1,
-                 shipping:1
-       }},
-       {$group:
-           {
-             _id:"$email",
-             items:{$addToSet:"$items.sku"},
-           }
-       },
-       {$sort:{_id:1}}
-  ).forEach(function(result){
-    print(result._id+', '+result.items.sort());
-  });
-}; */
+exports.statsFavoriteProducts = function(req,res){
+  Orders.favoriteProducts(function (err, stats) {
+    if(err){
+      return res.send(400, errorHelper(err.message||err));
+    }
+    res.json(stats);
+  })
+};
 
 /**
  * get orders by criteria
