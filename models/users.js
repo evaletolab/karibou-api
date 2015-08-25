@@ -112,7 +112,10 @@ validate.postal = function (value) {
     //   alias:{type:String,unique:true,required:true}
     // }],
 
-    gateway_id    : {type:String, unique: true, select:false,sparse: true},
+    invoice:{type:Boolean},
+    merchant:{type:Boolean},
+
+    gateway_id:{type:String, unique: true, select:false,sparse: true},
 
     /* make user valid/invalid */
     status:{type:Boolean, default: true},
@@ -209,6 +212,7 @@ UserSchema.statics.findByToken = function(token, success, fail){
 // TODO this should be stored in db
 UserSchema.methods.populateRoles=function(){
   var user=this;
+  user.roles=[];
   config.admin.emails.forEach(function(admin){
     if (user&&user.email.address === admin){
       user.roles.push('admin');

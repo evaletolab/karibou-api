@@ -63,7 +63,7 @@ module.exports = function(app, config, passport) {
   //app.get('/v1/users/:id/psp', users.ensureMe, api.pspForm);
   app.get('/v1/users', auth.ensureAdmin, users.list);
   app.get('/v1/users/sessions', auth.ensureAdmin,api.sessions);
-  app.post('/v1/users/:id', users.ensureMe,users.update);
+  app.post('/v1/users/:id', users.ensureMeOrAdmin,users.update);
   app.post('/v1/users/:id/like/:sku', users.ensureMe,users.like);
   app.post('/v1/users/:id/unlike/:sku', users.ensureMe,users.unlike);
   app.post('/v1/users/:id/status', auth.ensureAdmin,users.status);

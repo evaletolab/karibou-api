@@ -179,10 +179,9 @@ exports.password=function(req,res){
 };
 
 exports.update=function(req,res){
-
   try{
     validate.check(req.params.id,"Invalid uid request").isInt();
-    validate.user(req.body);
+    validate.user(req.body,req.user.isAdmin());
   }catch(err){
     return res.send(400, err.message);
   }
@@ -193,7 +192,6 @@ exports.update=function(req,res){
   if(req.body.hash){delete(req.body.hash);}
   if(req.body.salt){delete(req.body.salt);}
 
-
   //
   // normalize ref _id
   for (var i = req.body.shops.length - 1; i >= 0; i--) {
@@ -201,17 +199,29 @@ exports.update=function(req,res){
   };
 
   Users.findOne({id:req.params.id}).exec(function(err,user){
+
+    //
+    // protect shop edition
+    req.body.shops=user.shops;
+
+
+    //
     // if not admin silently fix   
     if(!req.user.isAdmin()){
       req.body.id=user.id;
       req.body.status=user.status;
-      req.body.shops=user.shops;
       req.body.roles=user.roles;
+      req.invoice=user.invoice;
+      req.merchant=user.merchant;
+      req.gateway_id=user.gateway_id;
+      req.rank=user.rank;
     }
+
     if(req.body.email.address===user.email.address){
       delete (req.body.email);
     }
-    // do the update
+    //
+    // TODO rewrite safe! do the update 
     _.extend(user,req.body);
 
     user.save(function (err,user) {
