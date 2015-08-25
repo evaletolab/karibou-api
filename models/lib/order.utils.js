@@ -127,9 +127,11 @@ exports.getShippingPrice=function(factor){
   // 1) coupon for freeshipping
   //   --> this.payment.coupons
 
-
-  // 2) amount depend on price
-  // 3) amount depend on grouped orders
+  //
+  // TODO TESTING MERCHANT ACCOUNT
+  if (this.merchant===true){
+    return roundCHF(price-config.shop.shipping.priceB);
+  }
 
   
   // implement 3) get free shipping!
