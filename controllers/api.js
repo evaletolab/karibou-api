@@ -117,7 +117,35 @@ exports.message = function(req, res) {
     if(origins.indexOf(req.params.key)==-1){
       // return res.send(401,"invalid token")
     }
-    bus.emit('system.message',"[kariboo-subscribe] : ",req.body);
+    var mail={
+      title:"[karibou-subscribe] : "
+    };
+    if(req.params.subject){
+      if(config.mailing[req.params.subject]){
+        mail=config.mailing[req.params.subject];
+      }else{
+        mail=config.mailing.others;
+      }
+    }
+
+    if(mail.mailchimp){
+      var mailchimpvars = {
+        id:mail.mailchimp,
+        email: req.body.email,
+        fname: req.body.fname,
+        lname: req.body.lname,
+        tags:{
+          MMERGE3:req.params.subject
+        }
+      };
+      //
+      // try to subscribe this new account
+      bus.emit('mailchimp.subscribe',mailchimpvars,function (err,data) {
+        console.log('DEBUG------- subscribe',err,data,mailchimpvars)
+      });
+    }
+
+    bus.emit('system.message',mail.title,req.body);
 
     res.json({});
 };
