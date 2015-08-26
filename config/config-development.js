@@ -19,6 +19,39 @@ module.exports = {
       code:process.env.MANDRIL ||'xnbFeUU_FJrqaF3U2n8uhg'
     }
   },
+  mailing:{
+    '1223':{
+      name:'Cologny',
+      title:"[karibou-subscribe-cologny] : ",
+      mailchimp:'733ad74f31'
+    },
+    '1212':{
+      name:'Grand lancy',
+      title:"[karibou-subscribe-grand-lancy] : ",
+      mailchimp:'733ad74f31'
+    },
+    '1219':{
+      name:'Aïre',
+      title:"[karibou-subscribe-aire] : ",
+      mailchimp:'733ad74f31'
+    },
+    '1226':{
+      name:'Thonex',
+      title:"[karibou-subscribe-thoney] : ",
+      mailchimp:'733ad74f31'
+    },
+
+    'others':{
+      name:'Others',
+      title:"[karibou-subscribe-others] : ",
+      mailchimp:'733ad74f31'
+    },
+
+    'main':{
+      title:"",
+      mailchimp:'50fe26a799'
+    }
+  },
   admin:{
     handle:'secret',
     emails:['evaleto@gmail.com'],
@@ -89,7 +122,13 @@ module.exports = {
   },
 
 	auth:{
-    uploadcare:{pub:'b51a13e6bd44bf76e263',pk:'e1da8e0e16519c97364f'},
+    mailchimp:{
+        key:"a9ade807b26ef746022d094620244d9a-us9"
+    },
+    uploadcare:{
+        pub:'b51a13e6bd44bf76e263',
+        pk:'e1da8e0e16519c97364f'
+    },
     fb: {
         appId: '111565172259433'
       , appSecret: '85f7e0a0cc804886180b887c1f04a3c1'

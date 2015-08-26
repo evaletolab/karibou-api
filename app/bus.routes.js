@@ -1,4 +1,5 @@
 var bus = require("./bus"),
+    mailchimp =require("./bus.routes.mailchimp"),
     dummy=function(){},
     onTrace, onMessage;
 
@@ -6,7 +7,7 @@ var bus = require("./bus"),
 onTrace=function(token,error){
     var msg=JSON.stringify(error,null,2);
     bus.emit( "sendmail",
-              "evaleto@gmail.com","[kariboo-ui] : "+error.name,
+              "evaleto@gmail.com","[karibou-ui] : "+error.name,
               {content:msg}, "simple");
 
 };
@@ -14,15 +15,13 @@ onTrace=function(token,error){
 onMessage=function(title,content){
     var msg=JSON.stringify(content,null,2);
     bus.emit( "sendmail",
-              "info@karibou.io",title,
+              "info@karibou.ch",title,
               {content:msg}, "simple");
 
 };
 
 onPush=function(event,git){
   console.log("github ----------------",sig,id,event,req.body)
-
-
 }
 
 
@@ -48,6 +47,8 @@ bus.on('order.cancel',dummy)
 bus.on('err.user.login',dummy)
 bus.on('err.user.register',dummy)
 bus.on('user.send.password',dummy)
+
+bus.on('mailchimp.subscribe',mailchimp.subscribe)
 
 //
 // bus.on('',function(mail,cb){})

@@ -21,6 +21,34 @@ module.exports = {
     }
   },
 
+  mailing:{
+    '1223':{
+      name:'Cologny',
+      title:"[karibou-subscribe-cologny] : ",
+      mailchimp:'0f92954013'
+    },
+    '1212':{
+      name:'Grand lancy',
+      title:"[karibou-subscribe-grand-lancy] : ",
+      mailchimp:'0f92954013'
+    },
+    '1219':{
+      name:'Aïre',
+      title:"[karibou-subscribe-aire] : ",
+      mailchimp:'0f92954013'
+    },
+    '1226':{
+      name:'Thonex',
+      title:"[karibou-subscribe-thoney] : ",
+      mailchimp:'0f92954013'
+    },
+
+    'main':{
+      title:"",
+      mailchimp:'0f92954013'
+    }
+  },
+
   admin:{
     handle:'secret',
     emails:['evaleto@gmail.com'],

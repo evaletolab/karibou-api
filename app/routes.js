@@ -110,7 +110,7 @@ module.exports = function(app, config, passport) {
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/comment', api.email);
   // temporary path for subscription
-  app.post('/v1/message/:key', api.message);
+  app.post('/v1/message/:key/:subject?', api.message);
   app.post('/v1/github/webhook',api.github)
 
 
