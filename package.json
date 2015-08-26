@@ -19,6 +19,7 @@
     "fnv-plus": "~1.2.9",
     "helmet": "0.5.x",
     "jade": "^0.35.0",
+    "mailchimp": "^1.1.0",
     "method-override": "2.x",
     "mocha-lcov-reporter": "0.0.1",
     "moment": "2.x",
