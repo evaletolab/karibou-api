@@ -2,7 +2,7 @@ Bonjour <%= order.customer.name.givenName %>,<br/><br/>
 
 Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <%= created %>.<br/>
 
-<div style="font-size:10px;font-family: monospace;white-space: pre-wrap;white-space: -moz-pre-wrap !important;white-space: -o-pre-wrap;word-wrap: break-word;">
+<div style="font-size:11px;font-family: monospace;white-space: pre-wrap;white-space: -moz-pre-wrap !important;white-space: -o-pre-wrap;word-wrap: break-word;">
 *<% for(var i=0; i<order.items.length; i++) {%>
 * <%if (order.items[i].fulfillment.status==='failure') {%><span style="text-decoration:line-through;"><%}%><%= order.items[i].quantity %>x <%- order.items[i].title %> (<%- order.items[i].part %>) <%= order.items[i].finalprice.toFixed(2) %> CHF <%if (order.items[i].fulfillment.status==='failure') {%></span><%}%><%if (order.items[i].variant&&order.items[i].variant.title) {%>
 *    option: <%= order.items[i].variant.title %><% } %><% } %>
@@ -16,10 +16,12 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 </div>
 <%if (order.payment.issuer==='invoice') {%>
 <div>
-Veuillez effectuer le virement bancaire dans les 10 jours:
+<br/>
+Veuillez effectuer le virement bancaire dans les 10 jours:<br/>
 (1) - Compte:	CH76 0900 0000 1461 5643 8 / BIC: POFICHBEXXX<br/>
 (2) - Montant à payer, <%= totalWithFees %> CHF<br/>
-(4) - Versement pour:	Karibou Delphine Cluzel Evalet et Olivier Evalet, CH-1208 Genève<br/>
+(3) - Versement pour:	Karibou Delphine Cluzel Evalet et Olivier Evalet, CH-1208 Genève<br/>
+<br/>
 </div>
 <% } %>
 
