@@ -98,6 +98,12 @@ exports.register=function(auth){
   check(auth.email,"Entrez une adresse mail valide").isEmail();
   check(auth.lastname,"Le format du nom doit contenir au moins 2 caractères").isText().len(2, 64);
   check(auth.firstname,"Le format du prénom doit contenir au moins 2 caractères").isText().len(2, 64);
+
+  for( var i in auth.phoneNumbers){
+    check(auth.phoneNumbers[i].what,   "Votre libélé de téléphone n'est pas valide").isText().len(4, 30)
+    check(auth.phoneNumbers[i].number, "Votre numéro téléphone n'est pas valide").isText().len(10, 30)
+  }
+
 }
 
 /**
