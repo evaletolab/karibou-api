@@ -10,7 +10,7 @@
   "dependencies": {
     "async": "0.x",
     "connect-mongo": "0.x",
-    "debug": "^0.8.1",
+    "debug": "2.x",
     "ejs": "^1.0.0",
     "email-templates": "1.x",
     "express": "3.16.x",
@@ -34,11 +34,11 @@
     "passport-local": "1.x",
     "passport-persona": "~0.1.7",
     "passport-twitter": "1.x",
-    "password-generator": "0.2.x",
+    "password-generator": "1.x",
     "q": "1.4.x",
     "queue-async": "~1.0.7",
     "sitemap": "1.x",
-    "stripe": "^3.2.0",
+    "stripe": "3.7.x",
     "underscore": "1.x",
     "validator": "3.x"
   },
