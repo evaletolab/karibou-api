@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var payment = require('../app/payment');
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
 
@@ -90,7 +90,7 @@ describe("api.orders.payment.capture", function(){
       .set('cookie', gluck)
       .end(function(err,res){
         res.should.have.status(401);
-        res.text.should.include('est réservée a un administrateur')
+        res.text.should.containEql('est réservée a un administrateur')
         done();
       });
   });  
@@ -102,7 +102,7 @@ describe("api.orders.payment.capture", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include("La référence de la carte n'est pas compatible avec le service de paiement")
+        res.text.should.containEql("La référence de la carte n'est pas compatible avec le service de paiement")
         done();
       });
   });  
@@ -114,7 +114,7 @@ describe("api.orders.payment.capture", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('avec le status: partial')
+        res.text.should.containEql('avec le status: partial')
         done();
       });
   });  
@@ -126,7 +126,7 @@ describe("api.orders.payment.capture", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('avec le status: pending')
+        res.text.should.containEql('avec le status: pending')
         done();
       });
   });  

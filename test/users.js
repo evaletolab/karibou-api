@@ -84,7 +84,7 @@ describe("Users", function(){
     it("duplicate id, one for local and one for facebook, generate an error", function(done){
       db.model('Users').findOrCreate({ id: 1234, provider:"facebook" }, function (err, user) {
     		should.exist(err);
-    		err.should.include('utilisé par le provider');
+    		err.should.containEql('utilisé par le provider');
         done()
   		});      
     });
@@ -101,7 +101,7 @@ describe("Users", function(){
     it("registers a new User get duplicate email error", function(done){
       db.model('Users').register("evaleto@gluck.com", "olivier", "evalet", "password", "password", function(err, user){
     		should.exist(err);
-    		err.should.include('utilisateur existe');
+    		err.should.containEql('utilisateur existe');
         done();
       });
     });
@@ -109,7 +109,7 @@ describe("Users", function(){
     it("duplicate email, one for persona and one for the current registration, generate an error", function(done){
       db.model('Users').register("test@persona.com", "olivier", "evalet", "password", "password", function(err, doc){
         should.exist(err);
-        err.should.include('utilisateur existe');
+        err.should.containEql('utilisateur existe');
         done();
       });
     });

@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 //http://www.paypalobjects.com/en_US/vhelp/paypalmanager_help/credit_card_numbers.htm
@@ -83,7 +83,7 @@ describe("api.users.payment", function(){
       .send({ email: "evaleto@gluck.com", password:'password', provider:'local' })
       .end(function(err,res){
         res.should.have.status(200);
-        res.body.roles.should.not.include('admin');
+        res.body.roles.should.not.containEql('admin');
         cookie = res.headers['set-cookie'];
         user=res.body;
         done();
@@ -108,7 +108,7 @@ describe("api.users.payment", function(){
       .post('/v1/users/'+user.id+'/payment/pipo/delete')
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include("mode de paiement est inconnu")
+        res.text.should.containEql("mode de paiement est inconnu")
         res.should.have.status(400);
         done()
       });
@@ -121,7 +121,7 @@ describe("api.users.payment", function(){
       .send({expiry:cardDate(VisaCard),name:VisaCard.name,number:VisaCard.hiddenNumber,issuer:'visa'})
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include("Impossible d'enregistrer une carte sans (id:stripe)")
+        res.text.should.containEql("Impossible d'enregistrer une carte sans (id:stripe)")
         res.should.have.status(400);
         done()
       });
@@ -133,7 +133,7 @@ describe("api.users.payment", function(){
       .send({expiry:cardDate(VisaCard),number:VisaCard.hiddenNumber,issuer:'tester'})
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include('Le titulaire de la carte ')
+        res.text.should.containEql('Le titulaire de la carte ')
         res.should.have.status(400);
         done()
       });
@@ -147,7 +147,7 @@ describe("api.users.payment", function(){
       .send({name:VisaCard.name,number:VisaCard.hiddenNumber,issuer:'tester'})
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include('La date de validité')
+        res.text.should.containEql('La date de validité')
         res.should.have.status(400);
         done()
       });
@@ -161,7 +161,7 @@ describe("api.users.payment", function(){
       .send({expiry:cardDate(VisaCard),name:VisaCard.name,number:VisaCard.hiddenNumber})
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include("Le type de carte n'est pas valide")
+        res.text.should.containEql("Le type de carte n'est pas valide")
         res.should.have.status(400);
         done()
       });
@@ -198,7 +198,7 @@ describe("api.users.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('méthode de paiement existe')
+        res.text.should.containEql('méthode de paiement existe')
         done()
       });
   });
@@ -254,7 +254,7 @@ describe("api.users.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include("Ce mode de paiement est inconnu")
+        res.text.should.containEql("Ce mode de paiement est inconnu")
         done()
       });
   });

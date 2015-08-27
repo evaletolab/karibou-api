@@ -175,7 +175,7 @@ describe("orders.date", function(){
     all.forEach(function(n,i){
       // deprecated use containEql(n.getDay())
       n.getHours().should.not.be.above(config.shop.order.timelimitH)
-      config.shop.order.weekdays.should.include(n.getDay())
+      config.shop.order.weekdays.should.containEql(n.getDay())
     })
     
 

@@ -238,9 +238,9 @@ describe("orders.create.success", function(){
         //         }))
         orders.length.should.equal(2)
         var oids=[2000001,2000006]; // 2000000 has been closed right after rollback
-        // oids.should.include(orders[0].oid)
-        oids.should.include(orders[0].oid)
-        oids.should.include(orders[1].oid)
+        // oids.should.containEql(orders[0].oid)
+        oids.should.containEql(orders[0].oid)
+        oids.should.containEql(orders[1].oid)
         done();
       })
     },config.shop.order.timeoutAndNotPaid*1000+10)

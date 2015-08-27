@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
@@ -147,7 +147,7 @@ describe("api.users", function(){
       .send({ email:"delphine@gmail.com", new:'12347',current:'password' })
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include('pas le propriétaire de ce compte')
+        res.text.should.containEql('pas le propriétaire de ce compte')
         res.should.have.status(401);
         done()
       });    
@@ -161,7 +161,7 @@ describe("api.users", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('passe doit contenir au moins')
+        res.text.should.containEql('passe doit contenir au moins')
         done()
       });    
   });
@@ -173,7 +173,7 @@ describe("api.users", function(){
       .send({ email:"evaleto@gluck.com", new:'12345',current:'12345' })
       .set('cookie', cookie)
       .end(function(err,res){
-        res.text.should.include('mot de passe est incorrect (2)')
+        res.text.should.containEql('mot de passe est incorrect (2)')
         res.should.have.status(400);
         done()
       });    

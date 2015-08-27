@@ -83,7 +83,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
 
       should.exist(order.errors)
-      order.errors[0]['1000001'].should.include('Le prix de votre produit')
+      order.errors[0]['1000001'].should.containEql('Le prix de votre produit')
       done();          
     });
   });    
@@ -100,7 +100,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(order.errors)
-      order.errors[0]['1000006'].should.include('est plus en stock')
+      order.errors[0]['1000006'].should.containEql('est plus en stock')
       done();          
     });
   });
@@ -119,7 +119,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
       should.exist(order.errors)
-      order.errors[0]['1000001'].should.include("La quantité souhaitée n'est ")
+      order.errors[0]['1000001'].should.containEql("La quantité souhaitée n'est ")
       done();          
     });
 
@@ -138,7 +138,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       //console.log(err)
       should.exist(order.errors)
-      order.errors[0]['1000001'].should.include("quantité d'achat minimum est de 1")
+      order.errors[0]['1000001'].should.containEql("quantité d'achat minimum est de 1")
       done();          
     });
 
@@ -158,7 +158,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       // console.log(err,order)
       should.exist(order.errors)
-      order.errors[0]['1000001'].should.include("cet article (2)")
+      order.errors[0]['1000001'].should.containEql("cet article (2)")
       done();          
     });
 
@@ -175,7 +175,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(order.errors)
-      order.errors[0]['1000002'].should.include("la boutique a été désactivé")
+      order.errors[0]['1000002'].should.containEql("la boutique a été désactivé")
       done();          
     });
   });    
@@ -195,7 +195,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       order.errors.length.should.equal(1);
-      order.errors[0]['1000003'].should.include("Ce produit n'est plus disponible")
+      order.errors[0]['1000003'].should.containEql("Ce produit n'est plus disponible")
       done();          
     });
   });  
@@ -214,7 +214,7 @@ describe("orders.validate.item", function(){
     Orders.create(items, customer, shipping, payment, function(err,order){
       // console.log(order.errors)
       should.exist(order.errors)
-      order.errors[0]['1000003'].should.include("la boutique sera fermée ce jour là")
+      order.errors[0]['1000003'].should.containEql("la boutique sera fermée ce jour là")
       done();          
     });
   });    
@@ -233,7 +233,7 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(order.errors)
-      order.errors[0]['1000004'].should.include("Ce produit n'est plus disponible")
+      order.errors[0]['1000004'].should.containEql("Ce produit n'est plus disponible")
       done();          
     });
   });    
@@ -253,7 +253,7 @@ describe("orders.validate.item", function(){
 
         Orders.create(items, customer, shipping, payment, function(err,order){
           should.exist(order.errors)
-          order.errors[0]['1000001'].should.include("pas disponible pour la boutique Premier shop")
+          order.errors[0]['1000001'].should.containEql("pas disponible pour la boutique Premier shop")
           done();          
         });
 

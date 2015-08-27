@@ -2,7 +2,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
 var Products=db.model('Products'), 
@@ -141,7 +141,7 @@ describe("api.orders.create", function(){
       .expect(200,function(err,res){
         should.not.exist(err)
         should.exist(res.body.errors)
-        res.body.errors[0]['1000002'].should.include("la boutique a été désactivé")
+        res.body.errors[0]['1000002'].should.containEql("la boutique a été désactivé")
         done()
       });
   });    
@@ -178,7 +178,7 @@ describe("api.orders.create", function(){
       .expect(200,function(err,res){
         should.not.exist(err)
         should.exist(res.body.errors)
-        res.body.errors[0]['1000001'].should.include("La quantité souhaitée")
+        res.body.errors[0]['1000001'].should.containEql("La quantité souhaitée")
         done()
       });
   });    
@@ -216,7 +216,7 @@ describe("api.orders.create", function(){
       .set('cookie', cookie)
       .expect(400,function(err,res){
         should.not.exist(err)
-        res.text.should.include("date de livraison n'est plus disponible")
+        res.text.should.containEql("date de livraison n'est plus disponible")
         done()
       });
   });    
@@ -254,7 +254,7 @@ describe("api.orders.create", function(){
       .set('cookie', cookie)
       .expect(400,function(err,res){
         should.not.exist(err)
-        res.text.should.include("livraison n'est pas valable")
+        res.text.should.containEql("livraison n'est pas valable")
         done()
       });
   });    

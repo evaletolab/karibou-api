@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
 
 var Products=db.model('Products'), 
@@ -80,7 +80,7 @@ describe("api.orders.email", function(){
       .set('cookie', cookie)      
       .expect(401,function(err,res){
         should.not.exist(err)
-        res.text.should.include('Your are not the owner of this shop')
+        res.text.should.containEql('Your are not the owner of this shop')
         //res.body.length.should.equal(3)
         done()
       });  

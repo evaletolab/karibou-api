@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
 var Products=db.model('Products'), 
@@ -166,7 +166,7 @@ describe("api.orders.security", function(){
       .end(function(err,res){
         should.not.exist(err)
         res.should.have.status(401);
-        res.text.should.include("La méthode de paiement utilisée n'est pas valide")
+        res.text.should.containEql("La méthode de paiement utilisée n'est pas valide")
         done()
       });
   }); 

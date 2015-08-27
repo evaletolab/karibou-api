@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.find.js"]);
 
 var Products=db.model('Products'), 
@@ -89,7 +89,7 @@ describe("api.orders.payment", function(){
       .set('cookie', gluck)
       .end(function(err,res){
         res.should.have.status(401);
-        res.text.should.include('not the owner')
+        res.text.should.containEql('not the owner')
         done();
       });
   });  
@@ -101,7 +101,7 @@ describe("api.orders.payment", function(){
       .set('cookie', gluck)
       .end(function(err,res){
         res.should.have.status(401);
-        res.text.should.include('not the owner')
+        res.text.should.containEql('not the owner')
         done();
       });
   });  
@@ -113,7 +113,7 @@ describe("api.orders.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('avec le status: partial')
+        res.text.should.containEql('avec le status: partial')
         done();
       });
   });  
@@ -125,7 +125,7 @@ describe("api.orders.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('avec le status: pending')
+        res.text.should.containEql('avec le status: pending')
         done();
       });
   });  
@@ -137,7 +137,7 @@ describe("api.orders.payment", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);
-        res.text.should.include('méthode de paiement est invalide')
+        res.text.should.containEql('méthode de paiement est invalide')
         done();
       });
   });  

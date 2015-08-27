@@ -82,7 +82,7 @@ describe("orders.find.product", function(){
     db.model('Products').findPopularByUser(criteria, function(err,products){
       should.not.exist(err)
       products.length.should.equal(5)
-      // products.should.include(1000005)
+      // products.should.containEql(1000005)
       // products.forEach(function (product) {
       //   console.log('------------',product.sku)
       // })

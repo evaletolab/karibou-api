@@ -161,7 +161,7 @@ describe("orders.update", function(){
 
     db.model('Orders').updateItem(oid,items, function(err,order){
       should.exist(err)
-      err.should.include('Impossible de modifier une commande')
+      err.should.containEql('Impossible de modifier une commande')
       done()
     });
 

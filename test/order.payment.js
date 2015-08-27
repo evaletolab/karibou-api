@@ -87,7 +87,7 @@ describe("orders.payment", function(){
     payment.for(order.payment.issuer).authorize(order)
       .fail(function(err){
         should.exist(err.message)
-        err.message.should.include("Impossible d'autoriser une commande")
+        err.message.should.containEql("Impossible d'autoriser une commande")
         done()        
       })
   });   
@@ -100,7 +100,7 @@ describe("orders.payment", function(){
     payment.for(order.payment.issuer).authorize(order)
       .fail(function(err){
         should.exist(err.message)
-        err.message.should.include("Impossible d'autoriser une commande")
+        err.message.should.containEql("Impossible d'autoriser une commande")
         done()        
       })
   });   

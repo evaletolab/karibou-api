@@ -43,10 +43,11 @@
     "validator": "3.x"
   },
   "devDependencies": {
-    "mocha": "1.x",
-    "supertest": "0.x",
-    "should": "1.3.x",
-    "pow-mongoose-fixtures": "x"
+    "mocha": "2.x",
+    "pow-mongoose-fixtures": "x",
+    "should": "7.x",
+    "should-http": "0.0.4",
+    "supertest": "1.x"
   },
   "scripts": {
     "start": "node app.js",

@@ -88,8 +88,8 @@ describe("products.find:", function(){
       should.exist(products);
       var ps=[1000001,1000003]
       products.length.should.equal(2)
-      ps.should.include(products[0].sku);
-      ps.should.include(products[1].sku);
+      ps.should.containEql(products[0].sku);
+      ps.should.containEql(products[1].sku);
       done();
     });  
 
@@ -102,8 +102,8 @@ describe("products.find:", function(){
       should.exist(products);
       var ps=[1000001,1000003]
       products.length.should.equal(2)
-      ps.should.include(products[0].sku);
-      ps.should.include(products[1].sku);
+      ps.should.containEql(products[0].sku);
+      ps.should.containEql(products[1].sku);
       done();
     });  
 

@@ -4,7 +4,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js"]);
 
 
@@ -152,7 +152,7 @@ describe("api.validate", function(){
       .get('/v1/validate/'+uid+'/evaleto@gluck.com')
       .end(function(err,res){
         res.should.have.status(400);        
-        res.text.should.include('n\'est plus disponible')
+        res.text.should.containEql('n\'est plus disponible')
         done()
       });
   });
@@ -163,7 +163,7 @@ describe("api.validate", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(400);        
-        res.text.should.include('n\'est plus disponible')
+        res.text.should.containEql('n\'est plus disponible')
         done()
       });
   });

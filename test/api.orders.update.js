@@ -2,7 +2,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Orders.js"]);
 
 var Products=db.model('Products'),
@@ -200,7 +200,7 @@ describe("api.orders.create", function(){
       .end(function(err,res){
         should.not.exist(err)
         res.should.have.status(401);
-        res.text.should.include('appartient pas à votre boutique')
+        res.text.should.containEql('appartient pas à votre boutique')
 
         done()
       });
@@ -223,7 +223,7 @@ describe("api.orders.create", function(){
       .end(function(err,res){
         should.not.exist(err)
         res.should.have.status(401);
-        res.text.should.include('appartient pas à votre boutique')
+        res.text.should.containEql('appartient pas à votre boutique')
 
         done()
       });
@@ -248,7 +248,7 @@ describe("api.orders.create", function(){
       .end(function(err,res){
         should.not.exist(err)
         res.should.have.status(400);
-        res.text.should.include('les articles suivants ne concernent pas')
+        res.text.should.containEql('les articles suivants ne concernent pas')
         done()
       });
   });
@@ -331,7 +331,7 @@ describe("api.orders.create", function(){
       .set('cookie', cookie)
       .expect(400,function(err,res){
         should.not.exist(err)
-        res.text.should.include('modifier une commande avec le status: fulfilled')
+        res.text.should.containEql('modifier une commande avec le status: fulfilled')
         done()
       });
   });
@@ -355,7 +355,7 @@ describe("api.orders.create", function(){
       .set('cookie', cookie)
       .expect(400,function(err,res){
         should.not.exist(err)
-        res.text.should.include('modifier une commande avec le status: fulfilled')
+        res.text.should.containEql('modifier une commande avec le status: fulfilled')
         done()
       });
   });

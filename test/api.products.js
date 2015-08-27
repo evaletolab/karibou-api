@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 describe("api.products", function(){
@@ -117,7 +117,7 @@ describe("api.products", function(){
         .set('cookie', cookie)
         .send(p)
         .end(function(err,res){
-          res.text.should.include("qui vous appartient")
+          res.text.should.containEql("qui vous appartient")
           res.should.have.status(400);
           done();        
         });

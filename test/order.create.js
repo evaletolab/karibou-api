@@ -240,7 +240,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Could not find payment method")
+      err.should.containEql("Could not find payment method")
       done();          
     });
   });    
@@ -274,7 +274,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Votre méthode de paiement est inconnue")
+      err.should.containEql("Votre méthode de paiement est inconnue")
       done();          
     });
   });    
@@ -308,7 +308,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Could not find payment method")
+      err.should.containEql("Could not find payment method")
       done();          
     });
   });    
@@ -326,7 +326,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("La date de livraison n'est pas valable")
+      err.should.containEql("La date de livraison n'est pas valable")
 
       done();          
     });
@@ -343,7 +343,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("Cette date de livraison n'est plus")
+      err.should.containEql("Cette date de livraison n'est plus")
 
       done();          
     });
@@ -361,7 +361,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include("L'heure de livraison n'est pas valable")
+      err.should.containEql("L'heure de livraison n'est pas valable")
 
       done();          
     });
@@ -378,7 +378,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.include(" produits sélectionnés n'existent plus")
+      err.should.containEql(" produits sélectionnés n'existent plus")
 
       done();          
     });
@@ -411,7 +411,7 @@ describe("orders.create", function(){
       //  - items, customer, shipping
       Orders.create(items, customer, shipping, payment, function(err,order){
         should.exist(order.errors)
-        order.errors[0]['12346'].should.include("variation de ce produit n'est")
+        order.errors[0]['12346'].should.containEql("variation de ce produit n'est")
 
         done();          
       });

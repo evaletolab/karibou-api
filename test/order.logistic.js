@@ -38,7 +38,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error when missing param',function(done){
     Orders.updateLogistic({oid:2100000}, {},function (err, orders) {
       should.exist(err)
-      err.should.include('Ooops error updateLogistic missing param')
+      err.should.containEql('Ooops error updateLogistic missing param')
       done()
     })
   });
@@ -46,7 +46,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error when missing param',function(done){
     Orders.updateLogistic({}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Ooops error updateLogistic missing order selector')
+      err.should.containEql('Ooops error updateLogistic missing order selector')
       done()
     })
   });
@@ -55,7 +55,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error when payment is not auth',function(done){
     Orders.updateLogistic({oid:2000006}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Impossible de livrer une commande sans validation financière')
+      err.should.containEql('Impossible de livrer une commande sans validation financière')
       done()
     })
   });
@@ -63,7 +63,7 @@ describe("api.orders.find", function(){
   it.skip('mark order shipped get an error when order is not fulfilled',function(done){
     Orders.updateLogistic({oid:2000016}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Impossible de livrer une commande avec le status')
+      err.should.containEql('Impossible de livrer une commande avec le status')
       done()
     })
   });
@@ -71,7 +71,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error for wrong order id',function(done){
     Orders.updateLogistic({oid:3000020}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Impossible de trouver la commande')
+      err.should.containEql('Impossible de trouver la commande')
       done()
     })
   });
@@ -89,7 +89,7 @@ describe("api.orders.find", function(){
   it('mark order collected get an error when missing date',function(done){
     Orders.updateLogistic({'vendors.slug':'un-autre-shop'}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Ooops error updateLogistic missing date')
+      err.should.containEql('Ooops error updateLogistic missing date')
       done()
     })
   });
@@ -98,7 +98,7 @@ describe("api.orders.find", function(){
     var when=Orders.findCurrentShippingDay();
     Orders.updateLogistic({'vendors.slug':'un-autre-shop'}, {status:true, when:when},function (err, orders) {
       should.exist(err)
-      err.should.include('Impossible de livrer une commande')
+      err.should.containEql('Impossible de livrer une commande')
       done()
     })
   });
@@ -106,7 +106,7 @@ describe("api.orders.find", function(){
   it.skip('mark order collect even when some orders are closed',function(done){
     Orders.updateLogistic({oid:2100000}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.include('Impossible de livrer une commande fermée')
+      err.should.containEql('Impossible de livrer une commande fermée')
       done()
     })
   });

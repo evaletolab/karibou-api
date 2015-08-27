@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js"]);
 
 
@@ -98,7 +98,7 @@ describe("api.shops", function(){
       .set('cookie', cookie)
       .end(function(err,res){      
         res.should.have.status(400);
-        res.text.should.include('mot de passe est incorrect')
+        res.text.should.containEql('mot de passe est incorrect')
         done();
       });
   });  

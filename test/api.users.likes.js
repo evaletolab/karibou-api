@@ -3,7 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
-var should = require("should");
+var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
 
@@ -39,7 +39,7 @@ describe("api.users.likes", function(){
       .send({ email: "evaleto@gmail.com", password:'password', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(200);
-        res.body.roles.should.include('admin');
+        res.body.roles.should.containEql('admin');
         cookie = res.headers['set-cookie'];
         user=res.body;
         done();        
