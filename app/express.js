@@ -3,6 +3,7 @@
  */
 
 var express = require('express')
+  , mongoose=require("mongoose")
   , MongoStore = require('connect-mongo')(express)
   , bus = require('../app/bus')
   , methodOverride = require('method-override')
@@ -96,7 +97,7 @@ var tokenSession=function (req, res, next) {
       filter: function (req, res) {
         return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
       },
-      level: 9
+      level: 6
     }))
 
     //
@@ -137,7 +138,7 @@ var tokenSession=function (req, res, next) {
 
     //
     // cookie session
-    if (!config.express.cookieSession){
+    if (!config.express.mongoSession){
       app.use(express.cookieSession({
         secret: config.middleware.session.secret,
         cookie: config.middleware.session.cookie
@@ -147,11 +148,10 @@ var tokenSession=function (req, res, next) {
 
     // express/mongo session storage
     if (config.express.mongoSession){
-      var mongoose=require("mongoose");
       app.use(express.session({
         secret: config.middleware.session.secret,
         maxAge:config.middleware.session.cookie.maxAge,
-        store: new MongoStore({db: mongoose.connection.db})
+        store: new MongoStore({mongooseConnection : mongoose.connection})
       }))
     }
 
@@ -159,6 +159,7 @@ var tokenSession=function (req, res, next) {
     // use passport session
     app.use(passport.initialize())
     app.use(passport.session())
+
 
 
     // connect flash for flash messages - should be declared after sessions
@@ -174,21 +175,9 @@ var tokenSession=function (req, res, next) {
       // http://stackoverflow.com/questions/19566949/csrf-protection-in-expressjs
       app.use(function(req, res, next){
         req.cookie('XSRF-TOKEN', req.csrfToken());
-        next()
+        return next()
       })
     }
-
-
-    // app.use(function(req, res, next){
-    //   req.sendmail=sendmail;
-
-    //   if (process.env.NODE_ENV !== 'test') {
-    //     console.log("cookie:",req.header('Cookie'), "Sid:",req.sessionID)
-    //     console.log("cookies",req.cookies, req.session.passport)
-    //   }
-    //   next();
-    // });
-
 
 
     // routes should be at the last
@@ -201,17 +190,19 @@ var tokenSession=function (req, res, next) {
     // valid, you can do whatever you like, set
     // properties, use instanceof etc.
     app.use(function(err, req, res, next){
-      // treat as 404
-      // if (err.message
-      //   && (~err.message.indexOf('not found')
-      //   || (~err.message.indexOf('Cast to ObjectId failed')))) {
-      //   return next()
-      // }
 
+      //
+      // no error
+      if(!err){
+        return next()
+      }
 
       //send emails if you want
       if(process.env.NODE_ENV==='production'){
-        var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
+        var msg=JSON.stringify(
+            {error:((err.stack)?err.stack:err),user:req.user, params:req.params},
+            null,2
+        );
         bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
             {content:msg}, "simple",function(err,status){
               console.log(err,status)
