@@ -35,8 +35,8 @@ Sequences.statics.next =  function(name, start, callback){
       start=1000000;
     }
 
-    // this.collection.findAndModify(query, sort, doc, options, callback);
-    this.collection.findAndModify({name:name}, [], {$inc: {seq:1}}, { new: true }, function(err,counter){
+    Sequences.findOneAndUpdate({name:name},{$inc: {seq:1}}, { new: true }, function(err,counter){
+    // this.collection.findAndModify({name:name}, [], {$inc: {seq:1}}, { new: true }, function(err,counter){
         if(counter){
           //console.log("update",counter.seq)      
           return callback(err,counter.seq);  
