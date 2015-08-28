@@ -62,11 +62,25 @@ module.exports = function(app,bus) {
       if (err) {
         return cb && cb(err);
       } 
-      var errs=[]
+      var errs=[];
+
+      //
+      // testing mode
+      if(config.mail.develMode){
+        subject="[TEST] "+subject;
+      }
+
       //
       // Load the template and send the emails
       t(templateName, true, function(err, batch) {
         for(var user in content) {
+          //
+          // testing mode
+          content[user].develMode=false;
+          if(config.mail.develMode){
+            content[user].develMode=config.mail.develMode;
+          }
+
           var render = new Render(content[user],{},function(err){
             if(err){errs.push(err)}
             //TODO log activities
@@ -86,6 +100,15 @@ module.exports = function(app,bus) {
       if (err) {
         return cb && cb(err);
       } 
+
+      //
+      // testing mode
+      content.develMode=false;
+      if(config.mail.develMode){
+        content.develMode=config.mail.develMode;
+        subject="[TEST] "+subject;
+      }
+
       //
       // Send a single email
       t(templateName, content, function(err, html, text) {
@@ -93,13 +116,6 @@ module.exports = function(app,bus) {
           return cb && cb(err);
         }
 
-        //
-        // testing mode
-        content.develMode=false;
-        if(config.mail.develMode){
-          content.develMode=config.mail.develMode;
-          subject="[TEST] "+subject;
-        }
 
         var mail={
           from: config.mail.from,
