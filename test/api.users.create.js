@@ -128,6 +128,46 @@ describe("api.users.create", function(){
       });
   });
 
+  it('POST /register with incomplet phone should return 400 ',function(done){
+    var r={
+      email:"reg3@test.com",
+      firstname:"first",
+      lastname:"last",
+      password:"123456",
+      confirm:"123456",
+      phoneNumbers:[{what:'phone'}],
+      addresses:[]
+    };
+  
+    request(app)
+      .post('/register')
+      .send(r)
+      .end(function(err,res){      
+        res.should.have.status(400);
+        done();        
+      });
+  });
+
+  it('POST /register with incomplet address should return 400 ',function(done){
+    var r={
+      email:"reg3@test.com",
+      firstname:"first",
+      lastname:"last",
+      password:"123456",
+      confirm:"123456",
+      phoneNumbers:[],
+      addresses:[{what:'phone'}]
+    };
+  
+    request(app)
+      .post('/register')
+      .send(r)
+      .end(function(err,res){      
+        res.should.have.status(400);
+        done();        
+      });
+  });
+
   it('POST /register without data should return 400 ',function(done){
     request(app)
       .post('/register')
