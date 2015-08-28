@@ -42,8 +42,8 @@ module.exports = function(app,bus) {
       }
       //
       // avoid cc in some cases 
-      if(!options.noCC && config.mail.to.indexOf(locals.email)===-1){
-        mail.cc=config.mail.to.join(', ');          
+      if(!options.noCC && config.mail.cc.indexOf(locals.email)===-1){
+        mail.cc=config.mail.cc.join(', ');          
       }
       transport.sendMail(mail, cb);
     };
@@ -92,6 +92,15 @@ module.exports = function(app,bus) {
         if (err) {
           return cb && cb(err);
         }
+
+        //
+        // testing mode
+        content.develMode=false;
+        if(config.mail.develMode){
+          content.develMode=config.mail.develMode;
+          subject="[TEST] "+subject;
+        }
+
         var mail={
           from: config.mail.from,
           to: to,
@@ -100,15 +109,17 @@ module.exports = function(app,bus) {
           text: text
         };
 
+
         //
         // send html format too
         if(content.withHtml){
           mail.html=html;
         }
+
         //
         // avoid cc in some cases 
-        if(!content.noCC && config.mail.to.indexOf(to)===-1){
-          mail.cc=config.mail.to.join(', ');          
+        if(!content.noCC && config.mail.cc.indexOf(to)===-1){
+          mail.cc=config.mail.cc.join(', ');          
         }
         transport.sendMail(mail, cb);
         if (process.env.NODE_ENV!=='production'){

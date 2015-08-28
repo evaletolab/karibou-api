@@ -1,4 +1,6 @@
-Bonjour <%= order.customer.name.givenName %>,<br/>
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour <%= order.customer.name.givenName %>,<br/>
 <br/>
 Votre commande  <%= order.oid %> du <%= created %> à bien été annulée.<br/>
 Avec nos meilleurs messages,<br/>

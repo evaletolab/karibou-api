@@ -56,7 +56,9 @@ background-color: #fff;
 
 <body style="font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6; background: #fff; margin: 0; padding: 0;">
 
-Bonjour <%= order.customer.name.givenName %>,<br/>
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour <%= order.customer.name.givenName %>,<br/>
 <br/>
 Nous vous remercions pour votre commande du <u><%= created %></u>. <br/>
 Vous trouverez ci-dessous le détail de votre commande<br/>

@@ -1,4 +1,6 @@
-Hello,<br/> 
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour,<br/> 
 L'utilisateur <%= user %> (<%= email %>) à une question : <br/>
 <% if(typeof product !== 'undefined') { %>
 Pour le produit: <%= product %><br/>

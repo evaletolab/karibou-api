@@ -6,8 +6,9 @@ var PATH = function(p) {
 
 module.exports = {
   mail:{
-    from:'james@karibou.io',
-    to:['james@karibou.io'],
+    develMode:true,
+    from:'james@karibou.ch',
+    cc:['james@karibou.ch'],
     info:'info@karibou.ch',
     validate:{time:24,short:1},
     origin:'http://lo.cal:3000',

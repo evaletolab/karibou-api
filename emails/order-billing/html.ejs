@@ -1,4 +1,6 @@
-Bonjour <%= order.customer.name.givenName %>,<br/><br/>
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour <%= order.customer.name.givenName %>,<br/><br/>
 
 Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <%= created %>.<br/>
 

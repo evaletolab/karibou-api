@@ -57,7 +57,9 @@ background-color: #fff;
 
 <!-- BEGIN -->
 
-Bonjour <%= shop.owner.name.givenName %>,<br/>
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour <%= shop.owner.name.givenName %>,<br/>
 
 Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen %></u>. La collecte s'effectuera entre 10h30 et 14h00 au plus tard.<br/>
 <br/>
