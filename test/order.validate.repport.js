@@ -85,10 +85,9 @@ describe("orders.validate.repport", function(){
 
     Orders.generateRepportForShop(criteria,function(err,repport){
       should.not.exist(err)
-      Object.keys(repport.shops).forEach(function (slug) {
-        // console.log('-----',slug,repport.shops[slug])
-
-      })
+      // Object.keys(repport.shops).forEach(function (slug) {
+      //   console.log('-----',slug,repport.shops[slug])
+      // })
 
       repport.shops['mon-shop'].monthitems.should.equal(2);
       repport.shops['mon-shop'].monthamount.should.equal(5);

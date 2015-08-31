@@ -22,7 +22,7 @@ var customerDay=oneweek[0];
 var passedday=new Date(customerDay.getTime()-86400000*7)
 
 lastDayOfMonth.setDate(lastDayOfMonth.daysInMonth());
-lastDayOfMonth.setHours(11,0,0,0);
+lastDayOfMonth.setHours(22,0,0,0);
 
 firstDayOfMonth.setDate(1);
 firstDayOfMonth.setHours(16,0,0,0);
