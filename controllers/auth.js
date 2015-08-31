@@ -189,8 +189,7 @@ exports.register_post= function(req, res,next) {
 
 
     }catch(err){
-      console.log("ERROR [register] ", err.message)
-      return res.send(400, err.message);
+       return res.send(400, err.message);
     }  
     var reg={}
     if(req.body.addresses&&req.body.addresses.length)reg.addresses=req.body.addresses;
