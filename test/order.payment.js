@@ -105,6 +105,20 @@ describe("orders.payment", function(){
       })
   });   
 
+  // order state is failure
+  it("Invoice paiement is no more available", function(done){
+    var order=data.Orders[1];
+    order.payment.status="pending";
+    order.fulfillments.status="reserved";
+    payment.for(order.payment.issuer).authorize(order)
+      .fail(function(err){
+        should.exist(err.message)
+        err.message.should.containEql("Le service de paiement n'est plus disponible")
+        done()        
+      })
+  });   
+
+
   // order state become (reserved,partial,fulfilled) or failure
   it.skip("Pending state can be changed to auth or voided", function(done){
     done()

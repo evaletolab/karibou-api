@@ -86,8 +86,9 @@ exports.Orders=[
         payment: {
             issuer: "invoice",
             number:'98xxxxxxx4123',
+            expiry:'08/2015',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"refunded"
+            status:"pending"
         },
 
 

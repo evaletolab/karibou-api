@@ -8,17 +8,49 @@ var PaymentInvoice=function(_super){
   this._super=_super;
 }
 
+// Helper for year normalization
+function normalizeYear(order, year) {
+  return (Math.floor(new Date().getFullYear() / order) * order) + year;
+}
+
+function parseYear (year) {
+    if (!year) { return; }
+
+    year = parseInt(year, 10);
+    if (year < 10) {
+      yearVal = normalizeYear(10, year);
+    } else if (year >= 10 && year < 100) {
+      yearVal = normalizeYear(100, year);
+    } else if (year >= 2000 && year < 2050){
+      yearVal = parseInt(year)-2000;
+    } else {
+      yearVal = year;
+    }
+    return yearVal+2000;
+}
 //
 // verify if an alias belongs to the user
 PaymentInvoice.prototype.isValidAlias=function(alias, user, method){
-  return ((user.id+'invoice').hash().crypt()===alias);
+    //
+    // constrain with a date limit
+  var expiry='invoice';
+  // if(method.expiry){
+  //   expiry+=':'+method.expiry;
+  // }
+  return ((user.id+expiry).hash().crypt()===alias);
 }
 
 //
 // verify if an alias is valid and decode it
 PaymentInvoice.prototype.decodeAlias=function(alias, user, method){
   try{
-    if((user.id+'invoice').hash().crypt()===alias){
+    //
+    // constrain with a date limit
+    var expiry='invoice';
+    // if(method.expiry){
+    //   expiry+=':'+method.expiry;
+    // }
+    if((user.id+expiry).hash().crypt()===alias){
       return {id:user.id,gateway_id:null,card_id:null}
     }
   }catch(e){}
@@ -27,7 +59,13 @@ PaymentInvoice.prototype.decodeAlias=function(alias, user, method){
 }
 
 PaymentInvoice.prototype.alias=function(user_id,payment){
-  return (user_id+payment.issuer.toLowerCase()).hash().crypt();
+  //
+  // constrain with a date limit
+  var expiry=payment.issuer.toLowerCase();  
+  // if(payment.expiry){
+  //   expiry+=':'+payment.expiry;
+  // }
+  return (user_id+expiry).hash().crypt();
 }
 
 //
@@ -89,13 +127,20 @@ PaymentInvoice.prototype.addCard=function(user, payment){
   var stripePromise, self=this, result={};
 
 
-  var _addCard=function (deferred, callback) {
+  var _addCard=function (deferred, callback) {    
+    var expiry=payment.expiry.split('/'),
+        year=parseYear(expiry[1]),month=parseInt(expiry[0]);
+    if(year>2050||year<2000||month<1||month>12){
+      return Q.reject(new Error("La date d'expiration du service de paiement n'est pas valide MM/YYYY"))
+    }
+
+
     result={
       alias:self.alias(user.id,payment),
       number:payment.number,
       issuer:payment.issuer.toLowerCase(),
       name:payment.name,
-      expiry:payment.expiry,
+      expiry:month+'/'+year,
       updated:Date.now(),
       provider:'invoice'
     };
@@ -119,12 +164,24 @@ PaymentInvoice.prototype.addCard=function(user, payment){
 PaymentInvoice.prototype.authorize=function(order){
   var self=this;
   var _authorize=function (deferred, callback) {
-    //
+      //
     // check alias
     var handleStripe=self.decodeAlias(order.payment.alias,order.customer);
     if(!handleStripe){
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
     }
+
+    //
+    // check date
+    if(order.payment.expiry){
+      var expiry=order.payment.expiry.split('/'),
+          dt,now=new Date();
+      dt=new Date(parseYear(expiry[1]), (parseInt(expiry[0])), 0)
+      if(dt<now){
+        return Q.reject(new Error("Le service de paiement n'est plus disponible"))        
+      }
+    }
+
 
     var result={
       log:'authorized amount '+(Math.round(order.getTotalPrice(config.payment.reserve)))+' the '+new Date(),
@@ -138,7 +195,6 @@ PaymentInvoice.prototype.authorize=function(order){
     }, 0);
     return deferred.promise;    
   } 
-
   // return promise
   return this._super.authorize(_authorize, order);
 }

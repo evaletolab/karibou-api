@@ -168,6 +168,73 @@ describe("api.users.payment", function(){
   });
 
 
+  it('user add bad invoice payment return 400 (0)',function(done){
+    var payment={
+      expiry:'2000',
+      issuer:'invoice',
+      name:VisaCard.name
+    };
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.containEql("La date d'expiration du service")
+        done()
+      });
+  });
+
+  it('user add bad invoice payment return 400 (1)',function(done){
+    var payment={
+      expiry:'00/15',
+      issuer:'invoice',
+      name:VisaCard.name
+    };
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.containEql("La date d'expiration du service")
+        done()
+      });
+  });
+
+ it('user add bad invoice payment return 400 (2)',function(done){
+    var payment={
+      expiry:'00/15',
+      issuer:'invoice',
+      name:VisaCard.name
+    };
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.containEql("La date d'expiration du service")
+        done()
+      });
+  });
+
+ it('user add invoice without date limit payment return 400 ',function(done){
+    var payment={
+      issuer:'invoice',
+      name:VisaCard.name
+    };
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.containEql("La date de validité de la carte n'est pas correcte")
+        done()
+      });
+  });
+
 
   it('user add new payment return 200',function(done){
     var payment={
