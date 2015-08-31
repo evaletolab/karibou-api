@@ -219,6 +219,23 @@ describe("api.users.payment", function(){
       });
   });
 
+ it('user add bad invoice payment return 400 (3)',function(done){
+    var payment={
+      expiry:'dizf',
+      issuer:'invoice',
+      name:VisaCard.name
+    };
+    request(app)
+      .post('/v1/users/'+user.id+'/payment')
+      .send(payment)
+      .set('cookie', cookie)
+      .end(function(err,res){
+        res.should.have.status(400);
+        res.text.should.containEql("La date d'expiration du service")
+        done()
+      });
+  });
+
  it('user add invoice without date limit payment return 400 ',function(done){
     var payment={
       issuer:'invoice',
