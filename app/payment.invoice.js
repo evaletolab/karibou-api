@@ -133,7 +133,6 @@ PaymentInvoice.prototype.addCard=function(user, payment){
     if(isNaN(month)||year===undefined||year>2050||year<2000||month<1||month>12){
       return Q.reject(new Error("La date d'expiration du service de paiement n'est pas valide MM/YYYY"))
     }
-    console.log('-------------',month,year)
 
 
     result={
