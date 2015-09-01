@@ -35,7 +35,7 @@ describe("mongoose.fixtures", function(){
     dbtools.load(["../fixtures/Users.js"],db, function(err){
       should.not.exist(err)
       db.model('Users').find({},function(e,users){
-        users.length.should.equal(4);
+        users.length.should.equal(5);
         done();
       });
     });

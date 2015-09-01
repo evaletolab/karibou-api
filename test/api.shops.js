@@ -11,7 +11,7 @@ describe("api.shops", function(){
   var request= require('supertest');
   var _=require('underscore');
 
-  var cookie;
+  var cookie,newuser;
 
   before(function(done){
     dbtools.clean(function(e){
@@ -50,9 +50,19 @@ describe("api.shops", function(){
       .send({ email: "evaleto@gluck.com", password:'password', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(200);
-        res.body.roles.should.be.empty;
         res.body.shops.length.should.equal(1)
         cookie = res.headers['set-cookie'];
+        done();        
+      });
+  });
+
+  it('POST /login new user should return 200 ',function(done){
+    request(app)
+      .post('/login')
+      .send({ email: "test1@gmail.com", password:'password', provider:'local' })
+      .end(function(err,res){      
+        res.should.have.status(200);
+        newuser = res.headers['set-cookie'];
         done();        
       });
   });
@@ -80,6 +90,20 @@ describe("api.shops", function(){
       });
   });  
  
+   it('shops.create /v1/shops should return 400 (for non valid user)',function(done){
+    var s=_.clone(data.Shops[0]);
+    delete(s._id);
+    s.name="Nouvelle boutique";
+    s.urlpath="nouvelle-boutique";    
+    request(app)
+      .post('/v1/shops')
+      .send(s)
+      .set('cookie', newuser)
+      .end(function(err,res){      
+        res.should.have.status(401);
+        done();
+      });
+  });  
 
   it('shops.delete /v1/shops/mon-shop should return 401 (you are not the owner)',function(done){
     request(app)

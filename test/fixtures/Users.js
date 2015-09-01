@@ -157,8 +157,47 @@ var Users=exports.Users=[{
     id: 1279482741765243,
     created: "2012-03-27T17:07:34.201Z",
     status: true,
-  }
-];
+  },{
+    //Users[4]
+    _id : new ObjectId(), 
+    password: "password",
+    tags: [],
+    shops: [],
+    roles:[],
+    provider: "local",
+    photo: "jpg",
+    phoneNumbers: [
+        {
+            what: "principal",
+            number: "076 3787968"
+        }
+    ],
+    addresses: [
+        {
+            region: "Genève",
+            primary: true,
+            geo: {
+                lng: 6.1692497,
+                lat: 46.1997473
+            },
+            postalCode: "1204",
+            floor: "1",
+            streetAdress: "rue de carouge",
+            note: "",
+            name: "famille delphine evalet"
+        }
+    ],
+    email: {
+        status: new Date(),
+        address: "test1@gmail.com"
+    },
+    displayName: "delphine pluck",
+    likes: [],
+    invoices: [],
+    id: 1279482741765243,
+    created: "2012-03-27T17:07:34.201Z",
+    status: true,
+  }];
 
 
 

@@ -58,9 +58,15 @@ exports.create=function (req, res) {
     return res.send(400, err.message);
   }
 
+  //
+  // not valide user can't create shop
+  if(req.user.email.status!==true){
+    return res.send(401,'Votre compte doit être validé pour pouvoir créer une boutique');
+  }
+
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
-      return res.send(400,errorHelper(err));
+      return res.send(400,errorHelper(err.message||err));
     }
     res.json(shop);
   });
@@ -78,6 +84,8 @@ exports.remove=function (req, res) {
   // check admin or owner
   // delegated
 
+  //
+  // TODO remove products before shop
 
   db.model('Shops').remove({urlpath:req.params.shopname},function(err){
     if (err){
