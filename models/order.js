@@ -729,6 +729,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         alias:paymentData.alias,
         number:paymentData.number,
         issuer:paymentData.issuer,
+        expiry:paymentData.expiry,
         fees:{shipping:null}
       };
 
