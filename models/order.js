@@ -64,6 +64,7 @@ var Orders = new Schema({
    payment:{
       alias: {type:String, required:true},
       number:{type:String, required:false},
+      expiry:{type:String, required:false},
       issuer:{type:String,enum: EnumOrderMethod, required:true},
       status:{type:String, enum:EnumFinancialStatus, default:'pending'},
       handle:{type:String,default:config.admin.handle},
