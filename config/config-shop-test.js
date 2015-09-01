@@ -11,12 +11,6 @@ module.exports = {
       types:['Category', 'Catalog']
     },
 
-    shipping:{
-      average:115, // average 
-      free:180,    // full price 11.7@18% & 9.75@15%
-      half:145,  // half price 5.4@18% & 4.5@15%
-      price:10, // shipping price
-    },
 
     shipping:{
       average:115, // average 

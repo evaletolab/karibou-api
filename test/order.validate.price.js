@@ -78,7 +78,7 @@ describe("orders.validate.price", function(){
   });
 
 
-  it("check order shipping half shipping price ", function(done){
+  it("check order 145fr got special shipping price ", function(done){
     db.model('Orders').find({oid:2000008}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
@@ -88,7 +88,7 @@ describe("orders.validate.price", function(){
     });
   });
 
-  it("check order shipping free shipping price ", function(done){
+  it("check order 180fr got special shipping price ", function(done){
     db.model('Orders').find({oid:2000009}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
@@ -99,6 +99,7 @@ describe("orders.validate.price", function(){
   });
 
   it("check order shipping half shipping price even with 180CHF", function(done){
+    // this way you disabled the discountB
     config.shop.shipping.discountB=0;
     db.model('Orders').find({oid:2000009}, function(err,order){
       should.not.exist(err)
