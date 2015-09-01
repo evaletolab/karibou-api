@@ -176,7 +176,7 @@ PaymentInvoice.prototype.authorize=function(order){
     if(order.payment.expiry){
       var expiry=order.payment.expiry.split('/'),
           dt,now=new Date();
-      dt=new Date(parseYear(expiry[1]), (parseInt(expiry[0])), 0)
+      dt=new Date(parseYear(expiry[1]), (parseInt(expiry[0])-1), 0)
       if(dt<now){
         return Q.reject(new Error("Le service de paiement n'est plus disponible"))        
       }
