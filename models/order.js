@@ -730,9 +730,16 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         alias:paymentData.alias,
         number:paymentData.number,
         issuer:paymentData.issuer,
-        expiry:paymentData.expiry,
         fees:{shipping:null}
       };
+
+      if(customer.payments&&customer.payments.length){
+        var payment=customer.payments.find(function (p) {
+          return(p.alias===paymentData.alias)
+        })
+        order.payment.expiry=payment.expiry;
+      }
+
 
       //
       // ready to create one order
