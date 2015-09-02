@@ -127,7 +127,7 @@ PaymentTest.prototype.authorize=function(order){
         callback(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
       }, 0);
       return deferred.promise        
-		}
+			}
 
   	var result={
   		log:'authorized amount '+(Math.round(order.getTotalPrice(config.payment.reserve)))+' the '+new Date(),
@@ -189,8 +189,14 @@ PaymentTest.prototype.refund=function(order,reason, amount){
 	  if(!order.payment.transaction){
 	  	return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
 	  }
+    //
+    // verify max refund amount
+    var maxamount=Math.round(order.getTotalPrice(config.payment.reserve));
+    var refund=amount||maxamount;
+    if(amount>maxamount){
+      refund=maxamount;
+    }
 
-	  var refund=amount||(Math.round(order.getTotalPrice(config.payment.reserve)))
   	var result={
   		log:'refund '+refund+' the '+new Date(),
   		transaction:order.oid,

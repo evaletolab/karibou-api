@@ -259,7 +259,13 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
       return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
     }
 
-    var refund=amount||(Math.round(order.getTotalPrice(config.payment.reserve)))
+    //
+    // verify max refund amount
+    var maxamount=Math.round(order.getTotalPrice(config.payment.reserve));
+    var refund=amount||maxamount;
+    if(amount>maxamount){
+      refund=maxamount;
+    }
     var result={
       log:'refund '+refund+' the '+new Date(),
       transaction:(order.oid+'').crypt(),
