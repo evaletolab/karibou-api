@@ -510,7 +510,8 @@ exports.refund=function(req,res){
   }catch(err){
     return res.send(400, err.message);
   }
-  db.model('Orders').onRefund(req.params.oid,function(err,order){
+
+  db.model('Orders').onRefund(req.params.oid,req.body.amount,function(err,order){
     if(err){
       return res.send(400, errorHelper(err.message||err));
     }

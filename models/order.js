@@ -733,6 +733,9 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         fees:{shipping:null}
       };
 
+      //
+      // save the payment expiry 
+      // TODO throw error if no payment is available
       if(customer.payments&&customer.payments.length){
         var payment=_.find(customer.payments,function (p) {
           return(p.alias===paymentData.alias)
@@ -962,7 +965,7 @@ Orders.statics.onCancel = function(oid, reason, callback){
   });
 }
 
-Orders.statics.onRefund = function(oid, callback){
+Orders.statics.onRefund = function(oid, amount, callback){
   assert(oid);
 
   db.model('Orders').findOne({oid:oid}).select('+payment.transaction').exec(function(err,order){
@@ -983,7 +986,7 @@ Orders.statics.onRefund = function(oid, callback){
 
     //
     // TODO should be abel cancel fraud 
-    payment.for(order.payment.issuer).refund(order)
+    payment.for(order.payment.issuer).refund(order, amount)
       .then(function(transaction){
         bus.emit('order.refund',order)
         //
