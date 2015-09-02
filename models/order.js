@@ -734,7 +734,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       };
 
       if(customer.payments&&customer.payments.length){
-        var payment=customer.payments.find(function (p) {
+        var payment=_.find(customer.payments,function (p) {
           return(p.alias===paymentData.alias)
         })
         order.payment.expiry=payment.expiry;
