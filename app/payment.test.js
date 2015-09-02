@@ -123,7 +123,10 @@ PaymentTest.prototype.authorize=function(order){
 		// check alias
 		var handleStripe=self.decodeAlias(order.payment.alias,order.customer);
 		if(!handleStripe){
-	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
+      setTimeout(function() {
+        callback(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+      }, 0);
+      return deferred.promise        
 		}
 
   	var result={

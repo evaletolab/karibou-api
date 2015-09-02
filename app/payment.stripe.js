@@ -252,10 +252,13 @@ PaymentStripe.prototype.authorize=function(order){
 	var self=this;
   var _authorize=function (deferred, callback) {
 		//
-		// check alias
+		// check alias, in this case the order status is affected
 		var handleStripe=self.decodeAlias(order.payment.alias,order.customer);
 		if(!handleStripe){
-	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
+      setTimeout(function() {
+        callback(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+      }, 0);
+      return deferred.promise;
 		}
 
 		stripe.charges.create({
@@ -292,6 +295,8 @@ PaymentStripe.prototype.cancel=function(order,reason){
 	var self=this;
   var _cancel=function (deferred, callback) {
 
+  	//
+  	// for capture, cancel and refund the order status is not changed
 	  if(!self.isValidAlias(order.payment.alias, order.customer)){
 	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
 	  }
@@ -327,6 +332,9 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
   //
   // create full refund 
 	var _refund=function (deferred, callback) {
+
+  	//
+  	// for capture, cancel and refund the order status is not changed
 	  if(!self.isValidAlias(order.payment.alias, order.customer)){
 	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
 	  }
@@ -365,6 +373,8 @@ PaymentStripe.prototype.capture=function(order,reason){
 	var self=this;
 	var _capture=function (deferred, callback) {
 
+  	//
+  	// for capture, cancel and refund the order status is not changed
 	  if(!self.isValidAlias(order.payment.alias, order.customer)){
 	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
 	  }

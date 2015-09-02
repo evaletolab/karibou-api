@@ -80,42 +80,65 @@ describe("orders.payment", function(){
   })  
 
   // order state is failure
-  it("Voided state can not be changed", function(done){
+  it("ERROR Voided state can not be changed", function(done){
     var order=data.Orders[0];
     order.payment.status="voided";
     order.fulfillments.status="created";
     payment.for(order.payment.issuer).authorize(order)
       .fail(function(err){
         should.exist(err.message)
+        order.fulfillments.status.should.equal("created");
+        order.payment.status.should.equal('voided');
         err.message.should.containEql("Impossible d'autoriser une commande")
         done()        
       })
   });   
 
   // order state is failure
-  it("Refund state can not be changed", function(done){
+  it("ERROR Refund state can not be changed", function(done){
     var order=data.Orders[0];
     order.payment.status="refunded";
     order.fulfillments.status="created";
     payment.for(order.payment.issuer).authorize(order)
       .fail(function(err){
         should.exist(err.message)
+        order.fulfillments.status.should.equal("created");
+        order.payment.status.should.equal('refunded');
         err.message.should.containEql("Impossible d'autoriser une commande")
         done()        
       })
   });   
 
-  // order state is failure
-  it("Invoice paiement is no more available", function(done){
+  it("ERROR Invoice paiement is no more available", function(done){
     var order=data.Orders[1];
-    order.payment.status="pending";
-    order.fulfillments.status="reserved";
-    payment.for(order.payment.issuer).authorize(order)
-      .fail(function(err){
-        should.exist(err.message)
-        err.message.should.containEql("Le service de paiement n'est plus disponible")
-        done()        
-      })
+    Orders.findOne({oid:data.Orders[1].oid},function (err,order) {
+      order.fulfillments.status="reserved";
+      payment.for(order.payment.issuer).authorize(order)
+        .fail(function(err){
+          should.exist(err.message)
+          order.fulfillments.status.should.equal("failure");
+          order.payment.status.should.equal('voided');
+          err.message.should.containEql("Le service de paiement n'est plus disponible")
+          done()        
+        })
+    })
+  });   
+
+  it("ERROR Invoice paiement alias is wrong", function(done){
+    var order=data.Orders[1];
+    Orders.findOne({oid:data.Orders[1].oid},function (err,order) {
+      order.payment.status="pending";
+      order.fulfillments.status="reserved";
+      order.payment.alias='da18ccd1ed10f4774c167ecead9b19aac7f7e65c0df438c3fe5a502706c688800e0e0e';
+      payment.for(order.payment.issuer).authorize(order)
+        .fail(function(err){
+          should.exist(err.message)
+          order.fulfillments.status.should.equal("failure");
+          order.payment.status.should.equal('voided');
+          err.message.should.containEql("La référence de la carte n'est pas compatible avec")
+          done()        
+        })
+    })
   });   
 
 

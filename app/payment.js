@@ -57,6 +57,8 @@ var Payment=function(){
 		authorize:function(provider, order){
 			var deferred = Q.defer()
 
+			//
+			// those errors are not change the order status
 			// only partial and reserved has status auth
 			if(["reserved"].indexOf(order.fulfillments.status)===-1){
 		    return Q.reject(new Error("Impossible d'autoriser une commande avec le status: "+order.fulfillments.status))

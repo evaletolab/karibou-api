@@ -131,7 +131,10 @@ PaymentInvoice.prototype.addCard=function(user, payment){
     var expiry=payment.expiry.split('/'),
         year=parseYear(expiry[1]),month=parseInt(expiry[0]);
     if(isNaN(month)||year===undefined||year>2050||year<2000||month<1||month>12){
-      return Q.reject(new Error("La date d'expiration du service de paiement n'est pas valide MM/YYYY"))
+      setTimeout(function() {
+        callback(new Error("La date d'expiration du service de paiement n'est pas valide MM/YYYY"));
+      }, 0);
+      return deferred.promise;    
     }
 
 
@@ -164,11 +167,15 @@ PaymentInvoice.prototype.addCard=function(user, payment){
 PaymentInvoice.prototype.authorize=function(order){
   var self=this;
   var _authorize=function (deferred, callback) {
-      //
-    // check alias
+
+    //
+    // check alias, in this case the order status is affected
     var handleStripe=self.decodeAlias(order.payment.alias,order.customer);
     if(!handleStripe){
-      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
+      setTimeout(function() {
+        callback(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+      }, 0);
+      return deferred.promise        
     }
 
     //
@@ -176,9 +183,12 @@ PaymentInvoice.prototype.authorize=function(order){
     if(order.payment.expiry){
       var expiry=order.payment.expiry.split('/'),
           dt,now=new Date();
-      dt=new Date(parseYear(expiry[1]), (parseInt(expiry[0])-1), 0)
+      dt=new Date(parseYear(expiry[1]), (parseInt(expiry[0])), 0)
       if(dt<now){
-        return Q.reject(new Error("Le service de paiement n'est plus disponible"))        
+        setTimeout(function() {
+          callback(new Error("Le service de paiement n'est plus disponible"));
+        }, 0);
+        return deferred.promise        
       }
     }
 
@@ -205,6 +215,8 @@ PaymentInvoice.prototype.cancel=function(order,reason){
   var self=this;
   var _cancel=function (deferred, callback) {
 
+    //
+    // for capture, cancel and refund the order status is not changed
     if(!self.isValidAlias(order.payment.alias, order.customer)){
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
@@ -236,6 +248,9 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
   //
   // create full refund 
   var _refund=function (deferred, callback) {
+
+    //
+    // for capture, cancel and refund the order status is not changed
     if(!self.isValidAlias(order.payment.alias, order.customer)){
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
@@ -267,6 +282,9 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
 PaymentInvoice.prototype.capture=function(order,reason){
   var self=this;
   var _capture=function (deferred, callback) {
+
+    //
+    // for capture, cancel and refund the order status is not changed
     if(!self.isValidAlias(order.payment.alias, order.customer)){
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
