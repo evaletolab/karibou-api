@@ -71,6 +71,18 @@ describe("api.users", function(){
       })
   });
 
+  it('POST update other user without admin role, should return 401',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/'+data.Users[1].id)      
+      .send(u)
+      .set('cookie', cookie)
+      .end(function (err,res) {
+        res.should.have.status(401);
+        done();
+      })
+  });
+
   it('POST update user, with different user.id silently avoid it',function(done){
     var u=data.Users[0];
     request(app)
@@ -97,6 +109,33 @@ describe("api.users", function(){
       })
   });
 
+  it('POST update user, with empty user.email.address silently avoid it',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/'+user.id)      
+      .send(_.extend({},u,{email:{status:false}}))
+      .set('cookie', cookie)
+      .end(function (err,res) {
+        res.should.have.status(200);
+        res.body.email.address.should.equal(user.email.address)
+        done();
+      })
+  });
+
+  it('POST update user, with different user.email.status silently avoid it',function(done){
+    var u=data.Users[0];
+    request(app)
+      .post('/v1/users/'+user.id)      
+      .send(_.extend({},u,{email:{status:false,address:user.email.address}}))
+      .set('cookie', cookie)
+      .end(function (err,res) {
+        res.should.have.status(200);
+        res.body.email.status.should.equal(user.email.status)
+        res.body.email.address.should.equal(user.email.address)
+        done();
+      })
+  });
+
   it('POST update user, with different user.shops silently avoid it',function(done){
     var u=data.Users[0], shops=user.shops.map(function (s) {return s._id;});
     request(app)
@@ -108,7 +147,8 @@ describe("api.users", function(){
         res.body.shops[0].should.equal(shops[0])
         done();
       })
-  });
+  });     
+
      
 });
 

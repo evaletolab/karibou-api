@@ -112,7 +112,6 @@ validate.postal = function (value) {
     //   alias:{type:String,unique:true,required:true}
     // }],
 
-    invoice:{type:Boolean},
     merchant:{type:Boolean},
 
     gateway_id:{type:String, unique: true, select:false,sparse: true},
@@ -225,6 +224,8 @@ UserSchema.methods.populateRoles=function(){
       user.roles.push('logistic');
     }
   });  
+
+
 }
 
 
@@ -515,11 +516,12 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 
 
 //
-// update user
+// update user , the owner is 
 UserSchema.statics.findAndUpdate=function(id, u,callback){
 	var Users=this.model('Users');
   //http://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
-  return Users.findOne(id).populate('shops').exec(function (err, user) {
+
+  return Users.findOne({id:id}).exec(function (err, user) {
     if(err){
       return callback(err);
     }
@@ -527,20 +529,64 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
       return callback("Utilisateur inconnu");
     }
 
-    if (u.name&&u.name.familyName) user.name.familyName=u.name.familyName;
-    if (u.name&&u.name.givenName) user.name.givenName=u.name.givenName;
+    if (u.name&&u.name.familyName){
+      user.name.familyName=u.name.familyName;
+    }
+
+    if (u.name&&u.name.givenName){
+      user.name.givenName=u.name.givenName;
+    }
     user.displayName=user.name.givenName+" "+user.name.familyName;
+
+
+    if(u.birthday!==undefined)user.birthday=u.birthday;
+    if(u.gender!==undefined)user.gender=u.gender;
+    if(u.tags!==undefined)user.tags=u.tags;
+    if(u.url!==undefined)user.url=u.url;
+
+
+    //
+    // ADMIN PARTS
 
     //
     // check is email has changed (require a new validation)
-    if (u.email&&u.email.address) {
-      if (user.email.address!==u.email.address)
-        user.email.status=new Date();
-      user.email.address=u.email.address;
+    if(u.email&&u.email.status!==undefined){
+      user.email.status=u.email.status;
+    }
 
-      // security check for admin? currently status is false
-      //if(config.admin.emails.indexOf(user.email.address)!=-1){
-      //}
+    //
+    // admin can update the status here
+    if(u.status!==undefined){
+      user.status=u.status;
+    }
+
+    //
+    // some admin updates
+    if(u.roles&&Array.isArray(u.roles)){
+      user.roles=u.roles;
+    }
+    if(u.rank!==undefined){
+      user.rank=u.rank;
+    }
+    if(u.gateway_id!==undefined){
+      user.gateway_id=u.gateway_id;
+    }
+    if(u.merchant!==undefined){
+      user.merchant=u.merchant;
+    }
+
+    // END OF ADMIN
+    //
+
+
+    // 
+    // user update email
+    if (u.email&&u.email.address) {
+      if (user.email.address!==u.email.address){
+        user.email.status=new Date();
+        user.email.address=u.email.address;
+      }
+
     }
     //
     // update the adress
@@ -566,11 +612,6 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
       });
     }
 
-    //
-    // DO NOT update the validation here
-    // ONLY ADMIN CAN DO THAT
-    if(u.status!=user.status){
-    }
     user.updated=Date.now();
 
     user.save(callback);

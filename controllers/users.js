@@ -187,52 +187,52 @@ exports.update=function(req,res){
   }
 
   //
-  // silently remove some fields
-  if(req.body.password){delete(req.body.password);}
-  if(req.body.hash){delete(req.body.hash);}
-  if(req.body.salt){delete(req.body.salt);}
-
-  //
   // normalize ref _id
   for (var i = req.body.shops.length - 1; i >= 0; i--) {
     req.body.shops[i]=(req.body.shops[i]._id)?req.body.shops[i]._id:req.body.shops[i];
   };
 
-  Users.findOne({id:req.params.id}).exec(function(err,user){
-
+  //
+  // ADMIN PARTS
+  if(!req.user.isAdmin()){
     //
-    // protect shop edition
-    req.body.shops=user.shops;
-
-
-    //
-    // if not admin silently fix   
-    if(!req.user.isAdmin()){
-      req.body.id=user.id;
-      req.body.status=user.status;
-      req.body.roles=user.roles;
-      req.invoice=user.invoice;
-      req.merchant=user.merchant;
-      req.gateway_id=user.gateway_id;
-      req.rank=user.rank;
+    // check is email has changed (require a new validation)
+    if(req.body.email.status!==undefined){
+      delete req.body.email['status'];
     }
 
-    if(req.body.email.address===user.email.address){
-      delete (req.body.email);
-    }
     //
-    // TODO rewrite safe! do the update 
-    _.extend(user,req.body);
+    // admin can update the status here
+    if(req.body.status!==undefined){
+      delete req.body['status'];
+    }
 
-    user.save(function (err,user) {
-      if (err){
-        if(err.code==11001){
-          return res.send(400,"Cette adresse email est déjà utilisée");
-        }
-        return res.send(400,errorHelper(err.message||err));
+    //
+    // some admin updates
+    if(req.body.roles){
+      delete req.body['roles'];
+    }
+    if(req.body.rank!==undefined){
+      delete req.body['rank'];
+    }
+    if(req.body.gateway_id!==undefined){
+      delete req.body['gateway_id'];
+    }
+    if(req.body.merchant!==undefined){
+      delete req.body['merchant'];
+    }
+
+  }
+
+
+  Users.findAndUpdate(req.params.id,req.body,function(err,user){
+    if (err){
+      if(err.code==11001){
+        return res.send(400,"Cette adresse email est déjà utilisée");
       }
-      return res.json(user);
-    })
+      return res.send(400,errorHelper(err.message||err));
+    }
+    return res.json(user);
   });
 
 };
