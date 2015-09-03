@@ -65,10 +65,23 @@ html(itemscope itemtype="http://schema.org/Product")
       h1: =product.title
       div: =product.details.description
       div: =product.details.origin
+      div
+        if product.details.homemade
+          span( class="label label-success") Artisanal
+        if product.details.local
+          span(  class="label label-success") Local
+        if product.details.gluten
+          span(  class="label label-success") Sans gluten
+        if product.details.bio
+          span(  class="label label-success") BIO
+        if product.details.natural
+          span(  class="label label-success" title="Naturel") Sans chimie de synthèse
+
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
-        span(itemprop="price"): =product.getPrice().toFixed(2)+' CHF'
+        span(itemprop="price"): =product.getPrice().toFixed(2)+' CHF /'+product.pricing.part
       div 
         img(src='#{prependUrlImage(product.photo.url)}', class="img-responsive")
+
       h2:  =product.categories.name
       div: |Région de Genève
       h2 Boutique
