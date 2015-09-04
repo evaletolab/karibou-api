@@ -150,7 +150,8 @@ var tokenSession=function (req, res, next) {
     if (config.express.mongoSession){
       app.use(express.session({
         secret: config.middleware.session.secret,
-        maxAge:config.middleware.session.cookie.maxAge,
+        ttl:config.middleware.session.cookie.maxAge,
+        cookie: config.middleware.session.cookie,
         store: new MongoStore({mongooseConnection : mongoose.connection})
       }))
     }
