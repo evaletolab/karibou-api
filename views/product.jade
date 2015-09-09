@@ -32,7 +32,7 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( property="og:title", content="#{product.title}" )
     meta( property="og:type", content="article" )
     meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
-    meta( property="og:image", content="#{prependUrlImage(product.photo.url)}" )
+    meta( property="og:image", content="#{prependUrlImage(product.photo.url)}-/resize/600x/" )
     meta( property="og:description", content="#{product.details.description}" )
     meta( property="og:site_name", content="https://karibou.ch" )
     meta( property="og:price:amount", content="#{product.getPrice().toFixed(2)}" )
@@ -80,7 +80,7 @@ html(itemscope itemtype="http://schema.org/Product")
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
         span(itemprop="price"): =product.getPrice().toFixed(2)+' CHF /'+product.pricing.part
       div 
-        img(src='#{prependUrlImage(product.photo.url)}', class="img-responsive")
+        img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/', class="img-responsive")
 
       h2:  =product.categories.name
       div: |Région de Genève
