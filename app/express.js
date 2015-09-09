@@ -153,7 +153,7 @@ var tokenSession=function (req, res, next) {
         ttl:config.middleware.session.cookie.maxAge,
         cookie: config.middleware.session.cookie,
         store: new MongoStore({mongooseConnection : mongoose.connection})
-      }))
+      }));
     }
 
 
