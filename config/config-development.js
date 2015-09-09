@@ -42,6 +42,18 @@ module.exports = {
       mailchimp:'733ad74f31'
     },
 
+    'apero':{
+      name:'Apéro dégustation',
+      title:'Apéro dégustation chez Mu-Food',
+      mailchimp:'b3d63e7e47'
+    },
+
+    'cuisine':{
+      name:'Atelier cuisine',
+      title:'Atelier cuisine chez Mu-Food',
+      mailchimp:'c95b350f6b'
+    },
+
     'others':{
       name:'Others',
       title:"[karibou-subscribe-others] : ",
