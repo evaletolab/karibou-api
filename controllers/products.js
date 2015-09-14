@@ -368,7 +368,10 @@ exports.update=function (req, res) {
     if(!product.vendor._id.equals(req.body.vendor)){
       return res.send(400,'Ooops, unknow product vendor ',req.body.vendor);          
     }
-    delete(req.body.vendor);
+    
+    if(!req.user.isAdmin()){
+      delete(req.body.vendor);
+    }
 
     // do the update
     _.extend(product,req.body)
