@@ -21,13 +21,15 @@ var Shops = new Schema({
     photo:{
       owner:{ type: String, required: false },
       bg:{ type: String, required: false },
-      fg:{ type: String, required: false }
+      fg:{ type: String, required: false },
+      source:{ type: String, required: false }
     },
     
     details:{
       bio:{type: Boolean,default:false},
       gluten:{type: Boolean,default:false},
       lactose:{type: Boolean,default:false},
+      vegetarian:{type: Boolean,default:false},
       local:{type: Boolean,default:false}      
     },
 
