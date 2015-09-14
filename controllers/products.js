@@ -361,16 +361,14 @@ exports.update=function (req, res) {
     }
 
     // if not admin  
-    if(!req.user.isAdmin() && req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
-      return res.send(401, "Your are not allowed to do that, arch!");    
-    }
-
-    if(!product.vendor._id.equals(req.body.vendor)){
-      return res.send(400,'Ooops, unknow product vendor ',req.body.vendor);          
-    }
-    
     if(!req.user.isAdmin()){
-      delete(req.body.vendor);
+      if(req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
+        return res.send(401, "Your are not allowed to do that, arch!");    
+      }
+
+      if(!product.vendor._id.equals(req.body.vendor)){
+        return res.send(400,'Ooops, unknow product vendor '+req.body.vendor);          
+      }
     }
 
     // do the update
