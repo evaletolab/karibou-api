@@ -22,7 +22,7 @@ module.exports = {
       }, // shipping price
       priceA:5,
       priceB:5,
-      periphery:["1219"]
+      periphery:["1219","1231"]
     },
 
     //
@@ -39,7 +39,7 @@ module.exports = {
     },
     user:{
       location:{
-        list:["1201","1202","1203","1204","1205","1206","1207","1208","1227","1219"]
+        list:["1201","1202","1203","1204","1205","1206","1207","1208","1227","1219","1231"]
       },
       region:{
         list:["Genève", "Carouge,GE"]
