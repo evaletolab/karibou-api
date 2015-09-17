@@ -149,13 +149,13 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
         return cb(null,{});
       }
 
-      var group={},stats={};
+      var group={};
 
       //
       // group amount CA by vendor
       results.forEach(function(result){
+        var stats={};
         result.items.forEach(function(item){
-
 
           //
           // grouped by vendor (restor the unwind on vendors )
@@ -178,23 +178,24 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
             stats[item.vendor].orders++;
             stats[item.vendor].oid[item.oid]=1;
           }
+          // console.log('---------------',result._id,Object.keys(group[result._id.year][result._id.month]))
         });
 
 
 
         //
         // group vendor by year and month
-        if(!group[result._id.year]||!group[result._id.year][result._id.month]){
+        if(!group[result._id.year]){
           group[result._id.year]={};
+        }
+        if(!group[result._id.year][result._id.month]){
           group[result._id.year][result._id.month]={};          
         }
-        group[result._id.year][result._id.month]=_.extend(group[result._id.year][result._id.month],stats);
-
-        // console.log('---------------',result._id,Object.keys(group[result._id.year][result._id.month]))
-
-
+        group[result._id.year][result._id.month]=_.extend({},group[result._id.year][result._id.month],stats);
 
       });
+
+
 
       //
       // compute CA for month
