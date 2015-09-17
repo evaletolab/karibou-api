@@ -4,7 +4,8 @@
 module.exports = function(app, config, passport) {
   var path='../controllers/';
 
-  var api 			= require(path+'api');
+  var api       = require(path+'api');
+  var stats     = require(path+'stats');
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
   var products 	= require(path+'products');
@@ -54,6 +55,13 @@ module.exports = function(app, config, passport) {
   app.get ('/seo/robots.txt', api.robots);
   
   
+
+  //
+  // stats
+  app.get('/v1/stats/orders/favorite/products', stats.favoriteProductsVsUsers);
+  app.get('/v1/stats/orders/ca/shop/:shopname?',  stats.getCAByYearMonthAndVendor);
+  app.get('/v1/stats/orders/sells',  stats.getSellValueByYearAndWeek);
+
 
   //
   // user
@@ -180,10 +188,6 @@ module.exports = function(app, config, passport) {
   app.get('/v1/orders/shops/:shopname', shops.ensureOwnerOrAdmin, orders.listByShop);
   app.get('/v1/orders/users/:id', users.ensureMeOrAdmin, orders.list);
   app.get('/v1/orders/:oid', orders.ensureOwnerOrAdmin, orders.get);
-
-  //
-  // stats
-  app.get('/v1/orders/stats/favorite', orders.statsFavoriteProducts);
 
 
   app.post('/v1/orders/items/verify',orders.verifyItems)

@@ -89,6 +89,7 @@ describe("orders.validate.repport", function(){
       //   console.log('-----',slug,repport.shops[slug])
       // })
 
+
       repport.shops['mon-shop'].monthitems.should.equal(2);
       repport.shops['mon-shop'].monthamount.should.equal(5);
       repport.shops['mon-shop'].monthorders.should.equal(2);
@@ -124,6 +125,46 @@ describe("orders.validate.repport", function(){
       done();
     });
   });
+
+
+  it("validate repport content with the new API", function(done){
+
+    //
+    // order 2000006 contains variation on
+    // -> item 1000002 [un-autre-shop] + 1.-
+    var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
+    Orders.getCAByYearMonthAndVendor({month:month},function (err,repport) {
+      should.not.exist(err)
+
+
+      repport[year][month]['mon-shop'].items.should.equal(2);
+      repport[year][month]['mon-shop'].amount.should.equal(5);
+      repport[year][month]['mon-shop'].orders.should.equal(2);
+      repport[year][month]['mon-shop'].fees.should.equal(1.13);
+      // FIXME select vendor fees 
+      repport[year][month]['mon-shop'].details.fees.should.equal(0.15);
+
+      repport[year][month]['super-shop'].items.should.equal(3);
+      repport[year][month]['super-shop'].amount.should.equal(10);
+      repport[year][month]['super-shop'].orders.should.equal(1);
+      repport[year][month]['super-shop'].fees.should.equal(1.6);
+      repport[year][month]['super-shop'].details.fees.should.equal(0.16);
+
+      repport[year][month]['un-autre-shop'].items.should.equal(17);
+      repport[year][month]['un-autre-shop'].amount.should.equal(55.6);
+      repport[year][month]['un-autre-shop'].orders.should.equal(4);
+      repport[year][month]['un-autre-shop'].fees.should.equal(7.78);
+      repport[year][month]['un-autre-shop'].details.fees.should.equal(0.14);
+
+      repport[year][month].fees.should.equal(10.51);
+      repport[year][month].items.should.equal(22);
+      repport[year][month].orders.should.equal(4);
+
+      done();
+    })
+
+  });
+
 
 
   it("validate repport content for unknown year ", function(done){

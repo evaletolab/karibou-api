@@ -183,7 +183,9 @@ Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForSho
 //
 // import stats API
 Orders.statics.getStatsByOrder=stats.getStatsByOrder;
-Orders.statics.favoriteProducts=stats.favoriteProducts;
+Orders.statics.favoriteProductsVsUsers=stats.favoriteProductsVsUsers;
+Orders.statics.getSellValueByYearAndWeek=stats.getSellValueByYearAndWeek;
+Orders.statics.getCAByYearMonthAndVendor=stats.getCAByYearMonthAndVendor;
 
 
 
