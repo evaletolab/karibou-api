@@ -61,7 +61,7 @@ exports.create=function (req, res) {
   //
   // not valide user can't create shop
   if(req.user.email.status!==true){
-    return res.send(401,'Votre compte doit être validé pour pouvoir créer une boutique');
+    return res.send(400,'Votre compte doit être validé pour pouvoir créer une boutique');
   }
 
   db.model('Shops').create(req.body, req.user, function(err,shop){
