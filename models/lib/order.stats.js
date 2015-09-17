@@ -149,12 +149,11 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
         return cb(null,{});
       }
 
-      var group={};
+      var group={},stats={};
 
       //
       // group amount CA by vendor
       results.forEach(function(result){
-        var stats={};
         result.items.forEach(function(item){
 
 
@@ -189,11 +188,9 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
           group[result._id.year]={};
           group[result._id.year][result._id.month]={};          
         }
-        _.extend(group[result._id.year][result._id.month],stats);
+        group[result._id.year][result._id.month]=_.extend(group[result._id.year][result._id.month],stats);
 
-        Object.keys(group[result._id.year][result._id.month]).forEach(function (slug) {
-          // delete group[result._id.year][result._id.month][slug].oid;          
-        })
+        // console.log('---------------',result._id,Object.keys(group[result._id.year][result._id.month]))
 
 
 
@@ -214,8 +211,10 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
             items+=group[year][month][slug].items;
             //
             // order is special because the same oid can be shared between vendors
-            orders=_.union(Object.keys(group[year][month][slug].oid),orders);
-            delete group[year][month][slug].oid;
+            if(group[year][month][slug].oid){
+              orders=_.union(Object.keys(group[year][month][slug].oid),orders);
+              delete group[year][month][slug].oid;
+            }
           });
           group[year][month].amount=amount;
           group[year][month].fees=fees;
