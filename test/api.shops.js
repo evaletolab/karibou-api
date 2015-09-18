@@ -100,7 +100,7 @@ describe("api.shops", function(){
       .send(s)
       .set('cookie', newuser)
       .end(function(err,res){      
-        res.should.have.status(401);
+        res.should.have.status(400);
         done();
       });
   });  
