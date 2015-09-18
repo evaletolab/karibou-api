@@ -72,7 +72,7 @@ exports.getSellValueByYearAndWeek=function(query,cb){
         return cb(null,{});
       }
 
-      var stats={};
+      var stats={}, axisX_date={};
       results.forEach(function(result){
         var sum=0,total=0,avg=0,div=1;
         //
@@ -82,6 +82,11 @@ exports.getSellValueByYearAndWeek=function(query,cb){
           sum+=total;
           avg=(avg+total)/div;div=2;
         });
+
+
+        //
+        // build set of axisY
+        axisX_date[result._id.year+'.'+result._id.week]=Object.keys(axisX_date).length;
 
         //
         // grouping by year
@@ -98,6 +103,14 @@ exports.getSellValueByYearAndWeek=function(query,cb){
       });      
 
 
+      // prepare axis
+      Object.keys(axisX_date).sortSeparatedAlphaNum().forEach(function (date,i) {
+        axisX_date[date]=i;
+      });
+
+      stats.axis={
+        x:axisX_date
+      }
       //
       //
       return cb(null,stats)
@@ -149,7 +162,7 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
         return cb(null,{});
       }
 
-      var group={};
+      var group={}, series_shops={}, axisX_date={};
 
       //
       // group amount CA by vendor
@@ -162,6 +175,9 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
           if(item.vendor!==result._id.vendor){
             return true;
           }
+          //
+          // set for axisY
+          series_shops[item.vendor]=Object.keys(series_shops).length;
 
           if(!stats[item.vendor]){
             stats[item.vendor]={amount:0,orders:0,fees:0,items:0,oid:{}};
@@ -181,7 +197,9 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
           // console.log('---------------',result._id,Object.keys(group[result._id.year][result._id.month]))
         });
 
-
+        //
+        // build set of axisY
+        axisX_date[result._id.year+'.'+result._id.month]=Object.keys(axisX_date).length;
 
         //
         // group vendor by year and month
@@ -194,7 +212,6 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
         group[result._id.year][result._id.month]=_.extend({},group[result._id.year][result._id.month],stats);
 
       });
-
 
 
       //
@@ -224,6 +241,20 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
 
         });
       })
+
+      // prepare axis
+      Object.keys(series_shops).forEach(function (shop,i) {
+        series_shops[shop]=i;
+      });
+
+      Object.keys(axisX_date).sortSeparatedAlphaNum().forEach(function (date,i) {
+        axisX_date[date]=i;
+      });
+
+      group.axis={
+        x:axisX_date,
+        series:series_shops
+      }
       return cb(null,group);
   });  
 }
