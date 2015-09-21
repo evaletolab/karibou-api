@@ -2,6 +2,9 @@
 
 module.exports = function (app) {
 
+
+
+
   // simple hash function on 64bits
   String.prototype.hash=function hash(append){
     var more=append||''
@@ -91,6 +94,54 @@ module.exports = function (app) {
     months += d1.getMonth();
     return months <= 0 ? 0 : months;
   };
-  
+ 
+
+  //
+  // label alphanum sort for this case "2000.10"
+  Array.prototype.sortSeparatedAlphaNum=function (separator) {
+    separator=separator||'.';
+
+    return this.sort(function (a,b) {
+      var aA = a.split(separator);
+      var bA = b.split(separator);
+      // left part
+      if(parseInt(aA[0])>parseInt(bA[0])){
+        return 1;
+      }else
+      if(parseInt(aA[0])<parseInt(bA[0])){
+        return -1;
+      }
+      //right part
+      if(parseInt(aA[1])>parseInt(bA[1])){
+        return 1;
+      }else
+      if(parseInt(aA[1])<parseInt(bA[1])){
+        return -1;
+      }
+      return 0;
+    });
+  };
+  Object.defineProperty(Array.prototype, "sortSeparatedAlphaNum", { enumerable: false });
+
+  //
+  // simple alpha num sorting
+  Array.prototype.sortAlphaNum=function () {
+    var reA = /[^a-zA-Z]/g;
+    var reN = /[^0-9]/g;
+    return this.sort(function (a,b) {
+      var aA = a.replace(reA, "");
+      var bA = b.replace(reA, "");
+      if(aA === bA) {
+          var aN = parseInt(a.replace(reN, ""), 10);
+          var bN = parseInt(b.replace(reN, ""), 10);
+          return aN === bN ? 0 : aN > bN ? 1 : -1;
+      } else {
+          return aA > bA ? 1 : -1;
+      }
+    });
+  };
+
+  Object.defineProperty(Array.prototype, "sortAlphaNum", { enumerable: false });
+
 }
 

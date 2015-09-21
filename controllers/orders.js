@@ -202,18 +202,6 @@ function parseCriteria(criteria, req){
 }
 
 /**
- * get products
- */
-exports.statsFavoriteProducts = function(req,res){
-  Orders.favoriteProducts(function (err, stats) {
-    if(err){
-      return res.send(400, errorHelper(err.message||err));
-    }
-    res.json(stats);
-  })
-};
-
-/**
  * get orders by criteria
  */
 exports.list = function(req,res){
@@ -363,6 +351,7 @@ exports.create=function(req,res){
     if(err){
       return res.send(400, errorHelper(err.message||err));
     }
+
 
     // items issue?
     if(order.errors){

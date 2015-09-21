@@ -13,6 +13,16 @@ describe("system", function(){
     done()
   });
   describe("tools", function(){
+    it("Sort array of ['2012.12','2012.13']",function (done) {
+      var a=[ 
+        '2014.11','2014.12','2015.1','2015.2','2015.7','2015.8','2015.9','2015.10','2015.11'
+        ].sortSeparatedAlphaNum(),
+          b=[ '2014.11','2014.12','2015.1','2015.2','2015.7','2015.8','2015.9','2015.10','2015.11'];
+
+      a.should.eql(b);
+      done()
+    })
+
     it("Crypt string", function(done){
         var crypt="Hello World".crypt()
             done()
