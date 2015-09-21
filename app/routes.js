@@ -58,11 +58,11 @@ module.exports = function(app, config, passport) {
 
   //
   // stats
-  app.get('/v1/stats/orders/ca/shop/:shopname?',  stats.getCAByYearMonthAndVendor);
-  app.get('/v1/stats/orders/sells',  stats.getSellValueByYearAndWeek);
-  app.get('/v1/stats/orders/by/postal',  stats.ordersByPostalVsUsersByPostal);
-  app.get('/v1/stats/orders/by/users',  stats.ordersByUsers);
-  app.get('/v1/stats/orders/by/users/and/products', stats.favoriteProductsVsUsers);
+  app.get('/v1/stats/orders/ca/shop/:shopname?', auth.ensureAdmin, stats.getCAByYearMonthAndVendor);
+  app.get('/v1/stats/orders/sells', auth.ensureAdmin,  stats.getSellValueByYearAndWeek);
+  app.get('/v1/stats/orders/by/postal', auth.ensureAdmin, stats.ordersByPostalVsUsersByPostal);
+  app.get('/v1/stats/orders/by/users', auth.ensureAdmin, stats.ordersByUsers);
+  app.get('/v1/stats/orders/by/users/and/products', auth.ensureAdmin, stats.favoriteProductsVsUsers);
 
 
   //
