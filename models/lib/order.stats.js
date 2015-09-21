@@ -68,7 +68,7 @@ exports.ordersByUsers=function (filter,cb) {
 
       users.forEach(function (user) {
         //
-        // avoid user already has orders
+        // avoid user already has orders TODO need better implementation when users > 2000
         if(_.find(stats,function (lst) {
           return lst._id===user.email.address;
         })){
