@@ -38,6 +38,118 @@ exports.favoriteProductsVsUsers=function(cb){
 
 };
 
+
+exports.ordersByUsers=function (filter,cb) {
+  var Orders=this, Users=db.model('Users'), results={};
+  Orders.aggregate(
+     [
+       { $match: { 'payment.status': 'paid'  }},
+       {$project:{items:1,
+                 shipping:1,
+                 email:1,
+                 customer:1
+       }},
+       {$sort:{'shipping.when':-1}},
+       {$group:
+           {
+             _id:"$email",
+             user:{$first:"$customer.name"},
+             last:{$first:"$shipping.when"},
+             count: { $sum: 1 }
+           }
+       },
+       {$sort:{count:-1}}
+     ]
+  ,function (err,stats) {
+    if(err){
+      return cb(err);
+    }
+    Users.find({$and:[{shops:{$size:0},roles:{$size:0},'email.status':true}]},function (err,users) {
+
+      users.forEach(function (user) {
+        //
+        // avoid user already has orders
+        if(_.find(stats,function (lst) {
+          return lst._id===user.email.address;
+        })){
+          return true;
+        }
+
+        stats.push({
+          _id:user.email.address,
+          user:user.name,
+          count:0,
+        });
+      })
+
+      cb(err,stats)
+    })
+  })
+
+}
+
+//
+// users grouped by postalCode
+exports.ordersByPostalVsUsersByPostal=function(filter,cb){
+  var Orders=this, Users=db.model('Users'), results={};
+
+  //
+  // orders by postal
+  Users.aggregate([
+   { $match: { 'email.status': true , shops:{$size:0}} },
+   {$project:{
+            week: { $week: "$created"},
+            year: { $year: "$created"},
+            cp:'$addresses.postalCode',
+            id:1,
+            name:{$concat:['$name.givenName',' ','$name.familyName']},
+            displayName:1,
+            email:1,
+            likes:1,
+            shops:1
+   }},
+   {$unwind:'$cp'},
+   {$group:
+       {
+         _id:"$cp",
+         emails:{$push:'$email.address'},
+         users:{$sum:1}
+       }
+   },
+   {$sort:{'_id':1}}
+   ]).exec().then(function (stats) {
+      results.users=stats;
+      //
+      // users by postal
+      return Orders.aggregate([
+         { $match: { 'payment.status': 'paid', 'email':{$nin:['delphine.cluzel@gmail.com','evaleto@gmail.com']} }},
+         {$project:{
+                  cp:'$shipping.postalCode',
+                  id:'$customer.id',
+                  email:1
+         }},
+         {$group:
+             {
+               _id:"$cp",
+               emails:{$addToSet:'$email'},
+               orders:{$sum:1}
+             }
+         },
+         {$sort:{'_id':1}}
+      ]).exec();
+
+   })
+   .then(function (stats) {
+      results.orders=stats;
+      cb(null,results);
+   },function (err) {
+      cb(err)
+   });
+
+};
+
+
+
 //
 // compute Sell value (not CA) by week and by year
 exports.getSellValueByYearAndWeek=function(query,cb){

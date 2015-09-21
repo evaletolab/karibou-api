@@ -23,9 +23,33 @@ exports.favoriteProductsVsUsers = function(req,res){
       return res.send(400, errorHelper(err.message||err));
     }
     res.json(stats);
-  })
+  });
 };
 
+
+/**
+ * get user grouped by postalCode VS. orders by postalCode
+ */
+exports.ordersByPostalVsUsersByPostal=function (req,res) {
+  db.model('Orders').ordersByPostalVsUsersByPostal({},function (err,stats) {
+    if(err){
+      return res.send(400, errorHelper(err.message||err));
+    }
+    res.json(stats);
+  });
+};
+
+/**
+ * count orders by users 
+ */
+exports.ordersByUsers=function (req,res) {
+  db.model('Orders').ordersByUsers({},function (err,stats) {
+    if(err){
+      return res.send(400, errorHelper(err.message||err));
+    }
+    res.json(stats);
+  });
+};
 
 /**
  * Compute CA grouped by Year and Week
@@ -36,7 +60,7 @@ exports.getSellValueByYearAndWeek = function(req,res){
       return res.send(400, errorHelper(err.message||err));
     }
     res.json(stats);
-  })
+  });
 };
 
 /**
@@ -56,5 +80,5 @@ exports.getCAByYearMonthAndVendor = function(req,res){
       return res.send(400, errorHelper(err.message||err));
     }
     res.json(stats);
-  })
+  });
 };

@@ -186,6 +186,8 @@ Orders.statics.getStatsByOrder=stats.getStatsByOrder;
 Orders.statics.favoriteProductsVsUsers=stats.favoriteProductsVsUsers;
 Orders.statics.getSellValueByYearAndWeek=stats.getSellValueByYearAndWeek;
 Orders.statics.getCAByYearMonthAndVendor=stats.getCAByYearMonthAndVendor;
+Orders.statics.ordersByPostalVsUsersByPostal=stats.ordersByPostalVsUsersByPostal;
+Orders.statics.ordersByUsers=stats.ordersByUsers;
 
 
 
