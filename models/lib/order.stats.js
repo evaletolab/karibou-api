@@ -77,7 +77,8 @@ exports.ordersByUsers=function (filter,cb) {
 
         stats.push({
           _id:user.email.address,
-          user:user.name,
+          name:user.name,
+          from:user.created,
           count:0,
         });
       })
