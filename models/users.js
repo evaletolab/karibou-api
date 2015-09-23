@@ -114,6 +114,7 @@ validate.postal = function (value) {
 
     merchant:{type:Boolean},
 
+    // this is the stripe 
     gateway_id:{type:String, unique: true, select:false,sparse: true},
 
     /* make user valid/invalid */
