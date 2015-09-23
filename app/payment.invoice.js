@@ -286,7 +286,10 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
 //
 // capture this authorized order
 PaymentInvoice.prototype.capture=function(order,reason){
-  var self=this;
+  var self=this, 
+      options=options||{},
+      error=null;
+
   var _capture=function (deferred, callback) {
 
     //
@@ -299,21 +302,36 @@ PaymentInvoice.prototype.capture=function(order,reason){
       return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
     }
 
-    var amount=order.getTotalPrice()
+
+    var amount=order.getTotalPrice();
+    var status='invoice';
+    var log='invoice '+amount+' the '+new Date();
+
+    //
+    // new invoice event
+    if(reason==='invoice'){
+
+    }
+    else if(order.payment.status==='invoice'){
+      log='captured '+amount+' the '+new Date();
+      status='paid';
+    }
+
     var result={
-      log:'capture '+amount+' the '+new Date(),
+      log:log,
+      status:status,
       transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };
 
     setTimeout(function() {
-      callback(null,result);
+      callback(error,result);
     }, 0);
     return deferred.promise;
   }
 
-  return this._super.capture(_capture,order,reason)
+  return this._super.capture(_capture,order)
 
 }
 

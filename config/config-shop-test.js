@@ -88,6 +88,7 @@ module.exports = {
       financialstatus:["pending",
                        "authorized",
                        "partially_paid",
+                       "invoice",
                        "paid",
                        "partially_refunded",
                        "refunded",

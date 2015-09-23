@@ -180,14 +180,15 @@ var Payment=function(){
 
 		//
 		// capture this authorized order
-		capture:function(provider,order,reason){
+		capture:function(provider,order){
 			var deferred = Q.defer(),self=this;
 
 			if(["fulfilled"].indexOf(order.fulfillments.status)===-1){
 		    return Q.reject(new Error("Impossible de payer une commande en cours avec le status: "+order.fulfillments.status))
 			}
 
-			if(['authorized'].indexOf(order.payment.status)===-1){
+			// THAT IS NOT PERFECT, INVOICE DOES NOT BELLONG TO PAYMENT!
+			if(['authorized','invoice'].indexOf(order.payment.status)===-1){
 		    return Q.reject(new Error("Impossible de payer une commande avec le status: "+order.payment.status))
 		  }
 
@@ -196,8 +197,10 @@ var Payment=function(){
 		  	if(err){
 		  		return deferred.reject(parseError(err));		
 		  	}
+
+
 		  	order.payment.logs.push(charge.log)
-		    order.payment.status="paid";
+		    order.payment.status=charge.status||"paid";
 		    order.closed=new Date();
 		    return order.save(function(err){
 			    if(err){

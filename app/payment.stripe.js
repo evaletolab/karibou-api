@@ -369,7 +369,7 @@ PaymentStripe.prototype.refund=function(order,reason, amount){
 
 //
 // capture this authorized order
-PaymentStripe.prototype.capture=function(order,reason){
+PaymentStripe.prototype.capture=function(order){
 	var self=this;
 	var _capture=function (deferred, callback) {
 
@@ -400,7 +400,7 @@ PaymentStripe.prototype.capture=function(order,reason){
 		return deferred.promise;
 	}
 
-	return this._super.capture(_capture,order,reason)
+	return this._super.capture(_capture,order)
 
 }
 

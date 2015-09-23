@@ -215,7 +215,7 @@ PaymentTest.prototype.refund=function(order,reason, amount){
 
 //
 // capture this authorized order
-PaymentTest.prototype.capture=function(order,reason){
+PaymentTest.prototype.capture=function(order){
 	var self=this;
 	var _capture=function (deferred, callback) {
 	  if(!self.isValidAlias(order.payment.alias, order.customer)){
@@ -240,7 +240,7 @@ PaymentTest.prototype.capture=function(order,reason){
 		return deferred.promise;
 	}
 
-	return this._super.capture(_capture,order,reason)
+	return this._super.capture(_capture,order)
 
 }
 
