@@ -646,9 +646,10 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
 
   //
   // if invoice , then attache the next order ID
+  // TODO remove this part as it's already checked by the payment module
   if(promise){
     promise.then(function (orders) {
-      if(orders.length){
+      if(orders.length>config.shop.order.openInvoice){
         callback("Cette méthode de paiement n'est pas invalide lorsque des factures sont encore ouvertes ");
         return;
 
