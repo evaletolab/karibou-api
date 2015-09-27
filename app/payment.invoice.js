@@ -1,6 +1,7 @@
 var util = require("util");
 var events = require("events");
 var bus = require('../app/bus');
+var db = require('mongoose');
 var Q=require('q');
 
 
@@ -95,8 +96,25 @@ PaymentInvoice.prototype.checkCard=function(user,alias){
     return Q.reject(new Error("Cette carte n'est pas attachée à votre compte"))   
   }
 
+  //
+  // checking payment method
+  db.model('Orders').findByCriteria({user:user.id,payment:'invoice'},function (err, orders) {
+    if(err){
+      return deferred.reject(err);
+    }
+
+    // check open invoice
+    if(orders.length>0){
+      return deferred.reject(new Error("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes"))
+    }
+
+    // invoice is ok
+    return deferred.resolve(payment);
+  });
+
+
   // return promise
-  return Q.when(payment);
+  return deferred.promise;
 
 }
 

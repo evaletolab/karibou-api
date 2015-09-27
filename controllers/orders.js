@@ -548,7 +548,7 @@ exports.capture=function(req,res){
       return res.json(400, "La commande "+req.params.oid+" n'existe pas.");
     }
 
-    payment.for(order.payment.issuer).capture(order)
+    payment.for(order.payment.issuer).capture(order, req.body.reason)
       .then(function(order){
 
         //
