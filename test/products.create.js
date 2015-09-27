@@ -61,7 +61,7 @@ describe("products.create", function(){
 
     it("First OTHER shoud equals 100000", function(done){
       db.model('Sequences').next('other',function(err,sku){
-        sku.should.equal(1000000);
+        sku.should.equal(10000000);
         done();
       });
     });
