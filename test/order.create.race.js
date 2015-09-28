@@ -121,7 +121,7 @@ describe("orders.create.race", function(){
         Orders.findByTimeoutAndNotPaid(function(err,orders){
 
           require('async').eachLimit(orders,1,function(o,cb){
-            o.print()
+            // o.print()
             o.fulfillments.status='failure';
             o.payment.status='voided';
             o.rollbackProductQuantityAndClose("timeout",function(err,o){
