@@ -388,7 +388,7 @@ exports.create=function(req,res){
       })
       .fail(function(err){
         bus.emit('system.message',"[order-create] :",{error:err.message,order:order.oid,customer:order.email});
-        return res.json(400,err.message)        
+        return res.json(400,err.message||err)        
       })
   });
 
