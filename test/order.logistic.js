@@ -38,7 +38,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error when missing param',function(done){
     Orders.updateLogistic({oid:2100000}, {},function (err, orders) {
       should.exist(err)
-      err.should.containEql('Ooops error updateLogistic missing param')
+      err.should.containEql('updateLogistic missing shipping param')
       done()
     })
   });
@@ -46,7 +46,7 @@ describe("api.orders.find", function(){
   it('mark order shipped get an error when missing param',function(done){
     Orders.updateLogistic({}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.containEql('Ooops error updateLogistic missing order selector')
+      err.should.containEql('updateLogistic missing order selector')
       done()
     })
   });
@@ -60,7 +60,7 @@ describe("api.orders.find", function(){
     })
   });
 
-  it.skip('mark order shipped get an error when order is not fulfilled',function(done){
+  it('mark order shipped get an error when order is not fulfilled',function(done){
     Orders.updateLogistic({oid:2000016}, {status:true},function (err, orders) {
       should.exist(err)
       err.should.containEql('Impossible de livrer une commande avec le status')
@@ -77,10 +77,21 @@ describe("api.orders.find", function(){
   });
 
   it('mark order shipped true',function(done){
-    Orders.updateLogistic({oid:2000007}, {status:true},function (err, orders) {
+    Orders.updateLogistic({oid:2000007}, {status:true,bags:2},function (err, orders) {
       should.not.exist(err)
       should.exist(orders)
-      orders[0].shipping.shipped.should.be.true
+      orders[0].shipping.shipped.should.equal(true)
+      orders[0].shipping.bags.should.equal(2)
+      done()
+    })
+  });
+
+  it('change order bags count',function(done){
+    Orders.updateLogistic({oid:2000007}, {bags:1},function (err, orders) {
+      should.not.exist(err)
+      should.exist(orders)
+      orders[0].shipping.shipped.should.equal(true)
+      orders[0].shipping.bags.should.equal(1)
       done()
     })
   });
@@ -89,7 +100,7 @@ describe("api.orders.find", function(){
   it('mark order collected get an error when missing date',function(done){
     Orders.updateLogistic({'vendors.slug':'un-autre-shop'}, {status:true},function (err, orders) {
       should.exist(err)
-      err.should.containEql('Ooops error updateLogistic missing date')
+      err.should.containEql('updateLogistic missing date')
       done()
     })
   });

@@ -147,7 +147,8 @@ var Orders = new Schema({
         lat:{type:Number, required: false},
         lng:{type:Number, required: false}
       },
-      shipped:{type:Boolean,default:false}
+      shipped:{type:Boolean,default:false},
+      bags:{type:Number}
    }
 
 
@@ -1015,8 +1016,8 @@ Orders.statics.updateLogistic = function(query,options, callback){
   assert(options);
   var saveTasks=[], Q=require('q');
 
-  if(options.status === undefined){
-    return callback("Ooops error updateLogistic missing param");          
+  if(options.status === undefined && options.bags===undefined){
+    return callback("updateLogistic missing shipping param");          
   }
 
 
@@ -1026,7 +1027,7 @@ Orders.statics.updateLogistic = function(query,options, callback){
   if(query['vendors.slug']){
     var when=Date.parse(options.when);
     if(!when||when==NaN){
-      return callback("Ooops error updateLogistic missing date ");                
+      return callback("updateLogistic missing date ");                
     }
     // date is ok
     when=new Date(when)
@@ -1042,7 +1043,7 @@ Orders.statics.updateLogistic = function(query,options, callback){
   //
   // select order by OID
   }else if(!query.oid){
-    return callback('Ooops error updateLogistic missing order selector ')
+    return callback('updateLogistic missing order selector ')
   }
 
   db.model('Orders').find(query,function(err,orders){
@@ -1061,29 +1062,25 @@ Orders.statics.updateLogistic = function(query,options, callback){
       saveTasks.push((function(order) {
         var deferred = Q.defer();
 
+        var statusShopper=(options.status === "true"||options.status === true);
+
         //
         // check order status
-        if(order.closed){
-          return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
-        }
+        // if(order.closed&&statusShopper){
+        //   return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
+        // }
 
         // cancelreason:["customer", "fraud", "inventory", "other"],
         if(order.cancel&&order.cancel.when){
           return Q.reject(("Impossible de livrer une commande annulée: "+order.oid))
         }
         //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-        if(["authorized"].indexOf(order.payment.status)==-1){
+        if(["authorized","invoice","paid"].indexOf(order.payment.status)==-1){
           return Q.reject(("Impossible de livrer une commande sans validation financière : "+order.payment.status));
         }
 
 
-        // TODO this is not needed
-        // if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
-        //   return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
-        // }
 
-
-        var statusShopper=Boolean(options.status)
 
         //
         // vendor is collected?
@@ -1097,7 +1094,11 @@ Orders.statics.updateLogistic = function(query,options, callback){
         }
         // customer is shipped
         else{
-          order.shipping.shipped=statusShopper;
+          if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
+            return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
+          }
+          if(options.bags!==undefined)order.shipping.bags=options.bags;
+          if(options.status!==undefined)order.shipping.shipped=statusShopper;
         }
 
         // return order.save()
