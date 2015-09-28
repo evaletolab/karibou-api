@@ -107,6 +107,9 @@ module.exports = {
         {label:"bitcoin",fees:0.0}
       ],
 
+      /*open invoice limit to authorize invoice payment */
+      openInvoice:0,
+
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
       timelimit:39,

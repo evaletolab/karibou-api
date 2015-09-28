@@ -108,6 +108,9 @@ module.exports = {
         {label:"bitcoin",fees:0.0}
       ],
 
+      /*open invoice limit to authorize invoice payment */
+      openInvoice:0,
+
       /* order is in timeout if payment status != 'paid' and created<15m (timeoutAndNotPaid)*/
       timeoutAndNotPaid:60,
 
