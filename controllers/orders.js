@@ -388,7 +388,7 @@ exports.create=function(req,res){
       })
       .fail(function(err){
         bus.emit('system.message',"[order-create] :",{error:err.message,order:order.oid,customer:order.email});
-        return res.json(400,err.message)        
+        return res.json(400,err.message||err)        
       })
   });
 
@@ -418,8 +418,9 @@ exports.updateShipping=function(req,res){
 
   // check && validate input 
   try{
-    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
-    validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean()
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt();
+    validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean();
+    validate.ifCheck(req.body.bags, "Le nombre de sac n'est pas valide").isInt();
   }catch(err){
     return res.send(400, err.message);
   }
@@ -548,7 +549,7 @@ exports.capture=function(req,res){
       return res.json(400, "La commande "+req.params.oid+" n'existe pas.");
     }
 
-    payment.for(order.payment.issuer).capture(order)
+    payment.for(order.payment.issuer).capture(order, req.body.reason)
       .then(function(order){
 
         //

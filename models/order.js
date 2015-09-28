@@ -9,6 +9,7 @@ var mongoose = require('mongoose')
   , format=require('./lib/order.format')
   , utils=require('./lib/order.utils')
   , stats=require('./lib/order.stats')
+  , finds=require('./lib/order.finds')
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
@@ -146,7 +147,8 @@ var Orders = new Schema({
         lat:{type:Number, required: false},
         lng:{type:Number, required: false}
       },
-      shipped:{type:Boolean,default:false}
+      shipped:{type:Boolean,default:false},
+      bags:{type:Number}
    }
 
 
@@ -176,6 +178,12 @@ Orders.statics.getVendorsSlug=utils.getVendorsSlug;
 Orders.statics.filterByShop=utils.filterByShop;
 
 //
+// import find API
+Orders.statics.findByTimeoutAndNotPaid=finds.findByTimeoutAndNotPaid;
+Orders.statics.findByCriteria=finds.findByCriteria;
+
+
+//
 // import format API
 Orders.statics.sortByDateAndUser=format.sortByDateAndUser;
 Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForShop;
@@ -188,7 +196,6 @@ Orders.statics.getSellValueByYearAndWeek=stats.getSellValueByYearAndWeek;
 Orders.statics.getCAByYearMonthAndVendor=stats.getCAByYearMonthAndVendor;
 Orders.statics.ordersByPostalVsUsersByPostal=stats.ordersByPostalVsUsersByPostal;
 Orders.statics.ordersByUsers=stats.ordersByUsers;
-
 
 
 //
@@ -204,6 +211,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
     , msg31="Une erreur c'est produite avec cet article (2)"
+    , msg32="Une erreur c'est produite avec cet article (3)"
     , msg4="La quantité d'achat minimum est de 1 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivée"
     , msg6="Ce produit n'est pas disponible car la boutique sera fermée ce jour là"
@@ -269,50 +277,56 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
 
 
-  if((typeof item.vendor) !=='object' ){
-    assert(product.vendor._id.toString()===item.vendor.toString())
-    item.vendor=product.vendor.urlpath;
 
-    // default address
-    var address=product.vendor.address.streetAdress+', '+product.vendor.address.postalCode+' tel:'+product.vendor.address.phone, 
-        geo=product.vendor.address.geo,
-        marketplace=false;
+  //
+  // check that mapping between product and item is correct
+  if(product.vendor._id.toString()!==item.vendor.toString()&&
+     product.vendor.urlpath!==item.vendor &&
+     product.vendor._id.toString()!==item.vendor._id.toString()){
+    return cb(msg32,item)
+  }
+  item.vendor=product.vendor.urlpath;
 
-    // override address based on marketplace        
-    if(product.vendor.marketplace.length){
-      config.shop.marketplace.list.every(function(place){
-        // check place with date
-        if(place.d&&place.d===shipping.when.getDay()){
-          address=place.name;
-          geo={lat:place.lat,lng:place.lng}
-          marketplace=true;
-          return false;
-        } 
-        return true;
-      })
-    }
+  // default address
+  var address=product.vendor.address.streetAdress+', '+product.vendor.address.postalCode+' tel:'+product.vendor.address.phone, 
+      geo=product.vendor.address.geo,
+      marketplace=false;
 
-    // append repository if marketplace is defined
-    if(marketplace && product.vendor.address.repository){
-      address=address+', '+product.vendor.address.repository
-    }
-    // set respository as address
-    // -> remove geo 
-    else if(product.vendor.address.repository){
-      address=product.vendor.address.repository;
-      geo=undefined;
-    }
-
-    vendor={
-        ref:product.vendor._id,
-        slug:product.vendor.urlpath,
-        name:product.vendor.name,
-        address:address,
-        fees:product.vendor.account.fees,
-        geo:geo
-    };
+  // override address based on marketplace        
+  if(product.vendor.marketplace.length){
+    config.shop.marketplace.list.every(function(place){
+      // check place with date
+      if(place.d&&place.d===shipping.when.getDay()){
+        address=place.name;
+        geo={lat:place.lat,lng:place.lng}
+        marketplace=true;
+        return false;
+      } 
+      return true;
+    })
   }
 
+  // append repository if marketplace is defined
+  if(marketplace && product.vendor.address.repository){
+    address=address+', '+product.vendor.address.repository
+  }
+  // set respository as address
+  // -> remove geo 
+  else if(product.vendor.address.repository){
+    address=product.vendor.address.repository;
+    geo=undefined;
+  }
+
+  vendor={
+      ref:product.vendor._id,
+      slug:product.vendor.urlpath,
+      name:product.vendor.name,
+      address:address,
+      fees:product.vendor.account.fees,
+      geo:geo
+  };
+
+  
   //
   // check item is still available in stock
   if(!product.attributes.available){
@@ -533,22 +547,6 @@ Orders.methods.rollbackProductQuantityAndClose=function(reason, callback){
 
 }
 
-//
-// find open orders with financial status not paid
-Orders.statics.findByTimeoutAndNotPaid = function(callback){
-  var q={
-    closed:null,
-    "payment.status":{'$nin':['paid','authorized']},
-    created:{"$lte": new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000}
-  }
-
-
-  // console.log(q)
-  var query=db.model('Orders').find(q).sort({created: -1});
-  if (callback) return query.exec(callback);
-
-  return query;
-}
 
 //
 // create a new order
@@ -646,13 +644,34 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
     return callback(error.message)    
   }
 
+
+  //
+  //find open invoice for this user
+  var promise;
+  if(paymentData.issuer==='invoice'){
+    promise=Orders.findByCriteria({user:customer.id,payment:'invoice'}).exec();
+  }
+
+  //
+  // if invoice , then attache the next order ID
+  // TODO remove this part as it's already checked by the payment module
+  // if(promise){
+  //   promise.then(function (orders) {
+  //     if(orders.length>config.shop.order.openInvoice){
+  //       callback("Cette méthode de paiement n'est pas invalide lorsque des factures sont encore ouvertes ");
+  //       return;
+
+  //     }
+  //     return  db.model('Sequences').nextOrder();
+  //   })    
+  // }else{
+  //   // else, attach the next order ID
+  //   promise=db.model('Sequences').nextOrder();
+  // }
+
   //
   // get unique Order identifier
-  db.model('Sequences').nextOrder(function(err,oid){
-    if(err){
-      callback((err));
-      return;
-    }
+  db.model('Sequences').nextOrder().then(function(oid){
     //
     // set oid
     order.oid=oid;
@@ -769,135 +788,15 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
 
     });
 
+  },function (err) {
+    if(err){
+      callback((err));
+      return;
+    }
   });
 
 
 };
-
-
-
-//
-// find the last order for a shop
-Orders.statics.findByCriteria = function(criteria, callback){
-  assert(criteria);
-  var db=this
-    , Orders=db.model('Orders')
-    , Products=db.model('Products');
-
-  var q={};
-
-  // filter by OIDs
-  if(criteria.oid){
-      //
-      // force integers
-      var oids=criteria.oid.split(/[,+]/)
-      oids.forEach(function(x,y,z){ z[y]=x|0 });
-      q['oid']={$in:oids}
-  }
-
-
-  //
-  // filter by shop or shops
-  if(criteria.shop){
-    if(Array.isArray(criteria.shop)){
-      q["vendors.slug"]={"$in":criteria.shop};
-    }else{
-      q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
-    }
-  }
-
-
-  //
-  // filter by closed date
-  if((criteria.closed === null || criteria.closed === undefined)&&
-     !criteria.fulfillment&&
-     !criteria.reason){
-    q["closed"]={'$exists':false};
-  }
-  else if(criteria.closed === true){
-    var sd=new Date('1980'),
-        ed=new Date();
-    //q["closed"]={"$gte": sd, "$lt": ed};
-    q["closed"]={'$exists':true};
-  }
-  else if(criteria.closed ){
-    criteria.closed=new Date(criteria.closed)
-    var sd=new Date(criteria.closed.getFullYear(), criteria.closed.getUTCMonth(), criteria.closed.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000-60000);
-    q["closed"]={"$gte": sd, "$lt": ed};
-  }
-
-
-  //
-  // filter by next shipping date
-  if(criteria.nextShippingDay){
-    var next=this.findCurrentShippingDay();
-    var sd=new Date(next.getFullYear(), next.getUTCMonth(), next.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000-60000);
-    q["shipping.when"]={"$gte": sd, "$lt": ed};
-  }
-  //
-  // filter by date (24h = today up to tonight)
-  if(criteria.when){
-    var sd=new Date(criteria.when.getFullYear(), criteria.when.getMonth(), criteria.when.getDate()),
-        ed=new Date(sd.getTime()+86400000-60000);
-    q["shipping.when"]={"$gte": sd, "$lt": ed};
-  }
-
-
-  //
-  // filter by free date
-  if(criteria.from && criteria.to){
-    if(criteria.padding===true){
-      criteria.to=new Date(criteria.to.getTime()+7*86400000)
-    }
-
-    var sd=new Date(criteria.from.getFullYear(), criteria.from.getMonth(), criteria.from.getDate());
-    //
-    // do not remove the time limit of the ending date!
-    var ed=new Date(criteria.to);
-    q["shipping.when"]={"$gte": sd, "$lt": ed};
-  }
-
-
-
-  //
-  // filter by user
-  if(criteria.user){
-    // q["email"]=criteria.user
-    q["customer.id"]=parseInt(criteria.user);
-    if(criteria.closed === null || criteria.closed === undefined){
-      delete (q["closed"])   
-    }
-  }
-
-  if(criteria.fulfillment){
-    var multiple=criteria.fulfillment.split(',');
-    q["fulfillments.status"]=(multiple.length>1)?{$in:multiple}:criteria.fulfillment;
-  }
-
-  if(criteria.reason){
-    q["cancel.reason"]=criteria.reason;
-  }
-
-  //
-  // filter by user
-  if(criteria.payment){
-    // q["email"]=criteria.user
-    q["payment.status"]=criteria.payment;
-  }
-  debug("find criteria ",q)
-  var query=Orders.find(q).sort({created: -1});
-
-  //
-  // FIXME get plain javascript object
-  if(criteria.shop){
-    query=query.lean()
-  }
-  if (callback)
-    return query.exec(callback);
-  return query;
-}
 
 
 //
@@ -1117,8 +1016,8 @@ Orders.statics.updateLogistic = function(query,options, callback){
   assert(options);
   var saveTasks=[], Q=require('q');
 
-  if(options.status === undefined){
-    return callback("Ooops error updateLogistic missing param");          
+  if(options.status === undefined && options.bags===undefined){
+    return callback("updateLogistic missing shipping param");          
   }
 
 
@@ -1128,7 +1027,7 @@ Orders.statics.updateLogistic = function(query,options, callback){
   if(query['vendors.slug']){
     var when=Date.parse(options.when);
     if(!when||when==NaN){
-      return callback("Ooops error updateLogistic missing date ");                
+      return callback("updateLogistic missing date ");                
     }
     // date is ok
     when=new Date(when)
@@ -1144,7 +1043,7 @@ Orders.statics.updateLogistic = function(query,options, callback){
   //
   // select order by OID
   }else if(!query.oid){
-    return callback('Ooops error updateLogistic missing order selector ')
+    return callback('updateLogistic missing order selector ')
   }
 
   db.model('Orders').find(query,function(err,orders){
@@ -1163,29 +1062,25 @@ Orders.statics.updateLogistic = function(query,options, callback){
       saveTasks.push((function(order) {
         var deferred = Q.defer();
 
+        var statusShopper=(options.status === "true"||options.status === true);
+
         //
         // check order status
-        if(order.closed){
-          return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
-        }
+        // if(order.closed&&statusShopper){
+        //   return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
+        // }
 
         // cancelreason:["customer", "fraud", "inventory", "other"],
         if(order.cancel&&order.cancel.when){
           return Q.reject(("Impossible de livrer une commande annulée: "+order.oid))
         }
         //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-        if(["authorized"].indexOf(order.payment.status)==-1){
+        if(["authorized","invoice","paid"].indexOf(order.payment.status)==-1){
           return Q.reject(("Impossible de livrer une commande sans validation financière : "+order.payment.status));
         }
 
 
-        // TODO this is not needed
-        // if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
-        //   return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
-        // }
 
-
-        var statusShopper=Boolean(options.status)
 
         //
         // vendor is collected?
@@ -1199,7 +1094,11 @@ Orders.statics.updateLogistic = function(query,options, callback){
         }
         // customer is shipped
         else{
-          order.shipping.shipped=statusShopper;
+          if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
+            return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
+          }
+          if(options.bags!==undefined)order.shipping.bags=options.bags;
+          if(options.status!==undefined)order.shipping.shipped=statusShopper;
         }
 
         // return order.save()

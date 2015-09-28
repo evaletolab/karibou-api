@@ -185,9 +185,9 @@ exports.product = function(req){
 var order_items = exports.orderItems = function(items, update){
   for (var i in items){
     check(items[i].sku,'le format du produit est incompatible').isNumeric()
-    check(items[i].title,       "Le description doit contenir entre 6 et 500 caractères").isText().len(3, 500);
+    check(items[i].title,       "Le description doit contenir entre 3 et 500 caractères").isText().len(3, 500);
     if(update!==true){
-      check(items[i].categories,  "La catégorie doit contenir entre 6 et 200 caractères").isText().len(3, 200);
+      check(items[i].categories,  "La catégorie doit contenir entre 3 et 200 caractères").isText().len(3, 200);
       check(items[i].vendor,      "Le vendeur doit contenir entre 3 et 200 caractères").isText().len(3, 200);
       check(items[i].quantity,    "La quantité n'est pas valable").isNumeric()
       check(items[i].price,       "Le prix n'est pas valable").isFloat()

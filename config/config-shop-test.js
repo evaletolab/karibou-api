@@ -88,6 +88,7 @@ module.exports = {
       financialstatus:["pending",
                        "authorized",
                        "partially_paid",
+                       "invoice",
                        "paid",
                        "partially_refunded",
                        "refunded",
@@ -105,6 +106,9 @@ module.exports = {
         {label:"tester",fees:0.02}, 
         {label:"bitcoin",fees:0.0}
       ],
+
+      /*open invoice limit to authorize invoice payment */
+      openInvoice:0,
 
       /* for testing 50 hours is the time limit between order and delivery*/
       /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/

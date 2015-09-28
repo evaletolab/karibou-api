@@ -1,6 +1,7 @@
 var util = require("util");
 var events = require("events");
 var bus = require('../app/bus');
+var db = require('mongoose');
 var Q=require('q');
 
 
@@ -37,6 +38,7 @@ PaymentInvoice.prototype.isValidAlias=function(alias, user, method){
   // if(method.expiry){
   //   expiry+=':'+method.expiry;
   // }
+
   return ((user.id+expiry).hash().crypt()===alias);
 }
 
@@ -95,8 +97,25 @@ PaymentInvoice.prototype.checkCard=function(user,alias){
     return Q.reject(new Error("Cette carte n'est pas attachée à votre compte"))   
   }
 
+  //
+  // checking payment method
+  db.model('Orders').findByCriteria({user:user.id,payment:'invoice'},function (err, orders) {
+    if(err){
+      return deferred.reject(err);
+    }
+
+    // check open invoice
+    if(orders.length>config.shop.order.openInvoice){
+      return deferred.reject(new Error("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes"))
+    }
+
+    // invoice is ok
+    return deferred.resolve(payment);
+  });
+
+
   // return promise
-  return Q.when(payment);
+  return deferred.promise;
 
 }
 
@@ -200,9 +219,24 @@ PaymentInvoice.prototype.authorize=function(order){
       provider:'invoice'
     };
 
-    setTimeout(function() {
-      callback(null,result);
-    }, 0);
+    //
+    // check open invoice
+    db.model('Orders').findByCriteria({user:order.customer.id,payment:'invoice'},function (err, orders) {
+
+      if(err){
+        return callback(err);
+      }
+
+      // check open invoice
+      if(orders.length>config.shop.order.openInvoice){
+        return callback("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes")
+      }
+
+      // invoice is ok
+      return callback(null,result);
+    });
+
+
     return deferred.promise;    
   } 
   // return promise
@@ -286,7 +320,10 @@ PaymentInvoice.prototype.refund=function(order,reason, amount){
 //
 // capture this authorized order
 PaymentInvoice.prototype.capture=function(order,reason){
-  var self=this;
+  var self=this, 
+      options=options||{},
+      error=null;
+
   var _capture=function (deferred, callback) {
 
     //
@@ -299,21 +336,36 @@ PaymentInvoice.prototype.capture=function(order,reason){
       return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
     }
 
-    var amount=order.getTotalPrice()
+
+    var amount=order.getTotalPrice();
+    var status='invoice';
+    var log='invoice '+amount+' the '+new Date();
+
+    //
+    // new invoice event
+    if(reason==='invoice'){
+
+    }
+    else if(order.payment.status==='invoice'){
+      log='captured '+amount+' the '+new Date();
+      status='paid';
+    }
+
     var result={
-      log:'capture '+amount+' the '+new Date(),
+      log:log,
+      status:status,
       transaction:(order.oid+'').crypt(),
       updated:Date.now(),
       provider:'invoice'
     };
 
     setTimeout(function() {
-      callback(null,result);
+      callback(error,result);
     }, 0);
     return deferred.promise;
   }
 
-  return this._super.capture(_capture,order,reason)
+  return this._super.capture(_capture,order)
 
 }
 

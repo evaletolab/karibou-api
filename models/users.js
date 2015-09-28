@@ -114,6 +114,7 @@ validate.postal = function (value) {
 
     merchant:{type:Boolean},
 
+    // this is the stripe 
     gateway_id:{type:String, unique: true, select:false,sparse: true},
 
     /* make user valid/invalid */
@@ -721,8 +722,10 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
       });
     })
     .fail(function(err) {
+      //
+      // error is tracked but card is always removed!
       bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:alias});
-      return callback(err)
+      return;
     })
   });
 
