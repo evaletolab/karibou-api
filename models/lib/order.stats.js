@@ -249,6 +249,7 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
        { $unwind: '$vendors'}, 
        { $unwind: '$items'}, 
        { $match: filter  },
+       {$sort:{'week':-1}},
        {$group:
            {
              _id:{ month:"$month", year:"$year", vendor:"$vendors.slug"},

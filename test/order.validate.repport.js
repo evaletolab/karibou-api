@@ -142,7 +142,7 @@ describe("orders.validate.repport", function(){
       repport[year][month]['mon-shop'].orders.should.equal(2);
       repport[year][month]['mon-shop'].fees.should.equal(1.13);
       // FIXME select vendor fees 
-      repport[year][month]['mon-shop'].details.fees.should.equal(0.15);
+      repport[year][month]['mon-shop'].details.fees.should.equal(0.3);
 
       repport[year][month]['super-shop'].items.should.equal(3);
       repport[year][month]['super-shop'].amount.should.equal(10);
