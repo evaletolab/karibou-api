@@ -18,6 +18,7 @@ describe("api.orders.payment.capture", function(){
 
 
   var nextShippingDay=Orders.findCurrentShippingDay();
+  var okDay=Orders.findNextShippingDay();
 
 
   before(function(done){
@@ -190,6 +191,44 @@ describe("api.orders.payment.capture", function(){
         done();
       });
   });  
+
+
+  it.skip("POST /v1/orders create 2 orders with open invoice return 400", function(done){
+    var templateOrder=data.Orders[2];
+    templateOrder.customer.id='12346'
+    var payment={
+          alias:((templateOrder.customer.id+"invoice").hash().crypt()),
+          issuer:"invoice",
+          expiry:'12/'+okDay.getFullYear()
+        };
+
+    var order={
+      customer:templateOrder.customer,
+      items:[templateOrder.items[0]],
+      shipping:templateOrder.shipping,
+      payment:payment
+    }
+    order.items.forEach(function (item) {
+      item.categories=item.category;
+      item.price=3.8;
+      item.finalprice=item.price*item.quantity;
+    })
+    okDay.setHours(11,0,0,0)
+    order.shipping.when=okDay;
+
+
+
+    // done()
+    request(app)
+      .post('/v1/orders')
+      .send(order)
+      .set('cookie', cookie)
+      .expect(400,function(err,res){
+        should.not.exist(err)
+        res.text.should.containEql("Le paiement par facture n'est plus disponible")
+        done()
+      });
+  }); 
 
   it('POST /v1/orders/2000006/capture 200  got paid status',function(done){
     request(app)
