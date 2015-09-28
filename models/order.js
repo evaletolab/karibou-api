@@ -210,6 +210,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg2="Ce produit n'est plus disponible "
     , msg3="Le prix de votre produit a été modifié par le vendeur "
     , msg31="Une erreur c'est produite avec cet article (2)"
+    , msg32="Une erreur c'est produite avec cet article (3)"
     , msg4="La quantité d'achat minimum est de 1 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivée"
     , msg6="Ce produit n'est pas disponible car la boutique sera fermée ce jour là"
@@ -275,50 +276,56 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
 
 
-  if((typeof item.vendor) !=='object' ){
-    assert(product.vendor._id.toString()===item.vendor.toString())
-    item.vendor=product.vendor.urlpath;
 
-    // default address
-    var address=product.vendor.address.streetAdress+', '+product.vendor.address.postalCode+' tel:'+product.vendor.address.phone, 
-        geo=product.vendor.address.geo,
-        marketplace=false;
+  //
+  // check that mapping between product and item is correct
+  if(product.vendor._id.toString()!==item.vendor.toString()&&
+     product.vendor.urlpath!==item.vendor &&
+     product.vendor._id.toString()!==item.vendor._id.toString()){
+    return cb(msg32,item)
+  }
+  item.vendor=product.vendor.urlpath;
 
-    // override address based on marketplace        
-    if(product.vendor.marketplace.length){
-      config.shop.marketplace.list.every(function(place){
-        // check place with date
-        if(place.d&&place.d===shipping.when.getDay()){
-          address=place.name;
-          geo={lat:place.lat,lng:place.lng}
-          marketplace=true;
-          return false;
-        } 
-        return true;
-      })
-    }
+  // default address
+  var address=product.vendor.address.streetAdress+', '+product.vendor.address.postalCode+' tel:'+product.vendor.address.phone, 
+      geo=product.vendor.address.geo,
+      marketplace=false;
 
-    // append repository if marketplace is defined
-    if(marketplace && product.vendor.address.repository){
-      address=address+', '+product.vendor.address.repository
-    }
-    // set respository as address
-    // -> remove geo 
-    else if(product.vendor.address.repository){
-      address=product.vendor.address.repository;
-      geo=undefined;
-    }
-
-    vendor={
-        ref:product.vendor._id,
-        slug:product.vendor.urlpath,
-        name:product.vendor.name,
-        address:address,
-        fees:product.vendor.account.fees,
-        geo:geo
-    };
+  // override address based on marketplace        
+  if(product.vendor.marketplace.length){
+    config.shop.marketplace.list.every(function(place){
+      // check place with date
+      if(place.d&&place.d===shipping.when.getDay()){
+        address=place.name;
+        geo={lat:place.lat,lng:place.lng}
+        marketplace=true;
+        return false;
+      } 
+      return true;
+    })
   }
 
+  // append repository if marketplace is defined
+  if(marketplace && product.vendor.address.repository){
+    address=address+', '+product.vendor.address.repository
+  }
+  // set respository as address
+  // -> remove geo 
+  else if(product.vendor.address.repository){
+    address=product.vendor.address.repository;
+    geo=undefined;
+  }
+
+  vendor={
+      ref:product.vendor._id,
+      slug:product.vendor.urlpath,
+      name:product.vendor.name,
+      address:address,
+      fees:product.vendor.account.fees,
+      geo:geo
+  };
+
+  
   //
   // check item is still available in stock
   if(!product.attributes.available){
@@ -647,23 +654,23 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   //
   // if invoice , then attache the next order ID
   // TODO remove this part as it's already checked by the payment module
-  if(promise){
-    promise.then(function (orders) {
-      if(orders.length>config.shop.order.openInvoice){
-        callback("Cette méthode de paiement n'est pas invalide lorsque des factures sont encore ouvertes ");
-        return;
+  // if(promise){
+  //   promise.then(function (orders) {
+  //     if(orders.length>config.shop.order.openInvoice){
+  //       callback("Cette méthode de paiement n'est pas invalide lorsque des factures sont encore ouvertes ");
+  //       return;
 
-      }
-      return  db.model('Sequences').nextOrder();
-    })    
-  }else{
-    // else, attach the next order ID
-    promise=db.model('Sequences').nextOrder();
-  }
+  //     }
+  //     return  db.model('Sequences').nextOrder();
+  //   })    
+  // }else{
+  //   // else, attach the next order ID
+  //   promise=db.model('Sequences').nextOrder();
+  // }
 
   //
   // get unique Order identifier
-  promise.then(function(oid){
+  db.model('Sequences').nextOrder().then(function(oid){
     //
     // set oid
     order.oid=oid;
