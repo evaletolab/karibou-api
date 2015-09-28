@@ -38,6 +38,7 @@ PaymentInvoice.prototype.isValidAlias=function(alias, user, method){
   // if(method.expiry){
   //   expiry+=':'+method.expiry;
   // }
+
   return ((user.id+expiry).hash().crypt()===alias);
 }
 
@@ -104,7 +105,7 @@ PaymentInvoice.prototype.checkCard=function(user,alias){
     }
 
     // check open invoice
-    if(orders.length>0){
+    if(orders.length>config.shop.order.openInvoice){
       return deferred.reject(new Error("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes"))
     }
 
@@ -218,9 +219,24 @@ PaymentInvoice.prototype.authorize=function(order){
       provider:'invoice'
     };
 
-    setTimeout(function() {
-      callback(null,result);
-    }, 0);
+    //
+    // check open invoice
+    db.model('Orders').findByCriteria({user:order.customer.id,payment:'invoice'},function (err, orders) {
+
+      if(err){
+        return callback(err);
+      }
+
+      // check open invoice
+      if(orders.length>config.shop.order.openInvoice){
+        return callback("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes")
+      }
+
+      // invoice is ok
+      return callback(null,result);
+    });
+
+
     return deferred.promise;    
   } 
   // return promise
