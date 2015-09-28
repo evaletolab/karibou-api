@@ -181,7 +181,7 @@ describe("orders.validate.item", function(){
   });    
  
 
-  it("Error:this product is available even if shop is closed (with date) by the owner", function(done){
+  it("Error:this product is not available because the shop is closed (with date) by the owner", function(done){
     shipping.when=toNextDay;//toNextDay
 
     items=[]
@@ -195,7 +195,9 @@ describe("orders.validate.item", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       order.errors.length.should.equal(1);
+      // TODO check this as it seems to be an error
       order.errors[0]['1000003'].should.containEql("Ce produit n'est plus disponible")
+      //order.errors[0]['1000003'].should.containEql("la boutique sera fermée ce jour là")
       done();          
     });
   });  
