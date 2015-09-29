@@ -78,16 +78,17 @@ html(itemscope itemtype="http://schema.org/Product")
           span(  class="label label-success" title="Naturel") Sans chimie de synthèse
 
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
-        span(itemprop="price"): =product.getPrice().toFixed(2)+' CHF /'+product.pricing.part
+        span(itemprop="price"): =product.getPrice().toFixed(2)
+        <meta itemprop="priceCurrency" content="CHF" />
       div 
         img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/', class="img-responsive")
 
       h2:  =product.categories.name
       div: |Région de Genève
       h2 Boutique
-      div(itemprop='owns')
+      div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
         a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
-          span(itemprop="brand"): =product.vendor.name 
+          span(itemprop="name"): =product.vendor.name 
 
       h2 En vente sur le marché
       ul(class="list-group")
