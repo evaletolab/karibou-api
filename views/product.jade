@@ -80,7 +80,6 @@ html(itemscope itemtype="http://schema.org/Product")
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
         span(itemprop="price"): =product.getPrice().toFixed(2)
         <meta itemprop="priceCurrency" content="CHF" />
-      div 
         img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/', class="img-responsive")
 
         h2:  =product.categories.name
