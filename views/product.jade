@@ -86,9 +86,10 @@ html(itemscope itemtype="http://schema.org/Product")
       h2:  =product.categories.name
       div: |Région de Genève
       h2 Boutique
-      div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
-        a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
-          span(itemprop="name"): =product.vendor.name 
+      div(itemprop="offers" itemscope itemtype="http://schema.org/Offer")
+        div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
+          a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
+            span(itemprop="name"): =product.vendor.name 
 
       h2 En vente sur le marché
       ul(class="list-group")
