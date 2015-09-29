@@ -83,10 +83,9 @@ html(itemscope itemtype="http://schema.org/Product")
       div 
         img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/', class="img-responsive")
 
-      h2:  =product.categories.name
-      div: |Région de Genève
-      h2 Boutique
-      div(itemprop="offers" itemscope itemtype="http://schema.org/Offer")
+        h2:  =product.categories.name
+        div: |Région de Genève
+        h2 Boutique
         div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
           a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
             span(itemprop="name"): =product.vendor.name 
