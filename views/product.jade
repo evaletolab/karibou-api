@@ -62,8 +62,8 @@ html(itemscope itemtype="http://schema.org/Product")
           a(href="/shops" class="list-group-item"): |Les boutiques
           a(href="/products" class="list-group-item"): |Les produits
 
-      h1: =product.title
-      div: =product.details.description
+      h1(itemprop="name"): =product.title
+      div(itemprop="description"): =product.details.description
       div: =product.details.origin
       div
         if product.details.homemade
@@ -87,7 +87,7 @@ html(itemscope itemtype="http://schema.org/Product")
       h2 Boutique
       div(itemprop='owns')
         a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
-          span(itemprop="name"): =product.vendor.name 
+          span(itemprop="brand"): =product.vendor.name 
 
       h2 En vente sur le marché
       ul(class="list-group")
