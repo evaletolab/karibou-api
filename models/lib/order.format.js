@@ -109,10 +109,12 @@ exports.convertOrdersToRepportForShop=function(from,to,orders, shops, showAll){
     result.shops[slug].monthamount=parseFloat((total).toFixed(2));
     result.shops[slug].monthorders=_.uniq(monthorder).length;
     result.shops[slug].details=oshops[slug].details;
-    result.shops[slug].streetAdress=shop.address.streetAdress;
-    result.shops[slug].region=shop.address.region;
-    result.shops[slug].postalCode=shop.address.postalCode;
-    result.shops[slug].geo=shop.address.geo;
+    if(shop&&shop.address){  
+      result.shops[slug].streetAdress=shop.address.streetAdress;
+      result.shops[slug].region=shop.address.region;
+      result.shops[slug].postalCode=shop.address.postalCode;
+      result.shops[slug].geo=shop.address.geo;
+    }
     
     result.shops[slug].monthfees=parseFloat((totalfees).toFixed(2));
 
