@@ -16,7 +16,7 @@ exports.findByTimeoutAndNotPaid = function(callback){
 
 
   // console.log(q)
-  var query=db.model('Orders').find(q).sort({created: -1});
+  var query=this.find(q).sort({created: -1});
   if (callback) return query.exec(callback);
 
   return query;
@@ -28,9 +28,8 @@ exports.findByTimeoutAndNotPaid = function(callback){
 // find the last order for a shop
 exports.findByCriteria = function(criteria, callback){
   assert(criteria);
-  var Orders=db.model('Orders')
-    , Products=db.model('Products');
-
+  var Orders=this;
+  
   var q={};
 
   // filter by OIDs

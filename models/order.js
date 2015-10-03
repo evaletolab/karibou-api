@@ -10,12 +10,19 @@ var mongoose = require('mongoose')
   , utils=require('./lib/order.utils')
   , stats=require('./lib/order.stats')
   , finds=require('./lib/order.finds')
+  , core=require('./lib/order.core')
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
   , errorHelper = require('mongoose-error-helper').errorHelper;
 
 
+//
+// multiple connection
+if(config.mongo.multiple){
+  mongoose=mongoose.createConnection(config.mongo.multiple);
+  console.log('multiple',config.mongo.multiple)
+}
 
 //
 // managing geospatial with mongo
@@ -116,6 +123,10 @@ var Orders = new Schema({
       },
 
       vendor:{type:String, required:true}
+
+      //
+      // only displayed for owner and admin
+      // fees:{type:Number,select:false, requiered:true}
    }],
 
    vendors:[{
@@ -182,6 +193,12 @@ Orders.statics.filterByShop=utils.filterByShop;
 Orders.statics.findByTimeoutAndNotPaid=finds.findByTimeoutAndNotPaid;
 Orders.statics.findByCriteria=finds.findByCriteria;
 
+//
+// import manage API
+Orders.statics.updateItem = core.updateItem;
+Orders.statics.updateLogistic =core.updateLogistic;
+Orders.statics.coreCreate =core.coreCreate;
+Orders.methods.computeRankAndSave=core.computeRankAndSave;
 
 //
 // import format API
@@ -310,7 +327,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   if(marketplace && product.vendor.address.repository){
     address=address+', '+product.vendor.address.repository
   }
-  // set respository as address
+  // TODO, refactor the idea of repository! set respository as address
   // -> remove geo 
   else if(product.vendor.address.repository){
     address=product.vendor.address.repository;
@@ -326,7 +343,10 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
       geo:geo
   };
 
-  
+  //
+  // duplicate fees to simplify repport
+  item.fees=product.vendor.account.fees;
+
   //
   // check item is still available in stock
   if(!product.attributes.available){
@@ -423,23 +443,6 @@ Orders.statics.checkItems = function(shipping, items, callback){
     };
     return callback(err,products,vendors, errors)
   });
-}
-
-Orders.methods.computeRankAndSave=function(cb){
-
-  var self=this, sd=new Date(this.shipping.when), ed, promise, orderRank=1;
-  sd.setHours(1,0,0,0)
-  ed=new Date(sd.getTime()+86400000-3601000);
-
-  db.model('Orders').find({"shipping.when":{"$gte": sd, "$lt": ed}}).exec(function(err,orders){
-    var newRank=0;
-    for (var i = orders.length - 1; i >= 0; i--) {
-      newRank=Math.max(newRank,orders[i].rank);
-    };
-    self.rank=newRank+1;
-    debug("computeRankAndSave query:shipping.when",sd, ':',ed,'==',self.rank)
-    self.save(cb)
-  })
 }
 
 //
@@ -558,7 +561,6 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   var db=this
     , now =new Date()
     , Orders=db.model('Orders')
-    , Products=db.model('Products')
     , order={};
 
 
@@ -644,30 +646,6 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
     return callback(error.message)    
   }
 
-
-  //
-  //find open invoice for this user
-  var promise;
-  if(paymentData.issuer==='invoice'){
-    promise=Orders.findByCriteria({user:customer.id,payment:'invoice'}).exec();
-  }
-
-  //
-  // if invoice , then attache the next order ID
-  // TODO remove this part as it's already checked by the payment module
-  // if(promise){
-  //   promise.then(function (orders) {
-  //     if(orders.length>config.shop.order.openInvoice){
-  //       callback("Cette méthode de paiement n'est pas invalide lorsque des factures sont encore ouvertes ");
-  //       return;
-
-  //     }
-  //     return  db.model('Sequences').nextOrder();
-  //   })    
-  // }else{
-  //   // else, attach the next order ID
-  //   promise=db.model('Sequences').nextOrder();
-  // }
 
   //
   // get unique Order identifier
@@ -903,227 +881,6 @@ Orders.statics.onRefund = function(oid, amount, callback){
   });
 }
 
-//
-// only finalprice and note can be modified for an item
-// status == reserver,partial ,  payment==authorized
-Orders.statics.updateItem = function(oid,items, callback){
-  assert(oid);
-  assert(items);
-  db.model('Orders').findOne({oid:oid},function(err,order){
-    if(err){
-      return callback(err)
-    }
-    if(!order){
-      return callback("Impossible de trouver la commande: "+oid);
-    }
-
-    //
-    // check order status
-    if(order.closed){
-      return callback("Impossible de modifier une commande fermée: "+oid);
-    }
-
-    // cancelreason:["customer", "fraud", "inventory", "other"],
-    if(order.cancel&&order.cancel.when){
-      return callback("Impossible de modifier une commande annulée: "+oid);
-    }
-    //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-    if(["authorized"].indexOf(order.payment.status)==-1){
-      return callback("Impossible de modifier une commande sans validation financière : "+order.payment.status);
-    }
-
-
-    if(["reserved","partial"].indexOf(order.fulfillments.status)==-1){
-      return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status);
-    }
-
-
-    var itemIds=[], rollback=[];
-    items.forEach(function(item){
-      assert(item.sku)
-      for(var i in order.items){
-        if(order.equalItem(order.items[i],item)){
-        // if(order.items[i].sku===item.sku){
-          if(item.finalprice) order.items[i].finalprice=item.finalprice;
-          if(item.note)       order.items[i].note=item.note;
-          if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
-
-          //
-          // take care of variant
-          if(item.variant)       order.items[i].variant=item.variant;
-
-          // this item has bean removed from the order
-          if(item.fulfillment.status==='failure'){
-            rollback.push({sku:item.sku,qty:item.quantity})
-            //order.items[i].finalprice=item.finalprice=0.0;
-          }
-          itemIds.push(order.items[i].sku);
-          break;
-        }
-      }
-    })
-
-    // console.log('-----------> items:',_.collect(items,function(i){return i.sku}))
-    // console.log('-----------> order.items:',_.collect(order.items,function(i){return i.sku}))
-    // console.log('-----------> fulfillment:',_.collect(order.items,function(i){return i.fulfillment.status}))
-
-
-    if(itemIds.length!==items.length){
-      var itemIds=items.filter(function(e){
-          return (itemIds.indexOf(e.sku)===-1);
-      })
-
-      return callback("L'action est annulée, les articles suivants ne concernent pas cette commande : "+itemIds.map(function(i){return i.sku}).join(', '));
-    }
-
-    //
-    // notify this order has been successfully modified
-    bus.emit('order.update.items',null,order,items)
-
-    // if the order is not fulfilled
-    order.fulfillments.status='fulfilled'
-    order.items.forEach(function(item){
-      if(['failure','fulfilled'].indexOf(item.fulfillment.status)===-1){
-        order.fulfillments.status='partial'
-      }
-    })
-
-    order.save(callback)
-    // I DONT KNOW WHY THE NATIVE UPDATE IS NOT WORKING!!!
-    // order.update({'items.id': itemId.id}, {'$set': {
-    //     'items.$.finalprice': item.finalprice,
-    //     'items.$.note': item.note,
-    //     'items.$.fulfillment.status':item.fulfillment.status,
-    //     'items.$.sku':itemId.sku,
-    //     'items.$.title':itemId.title,
-    //     'items.$.quantity':itemId.quantity,
-    //     'items.$.price':itemId.price,
-    //     'items.$.part':itemId.part,
-    //     'items.$.category':itemId.category,
-    //     'items.$.vendor':itemId.vendor,
-    //     'items.$.fulfillment.shipping':itemId.fulfillment.shipping
-    // }}, callback);
-
-  });
-}
-
-
-//
-// only finalprice and note can be modified for an item
-// status == reserver,partial ,  payment==authorized
-Orders.statics.updateLogistic = function(query,options, callback){
-  assert(query);
-  assert(options);
-  var saveTasks=[], Q=require('q');
-
-  if(options.status === undefined && options.bags===undefined){
-    return callback("updateLogistic missing shipping param");          
-  }
-
-
-
-  //
-  // select orders by date
-  if(query['vendors.slug']){
-    var when=Date.parse(options.when);
-    if(!when||when==NaN){
-      return callback("updateLogistic missing date ");                
-    }
-    // date is ok
-    when=new Date(when)
-
-    var sd=new Date(when.getFullYear(), when.getUTCMonth(), when.getUTCDate()),
-        ed=new Date(sd.getTime()+86400000-60000);
-    query["shipping.when"]={"$gte": sd, "$lt": ed};
-
-    //
-    // in this case do not find closed order!
-    query["closed"]={'$exists':false};
-
-  //
-  // select order by OID
-  }else if(!query.oid){
-    return callback('updateLogistic missing order selector ')
-  }
-
-  db.model('Orders').find(query,function(err,orders){
-    if(err){
-      return callback(err)
-    } 
-
-    if(!orders.length){
-      if(query.oid) return callback("Impossible de trouver la commande: "+query.oid);
-      return callback("Impossible de trouver une commande pour la boutique: "+query['vendors.slug']);
-    }
-
-    for (var i=0; i < orders.length; i++) {
-      //
-      // fill an array of promises
-      saveTasks.push((function(order) {
-        var deferred = Q.defer();
-
-        var statusShopper=(options.status === "true"||options.status === true);
-
-        //
-        // check order status
-        // if(order.closed&&statusShopper){
-        //   return Q.reject(("Impossible de livrer une commande fermée: "+order.oid))
-        // }
-
-        // cancelreason:["customer", "fraud", "inventory", "other"],
-        if(order.cancel&&order.cancel.when){
-          return Q.reject(("Impossible de livrer une commande annulée: "+order.oid))
-        }
-        //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
-        if(["authorized","invoice","paid"].indexOf(order.payment.status)==-1){
-          return Q.reject(("Impossible de livrer une commande sans validation financière : "+order.payment.status));
-        }
-
-
-
-
-        //
-        // vendor is collected?
-        if(query['vendors.slug']){
-          for (var i = order.vendors.length - 1; i >= 0; i--) {
-            if(order.vendors[i].slug===query['vendors.slug']){
-              order.vendors[i].collected=statusShopper;
-              break;
-            }
-          };
-        }
-        // customer is shipped
-        else{
-          if(["fulfilled"].indexOf(order.fulfillments.status)==-1){
-            return Q.reject(("Impossible de livrer une commande avec le status: "+order.fulfillments.status));
-          }
-          if(options.bags!==undefined)order.shipping.bags=options.bags;
-          if(options.status!==undefined)order.shipping.shipped=statusShopper;
-        }
-
-        // return order.save()
-        order.save(function (err,order) {
-          if(err){return deferred.reject(err);}
-          deferred.resolve(order)
-        })
-        return deferred.promise;
-      })(orders[i]));
-    }
-    //
-    // notify this order has been successfully modified
-    bus.emit('order.update.logistic',null,orders,options)
-
-    return Q.all(saveTasks).then(function(){
-
-      callback(null,orders)
-    },function(err) {
-      callback(err)
-    })
-
-
-
-  });
-}
 
 
 
@@ -1163,4 +920,7 @@ Orders.statics.generateRepportForShop=function(criteria,cb) {
 
 
 Orders.set('autoIndex', config.mongo.ensureIndex);
+
+
+
 exports.Orders = mongoose.model('Orders', Orders);
