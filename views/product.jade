@@ -67,19 +67,21 @@ html(itemscope itemtype="http://schema.org/Product")
       div: =product.details.origin
       div
         if product.details.homemade
-          span( class="label label-success") Artisanal
+          li( class="label label-success") Artisanal
         if product.details.local
-          span(  class="label label-success") Local
+          li(  class="label label-success") Local
         if product.details.gluten
-          span(  class="label label-success") Sans gluten
+          li(  class="label label-success") Sans gluten
         if product.details.bio
-          span(  class="label label-success") BIO
+          li(  class="label label-success") BIO
         if product.details.natural
-          span(  class="label label-success" title="Naturel") Sans chimie de synthèse
+          li(  class="label label-success" title="Naturel") Sans chimie de synthèse
 
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
+        span prix, 
         span(itemprop="price"): =product.getPrice().toFixed(2)
         <meta itemprop="priceCurrency" content="CHF" />
+        span CHF
         img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/', class="img-responsive")
 
         h2:  =product.categories.name
@@ -93,6 +95,10 @@ html(itemscope itemtype="http://schema.org/Product")
       ul(class="list-group")
       - each place in product.vendor.marketplace
         li(class="list-group-item"): =place
+
+      h2 Livraison à domicile à vélo ou en voiture les
+      - each day in product.vendor.available.weekdays
+        li(  class="label label-success" title="#{weekdays[day]}")  #{weekdays[day]}
 
 
       h2 Contact
