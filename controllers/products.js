@@ -238,6 +238,7 @@ exports.getSEO=function (req, res) {
       product: product, 
       user: req.user, 
       _:_,
+      weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
       prependUrlImage:function (url) {
         if(url&&url.indexOf('//')===0){
           url='https:'+url;
@@ -281,6 +282,7 @@ exports.allSEO=function (req, res) {
         products: products, 
         user: req.user, 
         _:_,
+        weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){
             url='https:'+url;
