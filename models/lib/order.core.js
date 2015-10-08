@@ -83,7 +83,7 @@ exports.updateLogistic = function(query,options, callback){
     return callback('updateLogistic missing order selector ')
   }
 
-  db.model('Orders').find(query,function(err,orders){
+  this.find(query,function(err,orders){
     if(err){
       return callback(err)
     } 
@@ -152,7 +152,7 @@ exports.updateLogistic = function(query,options, callback){
 
     return Q.all(saveTasks).then(function(){
 
-      callback(null,orders)
+      callback(null,(orders.length==1)?orders[0]:orders)
     },function(err) {
       callback(err)
     })
