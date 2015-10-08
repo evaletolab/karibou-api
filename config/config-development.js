@@ -114,7 +114,8 @@ module.exports = {
   // TODO load by env
   mongo:{
     name:'mongodb://localhost/karibou-devel',
-    ensureIndex:true
+    ensureIndex:true,
+    multiple:'mongodb://localhost/karibou-core'
   },
 
 	nodetime:{
