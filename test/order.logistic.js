@@ -11,7 +11,7 @@ var when16=new Date('Tue Dec 16 2014 16:00:00 GMT+0100 (CET)'),
     when23=new Date('Tue Dec 23 2014 16:00:00 GMT+0100 (CET)'),
     Orders=db.model('Orders');
 
-describe("api.orders.find", function(){
+describe("orders.logistic", function(){
   before(function(done){
 
     dbtools.clean(function(e){
@@ -77,21 +77,21 @@ describe("api.orders.find", function(){
   });
 
   it('mark order shipped true',function(done){
-    Orders.updateLogistic({oid:2000007}, {status:true,bags:2},function (err, orders) {
+    Orders.updateLogistic({oid:2000007}, {status:true,bags:2},function (err, order) {
       should.not.exist(err)
-      should.exist(orders)
-      orders[0].shipping.shipped.should.equal(true)
-      orders[0].shipping.bags.should.equal(2)
+      should.exist(order)
+      order.shipping.shipped.should.equal(true)
+      order.shipping.bags.should.equal(2)
       done()
     })
   });
 
   it('change order bags count',function(done){
-    Orders.updateLogistic({oid:2000007}, {bags:1},function (err, orders) {
+    Orders.updateLogistic({oid:2000007}, {bags:1},function (err, order) {
       should.not.exist(err)
-      should.exist(orders)
-      orders[0].shipping.shipped.should.equal(true)
-      orders[0].shipping.bags.should.equal(1)
+      should.exist(order)
+      order.shipping.shipped.should.equal(true)
+      order.shipping.bags.should.equal(1)
       done()
     })
   });
