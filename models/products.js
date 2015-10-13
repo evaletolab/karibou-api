@@ -36,6 +36,7 @@ var Manufacturer = new Schema({
 var Product = new Schema({
    sku: { type: Number, required: true, unique:true },
    title: { type: String, required: true },
+   slug: { type: String, required: false },
    
    details:{
       description:{type:String, required:true},
@@ -247,6 +248,12 @@ Product.statics.create = function(p,s,callback){
 
       p.categories=categories;        
  
+      //
+      // slug this product
+      if(!p.slug){
+        p.slug=p.title.slug();
+      }
+      
 
       //
       // ready to create one product

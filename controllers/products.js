@@ -373,6 +373,12 @@ exports.update=function (req, res) {
       }
     }
 
+    //
+    // slug this product
+    if(req.body.title&&product.title!==req.body.title){
+      product.slug=req.body.title.slug();
+    }    
+
     // do the update
     _.extend(product,req.body)
 
