@@ -328,7 +328,6 @@ Product.statics.findPopularByUser = function(criteria, callback){
     cb=undefined;
   }
 
-
   //
   // get items last 3 month sku by 
   this.model('Orders').aggregate(
@@ -345,10 +344,9 @@ Product.statics.findPopularByUser = function(criteria, callback){
          hit: { $sum: 1 }
        }
     },
-    {$match: { 'hit': {$gte:parseInt(criteria.minhit)||1 } } },     
+    {$match: { 'hit': {$gte:criteria.minhit} }},     
     {$sort:{month:-1}},
   function (err, result) {
-    // console.log('result',err,result)
     if(result&&result.length){
       result.forEach(function (item) {
         skus.push(item._id)
