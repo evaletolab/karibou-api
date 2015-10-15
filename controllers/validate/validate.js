@@ -171,8 +171,8 @@ exports.product = function(req){
     }
 
     for (var i in req.body.faq){
-      check(req.body.faq[i].q,"Vous devez écrire un question qui doit contenir entre 3 et 150 caractères").len(3, 150).isText();
-      check(req.body.faq[i].a,"Vous devez écrire un réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
+      check(req.body.faq[i].q,"Vous devez écrire une question qui doit contenir entre 3 et 150 caractères").len(3, 150).isText();
+      check(req.body.faq[i].a,"Vous devez écrire une réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
     for (var i in req.body.variants){
@@ -246,8 +246,8 @@ exports.shop=function(shop){
     }
 
     for (var i in shop.faq){
-      check(shop.faq[i].q,"La question doit contenir entre 3 et 150 caractères").len(3, 150).isText();
-      check(shop.faq[i].a,"La réponse doit contenir entre 3 et 400 caractères").len(3, 400).isText();
+      check(shop.faq[i].q,"Vous devez écrire une question qui doit contenir entre 3 et 150 caractères").len(3, 150).isText();
+      check(shop.faq[i].a,"Vous devez écrire une réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
     if (shop.available){
