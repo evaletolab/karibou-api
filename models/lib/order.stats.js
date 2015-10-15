@@ -156,7 +156,7 @@ exports.ordersByPostalVsUsersByPostal=function(filter,cb){
 exports.getSellValueByYearAndWeek=function(query,cb){
   query=query||{ closed: { '$exists': false } };
 
-  return db.model('Orders').aggregate(
+  return this.aggregate(
     [
        { $match: { 'payment.status': 'paid' }},
        {$project:{
@@ -233,10 +233,28 @@ exports.getSellValueByYearAndWeek=function(query,cb){
 //
 // follow CA for shops
 exports.getCAByYearMonthAndVendor=function (filter,cb) {
+  var today=new Date(), match={'items.fulfillment.status':'fulfilled'};
+  //
+  // filter by month, year, thismonth,shop 
   filter=filter||{};
-  filter=_.extend(filter,{'items.fulfillment.status':'fulfilled'})
-  db.model('Orders').aggregate([
-       { $match: { 'payment.status': 'paid' } },
+  match.year=today.getFullYear();
+  if(filter.year){
+    match.year=parseInt(filter.year)||match.year;
+  }
+  if(filter.month){
+    match.month=parseInt(filter.month);
+  }
+  if(filter.shop){    
+    match['items.vendor']=filter.shop;
+    if(Array.isArray(filter.shop)){
+      match['items.vendor']={'$in':filter.shop};
+    }
+  }
+
+  //
+  // only paid orders
+  this.aggregate([
+       { $match: {$or:[{'payment.status': 'paid'},{'payment.status': 'invoice'}]} },
        {$project:{
              month:{ $month:"$shipping.when"}, 
              week: { $week: "$shipping.when"}, 
@@ -248,7 +266,7 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
        }},
        { $unwind: '$vendors'}, 
        { $unwind: '$items'}, 
-       { $match: filter  },
+       { $match: match  },
        {$sort:{'week':-1}},
        {$group:
            {
@@ -377,7 +395,7 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
 exports.getStatsByOrder=function(query){
   query=query||{ closed: { '$exists': false } };
 
-  return db.model('Orders').aggregate(
+  return this.aggregate(
      [
        { $match: query },
        {$project:{week: { $week: "$shipping.when"}, year: { $year: "$shipping.when" },

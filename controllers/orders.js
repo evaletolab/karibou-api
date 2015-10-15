@@ -781,7 +781,7 @@ exports.invoicesByUsers=function(req,res){
 }
 
 //
-// get CSV invoices
+// get repport by shop
 exports.invoicesByShops=function(req,res){
   try{
     if(!req.params.month)throw new Error('Le mois est obligatoire');
@@ -835,3 +835,48 @@ exports.invoicesByShops=function(req,res){
   });
 
 }
+
+//
+// get repport by shop
+exports.invoicesByShops2=function(req,res){
+  try{
+    if(!req.params.month)throw new Error('Le mois est obligatoire');
+    if(req.params.year){}
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  var criteria={}, result=[], showAll=req.query.all||false, today=new Date(),output=req.query.output||'json';
+
+
+  criteria.month=req.params.month;
+  criteria.year=req.params.year||today.getFullYear();
+
+
+
+
+  //
+  // restrict to a shop name
+  // 0) no shops given => you should be admin
+  // 1) a list of shops is given => you should be admin
+  // 2) user shops  => is the default
+  if(req.user.isAdmin()){
+    // admin can specify the shops
+    if(req.query.shops){
+      criteria.shop=req.query.shops
+    }
+
+  }else{
+    // not admin and having almost one shop
+    criteria.shop=req.user.shops.map(function(i){ return i.urlpath})      
+  }
+
+  Orders.getCAByYearMonthAndVendor(criteria,function(err,repport){
+    if(err){
+      return res.send(400,errorHelper(err.message||err));
+    }
+    res.json(repport[criteria.year][criteria.month])
+  });
+
+}
+
