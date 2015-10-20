@@ -125,10 +125,10 @@ describe("system", function(){
     it("Basic testing of the Bus", function(done){
         var bus=require('../app/bus'), em=0;
         bus.on('test',function(a,cb){
-            cb(a+'-1')
+            cb(0,a+'-1')
         })
         bus.on('test',function(a,cb){
-            cb(a+'-2')
+            cb(0,a+'-2')
         })
 
         //
@@ -138,6 +138,23 @@ describe("system", function(){
 
             //console.log(out,bus.listeners('test').length)            
             if(++em===2)done()
+        })
+    });
+
+    it("Basic testing of the Bus and promise", function(done){
+        var bus=require('../app/bus'), em=0;
+        bus.on('test',function(a,cb){
+            cb(0,a+'-1')
+        })
+        bus.on('test',function(a,cb){
+            cb(0,a+'-2')
+        })
+
+        //
+        // this emiter will receive multiple callback 
+        // and this is an issue because only one done is permitted
+        bus.emit('test','msg').then(function(out){
+            done()
         })
     });
 
