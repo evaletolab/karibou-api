@@ -277,44 +277,6 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
-/**
- *
-  #prefered product for a user
-  db.orders.aggregate(
-       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
-       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 items:1,
-       }},
-       { $match: { 'month': {$gt:6,$lte:8 } } },     
-       {$unwind: '$items' },
-       {$group:
-           {
-             _id:"$items.sku",
-             month:{$first:"$month"},
-             hit: { $sum: 1 }
-           }
-       },
-       {$sort:{month:-1}}
-  ).forEach(function(result){print(result._id+' m:'+result.month);})
-  --
-  db.orders.aggregate(
-       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
-       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 items:1,
-       }},
-       {$unwind: '$items' },
-       {$group:
-           {
-             _id:"$items.sku",
-             month:{$first:"$month"},
-             hit: { $sum: 1 }
-           }
-       },
-       { $match: { 'hit': {$gt:2 } } },     
-       {$sort:{hit:-1}}
-  ).forEach(function(result){print(result._id+' h:'+result.hit);})
-
- */
 
 
 Product.statics.findPopularByUser = function(criteria, callback){
@@ -344,7 +306,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
          hit: { $sum: 1 }
        }
     },
-    {$match: { 'hit': {$gte:criteria.minhit} }},     
+    {$match: { 'hit': {$gte:criteria.minhit||1} }},     
     {$sort:{month:-1}},
   function (err, result) {
     if(result&&result.length){
@@ -442,7 +404,7 @@ Product.statics.findByCriteria = function(criteria, callback){
   require('async').waterfall([
     function(cb){
       //
-      // by available shops
+      // by available shops status could be a boolean or a lst of shop
       if (criteria.status){
         // specify the date 
         var nextShippingDays=Orders.findOneWeekOfShippingDay();
@@ -557,6 +519,12 @@ Product.statics.findByCriteria = function(criteria, callback){
       // only available products ?
       if(criteria.instock!==undefined){
         query=query.where("pricing.stock").gt(0);
+      }
+
+      //
+      // only low stock products ?
+      if(criteria.lowstock!==undefined){
+        query=query.where("pricing.stock").lt(5);
       }
 
       //
