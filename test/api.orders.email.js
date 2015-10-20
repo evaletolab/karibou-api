@@ -24,6 +24,7 @@ describe("api.orders.email", function(){
 
 
   before(function(done){
+    // remove admin
     admins=config.admin.emails;config.admin.emails=[];
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.find.js"],db,function(err){
@@ -75,7 +76,7 @@ describe("api.orders.email", function(){
 
   it('POST /v1/orders/un-autre-shop/email  send email return 401 when not shop owner',function(done){
     request(app)
-      .post('/v1/orders/un-autre-shop/email')
+      .post('/v1/orders/un-shop/email')
       .send({when:sellerDay})
       .set('cookie', cookie)      
       .expect(401,function(err,res){
@@ -108,17 +109,38 @@ describe("api.orders.email", function(){
       .expect(200,function(err,res){
         var when=Orders.formatDate(sellerDay)
         should.not.exist(err)
-        should.exist(res.body.items)
-        res.body.items.map(function (item) {
-          return item.sku
-        })[0].should.equal(1000001)
-        res.body.shippingWhen.should.equal(when)
+        should.exist(res.body['super-shop'].items)
+        res.body['super-shop'].items[0].sku.should.equal(1000001)
+        res.body['super-shop'].items[0].vendor.should.equal('super-shop')
+        res.body['super-shop'].shippingWhen.should.equal(when)
         // res.body.oid.should.equal(2000008)
         //res.body.length.should.equal(3)
         done()
       });  
   });  
 
+  it('POST /v1/orders/shops/email to all shops  send email return 200',function(done){
+    request(app)
+      .post('/v1/orders/shops/email')
+      .send({when:sellerDay})
+      .set('cookie', cookie)      
+      .expect(200,function(err,res){
+        var when=Orders.formatDate(sellerDay)
+        should.not.exist(err)
+        should.exist(res.body['super-shop'].items)
+        should.exist(res.body['un-autre-shop'].items)
+        res.body['super-shop'].items[0].sku.should.equal(1000001);
+        res.body['super-shop'].shippingWhen.should.equal(when)
+        res.body['super-shop'].items.forEach(function (item) {
+          item.vendor.should.equal('super-shop');
+        })
+        res.body['un-autre-shop'].items.forEach(function (item) {
+          item.vendor.should.equal('un-autre-shop');
+        });
+        res.body['un-autre-shop'].items[0].oid.should.equal(2000006);
+        done()
+      });  
+  });  
 
 
 });
