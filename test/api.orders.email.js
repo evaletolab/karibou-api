@@ -137,9 +137,12 @@ describe("api.orders.email", function(){
         res.body['un-autre-shop'].items.forEach(function (item) {
           item.vendor.should.equal('un-autre-shop');
         });
+        var count2000006=0;
         res.body['un-autre-shop'].items.map(function (i) {
+          if(i.oid===2000006)count2000006++;
           return i.oid;
         }).should.containEql(2000006);
+        count2000006.should.equal(2);
         done()
       });  
   });  
