@@ -137,7 +137,9 @@ describe("api.orders.email", function(){
         res.body['un-autre-shop'].items.forEach(function (item) {
           item.vendor.should.equal('un-autre-shop');
         });
-        res.body['un-autre-shop'].items[0].oid.should.equal(2000006);
+        res.body['un-autre-shop'].items.map(function (i) {
+          return i.oid;
+        }).should.containEql(2000006);
         done()
       });  
   });  
