@@ -8,7 +8,7 @@ var db = require('mongoose'),
 exports.prepareOrdersForMail=function (when,shops,closed, cb) {
   var Orders=this;
 
-  var criteria={closed:closed}
+  var criteria={fulfillment:closed}
 
   //
   // restrict to a list of shopname
@@ -20,7 +20,11 @@ exports.prepareOrdersForMail=function (when,shops,closed, cb) {
 
   //
   // select the shipping day
-  criteria.when=new Date(when);
+  if(!when){
+    criteria.nextShippingDay=true;
+  }else{
+    criteria.when=new Date(when);
+  }
 
 
   Orders.findByCriteria(criteria, function(err,orders){

@@ -249,18 +249,18 @@ exports.filterByShop=function(orders,shopname){
 
   orders.forEach(function(order,j){
     var copy=_.extend({},order);
-    copy.vendors=_.map(copy.vendors,_.clone)
-    copy.items=_.map(copy.items,_.clone)
+    copy.vendors=_.map(copy.vendors,_.clone);
+    copy.items=_.map(copy.items,_.clone);
 
     //
     // remove exo shops
     i=copy.vendors.length;while (i--){
       if(shopname.indexOf(copy.vendors[i].slug)===-1){
-          copy.vendors.splice(i,1)
+          copy.vendors.splice(i,1);
       }
     }
     if(copy.vendors.length){
-      toKeep.push(copy)
+      toKeep.push(copy);
     }
   })
 
@@ -271,14 +271,14 @@ exports.filterByShop=function(orders,shopname){
     // remove exo items
     i=order.items.length;while (i--){
       if(shopname.indexOf(order.items[i].vendor+'')===-1){
-          order.items.splice(i,1)
+          order.items.splice(i,1);
       }
     }
 
 
   })
 
-  return toKeep
+  return toKeep;
 }
 
 //
@@ -290,7 +290,7 @@ exports.collectVendorsSlug=function  (orders) {
         return vendor.slug;
       })
   })
-  return _.uniq(_.flatten(slugs))
+  return _.uniq(_.flatten(slugs));
 }
 
 //

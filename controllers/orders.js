@@ -649,7 +649,7 @@ exports.informShopToOrders=function(req,res){
 
 
 
-  var when=new Date(req.body.when),
+  var when=req.body.when,
       closed=req.body.closed,
       shop=req.params.shopname?[req.params.shopname]:[];
 
