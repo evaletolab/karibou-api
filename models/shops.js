@@ -152,6 +152,36 @@ Shops.statics.create = function(shop,user, callback){
 }; 
 
 //
+// list changed fields  
+Shops.methods.getDiff=function (next) {
+  var self=this.toObject(),result={
+    available:this.available,
+    fees:false
+  };
+
+  //
+  // check new instance
+  if(!next){
+    return result;
+  }
+
+  //
+  // log diff of available
+  Object.keys(self.available).forEach(function (attribute) {
+    if(self.available[attribute]!==next.available[attribute]){
+      result.available[attribute]=next.available[attribute];
+    }
+  });
+
+  if(self.accoun){
+    result.fees=self.account.fees!==next.account.fees;
+  }
+
+
+  return result;
+}
+
+//
 // validate shop
 //   valid: true, invalid: Date, deleted:false
 Shops.methods.updateStatus=function(valid,callback){

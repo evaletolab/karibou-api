@@ -190,6 +190,55 @@ Product.methods.getPrice=function(){
 };
 
 //
+// list changed fields  
+Product.methods.getDiff=function (next) {
+  var self=this.toObject(),result={
+    details:{},
+    attributes:{},
+    pricing:{}
+  };
+
+  //
+  // check new instance
+  if(!next){
+    result={
+      details:this.details,
+      attributes:this.attributes,
+      pricing:this.pricing
+    };    
+    return result;
+  }
+
+  //
+  // log diff of details
+  Object.keys(self.details).forEach(function (detail) {
+    if(self.details&&self.details[detail]!==next.details[detail]){
+      result.details[detail]=next.details[detail];
+    }
+  });
+
+  //
+  // log diff of attributes
+  Object.keys(self.attributes).forEach(function (attribute) {
+    if(self.attributes&&
+       self.attributes[attribute]!==next.attributes[attribute]){
+      result.attributes[attribute]=next.attributes[attribute];
+    }
+  });
+
+  //
+  // log diff of pricing
+  Object.keys(self.pricing).forEach(function (price) {
+    if(self.pricing&&
+       self.pricing[price]!==next.pricing[price]){
+      result.pricing[price]=next.pricing[price];
+    }
+  });
+
+
+  return result;
+}
+//
 // product is available for order only if
 // - vendor is populated,
 // - attributes.available is true
