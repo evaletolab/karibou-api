@@ -12,7 +12,8 @@ module.exports = function(app, config, passport) {
   var users 	  = require(path+'users');
   var shops     = require(path+'shops');
   var orders    = require(path+'orders');
-  var emails 	  = require(path+'emails');
+  var emails    = require(path+'emails');
+  var docs      = require(path+'documents');
   var categories= require(path+'categories');
   var _         = require('underscore');
 
@@ -54,7 +55,21 @@ module.exports = function(app, config, passport) {
   app.get ('/robots.txt', api.robots);
   app.get ('/seo/robots.txt', api.robots);
   
-  
+  //
+  // documents
+  app.get ('/v1/documents/list', docs.findByOwner);
+  app.get ('/v1/documents/list/skus/:skus', docs.findBySkus);
+  app.get ('/v1/documents/list/category/:category', docs.findByCategory);
+  app.get ('/v1/documents/:slug', docs.get);
+  // documents update/create
+  app.post('/v1/documents/:slug', auth.ensureAuthenticated, docs.ensureOwnerOrAdmin,docs.update);
+  app.post('/v1/documents', auth.ensureAuthenticated,docs.create);
+
+
+  //
+  // activities
+  app.get('/v1/activities', auth.ensureAuthenticated,api.activities);
+
 
   //
   // stats

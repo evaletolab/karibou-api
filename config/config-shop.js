@@ -8,6 +8,11 @@ module.exports = {
       post:{limitMS:500}
     },
 
+    document:{
+      types:['recipe','post','bundle']
+    },
+
+
     category:{
       types:['Category', 'Catalog']
     },
@@ -25,6 +30,18 @@ module.exports = {
       periphery:["1219","1231"]
     },
 
+    issue:{
+      code:[
+      "issue_missing_code",
+      "issue_missing_product",
+      "issue_missing_validation",
+      "issue_missing_validation",
+      "issue_wrong_packing",
+      "issue_wrong_code",
+      "issue_wrong_product_quality",
+      "issue_late_delivry"
+      ]
+    },
     //
     // collect place
     marketplace:{
