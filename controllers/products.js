@@ -3,6 +3,7 @@
 
 require('../app/config');
 var db = require('mongoose'),
+    bus=require('../app/bus'),
     Shops = db.model('Shops'),
     Products = db.model('Products'),
     validate = require('./validate/validate'),
@@ -81,6 +82,13 @@ exports.create=function (req, res) {
         if(err){
           return res.send(400, errorHelper(err));    
         }
+
+        //
+        // log activity
+        bus.emit('activity.create',req.user
+                               ,{type:'Products',key:'sku',id:product.sku}
+                               ,product.getDiff());
+
         res.json(product);            
     });
 
@@ -378,6 +386,12 @@ exports.update=function (req, res) {
     if(req.body.title&&product.title!==req.body.title){
       product.slug=req.body.title.slug();
     }    
+
+    //
+    // log activity
+    bus.emit('activity.update',req.user
+                           ,{type:'Products',key:'sku',id:product.sku}
+                           ,product.getDiff(req.body));
 
     // do the update
     _.extend(product,req.body)

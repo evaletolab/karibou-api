@@ -68,6 +68,14 @@ exports.create=function (req, res) {
     if(err){
       return res.send(400,errorHelper(err.message||err));
     }
+
+    //
+    // log activity
+    bus.emit('activity.create',req.user
+                           ,{type:'Shops',key:'urlpath',id:shop.urlpath}
+                           ,shop.getDiff());
+
+
     res.json(shop);
   });
 };
@@ -367,6 +375,13 @@ exports.update=function(req,res){
       req.body.status=shop.status;
       req.body.account=shop.account;
     }
+
+    //
+    // log activity
+    bus.emit('activity.update',req.user
+                           ,{type:'Shops',key:'urlpath',id:shop.urlpath}
+                           ,shop.getDiff(req.body));
+
 
     // do the update
     _.extend(shop,req.body)
