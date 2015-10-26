@@ -209,6 +209,9 @@ Product.methods.getDiff=function (next) {
     return result;
   }
 
+  // human content
+  result.title=next.title;
+
   //
   // log diff of details
   Object.keys(self.details).forEach(function (detail) {

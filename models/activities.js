@@ -96,7 +96,6 @@ Activity.statics.findByCrireria = function(criteria, callback){
     query[criteria.what.key]=criteria.what.id+'';
   }
 
-  console.log('-------------',query)
 
   if(callback) return this.find(query).exec(callback);
   return this.find(query);
