@@ -342,6 +342,8 @@ Product.statics.findPopularByUser = function(criteria, callback){
     cb=undefined;
   }
 
+
+
   //
   // get items last 3 month sku by 
   this.model('Orders').aggregate(
@@ -349,7 +351,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
-     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 } } },     
+     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 }, 'year':thisYear } },     
      {$unwind: '$items' },
      {$group:
        {
@@ -581,7 +583,7 @@ Product.statics.findByCriteria = function(criteria, callback){
 
       //
       // filter by SKUs
-      if(criteria.skus&&criteria.skus.length){
+      if(criteria.skus){
         query=query.where("sku").in(criteria.skus)
       }
 
