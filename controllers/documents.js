@@ -35,32 +35,6 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 
 
-
-
-exports.create=function (req, res) {
-
-  try{  
-    // validate.document(req,res);
-  }catch(err){
-    return res.send(400, err.message);
-  }  
-  
-  
-  //
-  // ready to create one doc
-  Documents.create(req.body,req.user.id, function(err,doc){
-      if(err&&err.code==11000){
-        return res.send(400,"Cet document existe déjà");    
-      }
-      else if(err){
-        return res.send(400, errorHelper(err));    
-      }
-      res.json(doc);            
-  });
-
-
-};
-
 exports.findByOwner=function (req, res) {
   Documents.findByCriteria({uid:req.user.id},function(err,docs){
     if (err) {
@@ -72,7 +46,9 @@ exports.findByOwner=function (req, res) {
 
 
 exports.findBySkus=function (req, res) {
-  Documents.findByCriteria({skus:req.query.skus},function(err,docs){
+  var skus=req.params.sku&&req.params.sku.split(',')||[];
+
+  Documents.findByCriteria({skus:skus},function(err,docs){
     if (err) {
       return res.send(400,err);
     }
@@ -81,7 +57,7 @@ exports.findBySkus=function (req, res) {
 };
 
 exports.findByCategory=function (req, res) {
-  Documents.findByCriteria({skus:req.query.skus},function(err,docs){
+  Documents.findByCriteria({type:req.params.category},function(err,docs){
     if (err) {
       return res.send(400,err);
     }
@@ -115,9 +91,105 @@ exports.get=function (req, res) {
 };
 
 //
+// creation
+exports.create=function (req, res) {
+  try{  
+    validate.document(req.body);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+  
+  //
+  // ready to create one doc
+  Documents.create(req.body,req.user.id, function(err,doc){
+      if(err&&err.code==11000){
+        return res.send(400,"Cet document existe déjà");    
+      }
+      else if(err){
+        return res.send(400, errorHelper(err));    
+      }
+
+      res.json(doc);            
+  });
+
+
+};
+
+// Single update
+exports.update=function (req, res) {
+  //
+  // check && validate input field
+  try{
+    validate.check(req.params.slug, "Le format SLUG du document n'est pas valide").len(3, 104).isSlug();    
+    validate.document(req.body);
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  req.body.updated=Date.now();
+
+  //
+  //body clean (avoid mongo warn !) 
+  delete(req.body._id);
+  delete(req.body.__v);
+  delete(req.body.slug);
+  req.body.$promise && delete(req.body.$promise);
+  req.body.$resolved && delete(req.body.$resolved);
+  
+  Documents.findOne({slug:req.params.slug}).exec(function(err,doc){
+    if (!doc){
+      return res.send(400,'Ooops, unknow doc '+req.params.slug);    
+    }
+
+    // if not admin  
+    if(!req.user.isAdmin()){
+      req.body.signature=doc.signature;
+      req.body.owner=doc.owner;
+      req.body.created=doc.created;
+    }
+
+    // 
+    // slug this doc TODO the slug change the final url && url can be bookmarked!! WE SHOULD SAVE SLUG VERSIONS
+    if(req.body.title&&doc.title!==req.body.title){
+      doc.slug=req.body.title.slug();
+    }    
+
+    // do the update
+    _.extend(doc,req.body)
+
+    doc.save(function (err) {
+      if (err){
+        return res.send(400,err.message||errorHelper(err));    
+      }
+      return res.json(doc);  
+    })
+  });
+};
+
+
+// remove a single doc
+exports.remove=function (req, res) {
+
+  try{
+    validate.check(req.params.slug, "Le format SLUG du produit n'est pas valide").len(3, 100).isSlug();
+  }catch(err){
+    return res.send(400, err.message);
+  }  
+
+  //TODO remove do not trigger post middleware, use find and remove
+  Documents.find({slug:req.params.slug}).remove(function(err){
+    if (err){
+      return res.json(400,err);    
+    }
+    return res.send(200);
+  });
+};
+
+
+//
 // get doc SEO
 exports.getSEO=function (req, res) {
-  return Documents.findOneBySlug(req.params.slug, function (err, doc) {
+  return Documents.findOneBySlug({slug:req.params.slug}, function (err, doc) {
     if (err) {
       return res.send(400,errorHelper(err));
     }
@@ -193,73 +265,7 @@ exports.allSEO=function (req, res) {
     })
 
   });
-*/
+*/  
 };
 
-// Single update
-exports.update=function (req, res) {
- //
-  // check && validate input field
-  try{
-    validate.check(req.params.slug, "Le format SLUG du document n'est pas valide").len(3, 104).isSlug();    
-    // validate.document(req);
-  }catch(err){
-    return res.send(400, err.message);
-  }  
-
-  req.body.updated=Date.now();
-
-  delete(req.body._id);
-  //
-  //body clean (avoid mongo warn !) 
-  req.body.$promise && delete(req.body.$promise);
-  req.body.$resolved && delete(req.body.$resolved);
-  
-  Documents.findOne({slug:req.params.slug}).exec(function(err,doc){
-    if (!doc){
-      return res.send(400,'Ooops, unknow doc '+req.params.slug);    
-    }
-
-    // if not admin  
-    if(!req.user.isAdmin()){
-      req.body.owner=doc.owner;
-      req.body.created=doc.created;
-    }
-
-    // 
-    // slug this doc TODO the slug change the final url && url can be bookmarked!! WE SHOULD SAVE SLUG VERSIONS
-    if(req.body.title&&doc.title!==req.body.title){
-      doc.slug=req.body.title.slug();
-    }    
-
-    // do the update
-    _.extend(doc,req.body)
-
-    doc.save(function (err) {
-      if (err){
-        return res.send(400,err.message||errorHelper(err));    
-      }
-      return res.json(doc);  
-    })
-  });
-};
-
-
-// remove a single doc
-exports.remove=function (req, res) {
-
-  try{
-    validate.check(req.params.slug, "Le format SLUG du produit n'est pas valide").len(3, 100).isSlug();
-  }catch(err){
-    return res.send(400, err.message);
-  }  
-
-  //TODO remove do not trigger post middleware, use find and remove
-  Documents.find({slug:req.params.slug}).remove(function(err){
-    if (err){
-      return res.json(400,err);    
-    }
-    return res.send(200);
-  });
-};
 

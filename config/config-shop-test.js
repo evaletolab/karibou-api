@@ -9,7 +9,7 @@ module.exports = {
     },
 
     document:{
-      types:['recipe','post','bundle']
+      types:['recipe','post','bundle','page']
     },
 
     category:{

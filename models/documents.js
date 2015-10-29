@@ -22,10 +22,10 @@ var EnumDocumentType=config.shop.document.types;
 
 
 // Product Model
-
 var Document = new Schema({
-  title: { type: String, required: true },
-  slug: { type: String, required: true, unique:true },
+  title:{type: String, required: true },
+  header:{type: String, required: true },
+  slug:{type: String, required: true, unique:true },
   content:{type:String, required:true},
    
   photo:{
@@ -41,25 +41,29 @@ var Document = new Schema({
 
   skus:[Number],
   type: {type:String, required:true,  enum:EnumDocumentType},
-  owner:{type:Number, requiered:true}  
+  owner:{type:Number, requiered:true},
+  signature:{type:String, requiered:true}
+
 });
 
 
 
 //
 // create a new document 'p' for the shop 's'
-Document.statics.create = function(doc,callback){
+Document.statics.create = function(doc,uid,callback){
   assert(doc);
   assert(callback);
 	var Documents=this;    
+
         
   doc.slug=doc.title.slug();
+  doc.owner=uid;
 
   //
   // ready to create one product
-  var myDocument =new  Documents(doc);
+  var myDocument=new  Documents(doc);
  
-  myDocument.save(callback);  
+  return myDocument.save(callback);  
 }; 
 
 
@@ -78,27 +82,27 @@ Document.statics.findOneBySlug = function(criteria, callback){
 };
 
 
-Document.statics.findByCrireria = function(criteria, callback){
+Document.statics.findByCriteria = function(criteria, callback){
   var query=this.find({});
   //
   // fondByType
   if(criteria.type){
     if(EnumDocumentType.indexOf(criteria.type)===-1){
-      return callback("Le type du document n'est pas valable: "+type);
+      return callback("Le type du document n'est pas valable: "+criteria.type);
     }
-    query.where({type:criteria.type});
+    query=query.where({type:criteria.type});
   }
 
   //
   // findByUser
   if(criteria.uid){
-    query.where({owner:criteria.uid});
+    query=query.where({owner:criteria.uid});
   }
 
   //
   // findBySkus
   if(criteria.skus){
-    query.where({skus:{$in:criteria.skus}});
+    query=query.where({skus:{$in:criteria.skus}});
   }
 
 

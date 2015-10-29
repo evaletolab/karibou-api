@@ -57,9 +57,9 @@ module.exports = function(app, config, passport) {
   
   //
   // documents
-  app.get ('/v1/documents/list', docs.findByOwner);
-  app.get ('/v1/documents/list/skus/:skus', docs.findBySkus);
-  app.get ('/v1/documents/list/category/:category', docs.findByCategory);
+  app.get ('/v1/documents', auth.ensureAuthenticated, docs.findByOwner);
+  app.get ('/v1/documents/sku/:sku', docs.findBySkus);
+  app.get ('/v1/documents/category/:category', docs.findByCategory);
   app.get ('/v1/documents/:slug', docs.get);
   // documents update/create
   app.post('/v1/documents/:slug', auth.ensureAuthenticated, docs.ensureOwnerOrAdmin,docs.update);
