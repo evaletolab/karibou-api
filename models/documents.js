@@ -94,6 +94,12 @@ Document.statics.findByCriteria = function(criteria, callback){
   }
 
   //
+  // findBySlug
+  if(criteria.slug){
+    query=query.where({slug:criteria.slug});
+  }
+
+  //
   // findByUser
   if(criteria.uid){
     query=query.where({owner:criteria.uid});

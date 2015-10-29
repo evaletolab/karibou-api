@@ -12,7 +12,7 @@ var db = require('mongoose'),
 
 exports.ensureOwnerOrAdmin=function(req, res, next) {   
   function isUserDocumentOwner () {
-    Documents.findByOwner({uid:req.user.id,slug:req.params.slug},function(err,docs){
+    Documents.findByCriteria({uid:req.user.id,slug:req.params.slug},function(err,docs){
       if(!docs.length){
         return res.send(401, "Your are not the owner of this doc");           
       }
