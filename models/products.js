@@ -349,7 +349,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
-     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 }, 'year':thisYear } },     
+     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 } } },     
      {$unwind: '$items' },
      {$group:
        {
