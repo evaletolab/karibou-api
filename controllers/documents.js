@@ -154,8 +154,13 @@ exports.update=function (req, res) {
       doc.slug=req.body.title.slug();
     }    
 
+
     // do the update
     _.extend(doc,req.body)
+
+    if(doc.skus.length){
+      doc.skus=_.uniq(doc.skus);
+    }
 
     doc.save(function (err) {
       if (err){
