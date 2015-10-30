@@ -343,6 +343,7 @@ exports.update=function(req,res){
 
   //
   //quick body clean (avoid mongo warn !) 
+  delete(req.body.urlpath);
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
 
