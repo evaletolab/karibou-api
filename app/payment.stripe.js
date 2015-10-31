@@ -178,6 +178,61 @@ PaymentStripe.prototype.removeCard=function(user, alias){
 }
 
 //
+// update a card
+// https://stripe.com/docs/api#update_card
+PaymentStripe.prototype.updateCard=function(user, alias, payment){
+	var self=this;
+	var _removeCard=function (deferred, callback) {
+		//
+		// check alias
+		var handleStripe=self.decodeAlias(alias,user);
+		if(!handleStripe){
+	    return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"))
+		}
+
+		//
+		// check customer id
+		if(!user.gateway_id){
+	    bus.emit('system.message',"[karibou-danger] update payment gateway_id error: ",{error:'gateway_id not found',user:user.email.address, alias:alias.decrypt()});
+	    return Q.when({id:1});		
+	    // return Q.reject(new Error("Impossible de supprimer une carte pour cet utilisateur"))
+		}
+		var updateCard={};
+		if(payment.month){
+			updateCard.exp_month=payment.month;
+		}
+		if(payment.year){
+			updateCard.exp_year=payment.year;
+		}
+		if(payment.name){
+			updateCard.name=payment.name;
+		}
+
+
+		stripe.customers.updateCard(
+			handleStripe.gateway_id, 
+			handleStripe.card_id,
+			updateCard,
+		function (err, card) {
+	    if(err)return deferred.reject(parseError(err,user));
+	    //
+	    // TODO update card 
+	    var result={
+
+	    }
+	    deferred.resolve(result);
+			// callback(parseError(err),confirmation)
+		})
+
+		// return promise
+		return deferred.promise;
+
+	}
+
+	return this._super.updateCard(_updateCard,user,alias)
+}
+
+//
 // validate a card or alias and get new Card by callback
 PaymentStripe.prototype.addCard=function(user, payment){
 	var stripePromise, self=this, result={};
