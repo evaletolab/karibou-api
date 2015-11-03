@@ -438,11 +438,11 @@ exports.updateShipping=function(req,res){
   }
 
 
-  Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,order){
+  Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,orders){
     if(err){
       return res.send(400, (err));
     }
-    return res.json(200,order)
+    return res.json(200,orders)
   });
 }
 
@@ -460,11 +460,11 @@ exports.updateCollect=function(req,res){
 
 
 
-  Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,order){
+  Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,orders){
     if(err){
       return res.send(400, (err));
     }
-    return res.json(200,order)
+    return res.json(200,orders)
   });
 }
 

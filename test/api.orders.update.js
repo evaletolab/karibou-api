@@ -314,7 +314,7 @@ describe("api.orders.create", function(){
   });
 
 
-  it("POST /v1/orders/:id/items update after finalize generate an ERROR", function(done){
+  it("POST /v1/orders/:id/items update after finalize generate NO ERROR", function(done){
     var items=[]
     data.Products.forEach(function(product){
       var e=Orders.prepare(product, 1, "",data.Shops);
@@ -329,9 +329,10 @@ describe("api.orders.create", function(){
       .set('Content-Type','application/json')
       .send(items)
       .set('cookie', cookie)
-      .expect(400,function(err,res){
+      .expect(200,function(err,res){
         should.not.exist(err)
-        res.text.should.containEql('modifier une commande avec le status: fulfilled')
+        // THIS WAS UPDATED NOV.2015 
+        // res.text.should.containEql('modifier une commande avec le status: fulfilled')
         done()
       });
   });

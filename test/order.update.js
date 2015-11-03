@@ -29,6 +29,8 @@ describe("orders.update", function(){
   // If days equal , orders count are different
   var dateEqual=(monday.getDay()==nextday.getDay())
 
+  var events=[];
+
 
   before(function(done){
     dbtools.clean(function(e){
@@ -37,6 +39,17 @@ describe("orders.update", function(){
         done();
       });
     });      
+
+    require('../app/bus').on('order.update.items',function(err, order, items){
+      //
+      // this is a test behavior, because the event will catch actions to the next test
+      should.not.exist(err)
+      should.exist(order)
+
+      events.push({oid:order.oid,items:_.flatten(items)});
+
+    });
+
   });
 
   
@@ -82,7 +95,7 @@ describe("orders.update", function(){
     });
   });
 
-  it("update items finalprice, note, fulfillment and get notified", function(done){
+  it("update items finalprice, note, fulfillment ", function(done){
     var oid=2000007;
     var items=[{      
           sku:1000002,
@@ -111,18 +124,9 @@ describe("orders.update", function(){
 
       // check price and finalprice
       order.items[0].finalprice.should.equal(items[1].finalprice)
-
+      done()
     });
 
-    require('../app/bus').on('order.update.items',function(err, order, items){
-      //
-      // this is a test behavior, because the event will catch actions to the next test
-      if(items.length!==2)return;
-      should.not.exist(err)
-      should.exist(order)
-      done();
-
-    });
 
   });
 
@@ -138,20 +142,15 @@ describe("orders.update", function(){
       should.not.exist(err)
       // check price and finalprice
       order.items[2].finalprice.should.equal(order.items[2].price*order.items[2].quantity)
+      done()
 
     });
 
-    require('../app/bus').on('order.update.items',function(err, order, items){
-      should.not.exist(err)
-      should.exist(order)
-      should.exist(items)
-      done();
-    })
 
   });  
 
 
-  it("get error when updating fulfilled order ", function(done){
+  it.skip("get error when updating fulfilled order ", function(done){
     var oid=2000007;
     var items=[{      
           sku:1000003,
@@ -167,6 +166,14 @@ describe("orders.update", function(){
 
 
   });  
+
+
+  it("get notified on update items", function(done){
+      console.log('!!! ----------- VALIDATE THE TEST HERE -------------- :) !!!')
+      events.length.should.equal(3)
+      done();
+
+  });
 
 });
 
