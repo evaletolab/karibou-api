@@ -50,6 +50,19 @@ exports.printInfo=function(){
   console.log("-- next shipping day for sellers  ", this.findCurrentShippingDay());
 }
 
+
+// sort by date and customer
+exports.sortByDateAndUser=function(o1,o2){
+  // asc date
+  if(o1.shipping.when!==o2.shipping.when){
+    if (o1.shipping.when > o2.shipping.when) return 1;
+    if (o1.shipping.when < o2.shipping.when) return -1;
+    return 0;
+  }
+  // asc email
+  return o1.customer.displayName.localeCompare(o2.customer.displayName)
+}
+
 //
 // prepare one product as order item
 exports.prepare=function(product, quantity, note, shops){
@@ -224,49 +237,77 @@ exports.formatDate=function(date, withTime){
 
 
 //
-// filter order content by User//Shop 
+// filter order content. It remove all data not owned by the Shop 
 exports.filterByShop=function(orders,shopname){
   assert(shopname)
   assert(orders)
+  var Orders=this
   var i=0, toKeep=[];
+  if(!Array.isArray(shopname)){
+    shopname=[shopname];
+  }
 
   orders.forEach(function(order,j){
+    var copy=_.extend({},order);
+    copy.vendors=_.map(copy.vendors,_.clone);
+    copy.items=_.map(copy.items,_.clone);
+
     //
     // remove exo shops
-    i=order.vendors.length;while (i--){
-      if(shopname.indexOf(order.vendors[i].slug)===-1){
-          order.vendors.splice(i,1)
+    i=copy.vendors.length;while (i--){
+      if(shopname.indexOf(copy.vendors[i].slug)===-1){
+          copy.vendors.splice(i,1);
       }
     }
-    if(order.vendors.length){
-      toKeep.push(order)
+    if(copy.vendors.length){
+      toKeep.push(copy);
     }
   })
+
+
 
   toKeep.forEach(function(order,j){
     //
     // remove exo items
     i=order.items.length;while (i--){
       if(shopname.indexOf(order.items[i].vendor+'')===-1){
-          order.items.splice(i,1)
+          order.items.splice(i,1);
       }
     }
 
 
   })
 
-  return toKeep
+  return toKeep;
 }
 
-exports.getVendorsSlug=function  (orders) {
+//
+// build a list of vendors with the input orders
+exports.collectVendorsSlug=function  (orders) {
   if(!orders)return [];
   var slugs=orders.map(function (order) {    
       return order.vendors.map(function (vendor) {
         return vendor.slug;
       })
   })
-  return _.uniq(_.flatten(slugs))
+  return _.uniq(_.flatten(slugs));
 }
+
+//
+// find a vendor from a list of orders
+exports.findOneVendorFromSlug=function (orders, slug) {
+  var vendor;
+  function findOneVendor(order,slug){
+    for (var i = order.vendors.length - 1; i >= 0; i--) {
+      if(order.vendors[i].slug===slug)return order.vendors[i];
+    };
+  }
+  for (var i = orders.length - 1; i >= 0; i--) {
+    vendor=findOneVendor(orders[i], slug);
+    if(vendor)return vendor;
+  };
+}
+
 
 //
 // group by shop
@@ -275,7 +316,7 @@ exports.groupByShop=function(orders){
   var shops={}
   function findOneVendor(order,slug){
     for (var i = order.vendors.length - 1; i >= 0; i--) {
-      if(order.vendors[i].slug===slug)return order.vendors[i]
+      if(order.vendors[i].slug===slug)return order.vendors[i];
     };
   }
   orders.forEach(function(order){

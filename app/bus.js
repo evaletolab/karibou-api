@@ -28,10 +28,15 @@
 
 var util = require("util");
 var events = require("events");
+var Q = require('q');
+
+
 
 var Bus=function(){
 	events.EventEmitter.call(this);
 }
+
+
 
 Bus.prototype.listeners=function(event){
 	events.EventEmitter.listenerCount(Bus, event)	
@@ -39,7 +44,41 @@ Bus.prototype.listeners=function(event){
 
 util.inherits(Bus, events.EventEmitter);
 
+var bus=new Bus()
+
+// hooking
+var _emit = Bus.prototype.emit;
+var _on = Bus.prototype.on;
+
 //
-// bus.emit('sendmail',{to,from},cb)
-// bus.on('sendmail',function(mail,cb))	
-module.exports=new Bus()
+// make this Bus promise when no callback is used
+// This is a simple hook, 
+bus.emit = function (name) {
+  var deferred = Q.defer();
+ 	var args = Array.prototype.slice.call(arguments);
+ 	var hasCallback=(typeof arguments[arguments.length-1]==='function');
+	function emitCallback () {
+	 	var args = Array.prototype.slice.call(arguments);
+		if(args[0]){
+			return deferred.reject(args[0]);
+		}
+		deferred.resolve(Array.prototype.slice.call(arguments,1));
+		return;
+	}
+	//
+	// if no callback we use promise
+ 	if(!hasCallback){
+ 		args.push(emitCallback)
+ 	}
+  _emit.apply(bus, args);
+	return deferred.promise;
+};
+
+
+
+
+bus.on = function (name, fn) {
+  _on.call(bus, name,fn);
+};
+
+module.exports=bus;

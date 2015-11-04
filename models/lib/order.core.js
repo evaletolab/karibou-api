@@ -152,7 +152,7 @@ exports.updateLogistic = function(query,options, callback){
 
     return Q.all(saveTasks).then(function(){
 
-      callback(null,(orders.length==1)?orders[0]:orders)
+      callback(null,(!options.when)?orders[0]:orders)
     },function(err) {
       callback(err)
     })
@@ -194,9 +194,10 @@ exports.updateItem = function(oid,items, callback){
     }
 
 
-    if(["reserved","partial"].indexOf(order.fulfillments.status)==-1){
-      return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status);
-    }
+    // THIS IS WRONG! 
+    // if(["reserved","partial"].indexOf(order.fulfillments.status)==-1){
+    //   return callback("Impossible de modifier une commande avec le status: "+order.fulfillments.status);
+    // }
 
 
     var itemIds=[], rollback=[];

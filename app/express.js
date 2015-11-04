@@ -200,8 +200,9 @@ var tokenSession=function (req, res, next) {
 
       //send emails if you want
       if(process.env.NODE_ENV==='production'){
+        var email=req.user?req.user.email:'Anonymous';
         var msg=JSON.stringify(
-            {error:((err.stack)?err.stack:err),user:req.user, params:req.params},
+            {error:((err.stack)?err.stack:err),user:email, url:req.originalUrl, params:req.params,body:req.body},
             null,2
         );
         bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
