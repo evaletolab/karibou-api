@@ -3,6 +3,7 @@
 
 require('../app/config');
 var db = require('mongoose'),
+    bus=require('../app/bus'),
     Shops = db.model('Shops'),
     Products = db.model('Products'),
     validate = require('./validate/validate'),
@@ -81,6 +82,13 @@ exports.create=function (req, res) {
         if(err){
           return res.send(400, errorHelper(err));    
         }
+
+        //
+        // log activity
+        bus.emit('activity.create',req.user
+                               ,{type:'Products',key:'sku',id:product.sku}
+                               ,product.getDiff());
+
         res.json(product);            
     });
 
@@ -96,8 +104,8 @@ exports.love=function (req, res) {
   var criteria={
     email:req.user.email.address,
     likes:req.user.likes,
-    minhit:req.query.minhit||1,
-    available:req.query.available
+    minhit:parseInt(req.query.minhit)||1,
+    available:(req.query.available&&req.query.available=='true')
   }
 
   //
@@ -372,6 +380,18 @@ exports.update=function (req, res) {
         return res.send(400,'Ooops, unknow product vendor '+req.body.vendor);          
       }
     }
+
+    //
+    // slug this product
+    if(req.body.title&&product.title!==req.body.title){
+      product.slug=req.body.title.slug();
+    }    
+
+    //
+    // log activity
+    bus.emit('activity.update',req.user
+                           ,{type:'Products',key:'sku',id:product.sku}
+                           ,product.getDiff(req.body));
 
     // do the update
     _.extend(product,req.body)

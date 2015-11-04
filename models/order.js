@@ -185,8 +185,10 @@ Orders.statics.findNextShippingDay=utils.findNextShippingDay;
 Orders.statics.findOneWeekOfShippingDay=utils.findOneWeekOfShippingDay;
 Orders.statics.jumpToNextWeekDay=utils.jumpToNextWeekDay;
 Orders.statics.groupByShop=utils.groupByShop;
-Orders.statics.getVendorsSlug=utils.getVendorsSlug;
+Orders.statics.collectVendorsSlug=utils.collectVendorsSlug;
+Orders.statics.findOneVendorFromSlug=utils.findOneVendorFromSlug;
 Orders.statics.filterByShop=utils.filterByShop;
+Orders.statics.sortByDateAndUser=utils.sortByDateAndUser;
 
 //
 // import find API
@@ -202,7 +204,7 @@ Orders.methods.computeRankAndSave=core.computeRankAndSave;
 
 //
 // import format API
-Orders.statics.sortByDateAndUser=format.sortByDateAndUser;
+Orders.statics.prepareOrdersForMail=format.prepareOrdersForMail;
 Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForShop;
 
 //
@@ -906,7 +908,7 @@ Orders.statics.generateRepportForShop=function(criteria,cb) {
 
     //
     // get shops details
-    var slugs=Orders.getVendorsSlug(orders)
+    var slugs=Orders.collectVendorsSlug(orders)
     return db.model('Shops').findAllBySlug(slugs,function(err,shops) {
       cb(null,Orders.convertOrdersToRepportForShop(criteria.from, criteria.to, orders, shops,criteria.showAll))
     });

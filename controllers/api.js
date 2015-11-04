@@ -219,6 +219,21 @@ exports.email=function(req,res){
   });
 }
 
+exports.activities=function (req,res) {
+  var now=new Date(), 
+      criteria={month:req.query.month||(now.getMonth()+1)};
+
+  if(!req.user.isAdmin()){
+    criteria.uid=req.user.id;
+  }
+
+  db.model('Activities').findByCrireria(criteria,function (err,activities) {
+    if(err){
+      return res.send(400,errorHelper(err))
+    }
+    res.json(activities);
+  })
+}
 
 exports.sessions = function(req, res) {
   require('mongoose').connection.db.collection('sessions',function(err,sessions){

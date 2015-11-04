@@ -2,6 +2,7 @@ module.exports = function(app,bus) {
   var path           = require('path')
     , templatesDir   = path.resolve(__dirname, '..', 'emails')
     , emailTemplates = require('email-templates')
+    , Q              = require('q')
     , nodemailer     = require('nodemailer');
 
 
@@ -147,18 +148,39 @@ module.exports = function(app,bus) {
   }
 
 
-
+  //
+  // sendmail fuction is removed for testing
   if (process.env.NODE_ENV==='test'){
     sendmail=function(to, subject, content, template, cb){
-      cb&&cb(null,"test is running well")
+      var result={ 
+        accepted: [ to],
+        rejected: [],
+        response: '250 2.0.0 Ok: queued as B2E6B4814D8 '+subject,
+        envelope: { from: 'james@karibou.ch', to: [to] },
+        messageId: '1445330063674-23cd03de-de15caac-b431a2ba@karibou.ch' 
+      };
+      setTimeout(function() {}, parseInt(Math.random()*10));
+      cb&&cb(null,result);
     }
   }
-
+  
   bus.on('sendmail',function(to, subject, content, template, cb){
-    //console.log("---------------------------EMAIL:",to,subject)
-    sendmail(to, subject, content, template, cb);
+    var deferred = Q.defer();
+
+    sendmail(to, subject, content, template, function (err,result) {
+      if(err){
+        if(cb){return cb(err);}
+        return deferred.reject(err);
+      }
+      if(cb){
+        return cb(0,result)
+      }
+      deferred.resolve(result);
+    });
+    //
+    // flexible use of cb or promise
+    return  deferred.promise;
   });
 
 
-  return sendmail;
 }

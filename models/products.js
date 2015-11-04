@@ -36,6 +36,7 @@ var Manufacturer = new Schema({
 var Product = new Schema({
    sku: { type: Number, required: true, unique:true },
    title: { type: String, required: true },
+   slug: { type: String, required: false },
    
    details:{
       description:{type:String, required:true},
@@ -189,6 +190,58 @@ Product.methods.getPrice=function(){
 };
 
 //
+// list changed fields  
+Product.methods.getDiff=function (next) {
+  var self=this.toObject(),result={
+    details:{},
+    attributes:{},
+    pricing:{}
+  };
+
+  //
+  // check new instance
+  if(!next){
+    result={
+      details:this.details,
+      attributes:this.attributes,
+      pricing:this.pricing
+    };    
+    return result;
+  }
+
+  // human content
+  result.title=next.title;
+
+  //
+  // log diff of details
+  Object.keys(self.details).forEach(function (detail) {
+    if(self.details&&self.details[detail]!==next.details[detail]){
+      result.details[detail]=next.details[detail];
+    }
+  });
+
+  //
+  // log diff of attributes
+  Object.keys(self.attributes).forEach(function (attribute) {
+    if(self.attributes&&
+       self.attributes[attribute]!==next.attributes[attribute]){
+      result.attributes[attribute]=next.attributes[attribute];
+    }
+  });
+
+  //
+  // log diff of pricing
+  Object.keys(self.pricing).forEach(function (price) {
+    if(self.pricing&&
+       self.pricing[price]!==next.pricing[price]){
+      result.pricing[price]=next.pricing[price];
+    }
+  });
+
+
+  return result;
+}
+//
 // product is available for order only if
 // - vendor is populated,
 // - attributes.available is true
@@ -247,6 +300,12 @@ Product.statics.create = function(p,s,callback){
 
       p.categories=categories;        
  
+      //
+      // slug this product
+      if(!p.slug){
+        p.slug=p.title.slug();
+      }
+      
 
       //
       // ready to create one product
@@ -270,56 +329,19 @@ Product.statics.create = function(p,s,callback){
 
 }; 
 
-/**
- *
-  #prefered product for a user
-  db.orders.aggregate(
-       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
-       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 items:1,
-       }},
-       { $match: { 'month': {$gt:6,$lte:8 } } },     
-       {$unwind: '$items' },
-       {$group:
-           {
-             _id:"$items.sku",
-             month:{$first:"$month"},
-             hit: { $sum: 1 }
-           }
-       },
-       {$sort:{month:-1}}
-  ).forEach(function(result){print(result._id+' m:'+result.month);})
-  --
-  db.orders.aggregate(
-       { $match: { 'payment.status': 'paid', email:'jean.terrier@bluewin.ch'  } },
-       {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
-                 items:1,
-       }},
-       {$unwind: '$items' },
-       {$group:
-           {
-             _id:"$items.sku",
-             month:{$first:"$month"},
-             hit: { $sum: 1 }
-           }
-       },
-       { $match: { 'hit': {$gt:2 } } },     
-       {$sort:{hit:-1}}
-  ).forEach(function(result){print(result._id+' h:'+result.hit);})
-
- */
 
 
 Product.statics.findPopularByUser = function(criteria, callback){
   assert(criteria.email);
 
-  var skus=[], today=new Date(), windowtime=(parseInt(criteria.windowtime)||2)-1;
+  var skus=[], today=new Date(), windowtime=(parseInt(criteria.windowtime)||2)-1, thisYear=today.getFullYear();
   var cb=function(err, products){
     callback(err,products);
   };
   if (typeof callback !== 'function') {
     cb=undefined;
   }
+
 
 
   //
@@ -329,7 +351,7 @@ Product.statics.findPopularByUser = function(criteria, callback){
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
-     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 } } },     
+     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 }, 'year':thisYear } },     
      {$unwind: '$items' },
      {$group:
        {
@@ -338,10 +360,9 @@ Product.statics.findPopularByUser = function(criteria, callback){
          hit: { $sum: 1 }
        }
     },
-    {$match: { 'hit': {$gte:parseInt(criteria.minhit)||1 } } },     
+    {$match: { 'hit': {$gte:criteria.minhit||1} }},     
     {$sort:{month:-1}},
   function (err, result) {
-    // console.log('result',err,result)
     if(result&&result.length){
       result.forEach(function (item) {
         skus.push(item._id)
@@ -437,7 +458,7 @@ Product.statics.findByCriteria = function(criteria, callback){
   require('async').waterfall([
     function(cb){
       //
-      // by available shops
+      // by available shops status could be a boolean or a lst of shop
       if (criteria.status){
         // specify the date 
         var nextShippingDays=Orders.findOneWeekOfShippingDay();
@@ -555,8 +576,14 @@ Product.statics.findByCriteria = function(criteria, callback){
       }
 
       //
+      // only low stock products ?
+      if(criteria.lowstock!==undefined){
+        query=query.where("pricing.stock").lt(5);
+      }
+
+      //
       // filter by SKUs
-      if(criteria.skus&&criteria.skus.length){
+      if(criteria.skus){
         query=query.where("sku").in(criteria.skus)
       }
 

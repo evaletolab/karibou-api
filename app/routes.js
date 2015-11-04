@@ -12,7 +12,8 @@ module.exports = function(app, config, passport) {
   var users 	  = require(path+'users');
   var shops     = require(path+'shops');
   var orders    = require(path+'orders');
-  var emails 	  = require(path+'emails');
+  var emails    = require(path+'emails');
+  var docs      = require(path+'documents');
   var categories= require(path+'categories');
   var _         = require('underscore');
 
@@ -54,7 +55,21 @@ module.exports = function(app, config, passport) {
   app.get ('/robots.txt', api.robots);
   app.get ('/seo/robots.txt', api.robots);
   
-  
+  //
+  // documents
+  app.get ('/v1/documents', auth.ensureAuthenticated, docs.findByOwner);
+  app.get ('/v1/documents/sku/:sku', docs.findBySkus);
+  app.get ('/v1/documents/category/:category', docs.findByCategory);
+  app.get ('/v1/documents/:slug', docs.get);
+  // documents update/create
+  app.post('/v1/documents/:slug', auth.ensureAuthenticated, docs.ensureOwnerOrAdmin,docs.update);
+  app.post('/v1/documents', auth.ensureAuthenticated,docs.create);
+
+
+  //
+  // activities
+  app.get('/v1/activities', auth.ensureAuthenticated,api.activities);
+
 
   //
   // stats
@@ -106,11 +121,11 @@ module.exports = function(app, config, passport) {
   app.get('/seo/shops',shops.allSEO);
   app.get('/seo/products',products.allSEO);
   app.get('/seo/products/category/:category',products.allSEO);
-  app.get('/seo/products/:sku',products.getSEO);
+  app.get('/seo/products/:sku/:slug?',products.getSEO);
 
   // app.get('/shop/:shopname', shops.getSEO);
   app.get('/seo/shop/:shopname', shops.getSEO);
-  app.get('/seo/shop/:shopname/products/:sku', products.getSEO);
+  app.get('/seo/shop/:shopname/products/:sku/:slug?', products.getSEO);
 
   //
   // system
@@ -211,6 +226,7 @@ module.exports = function(app, config, passport) {
   app.post('/v1/orders/:oid/remove', auth.ensureAdmin, orders.remove);
 
   // post order items to shopname
+  app.post('/v1/orders/shops/email',auth.ensureAuthenticated,orders.informShopToOrders);
   app.post('/v1/orders/:shopname/email',shops.ensureOwnerOrAdmin,orders.informShopToOrders);
 
   // shopper update logistic

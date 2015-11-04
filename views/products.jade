@@ -4,6 +4,6 @@ block content
     h1: | Liste des produits
     div(class="list-group")
     - each product in products
-          a(href="/products/#{product.sku}", class="list-group-item link", title="#{product.title}"): =product.title
+          a(href="/products/#{product.sku}/#{product.slug}", class="list-group-item link", title="#{product.title}"): =product.title
 
 

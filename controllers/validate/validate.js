@@ -7,6 +7,30 @@ var db = require('mongoose'),
 exports.check   = check;
 exports.ifCheck = ifCheck;
 
+exports.document=function (doc) {
+    // check(doc.created,"La date de création n'est pas valide").isDate();
+    // check(doc.updated,"La date de création n'est pas valide").isDate();
+    check(doc.title,"Le titre n'est pas valide").isText().len(2, 100);
+    check(doc.content,"Le contenu n'est pas valide").isText().len(2, 1000);
+
+    ifCheck(doc.photo.header,"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
+
+    for( var i in doc.photo.bundle){
+      check(doc.photo.bundle[i],"Le photo n'est pas valide (2)").len(6, 200).isImgUrl();
+    };
+
+    for( var i in doc.skus){
+      check(doc.skus[i],"Le SKU du produit n'est pas valide: "+doc.skus[i]).isNumeric();
+    };
+
+    if(config.shop.document.types.indexOf(doc.type)===-1){
+      throw new Error("Le type du document n'est pas valable ");
+    }
+
+    check(doc.available,"La validité du produit n'est pas valide: "+doc.available).isBoolean();
+    check(doc.published,"La validité du produit n'est pas valide: "+doc.published).isBoolean();
+}
+
 exports.config = function(conf){
   for( var i in conf.noshipping){
     check(conf.noshipping[i].from,"La date de fermeture n'est pas valide").isDate();

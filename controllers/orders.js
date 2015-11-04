@@ -8,6 +8,7 @@ require('../app/config');
 var db = require('mongoose'),
     _=require('underscore'),
     Orders = db.model('Orders'),
+    Q = require('q'),
     bus=require('../app/bus'),
     validate = require('./validate/validate'),
     payment = require('../app/payment'),
@@ -410,7 +411,18 @@ exports.updateItem=function(req,res){
     if(err){
       return res.send(400, (err));
     }
-    return res.json(200,order)
+    if(req.user.isAdmin()){
+      return res.json(200,order)
+    }
+
+    //
+    // no admin should not get all order details
+    var shop=_.collect(req.user.shops,function (shop) {
+      return shop.urlpath;
+    });
+
+    var filtered=Orders.filterByShop([order],shop)
+    return res.json(200,filtered[0])
   });
 }
 
@@ -426,11 +438,11 @@ exports.updateShipping=function(req,res){
   }
 
 
-  Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,order){
+  Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,orders){
     if(err){
       return res.send(400, (err));
     }
-    return res.json(200,order)
+    return res.json(200,orders)
   });
 }
 
@@ -448,11 +460,11 @@ exports.updateCollect=function(req,res){
 
 
 
-  Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,order){
+  Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,orders){
     if(err){
       return res.send(400, (err));
     }
-    return res.json(200,order)
+    return res.json(200,orders)
   });
 }
 
@@ -628,7 +640,7 @@ exports.remove=function(req,res){
 exports.informShopToOrders=function(req,res){
   try{
     if(!req.body.when)throw new Error('La date est obligatoire')
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
+    validate.ifCheck(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 100).isSlug();
     validate.check(new Date(req.body.when),"La date n'est pas valide").isDate()
     validate.ifCheck(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(0, 600).isText();
   }catch(err){
@@ -637,69 +649,95 @@ exports.informShopToOrders=function(req,res){
 
 
 
-  // TODO using promise would be better!
-  db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
-    if (err){
+  var when=req.body.when,
+      closed=req.body.closed,
+      shop=req.params.shopname?[req.params.shopname]:[];
+
+  if(!req.params.shopname){
+    if(!req.user.isAdmin()){
+      shop=_.collect(req.user.shops,function (shop) {
+        return shop.urlpath;
+      });
+    }
+  }
+
+
+  //
+  // get orders prepared for each shop mail
+  Orders.prepareOrdersForMail(when,shop,closed,function (err,contents) {
+    if(err){
       return res.send(400,errorHelper(err.message||err));
     }
-    if(!shop){
-      return res.send(400,"Cette boutique n'existe pas");
+    for(var s in contents){
+      contents[s].origin=req.header('Origin')||config.mail.origin;
+
+      //
+      // a message can be append to the mail 
+      contents[s].more=req.body.content||''
+      contents[s].withHtml=true;
+
     }
 
 
-    var criteria={}
-    parseCriteria(criteria,req)
-
-    // restrict to a shopname
-    criteria.shop=[req.params.shopname]
-
-    // get the date
-    criteria.when=new Date(req.body.when);
-
-
-    Orders.findByCriteria(criteria, function(err,orders){
-      if(err){
-        return res.send(400,errorHelper(err.message||err));
-      }
-
-      if(!orders.length){
-        return res.json({})
-      }
+    //
+    // content is ready to be sent
+    // BUT WE STILL NEEDS EMAILS
+    var promises=[];
+    db.model('Shops').find({urlpath:{$in:Object.keys(contents)}}).populate('owner')
+      .exec(function(err,shops){  
 
       //
-      // get items
-      var content={}, when=Orders.formatDate(orders[0].shipping.when), items=[];
-      Orders.filterByShop(orders,req.params.shopname).forEach(function(order){
-        order.items.forEach(function(item){
-          item.rank=order.rank;
-          item.name=order.customer.name;
-          item.email=order.customer.email.address;
-          items.push(item)
+      // extract full shop detailsand sent mail
+      shops.forEach(function (shop) {
+
+        contents[shop.urlpath].shop=shop;
+
+        //
+        // get lowstock product by shops
+        db.model('Products').findByCriteria({
+          lowstock:true,
+          available:true,
+          shopname:shop.urlpath
+        },function (err,products) {
+          contents[shop.urlpath].products=products;
+
+          //
+          // this shop is ready for sendmail 
+          promises.push(
+            bus.emit('sendmail',shop.owner.email.address,
+                     "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
+                      contents[shop.urlpath],"order-prepare")
+          );
+
+
         })
-      })    
+
+      })
 
 
-      content.shop=shop;
-      content.shippingWhen=when;
-      content.items=items;
-      content.origin=req.header('Origin')||config.mail.origin;
-      content.more=req.body.content||''
-      content.withHtml=true;
 
       //
-      // send email
-      return bus.emit('sendmail',shop.owner.email.address,
-                   "Karibou - Confirmation de vos préparations pour le "+when,
-                   content,
-                   "order-prepare", function(err, status){
-        if(err){
-          console.log('---------------------------prepare',err)
-          return res.send(400,errorHelper(err.message||err));
+      // waiting on results
+      Q.all(promises).then(function (sentMails) {
+        //
+        // TODO parse content of sentMails to get rejected mails
+        var rejected=[];
+        sentMails.forEach(function (sent) {
+          rejected=rejected.concat(sent[0].rejected);
+        });
+        rejected=_.uniq(rejected);
+        if(rejected.length){
+          return res.send(400,"les mails suivant n'ont pas été envoyés :"+rejected.join(','));
         }
-
-        res.json(content);
+        // console.log('mail',sentMails)
+        return res.json(contents);
+      },function (err) {
+        // TODO if only one msg got an error???
+        return res.send(400,errorHelper(err.message||err));
       })
+
     })
+    
 
   });
 

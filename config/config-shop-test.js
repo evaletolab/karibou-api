@@ -7,6 +7,11 @@ module.exports = {
       password:{len:5},
       post:{limitMS:10}
     },
+
+    document:{
+      types:['recipe','post','bundle','page']
+    },
+
     category:{
       types:['Category', 'Catalog']
     },

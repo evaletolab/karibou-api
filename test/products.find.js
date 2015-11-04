@@ -138,6 +138,18 @@ describe("products.find:", function(){
 
   });
 
+  it("Find products by empty skus should return 0 product ", function(done){
+    var criteria={ skus: [], status: true, available: true, instock: true };
+    Products.findByCriteria(criteria,function(err,products){
+      should.not.exist(err);
+      should.exist(products);
+      products.length.should.equal(0)
+      done();
+    });  
+
+  });
+  
+
   it.skip("Product could have a related products", function(done){
   });
 

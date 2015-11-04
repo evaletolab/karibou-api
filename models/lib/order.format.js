@@ -2,17 +2,80 @@ var db = require('mongoose'),
     _=require('underscore');
 
 
-// sort by date and customer
-exports.sortByDateAndUser=function(o1,o2){
-  // asc date
-  if(o1.shipping.when!==o2.shipping.when){
-    if (o1.shipping.when > o2.shipping.when) return 1;
-    if (o1.shipping.when < o2.shipping.when) return -1;
-    return 0;
+//
+// prepare Model for mail
+// Model contains lists of orders grouped by shop
+exports.prepareOrdersForMail=function (when,shops,closed, cb) {
+  var Orders=this;
+
+  var criteria={fulfillment:closed}
+
+  //
+  // restrict to a list of shopname
+  // no shop 'undefined' means all shops available (admin only!)
+  criteria.shop=shops.length?shops:undefined;
+
+  // 
+  // restrict for open order is the default
+
+  //
+  // select the shipping day
+  if(!when){
+    criteria.nextShippingDay=true;
+  }else{
+    criteria.when=new Date(when);
   }
-  // asc email
-  return o1.customer.displayName.localeCompare(o2.customer.displayName)
+
+
+  Orders.findByCriteria(criteria, function(err,orders){
+    if(err){
+      return cb(err);
+    }
+
+    if(!orders.length){
+      // return an empty model
+      return cb(0,{});
+    }
+
+    // orders.forEach(function (o) {
+    //   console.log(Orders.print(o))
+    // })
+
+    //
+    // find all vendors for a list of orders
+    if(!shops||!shops.length){
+      shops=Orders.collectVendorsSlug(orders);
+    }
+
+
+    //
+    // filter content for each shop
+    var contents={},formatWhen=Orders.formatDate(when), items=[];
+    shops.forEach(function (shop) {
+      var content={};items=[];
+      Orders.filterByShop(orders,shop).forEach(function(order){
+          order.items.forEach(function(item){
+          item.rank=order.rank;
+          item.oid=order.oid;
+          item.name=order.customer.name;
+          item.email=order.customer.email.address;
+          items.push(item)
+        });
+      });    
+
+      // 
+      // prepare the final model
+      content.shop=Orders.findOneVendorFromSlug(orders,shop);
+      content.shippingWhen=formatWhen;
+      content.items=items;
+      contents[shop]=content;
+    });
+
+
+    return cb(0,contents);
+  });
 }
+
 
 //
 // structure data for JSON output
