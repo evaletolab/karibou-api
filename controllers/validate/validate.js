@@ -11,7 +11,7 @@ exports.document=function (doc) {
     // check(doc.created,"La date de création n'est pas valide").isDate();
     // check(doc.updated,"La date de création n'est pas valide").isDate();
     check(doc.title,"Le titre n'est pas valide").isText().len(2, 100);
-    check(doc.content,"Le contenu n'est pas valide").isText().len(2, 1000);
+    check(doc.content,"Le contenu n'est pas valide (max 1'500 caratères)").isText().len(2, 1500);
 
     ifCheck(doc.photo.header,"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
 
@@ -59,7 +59,7 @@ var user_address = exports.address =  function(address){
  */
 var user= exports.user = function(u, lean){
     if(!u.id||!u.created){
-      throw new Error('Hmmm, ceci n\'est pas un utilisateur!')
+      throw new Error('Hmmm, ceci n\'est pas un utilisateur!');
     }
 
     if(u.email){
