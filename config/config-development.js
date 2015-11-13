@@ -78,10 +78,14 @@ module.exports = {
   },
 
   payment:{
+    allowMaxAmount:40000,
     reserve:1.15,
     provider:'stripe',
     stripe:{
       key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
+    },
+    karibou:{
+      apikey:"sk_test_t1im5hjyMbW6cNgyZpATg"
     },
     postfinance:{
       enabled:true,

@@ -218,9 +218,10 @@ var Payment=function(){
 
 
 	// this.postfinance =require('./payment.postfinance')(privatePayment)
-	this.stripe =require('./payment.stripe')(privatePayment)
-	this.invoice =require('./payment.invoice')(privatePayment)
-	this.tester =require('./payment.test')(privatePayment)
+	this.stripe =require('./payment.stripe')(privatePayment);
+	this.invoice =require('./payment.invoice')(privatePayment);
+	this.account =require('./payment.account')(privatePayment);
+	this.tester =require('./payment.test')(privatePayment);
 }
 
 //
@@ -234,6 +235,7 @@ Payment.prototype.for=function(issuer){
 		'mastercard':this.stripe,	
 		'bitcoin':this.stripe,	
 		'invoice':this.invoice,	
+		'wallet':this.account,	
 		'tester':this.tester
 	}
 	if(issuer && map[issuer.toLowerCase()]){

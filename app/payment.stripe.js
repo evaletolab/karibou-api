@@ -54,6 +54,9 @@ var PaymentStripe=function(_super){
 	this._super=_super;
 }
 
+PaymentStripe.prototype.getStripe=function () {
+	return this.stripe;
+}
 
 //
 // verify if an alias is valid and belongs to the user
@@ -71,7 +74,7 @@ PaymentStripe.prototype.isValidAlias=function(alias, user){
 // verify if an alias is valid and decode it
 PaymentStripe.prototype.decodeAlias=function(alias, user){
 	try{
-		var elems=alias.decrypt().split(':')
+		var elems=alias.decrypt().split(':');
 		if(elems[0]!==(user.id+'')) return false;
 		return {id:elems[0],gateway_id:elems[1],card_id:elems[2]}
 	}catch(e){

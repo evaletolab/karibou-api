@@ -5,6 +5,7 @@ module.exports = function(app, config, passport) {
   var path='../controllers/';
 
   var api       = require(path+'api');
+  var wallets   = require(path+'wallets');
   var stats     = require(path+'stats');
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
@@ -70,6 +71,14 @@ module.exports = function(app, config, passport) {
   // activities
   app.get('/v1/activities', auth.ensureAuthenticated,api.activities);
 
+  //
+  // wallet or giftcode
+  app.get ('/v1/wallets', auth.ensureAdmin,wallets.listWallet);
+  app.get ('/v1/wallets/:alias', wallets.ensureAdminOrOwner,wallets.getWallet);
+  app.post('/v1/wallets', auth.ensureAuthenticated,wallets.createWallet);
+  app.post('/v1/wallets/:alias', wallets.ensureAdminOrOwner,wallets.updateWallet);
+  app.post('/v1/wallets/register/:alias', wallets.ensureAdminOrOwner,wallets.registerGiftcode);
+
 
   //
   // stats
@@ -130,7 +139,6 @@ module.exports = function(app, config, passport) {
   //
   // system
   app.get ('/v1/config', cached, api.config);
-  app.get ('/v1/cdn/image/:size', longcached, api.imagecdn);
   app.post('/v1/config', auth.ensureAdmin, api.saveConfig);
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/comment', api.email);
