@@ -21,7 +21,7 @@ exports.ensureAdminOrOwner=function (req, res, next) {
       return res.send(401); 
   }
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
-  if(alias&&alias.id===req.user.id){
+  if(alias&&parseInt(alias.id)===req.user.id){
     return next();
   }
 
