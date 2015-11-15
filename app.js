@@ -121,7 +121,14 @@ if (process.env.C9_PORT ){
     host='0.0.0.0';
 }
 
-app.listen(port,host);
+var count=0;
+app.listen(port,host).on('connection', function(socket) {
+  console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
+  socket.on('end',function(){
+    console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
+  })
+
+})
 
 
 

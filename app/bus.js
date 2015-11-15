@@ -47,6 +47,7 @@ util.inherits(Bus, events.EventEmitter);
 var bus=new Bus()
 
 // hooking
+/**
 var _emit = Bus.prototype.emit;
 var _on = Bus.prototype.on;
 
@@ -80,5 +81,6 @@ bus.emit = function (name) {
 bus.on = function (name, fn) {
   _on.call(bus, name,fn);
 };
+*/
 
 module.exports=bus;
