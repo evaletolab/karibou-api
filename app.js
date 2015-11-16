@@ -140,7 +140,7 @@ process.on('uncaughtException', function(err) {
     var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
     bus.emit('sendmail',"evaleto@gmail.com",
          "[karibou] uncaughtException "+err.toString(), {content:msg}, "simple",
-    function (err,res) {
+    function (err,status) {
       console.log(err,status)
       process.exit(1)
     });
