@@ -87,7 +87,7 @@ require('./app/utils')(app);
 var bus=require('./app/bus');require('./app/bus.routes');
 
 // mailer
-var sendmail=require('./app/mail')(app,bus);
+require('./app/mail')(app,bus);
   
 
 // payment api
@@ -96,7 +96,7 @@ var payment=require('./app/payment');
 
 
 // express settings
-require('./app/express')(app, config, passport, sendmail)
+require('./app/express')(app, config, passport)
 
 // bootstrap passport config
 require('./app/passport')(app, config, passport)
@@ -138,10 +138,13 @@ process.on('uncaughtException', function(err) {
 
   if(process.env.NODE_ENV==='production'){
     var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
-    sendmail("evaleto@gmail.com","[kariboo] uncaughtException : "+err.toString(), {content:msg}, "simple",function(err,status){
+    bus.emit('sendmail',"evaleto@gmail.com",
+         "[karibou] uncaughtException "+err.toString(), {content:msg}, "simple",
+    function (err,res) {
       console.log(err,status)
       process.exit(1)
-    })
+    });
+
   }
   console.log("uncaughtException",err.stack);
 });

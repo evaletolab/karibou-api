@@ -22,7 +22,7 @@ if (config.express.state){
 }  
 
   
-module.exports = function (app, config, passport, sendmail) {
+module.exports = function (app, config, passport) {
 
   //
   // CORS middleware
