@@ -113,6 +113,35 @@ PaymentTest.prototype.addCard=function(user, payment){
 	return this._super.addCard(_addCard,user,payment);
 }
 
+//
+// simple charge wrapper
+PaymentTest.prototype.charge=function (options,alias,user) {
+  var self=this;
+  var _charge=function (deferred, callback) {
+
+    // check alias, in this case the order status is affected
+    var handleStripe=self.decodeAlias(alias,user);
+    if(!handleStripe){
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+    }
+    var charge={
+      amount:Math.round(options.amount*100),
+      log:'chare amount '+(options.amount)+' the '+new Date(),
+      transaction:Date.now(),
+      updated:Date.now(),
+      provider:'test'
+    };
+
+    setTimeout(function() {
+      return deferred.resolve(charge);
+    }, 0);
+    return deferred.promise;
+  }
+
+  // return promise
+  return this._super.charge(_charge, options);
+}
+
 
 //
 // authorize a new payment for this order

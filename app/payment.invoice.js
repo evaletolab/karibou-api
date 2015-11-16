@@ -180,6 +180,24 @@ PaymentInvoice.prototype.addCard=function(user, payment){
   return this._super.addCard(_addCard,user,payment);
 }
 
+//
+// simple charge wrapper
+PaymentInvoice.prototype.charge=function (options,alias,user) {
+  var self=this;
+  var _charge=function (deferred, callback) {
+
+    // check alias, in this case the order status is affected
+    var handleStripe=self.decodeAlias(alias,user);
+    if(!handleStripe){
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+    }
+
+    return Q.reject(new Error("Ce mode de paiement n'est pas valable dans ce context"));
+  }
+
+  // return promise
+  return this._super.charge(_charge, options);
+}
 
 //
 // authorize a new payment for this order

@@ -54,9 +54,6 @@ var PaymentStripe=function(_super){
 	this._super=_super;
 }
 
-PaymentStripe.prototype.getStripe=function () {
-	return this.stripe;
-}
 
 //
 // verify if an alias is valid and belongs to the user
@@ -301,7 +298,44 @@ PaymentStripe.prototype.addCard=function(user, payment){
 
 	// return promise
 	return this._super.addCard(_addCard, user,payment);
-}
+};
+
+//
+// simple charge wrapper
+PaymentStripe.prototype.charge=function (options,alias,user) {
+	var self=this;
+
+  var _charge=function (deferred, callback) {
+
+		// check alias, in this case the order status is affected
+		var handleStripe=self.decodeAlias(alias,user);
+		if(!handleStripe){
+			return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+		}
+
+	  stripe.charges.create({
+	    amount: Math.round(options.amount*100),
+	    currency: "CHF",
+	    customer:handleStripe.gateway_id,
+	    card: handleStripe.card_id, 
+	    capture:true, /// ULTRA IMPORTANT HERE!
+	    description: options.description
+	  }, function(err, charge) {
+	  	if(err){
+		    return deferred.reject(parseError(err,options));
+	  	}
+	    return deferred.resolve(charge);
+		});
+
+		// return a promise
+		return deferred.promise;
+  };
+
+
+
+	// return promise
+	return this._super.charge(_charge, options);
+};
 
 
 //

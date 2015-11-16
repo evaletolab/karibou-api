@@ -156,6 +156,45 @@ PaymentAccount.prototype.addCard=function(user, payment){
 	return this._super.addCard(_addCard, user,payment);
 }
 
+//
+// simple charge wrapper
+PaymentAccount.prototype.charge=function (options,alias,user) {
+  var self=this;
+  var _charge=function (deferred, callback) {
+
+    // check alias, in this case the order status is affected
+    var handleStripe=self.decodeAlias(alias,user);
+    if(!handleStripe){
+      return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+    }
+
+		karibou.charge.create(handleAccount.wallet_id,{
+		  amount: Math.round(options.amount*100),
+		  currency: "CHF",
+		  capture:true, /// ULTRA IMPORTANT HERE!
+		  description: options.description
+		}).then(function(charge) {
+
+	  	var result={
+	  		log:'captured amount '+(charge.amount/100)+' the '+new Date(charge.created).toDateString(),
+	  		transaction:charge.id.crypt(),
+	  		updated:Date.now(),
+	  		provider:'wallet'
+	  	};
+	  	//
+	  	// return result
+			callback(null,result)
+		}).then(undefined,function (err) {
+			callback(parseError(err,order));
+		})	  
+
+		return deferred.promise;
+  }
+
+  // return promise
+  return this._super.charge(_charge, options);
+}
+
 
 //
 // authorize a new payment for this order

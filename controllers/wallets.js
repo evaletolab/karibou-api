@@ -27,7 +27,7 @@ exports.ensureAdminOrOwner=function (req, res, next) {
 
   // if not admin, 
   if (!req.user.isAdmin()) { 
-      return res.send(401,"Cette fonctionalité est réservée a un administrateur");  
+      return res.send(401,"Cette fonctionalité est réservée a un administrateur ou au propriétaire");  
   }
   
   return next();
@@ -44,6 +44,12 @@ exports.listWallet=function (req,res) {
 
 };
 exports.registerGiftcode=function (req,res) {
+  try{
+    validate.registerWallet(req.body)
+  }catch(err){
+    return res.send(400, err.message);
+  }
+  
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
   if(!alias){
     res.send(400,"Wrong wallet id");
@@ -78,7 +84,7 @@ exports.getWallet=function (req,res) {
 };
 
 exports.updateWallet=function (req,res) {
-  var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
+  var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user),giftcard;
   if(!alias){
     return res.send(400,"Wrong wallet id");
   }
@@ -86,26 +92,17 @@ exports.updateWallet=function (req,res) {
 };
 
 exports.createWallet=function (req,res) {
-
-  //
-  // capture the payment
-  var handleStripe=payment.for(req.body.payment.issuer).decodeAlias(req.body.payment.alias,req.user);
-  if(!handleStripe){
-    return res.send(400,"La référence de la carte n'est pas compatible avec le service de paiement");
+  try{
+    validate.createWallet(req.body);
+  }catch(err){
+    return res.send(400, err.message);
   }
 
-
-  payment.for(req.body.payment.issuer).getStripe().charges.create({
-    amount: Math.round(req.body.amount*100),
-    currency: "CHF",
-    customer:handleStripe.gateway_id,
-    card: handleStripe.card_id, 
-    capture:true, /// ULTRA IMPORTANT HERE!
+  var alias=req.body.payment.alias;
+  payment.for(req.body.payment.issuer).charge({
+    amount: Math.round(req.body.amount),
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
-  }, function(err, charge) {
-    if(err){ return res.send(400,err.message||err);}
-
-
+  },alias,req.user).then(function(charge) {
     //
     // create the giftcode
     var wallet={
@@ -114,31 +111,33 @@ exports.createWallet=function (req,res) {
       description:'Créer une carte kdo karibou',
       giftcode:true    
     };
-
-    bank.wallet.create(wallet).then(function (wallet) {
-      var transfer={
-        amount:Math.round(req.body.amount*100),
-        description:'Crédit de '+req.body.amount+' fr',
-        type:'credit'
-      };
-      return bank.transfer.create(wallet.wid,transfer);
-    }).then(function (transfer,wallet) {
-      //
-      // send mail
-      var body=_.extend({},req.body);
-      var content={wallet:wallet,transfer:transfer,user:req.user,query:body};
-      // bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-send');
-      delete body.payment;
-      bus.emit('activity.create',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
-
-      return res.json(wallet);
-    }).then(undefined, function (err) {
-      return res.send(400,err.message||errorHelper(err))
-    });
-  });   
-
-
-
+    return bank.wallet.create(wallet);
+  }).then(function (wallet) {
+    //
+    // save the wallet reference
+    giftcard=wallet;
+    var transfer={
+      amount:Math.round(req.body.amount*100),
+      description:'Crédit de '+req.body.amount+' fr',
+      type:'credit'
+    };
+    return bank.transfer.create(wallet.wid,transfer);
+  }).then(function (transfer,w) {
+    var wallet=giftcard;
+    //
+    // send mail
+    var body=_.extend({},req.body);
+    var content={wallet:wallet,transfer:transfer,user:req.user,query:body};
+    // bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-send');
+    delete body.payment;
+    bus.emit('activity.create',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
+    return bank.wallet.retrieve(wallet.wid)
+  }).then(function (wallet) {
+    return res.json(wallet);    
+  }
+  ).then(undefined, function (err) {
+    return res.send(400,err.message||errorHelper(err))
+  });
 
 };
 

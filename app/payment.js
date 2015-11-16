@@ -51,7 +51,14 @@ var Payment=function(){
 			})
 		},
 
+		//
+		// charge, noting todo with the db at this point
+		charge:function(provider,options){
+			var deferred = Q.defer(),self=this;
 
+			// return promise
+			return provider(deferred);
+		},
 		//
 		// authorize a new payment for this order
 		authorize:function(provider, order){

@@ -63,7 +63,7 @@ exports.execute = function(db, script, callback){
 
 	
   //'payments.issuer':{$ne:'wallet'}
-  Users.find({$ne:'wallet'}).toArray(function (err,users) {
+  Users.find({'payments.issuer':{$ne:'wallet'}}).toArray(function (err,users) {
     if (!users.length){
       return callback(null, "0 users have been updated")
     }
