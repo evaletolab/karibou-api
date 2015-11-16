@@ -49,7 +49,7 @@ exports.registerGiftcode=function (req,res) {
   }catch(err){
     return res.send(400, err.message);
   }
-  
+
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
   if(!alias){
     res.send(400,"Wrong wallet id");
@@ -76,6 +76,23 @@ exports.getWallet=function (req,res) {
   //
   // easy 
   bank.wallet.retrieve(alias.wallet_id).then(function (wallet) {
+    res.json(wallet);
+  }).then(undefined, function (error) {
+    res.send(400,error.message||error);
+  });
+
+};
+
+exports.getGiftWallet=function (req,res) {
+
+  if(!req.params.card){
+    return res.send(400,"Hoho, missing data here!")
+  }
+
+
+  //
+  // easy 
+  bank.wallet.retrieveOneGift(req.params.card).then(function (wallet) {
     res.json(wallet);
   }).then(undefined, function (error) {
     res.send(400,error.message||error);
@@ -124,15 +141,21 @@ exports.createWallet=function (req,res) {
     return bank.transfer.create(wallet.wid,transfer);
   }).then(function (transfer,w) {
     var wallet=giftcard;
+    return bank.wallet.retrieve(wallet.wid)
+  }).then(function (wallet) {
     //
     // send mail
     var body=_.extend({},req.body);
-    var content={wallet:wallet,transfer:transfer,user:req.user,query:body};
-    // bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-send');
-    delete body.payment;
+    var content={
+      wallet:wallet,
+      user:req.user,
+      query:body,
+      origin:req.header('Origin')||config.mail.origin,
+      withHtml:true
+    };
+    bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-new');
     bus.emit('activity.create',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
-    return bank.wallet.retrieve(wallet.wid)
-  }).then(function (wallet) {
+
     return res.json(wallet);    
   }
   ).then(undefined, function (err) {

@@ -1,0 +1,31 @@
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>Bonjour <%= user.name.givenName %>,<br/>
+<br/>
+Vous avez commandé une carte cadeau karibou pour un montant de <%= (wallet.balance/100).toFixed(2) %> fr.
+Voici le code de la carte :<b> <%= wallet.card.number %> </b> cette carte est valable juqu'au <%= wallet.card.expiry %>.
+
+<br/>
+Comment ça marche? Envoyé à la personne de votre choix la marche à suivre suivante:
+<ol>
+<li>Créer un compte chez <a href="<%= origin %>">karibou.ch</a>, c'est essentiel pour utiliser votre carte cadeau ;)</li>
+<li>Pour enregister votre carte cadeau, allez dans votre compte personnel, et choisissez <a href="<%= origin %>/account/payment">mes méthodes de paiement</a></li>
+<li>Ensuite, il suffit de cliquer sur le boutton [utiliser une carte cadeau]</li>
+<li>Finalement, enregistrez votre carte avec le numéro suivant <b> <%= wallet.card.number %> </b>. (ce code est valable jusqu'au <%= wallet.card.expiry %>)</li>
+</ol>
+
+
+Voilà c'est fait, maintenant vous pouvez faire vos courses pour un montant de <%= (wallet.balance/100).toFixed(2) %> fr chez les commerçants de l'alimentation de Genève. 
+
+
+Avec nos meilleurs messages,<br/>
+<pre style="font-size:10px">
+ | |/ /         (_) |                
+ | ' / __ _ _ __ _| |__   ___  _   _ 
+ |  < / _` | '__| | '_ \ / _ \| | | |
+ | . \ (_| | |  | | |_) | (_) | |_| |
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+</pre>
+<br/>
+----<br/>
+votre compte commercial <%= origin %>/account/wallet<br/>

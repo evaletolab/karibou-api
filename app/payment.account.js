@@ -163,15 +163,14 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
   var _charge=function (deferred, callback) {
 
     // check alias, in this case the order status is affected
-    var handleStripe=self.decodeAlias(alias,user);
-    if(!handleStripe){
+    var handleAccount=self.decodeAlias(alias,user);
+    if(!handleAccount){
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
 
 		karibou.charge.create(handleAccount.wallet_id,{
 		  amount: Math.round(options.amount*100),
-		  currency: "CHF",
-		  capture:true, /// ULTRA IMPORTANT HERE!
+		  captured:true, /// ULTRA IMPORTANT HERE!
 		  description: options.description
 		}).then(function(charge) {
 
@@ -185,7 +184,7 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
 	  	// return result
 			callback(null,result)
 		}).then(undefined,function (err) {
-			callback(parseError(err,order));
+			callback(parseError(err,options));
 		})	  
 
 		return deferred.promise;
