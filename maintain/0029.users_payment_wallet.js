@@ -74,9 +74,12 @@ exports.execute = function(db, script, callback){
 
       var displayName=user.displayName||(user.name.givenName+' '+user.name.familyName);
 
-      user.payments=_.reject(user.payments,function (payment) {
-        return payment.issuer==='wallet';
-      });
+      if(_.find(user.payments,function (payment) {
+              return payment.issuer==='wallet';
+            })){
+        console.log('user has already a wallet:'+user.id+' - '+displayName)
+        return eachcb();
+      }
 
       //
       // add private account
