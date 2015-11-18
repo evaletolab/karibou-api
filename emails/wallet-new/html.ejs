@@ -1,8 +1,3 @@
-<%if (develMode) {%>
-<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
-<% } %>
-
-
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 	<head>
@@ -549,6 +544,9 @@
                     <tbody><tr>
                         
                         <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-left:18px; padding-bottom:9px; padding-right:0;">
+<%if (develMode) {%>
+<strong style="color:green">TEST -- TEST -- TEST</strong><br/>
+<% } %>                        
                         
                             <span style="line-height:20.8px">Envoyez cette carte cadeau avec la marche à suivre&nbsp;à la personne de votre choix.</span>
                         </td>
@@ -670,6 +668,10 @@
 </html>
 
 <!--
+TEST_    :
+<%if (develMode) {%>
+<div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
+<% } %>
 NAME_    : <%= user.name.givenName %>
 URL_     : <%= origin %>
 URLGIFT_ : <%= origin %>/account/payment?gift=<%= wallet.card.number %>
