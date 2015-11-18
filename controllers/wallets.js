@@ -117,7 +117,7 @@ exports.createWallet=function (req,res) {
 
   var alias=req.body.payment.alias;
   payment.for(req.body.payment.issuer).charge({
-    amount: Math.round(req.body.amount),
+    amount: payment.fees(req.body.payment.issuer,req.body.amount)
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
   },alias,req.user).then(function(charge) {
     //
