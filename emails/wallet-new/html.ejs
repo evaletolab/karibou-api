@@ -579,7 +579,7 @@
                             <td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align:center;">
                                 
                                     
-                                        <img align="center" alt="" src="/img/payments/giftcode-<%= (wallet.balance/100) %>.png" width="358" style="max-width:358px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
+                                        <img align="center" alt="" src="<%= origin %>/img/payments/giftcode-<%= (wallet.balance/100) %>.png" width="358" style="max-width:358px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
                                     
                                 
                             </td>
@@ -678,6 +678,7 @@ URLGIFT_ : <%= origin %>/account/payment?gift=<%= wallet.card.number %>
 CODE_    : <%= wallet.card.number %>.
 BALANCE_ : <%= (wallet.balance/100).toFixed(2) %> 
 
+replace <%= origin %>/img/payments/giftcode-<%= (wallet.balance/100) %>.png
 replace http://<%= origin %>
 replace https://gallery.mailchimp.com
 -->
