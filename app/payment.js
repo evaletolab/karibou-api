@@ -57,7 +57,12 @@ var Payment=function(){
 			var deferred = Q.defer(),self=this;
 
 			// return promise
-			return provider(deferred);
+			return provider(deferred,function (err,card) {
+		  	if(err){
+			    return deferred.reject(parseError(err));
+		  	}
+		    return deferred.resolve(card);
+			});
 		},
 		//
 		// authorize a new payment for this order
