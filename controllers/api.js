@@ -189,7 +189,13 @@ exports.email=function(req,res){
 
 exports.activities=function (req,res) {
   var now=new Date(), 
-      criteria={month:req.query.month||(now.getMonth()+1)};
+      criteria={
+        month:req.query.month||(now.getMonth()+1),
+        year:req.query.year,
+        email:req.query.email,
+        uid:req.query.uid,
+        what:req.query.what
+      };
 
   if(!req.user.isAdmin()){
     criteria.uid=req.user.id;

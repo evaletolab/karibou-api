@@ -64,8 +64,13 @@ exports.registerGiftcode=function (req,res) {
   };
 
   bank.transfer.registerGiftcode(alias.wallet_id,card).then(function (wallet) {
+    bus.emit('system.message',"[karibou-wallet] load giftcard "+card.number,
+        {transaction:wallet.card,balance:wallet.balance,what:'transfer'});
+    bus.emit('activity.update',req.user,{type:'Wallets',key:'wid',id:wallet.wid},
+        {transaction:wallet.card,balance:wallet.balance,what:'transfer'});
     res.json(wallet)
   }).then(undefined,function (error) {
+    bus.emit('system.message',"[karibou-wallet] error giftcard "+card.number,{error:error,user:req.user.email});
     res.send(400,error.message||error);
   })
 

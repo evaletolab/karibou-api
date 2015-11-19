@@ -44,7 +44,7 @@ Activity.statics.create = function(who,what,content,callback){
 
   //
   // set user info
-  doc.who={id:who.id,email:who.email.address,name:who.display()};
+  doc.who={id:who.id,email:who.email.address,name:who.name.familyName};
 
 
   //
@@ -87,13 +87,13 @@ Activity.statics.findByCrireria = function(criteria, callback){
     query['who.id']=criteria.uid;
   }
   if(criteria.email){
-    query['who.email']=criteria.email;
+    query['who.email']=new RegExp('^.*'+criteria.email+'.*$', "i");
   }
 
   //
   // findBy Content
   if(criteria.what){
-    query[criteria.what.key]=criteria.what.id+'';
+    query['what.type']=criteria.what;
   }
 
 

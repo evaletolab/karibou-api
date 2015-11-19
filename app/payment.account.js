@@ -13,12 +13,17 @@ karibou.configure({
 	debug:config.mail.develMode
 });
 
-function parseError(err, from) {
+function parseError(err, handleAccount,order) {
 
 	//
 	// get an email on error
-	var context=(from.oid)?('order.oid:'+from.oid):((from.id)?('user.id:'+from.id):from)
-  bus.emit('system.message',"[karibou-danger] karibou error: ",{message:err.message,type:err.type, param:err.param,code:err.code, context:context});
+	var context={wallet:handleAccount};
+
+	if(order){
+		context.email=order.email;
+		context.oid=order.oid;
+	}
+  bus.emit('system.message',"[karibou-wallet] karibou error: ",{message:err.message,type:err.type, context:context});
 
 	return err;
 }
@@ -88,7 +93,7 @@ PaymentAccount.prototype.checkCard=function(user,alias){
 	    deferred.resolve(wallet);
 	  })
 	  .then(undefined,function (err) {
-	    deferred.reject(parseError(err,user));
+	    deferred.reject(parseError(err,handleAccount));
 	  });
 
 	// return promise
@@ -172,9 +177,8 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
 		  amount: Math.round(options.amount*100),
 		  captured:true, /// ULTRA IMPORTANT HERE!
 		  description: options.description
-		}).then(function(charge) {
+		}).then(function(charge,wallet) {
 
-			console.log('--------------',options.amount,charge.amount)
 	  	var result={
 	  		log:'captured amount '+(charge.amount/100)+' the '+new Date(charge.created).toDateString(),
 	  		transaction:charge.id.crypt(),
@@ -183,9 +187,12 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
 	  	};
 	  	//
 	  	// return result
-			callback(null,result)
+ 		  bus.emit('activity.update',user,{type:'Wallets',key:'wid',id:handleAccount.wallet_id},
+ 		  		{transaction:charge.amount/100,balance:wallet.balance/100,what:'charge'});
+
+			callback(null,result,wallet);
 		}).then(undefined,function (err) {
-			callback(parseError(err,options));
+			callback(parseError(err,handleAccount));
 		})	  
 
 		return deferred.promise;
@@ -216,7 +223,7 @@ PaymentAccount.prototype.authorize=function(order){
 		  currency: "CHF",
 		  capture:false, /// ULTRA IMPORTANT HERE!
 		  description: "#"+order.oid+" for "+order.customer.email.address
-		}).then(function(charge) {
+		}).then(function(charge,wallet) {
 
 	  	var result={
 	  		log:'authorized amount '+(charge.amount/100)+' the '+new Date(charge.created).toDateString(),
@@ -224,11 +231,16 @@ PaymentAccount.prototype.authorize=function(order){
 	  		updated:Date.now(),
 	  		provider:'wallet'
 	  	};
+
+	  	// log
+ 		  bus.emit('activity.update',order.customer,{type:'Wallets',key:'wid',id:handleAccount.wallet_id},
+ 		  		{transaction:charge.amount/100,balance:wallet.balance/100,what:'authorize'});
+
 	  	//
 	  	// return result
 			callback(null,result)
 		}).then(undefined,function (err) {
-			callback(parseError(err,order));
+			callback(parseError(err,handleAccount,order));
 		})	  
 
 		// return a promise
@@ -262,15 +274,19 @@ PaymentAccount.prototype.cancel=function(order,reason){
 		karibou.charge.cancel(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt()
 		})
-		.then(function(refund) {
+		.then(function(refund,wallet) {
 	  	var result={
 	  		log:'cancel authorization the '+new Date().toDateString(),
 	  		updated:Date.now(),
 	  		provider:'wallet'
 	  	};
+
+ 		  bus.emit('activity.update',order.customer,{type:'Wallets',key:'wid',id:handleAccount.wallet_id},
+ 		  		{transaction:refund.amount/100,balance:wallet.balance/100,what:'cancel'});
+
 			callback(null,result)
 		}).then(undefined,function (err) {
-			callback(parseError(err,order));
+			callback(parseError(err,handleAccount,order));
 		})
 
 		return deferred.promise;
@@ -305,7 +321,8 @@ PaymentAccount.prototype.refund=function(order,reason, amount){
 		karibou.charge.refund(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt(),
 			amount:amount&&Math.round(amount*100)
-		}).then(function(refund) {
+		}).then(function(refund,wallet) {
+
 
 	  	var result={
 	  		log:'refund '+refund.amount/100+' the '+new Date().toDateString(),
@@ -313,9 +330,13 @@ PaymentAccount.prototype.refund=function(order,reason, amount){
 	  		updated:Date.now(),
 	  		provider:'wallet'
 	  	};
+
+ 		  bus.emit('activity.update',order.customer,{type:'Wallets',key:'wid',id:handleAccount.wallet_id},
+ 		  		{transaction:refund.amount/100,balance:wallet.balance/100,what:'refund'});
+
 			callback(null,result);
 	  }).then(undefined,function (err) {
-			callback(parseError(err,order))
+			callback(parseError(err,handleAccount,order))
 	  })
 
 		return deferred.promise;
@@ -348,16 +369,20 @@ PaymentAccount.prototype.capture=function(order,reason){
 		karibou.charge.capture(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt(),
 			amount:Math.round(order.getTotalPrice()*100)
-		}).then(function(charge) {
+		}).then(function(charge,wallet) {
 	  	var result={
 	  		log:'capture '+charge.amount/100+' the '+new Date().toDateString(),
 	  		transaction:charge.id.crypt(),
 	  		updated:Date.now(),
 	  		provider:'wallet'
 	  	};
+
+ 		  bus.emit('activity.update',order.customer,{type:'Wallets',key:'wid',id:handleAccount.wallet_id},
+ 		  		{transaction:charge.amount/100,balance:wallet.balance/100,what:'capture'});
+
 			callback(null,result)
 		}).then(undefined,function (err) {
-			callback(parseError(err,order))
+			callback(parseError(err,handleAccount,order))
 		})
 
 		return deferred.promise;
