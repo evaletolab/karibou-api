@@ -20,7 +20,7 @@ function parseError(err, from) {
 	var context=(from.oid)?('order.oid:'+from.oid):((from.id)?('user.id:'+from.id):from)
   bus.emit('system.message',"[karibou-danger] karibou error: ",{message:err.message,type:err.type, param:err.param,code:err.code, context:context});
 
-	return err
+	return err;
 }
 
 
@@ -174,6 +174,7 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
 		  description: options.description
 		}).then(function(charge) {
 
+			console.log('--------------',options.amount,charge.amount)
 	  	var result={
 	  		log:'captured amount '+(charge.amount/100)+' the '+new Date(charge.created).toDateString(),
 	  		transaction:charge.id.crypt(),

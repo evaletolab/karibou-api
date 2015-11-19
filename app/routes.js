@@ -73,7 +73,7 @@ module.exports = function(app, config, passport) {
 
   //
   // wallet or giftcode
-  app.get ('/v1/wallets', auth.ensureAdmin,wallets.listWallet);
+  app.get ('/v1/wallets', auth.ensureAuthenticated,wallets.listWallet);
   app.get ('/v1/wallets/:alias', wallets.ensureAdminOrOwner,wallets.getWallet);
   app.get ('/v1/wallets/giftcard/:card', auth.ensureAuthenticated,wallets.getGiftWallet);
   app.post('/v1/wallets', auth.ensureAuthenticated,wallets.createWallet);

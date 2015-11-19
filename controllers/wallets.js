@@ -35,8 +35,12 @@ exports.ensureAdminOrOwner=function (req, res, next) {
 
 // TODO giftcode should be outside this file
 exports.listWallet=function (req,res) {
+  var filters={};
+  if(!req.user.isAdmin()){
+    filters.id=req.user.id;
+  }
 
-  bank.wallet.retrieveAllGift().then(function (wallets) {
+  bank.wallet.retrieveAllGift(filters).then(function (wallets) {
     res.json(wallets);
   }).then(undefined, function (error) {
     return res.send(400,errorHelper(err))
@@ -117,7 +121,7 @@ exports.createWallet=function (req,res) {
 
   var alias=req.body.payment.alias;
   payment.for(req.body.payment.issuer).charge({
-    amount: payment.fees(req.body.payment.issuer,req.body.amount),
+    amount: payment.fees(req.body.payment.issuer,req.body.amount)+req.body.amount,
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
   },alias,req.user).then(function(charge) {
     //
