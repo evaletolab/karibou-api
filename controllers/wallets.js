@@ -60,7 +60,7 @@ exports.registerGiftcode=function (req,res) {
   }
   var card={
     name:req.body.name,
-    number:req.body.number
+    number:req.body.number.trim()
   };
 
   bank.transfer.registerGiftcode(alias.wallet_id,card).then(function (wallet) {
