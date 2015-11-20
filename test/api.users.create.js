@@ -3,6 +3,7 @@ var app = require("../app");
 
 var db = require('mongoose');
 var dbtools = require("./fixtures/dbtools");
+var _= require('underscore');
 var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.js']);
 
@@ -53,6 +54,10 @@ describe("api.users.create", function(){
       .send(r)
       .end(function(err,res){   
         res.should.have.status(200);
+        var payment=_.find(res.body.payments,function (p) {
+            return p.issuer==='wallet';
+        })
+        should.exist(payment);
         done();        
       });
   });
