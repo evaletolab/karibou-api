@@ -2,16 +2,8 @@ var util = require("util");
 var events = require("events");
 var bus = require('../app/bus');
 var Q=require('q');
-var karibou = require("karibou-wallet");
+var karibou = require("karibou-wallet")();
 
-//
-//
-karibou.configure({
-	allowMultipleSetOption:true,
-	apikey:config.payment.karibou.apikey,
-	allowMaxAmount:config.payment.allowMaxAmount,
-	debug:config.mail.develMode
-});
 
 function parseError(err, handleAccount,order) {
 

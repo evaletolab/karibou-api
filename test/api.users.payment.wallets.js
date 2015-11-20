@@ -110,11 +110,11 @@ describe("api.wallets", function(){
       });
     });  
 
-    it('GET /v1/wallets for non admin should return 401',function(done){
+    it('GET /v1/wallets for non admin should return 200',function(done){
       request(app)
         .get('/v1/wallets')
         .set('cookie', delphine.cookie)
-        .expect(401,done);
+        .expect(200,done);
     });
 
     it('GET /v1/wallets for admin should return 200',function(done){

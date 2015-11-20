@@ -62,6 +62,21 @@ mongoose.connect(config.mongo.name,{server:{safe:true, auto_reconnect:true}},fun
     }
 });
 
+
+//
+// configure karibou-wallet
+require("karibou-wallet")({
+  allowMultipleSetOption:true,
+  apikey:config.payment.karibou.apikey,
+  allowMaxAmount:config.payment.allowMaxAmount,
+  debug:config.mail.develMode,
+  mongo:{
+    name:config.mongo.multiple,
+    multiple:(config.mongo.multiple)?true:false
+  }
+});
+
+
 // load models
 files = require("fs").readdirSync( './models' );
 for(var i in files) {

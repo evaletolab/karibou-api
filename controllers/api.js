@@ -9,7 +9,6 @@ var _ = require('underscore'),
     http = require('http'),
     validate = require('./validate/validate'),
     payment = require('../app/payment'),
-    bank = require('karibou-wallet'),
     debug = require('debug')('api'),
     errorHelper = require('mongoose-error-helper').errorHelper,
     origins=[];

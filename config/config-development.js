@@ -119,7 +119,7 @@ module.exports = {
   mongo:{
     name:'mongodb://localhost/karibou-devel',
     ensureIndex:true,
-    multiple:'mongodb://localhost/karibou-core'
+    multiple_:'mongodb://localhost/karibou-core'
   },
 
 	nodetime:{
