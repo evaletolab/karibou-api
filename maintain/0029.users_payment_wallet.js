@@ -82,13 +82,13 @@ exports.execute = function(db, script, callback){
       }
 
       //
-      // add private account
+      // add private account and authorize a 7fr negative amount
       karibou.wallet.create({
         id:user.id,
         email:user.email.address,
         card:{name:displayName},
         description:'Votre compte privé',
-        amount_negative:0
+        amount_negative:700
       }).then(function (wallet) {
 
         result={
