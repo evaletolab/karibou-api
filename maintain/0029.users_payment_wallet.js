@@ -48,7 +48,8 @@ exports.execute = function(db, script, callback){
   var _=require('underscore');
   var karibou = require("karibou-wallet")({
     allowMultipleSetOption:true,
-    apikey:config.payment.karibou.apikey
+    apikey:config.payment.karibou.apikey,
+    allowMaxAmount:config.payment.allowMaxAmount
   });
 
 
@@ -86,7 +87,7 @@ exports.execute = function(db, script, callback){
         email:user.email.address,
         card:{name:displayName},
         description:'Votre compte privé',
-        amount_negative:config.payment.allowMaxAmount||0
+        amount_negative:config.payment.karibou.allowNegativeBalance||0
       }).then(function (wallet) {
 
         result={
