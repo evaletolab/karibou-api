@@ -33,7 +33,6 @@ exports.ensureAdminOrOwner=function (req, res, next) {
   return next();
 }
 
-// TODO giftcode should be outside this file
 exports.listWallet=function (req,res) {
   var filters={};
   if(!req.user.isAdmin()){
@@ -47,6 +46,24 @@ exports.listWallet=function (req,res) {
   });
 
 };
+
+exports.countGiftcode=function (req,res) {
+  // retrieve all giftcards
+  bank.wallet.retrieveAllGift({}).then(function (wallets) {
+    var amount=0;
+    wallets.forEach(function (wallet) {
+      amount+=wallet.transfers[wallet.transfers.length-1].amount;
+    });
+
+    res.json({amount:amount,quatity:wallets.length});
+  }).then(undefined, function (error) {
+    return res.send(400,errorHelper(err))
+  });
+
+};
+
+
+
 exports.registerGiftcode=function (req,res) {
   try{
     validate.registerWallet(req.body)
