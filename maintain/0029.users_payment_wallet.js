@@ -46,16 +46,16 @@ exports.execute = function(db, script, callback){
   var Users=db.collection('users'),countUp=0;
   var tosave=false, errs=[],logs=[];
   var _=require('underscore');
-  var karibou = require("karibou-wallet");
+  var karibou = require("karibou-wallet")({
+    allowMultipleSetOption:true,
+    apikey:config.payment.karibou.apikey,
+    allowMaxAmount:config.payment.allowMaxAmount
+  });
+
+  console.log('---------',config.payment)
 
   //
   //
-  karibou.configure({
-    allowMultipleSetOption:true,
-    apikey:config.payment.karibou.apikey,
-    allowMaxAmount:config.payment.allowMaxAmount,
-    debug:config.mail.develMode
-  });
 
   var alias=function(user_id,last4,wallet_id){
   return (user_id+':'+last4+':'+wallet_id).crypt()  

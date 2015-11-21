@@ -85,6 +85,7 @@ module.exports = {
       key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
     },
     karibou:{
+      allowNegativeBalance:700,
       apikey:"sk_test_t1im5hjyMbW6cNgyZpATg"
     },
     postfinance:{
