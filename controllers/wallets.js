@@ -5,6 +5,7 @@
 var _ = require('underscore'),
     bus=require('../app/bus'),
     db = require('mongoose'),
+    assert = require("assert"),
     http = require('http'),
     validate = require('./validate/validate'),
     payment = require('../app/payment'),
@@ -140,12 +141,14 @@ exports.createWallet=function (req,res) {
   }catch(err){
     return res.send(400, err.message);
   }
-
+  var giftcard;
   var alias=req.body.payment.alias;
+  var amount=parseFloat(req.body.amount);
   payment.for(req.body.payment.issuer).charge({
-    amount: payment.fees(req.body.payment.issuer,req.body.amount)+req.body.amount,
+    amount: payment.fees(req.body.payment.issuer,amount)+amount,
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
   },alias,req.user).then(function(charge) {
+    assert((charge.amount/100)>=amount);
     //
     // create the giftcode
     var wallet={
@@ -157,10 +160,10 @@ exports.createWallet=function (req,res) {
     return bank.wallet.create(wallet);
   }).then(function (wallet) {
     //
-    // save the wallet reference
+    // save the wallet reference    
     giftcard=wallet;
     var transfer={
-      amount:Math.round(req.body.amount*100),
+      amount:Math.round(amount*100),
       description:'Crédit de '+req.body.amount+' fr',
       type:'credit'
     };
@@ -190,3 +193,38 @@ exports.createWallet=function (req,res) {
 
 };
 
+
+exports.transferWallet=function (req,res) {
+  try{
+    validate.createWallet(req.body);
+  }catch(err){
+    return res.send(400, err.message);
+  }
+
+  var userWallet;
+  var wid=req.params.wid;
+  var amount=parseFloat(req.body.amount);
+  bank.wallet.retrieve(wid).then(function (wallet) {
+    //
+    // save the wallet reference    
+    userWallet=wallet;
+    var transfer={
+      amount:Math.round(amount*100),
+      description:'Crédit de '+req.body.amount+' fr',
+      type:'credit'
+    };
+    return bank.transfer.create(wallet.wid,transfer);
+  }).then(function (transfer,w) {
+    return bank.wallet.retrieve(userWallet.wid)
+  }).then(function (wallet) {
+    //
+    // send mail
+    bus.emit('activity.update',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
+
+    return res.json(wallet);    
+  }
+  ).then(undefined, function (err) {
+    return res.send(400,err.message||errorHelper(err))
+  });
+
+};

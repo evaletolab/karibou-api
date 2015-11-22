@@ -186,11 +186,11 @@ describe("api.wallets", function(){
         });
     });
 
-    it('POST /v1/wallets delphine create 10fr giftcard return 200',function(done){
+    it('POST /v1/wallets delphine create 10 (str) fr giftcard return 200',function(done){
       var payment={
         number:"xxxx-xxxx-xxxx-4444", expiry:"12/2029",name:'TO OLI',issuer:'tester',
         alias:(delphine.id+'').hash().crypt()
-      },amount=10;
+      },amount='10';
       request(app)
         .post('/v1/wallets')
         .send({payment:payment,amount:amount})
