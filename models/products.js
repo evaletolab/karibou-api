@@ -42,6 +42,7 @@ var Product = new Schema({
       description:{type:String, required:true},
       comment:{type:String, required:false},
       origin:{type:String, required:false},
+      lactose:{type:Boolean, default:false},       // lactose free
       gluten:{type:Boolean, default:false},        // Gluten free
       cold:{type:Boolean, default:false},          // Fresh food
       homemade:{type:Boolean, default:false},      // Home made
