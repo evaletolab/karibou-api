@@ -210,6 +210,37 @@ UserSchema.statics.findByToken = function(token, success, fail){
 };
 
 
+
+UserSchema.statics.findByCrireria = function(criteria, callback){
+  var query={}, from=new Date(),to;
+
+
+  // 
+  if(criteria.name){
+    query['displayName']=new RegExp('^.*'+criteria.name+'.*$', "i");
+  }
+
+  if(criteria.gifts){
+  }
+
+  if(criteria.orders){
+  }
+
+  if(criteria.amount){
+  }
+
+  //
+  // findByUser
+  if(criteria.uid){
+    query['id']=criteria.uid;
+  }
+
+
+  if(callback) return this.find(query).exec(callback);
+  return this.find(query);
+};
+
+
 // TODO this should be stored in db
 UserSchema.methods.populateRoles=function(){
   var user=this;

@@ -72,7 +72,7 @@ exports.me = function (req, res, next)  {
 exports.list = function (req, res, next)  {
   //
   // TODO add criteria
-  Users.find({}).populate('shops').exec(function(err,users){
+  Users.findByCrireria(req.query).populate('shops').exec(function(err,users){
       if (err){
         return res.send(400,errorHelper(err.message||err));
       }
