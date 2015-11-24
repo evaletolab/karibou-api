@@ -40,7 +40,7 @@ describe("api.users.create", function(){
       .expect(401,done);
   });
 
-  it('POST /register should return 200 ',function(done){
+  it.skip('POST /register should return 200 ',function(done){
     var r={
       email:"Reg1@test.com",
       firstname:"first",

@@ -11,7 +11,7 @@ exports.clean=function(callback){
     process.exit(1);
   }
 
-  var collections=['Users','Categories','Shops','Products','Sequences','DbMaintain', 'Emails'];
+  var collections=['Users','Categories','Shops','Products','Sequences','DbMaintain', 'Emails','Wallets'];
   var iterator = function(name, nextcb){
     db.model(name).remove({},function(e){
       nextcb(e);

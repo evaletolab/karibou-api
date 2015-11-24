@@ -682,6 +682,8 @@ UserSchema.methods.createWallet=function (callback) {
       provider:'wallet'
     });
     return self.save(callback);
+  }).then(undefined,function (error) {
+    callback(error)
   });
 };
 
