@@ -216,39 +216,40 @@ exports.register_post= function(req, res,next) {
           if (!user){
             return res.send(400,"Erreur inconnue lors de la création du compte");    
           }
-          //
-          // redirect for non ajax register
-          var redirect=req.param('redirect');
-          if(redirect){
-            return  res.redirect(redirect);
-          }
 
-          //
-          // send mail validation after user creation
-          var origin=req.header('Origin')||config.mail.origin;
-          db.model('Emails').createAndSendMail(user,origin,function(err,validate){
+          user.createWallet(function (err) {
             if(err){
-              console.log("DEBUG-------- register ",err)
-              return res.send(400,err)
+              bus.emit('system.message',"[karibou-wallet] karibou error: ",
+                {message:err.message,stack:err.stack});
             }
-
             //
-            // subscribe to mailchimp this new account
-            if(!user.mailchimp && user.name.familyName && user.name.givenName){
-              bus.emit('mailchimp.subscribe',{
-                  id:config.mailing.main.mailchimp,
-                  fname:user.name.givenName,
-                  lname:user.name.familyName,
-                  email:user.email.address
-              },function (err,data) {
-                console.log('DEBUG------- subscribe main list',err,data)
-              });
+            // send mail validation after user creation
+            var origin=req.header('Origin')||config.mail.origin;
+            db.model('Emails').createAndSendMail(user,origin,function(err,validate){
+              if(err){
+                bus.emit('system.message',"[karibou-register.mail] karibou error: ",
+                  {message:err.message,stack:err.stack});
+                return res.send(400,err)
+              }
 
-            }
+              //
+              // subscribe to mailchimp this new account
+              if(!user.mailchimp && user.name.familyName && user.name.givenName){
+                bus.emit('mailchimp.subscribe',{
+                    id:config.mailing.main.mailchimp,
+                    fname:user.name.givenName,
+                    lname:user.name.familyName,
+                    email:user.email.address
+                },function (err,data) {
+                  console.log('DEBUG------- subscribe main list',err,data)
+                });
 
-            //
-            // authenticate user
-            passport_Authenticate(req, res, next)
+              }
+
+              //
+              // authenticate user
+              passport_Authenticate(req, res, next)
+            });
           })
       });
 

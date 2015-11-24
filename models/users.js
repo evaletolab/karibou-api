@@ -4,6 +4,7 @@ var db = require('mongoose')
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
 	, passport = require('passport')
+  , karibou = require('karibou-wallet')()
   , payment = require('../app/payment')
   , bus = require('../app/bus')
   , validator = require('../app/validator')
@@ -206,6 +207,37 @@ UserSchema.statics.findByToken = function(token, success, fail){
       success(user);
     }
   });
+};
+
+
+
+UserSchema.statics.findByCrireria = function(criteria, callback){
+  var query={}, from=new Date(),to;
+
+
+  // 
+  if(criteria.name){
+    query['displayName']=new RegExp('^.*'+criteria.name+'.*$', "i");
+  }
+
+  if(criteria.gifts){
+  }
+
+  if(criteria.orders){
+  }
+
+  if(criteria.amount){
+  }
+
+  //
+  // findByUser
+  if(criteria.uid){
+    query['id']=criteria.uid;
+  }
+
+
+  if(callback) return this.find(query).exec(callback);
+  return this.find(query);
 };
 
 
@@ -473,7 +505,6 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ex
 
     //save it
     user.save(function(err){
-      //FIXME manage the duplicate address ( err && err.code === 11000 )
       callback(err, user);
     });
 
@@ -626,6 +657,35 @@ UserSchema.methods.isValidAlias=function(alias, method){
   return payment.for(method).isValidAlias(alias,this, method)
 }
 
+UserSchema.methods.createWallet=function (callback) {
+  var self=this;
+  
+  //
+  // add private account and authorize a 7fr negative amount
+  return karibou.wallet.create({
+    id:self.id,
+    email:self.email.address,
+    card:{name:self.display()},
+    description:'Votre compte privé',
+    amount_negative:config.payment.karibou.allowNegativeBalance||0
+  }).then(function (wallet) {
+    if(!self.payments){
+      self.payments=[];
+    }
+    self.payments.push({
+      alias:payment.for('wallet').alias(self.id,wallet.last4,wallet.wid),
+      number:'xxxx-xxxx-xxxx-'+wallet.card.last4,
+      issuer:'wallet',
+      name:self.display(),
+      expiry:wallet.card.expiry,
+      updated:Date.now(),
+      provider:'wallet'
+    });
+    return self.save(callback);
+  }).then(undefined,function (error) {
+    callback(error)
+  });
+};
 
 //
 // update user payment

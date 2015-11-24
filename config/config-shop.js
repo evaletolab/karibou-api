@@ -19,7 +19,7 @@ module.exports = {
 
     shipping:{
       average:115, // average 
-      discountA:145,  // half price 5.4@18% & 4.5@15%
+      discountA:2,  // half price 5.4@18% & 4.5@15%
       discountB:180,    // 180 full price 11.7@18% & 9.75@15%
       price:{
         hypercenter:10,
@@ -120,8 +120,9 @@ module.exports = {
         {label:"american express",fees:0.029}, 
         {label:"visa",fees:0.029}, 
         {label:"mastercard",fees:0.029}, 
-        {label:"invoice",fees:0.0}, 
-        {label:"paypal",fees:0.034}, 
+        {label:"wallet", fees:0.009}, 
+        {label:"invoice",fees:0.009}, 
+        {label:"paypal", fees:0.034}, 
         {label:"bitcoin",fees:0.0}
       ],
 

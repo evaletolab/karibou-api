@@ -62,6 +62,21 @@ mongoose.connect(config.mongo.name,{server:{safe:true, auto_reconnect:true}},fun
     }
 });
 
+
+//
+// configure karibou-wallet
+require("karibou-wallet")({
+  allowMultipleSetOption:true,
+  apikey:config.payment.karibou.apikey,
+  allowMaxAmount:config.payment.allowMaxAmount,
+  debug:config.mail.develMode,
+  mongo:{
+    name:config.mongo.multiple,
+    multiple:(config.mongo.multiple)?true:false
+  }
+});
+
+
 // load models
 files = require("fs").readdirSync( './models' );
 for(var i in files) {
@@ -87,7 +102,7 @@ require('./app/utils')(app);
 var bus=require('./app/bus');require('./app/bus.routes');
 
 // mailer
-var sendmail=require('./app/mail')(app,bus);
+require('./app/mail')(app,bus);
   
 
 // payment api
@@ -96,7 +111,7 @@ var payment=require('./app/payment');
 
 
 // express settings
-require('./app/express')(app, config, passport, sendmail)
+require('./app/express')(app, config, passport)
 
 // bootstrap passport config
 require('./app/passport')(app, config, passport)
@@ -121,7 +136,14 @@ if (process.env.C9_PORT ){
     host='0.0.0.0';
 }
 
-app.listen(port,host);
+var count=0;
+app.listen(port,host).on('connection', function(socket) {
+  console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
+  socket.on('end',function(){
+    console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
+  })
+
+})
 
 
 
@@ -131,10 +153,13 @@ process.on('uncaughtException', function(err) {
 
   if(process.env.NODE_ENV==='production'){
     var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
-    sendmail("evaleto@gmail.com","[kariboo] uncaughtException : "+err.toString(), {content:msg}, "simple",function(err,status){
+    bus.emit('sendmail',"evaleto@gmail.com",
+         "[karibou] uncaughtException "+err.toString(), {content:msg}, "simple",
+    function (err,status) {
       console.log(err,status)
       process.exit(1)
-    })
+    });
+
   }
   console.log("uncaughtException",err.stack);
 });

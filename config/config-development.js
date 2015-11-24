@@ -78,10 +78,15 @@ module.exports = {
   },
 
   payment:{
+    allowMaxAmount:40000,
     reserve:1.15,
     provider:'stripe',
     stripe:{
       key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
+    },
+    karibou:{
+      allowNegativeBalance:700,
+      apikey:"sk_test_t1im5hjyMbW6cNgyZpATg"
     },
     postfinance:{
       enabled:true,
@@ -115,7 +120,7 @@ module.exports = {
   mongo:{
     name:'mongodb://localhost/karibou-devel',
     ensureIndex:true,
-    multiple:'mongodb://localhost/karibou-core'
+    multiple_:'mongodb://localhost/karibou-core'
   },
 
 	nodetime:{

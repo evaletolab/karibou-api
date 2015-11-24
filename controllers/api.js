@@ -10,8 +10,8 @@ var _ = require('underscore'),
     validate = require('./validate/validate'),
     payment = require('../app/payment'),
     debug = require('debug')('api'),
-    errorHelper = require('mongoose-error-helper').errorHelper;
-    origins=[]
+    errorHelper = require('mongoose-error-helper').errorHelper,
+    origins=[];
 
 //
 // authorized origins
@@ -37,39 +37,6 @@ exports.index = function(app){
 };
 
 
-// 
-// proxy image from cdn
-exports.imagecdn =function(req, res) {
-
-    // cdn url format
-    // http://cdn.filter.to/75x75/http://yoursite.com/path/to/my/picture.jpg
-    // 375x1000/?uri=http://karibou-filepicker.s3-website-eu-west-1.amazonaws.com/Y8sMyOkzRvWgRwb0mBBJ_entrecote.jpg
-    // var source='http://karibou-filepicker.s3-website-eu-west-1.amazonaws.com/';
-    // var source="//s3-eu-west-1.amazonaws.com/karibou-filepicker/";
-    var source=encodeURI(req.query.source);
-    if(source.indexOf('http:')!==0){
-      source='http:'+source;
-    }
-    var size=req.params.size+'/';
-    var options = {
-        host: "cdn.filter.to",
-        path: "/"+size+source
-    };
-
-    var callback = function(response) {
-        if (response.statusCode === 200) {
-            res.writeHead(200, {
-                'Content-Type': response.headers['content-type']
-            });
-            response.pipe(res);
-        } else {
-            res.writeHead(response.statusCode);
-            res.end();
-        }
-    };
-
-    http.request(options, callback).end();
-};
 
 exports.config = function(req, res) {
   if (req.user&&req.user.isAdmin()) { 
@@ -221,7 +188,13 @@ exports.email=function(req,res){
 
 exports.activities=function (req,res) {
   var now=new Date(), 
-      criteria={month:req.query.month||(now.getMonth()+1)};
+      criteria={
+        month:req.query.month||(now.getMonth()+1),
+        year:req.query.year,
+        email:req.query.email,
+        uid:req.query.uid,
+        what:req.query.what
+      };
 
   if(!req.user.isAdmin()){
     criteria.uid=req.user.id;
@@ -234,6 +207,7 @@ exports.activities=function (req,res) {
     res.json(activities);
   })
 }
+
 
 exports.sessions = function(req, res) {
   require('mongoose').connection.db.collection('sessions',function(err,sessions){

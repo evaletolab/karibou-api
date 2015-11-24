@@ -7,6 +7,24 @@ var db = require('mongoose'),
 exports.check   = check;
 exports.ifCheck = ifCheck;
 
+
+exports.createWallet=function (walletInfo) {
+  if(!walletInfo.payment){
+    throw new Error("Les données du mode de paiement doivent être définis");
+  }
+  check(walletInfo.amount,"La valeur du montant n'est pas valide").isNumeric();
+  check(walletInfo.payment.alias,  "Ce mode de paiement n'est pas valide").isText().len(6,256);
+}
+
+
+exports.registerWallet=function (card) {
+  if(!card){
+    throw new Error("Missing gift card!!");
+  }
+  check(card.number,"La numéro de votre carte n'est pas valide").isNumeric();
+  check(card.name,  "Le nom associé à votre carte n'est pas valide").isText().len(6,150);
+}
+
 exports.document=function (doc) {
     // check(doc.created,"La date de création n'est pas valide").isDate();
     // check(doc.updated,"La date de création n'est pas valide").isDate();
@@ -92,7 +110,7 @@ var user= exports.user = function(u, lean){
 }
 
 exports.payment=function(payment, alias){
-  check(alias,  "Ce mode de paiement est inconnu").isText().len(6,256)
+  check(alias,  "Ce mode de paiement n'est pas valide").isText().len(6,256)
   check(payment.name,  "Le titulaire de la carte n'est pas valide").isText().len(4,50)
   check(payment.expiry,  "La date de validité de la carte n'est pas correcte").isText().len(4,10)
   // type is computed by number

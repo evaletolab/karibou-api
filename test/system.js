@@ -141,7 +141,7 @@ describe("system", function(){
         })
     });
 
-    it("Basic testing of the Bus and promise", function(done){
+    it.skip("Basic testing of the Bus and promise", function(done){
         var bus=require('../app/bus'), em=0;
         bus.on('test',function(a,cb){
             cb(0,a+'-1')

@@ -26,7 +26,6 @@ function parseError(err, from) {
 	//
 	// get an email on error
 	var context=(from.oid)?('order.oid:'+from.oid):((from.id)?('user.id:'+from.id):from)
-  bus.emit('system.message',"[karibou-danger] stripe error: ",{message:err.message,type:err.type, param:err.param,code:err.code, context:context});
 
 	switch (err.type) {
 	  case 'StripeCardError':
@@ -71,7 +70,7 @@ PaymentStripe.prototype.isValidAlias=function(alias, user){
 // verify if an alias is valid and decode it
 PaymentStripe.prototype.decodeAlias=function(alias, user){
 	try{
-		var elems=alias.decrypt().split(':')
+		var elems=alias.decrypt().split(':');
 		if(elems[0]!==(user.id+'')) return false;
 		return {id:elems[0],gateway_id:elems[1],card_id:elems[2]}
 	}catch(e){
@@ -298,7 +297,44 @@ PaymentStripe.prototype.addCard=function(user, payment){
 
 	// return promise
 	return this._super.addCard(_addCard, user,payment);
-}
+};
+
+//
+// simple charge wrapper
+PaymentStripe.prototype.charge=function (options,alias,user) {
+	var self=this;
+
+  var _charge=function (deferred, callback) {
+
+		// check alias, in this case the order status is affected
+		var handleStripe=self.decodeAlias(alias,user);
+		if(!handleStripe){
+			return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
+		}
+
+	  stripe.charges.create({
+	    amount: Math.round(options.amount*100),
+	    currency: "CHF",
+	    customer:handleStripe.gateway_id,
+	    card: handleStripe.card_id, 
+	    capture:true, /// ULTRA IMPORTANT HERE!
+	    description: options.description
+	  }, function(err, charge) {
+	  	if(err){
+		    return deferred.reject(parseError(err,options));
+	  	}
+	    return deferred.resolve(charge);
+		});
+
+		// return a promise
+		return deferred.promise;
+  };
+
+
+
+	// return promise
+	return this._super.charge(_charge, options);
+};
 
 
 //

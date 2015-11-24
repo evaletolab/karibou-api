@@ -51,7 +51,19 @@ var Payment=function(){
 			})
 		},
 
+		//
+		// charge, noting todo with the db at this point
+		charge:function(provider,options){
+			var deferred = Q.defer(),self=this;
 
+			// return promise
+			return provider(deferred,function (err,card) {
+		  	if(err){
+			    return deferred.reject(parseError(err));
+		  	}
+		    return deferred.resolve(card);
+			});
+		},
 		//
 		// authorize a new payment for this order
 		authorize:function(provider, order){
@@ -218,9 +230,10 @@ var Payment=function(){
 
 
 	// this.postfinance =require('./payment.postfinance')(privatePayment)
-	this.stripe =require('./payment.stripe')(privatePayment)
-	this.invoice =require('./payment.invoice')(privatePayment)
-	this.tester =require('./payment.test')(privatePayment)
+	this.stripe =require('./payment.stripe')(privatePayment);
+	this.invoice =require('./payment.invoice')(privatePayment);
+	this.account =require('./payment.account')(privatePayment);
+	this.tester =require('./payment.test')(privatePayment);
 }
 
 //
@@ -234,6 +247,7 @@ Payment.prototype.for=function(issuer){
 		'mastercard':this.stripe,	
 		'bitcoin':this.stripe,	
 		'invoice':this.invoice,	
+		'wallet':this.account,	
 		'tester':this.tester
 	}
 	if(issuer && map[issuer.toLowerCase()]){

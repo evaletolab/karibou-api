@@ -704,9 +704,16 @@ exports.informShopToOrders=function(req,res){
           //
           // this shop is ready for sendmail 
           promises.push(
-            bus.emit('sendmail',shop.owner.email.address,
-                     "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
-                      contents[shop.urlpath],"order-prepare")
+            (function () {
+              var defer=Q.defer();
+              bus.emit('sendmail',shop.owner.email.address,
+                   "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
+                    contents[shop.urlpath],"order-prepare",function (err,res) {
+                      if(err){defer.reject(err)}
+                      defer.resolve(res)
+                    });
+              return defer.promise;
+            })()
           );
 
 
