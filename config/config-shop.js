@@ -120,8 +120,8 @@ module.exports = {
         {label:"american express",fees:0.029}, 
         {label:"visa",fees:0.029}, 
         {label:"mastercard",fees:0.029}, 
-        {label:"wallet", fees:0.009}, 
-        {label:"invoice",fees:0.009}, 
+        {label:"wallet", fees:0.000}, 
+        {label:"invoice",fees:0.000}, 
         {label:"paypal", fees:0.034}, 
         {label:"bitcoin",fees:0.0}
       ],
