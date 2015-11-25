@@ -2,7 +2,7 @@
 
 module.exports = {
   shop:{
-    generalFees:0.15,
+    generalFees:0.20,
     system:{
       password:{len:6},
       post:{limitMS:500}
