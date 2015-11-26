@@ -3,6 +3,7 @@ var mongoose = require('mongoose')
   , TwitterStrategy = require('passport-twitter').Strategy
   , PersonaStrategy = require('passport-persona').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+  , bank = require("karibou-wallet")()
 //  , GitHubStrategy = require('passport-github').Strategy
 //  , FacebookStrategy = require('passport-facebook').Strategy
 //  , LinkedinStrategy = require('passport-linkedin').Strategy
@@ -45,8 +46,11 @@ module.exports = function (app, config, passport) {
 
       //
       // populate default roles
-      user.populateRoles()
+      user.populateRoles();
 
+      // generate user BVR
+      // user=user.toObject();
+      user.bvr=bank.mod10gen(user.id+'0');
 
       //console.log(id,config.admin.emails, user.email)
       // var u= user.toObject()

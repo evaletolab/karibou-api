@@ -2,7 +2,7 @@ var util = require("util");
 var events = require("events");
 var bus = require('../app/bus');
 var Q=require('q');
-var karibou = require("karibou-wallet")();
+var bank = require("karibou-wallet")();
 
 
 function parseError(err, handleAccount,order) {
@@ -22,7 +22,7 @@ function parseError(err, handleAccount,order) {
 
 
 var PaymentAccount=function(_super){
-	this.karibou=karibou;
+	this.bank=bank;
 	this._super=_super;
 }
 
@@ -80,8 +80,11 @@ PaymentAccount.prototype.checkCard=function(user,alias){
 
 	//
 	// check card binding
-	karibou.wallet.retrieve(handleAccount.wallet_id)
+	bank.wallet.retrieve(handleAccount.wallet_id)
 		.then(function(wallet) {
+			if(wallet.balance<=500){
+		    return deferred.reject(new Error("Le montant sur votre compte est insuffisant !"));				
+			}
 	    deferred.resolve(wallet);
 	  })
 	  .then(undefined,function (err) {
@@ -125,7 +128,7 @@ PaymentAccount.prototype.addCard=function(user, payment){
 	    return Q.reject(new Error("Impossible d'enregistrer une carte avec un compte non validé"))
 		}
 
-	  karibou.wallet.create({
+	  bank.wallet.create({
 	    id:user.id,
 	    email:user.email.address,
 	    card:{name:user.display()},
@@ -165,7 +168,7 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
       return Q.reject(new Error("La référence de la carte n'est pas compatible avec le service de paiement"));
     }
 
-		karibou.charge.create(handleAccount.wallet_id,{
+		bank.charge.create(handleAccount.wallet_id,{
 		  amount: Math.round(options.amount*100),
 		  captured:true, /// ULTRA IMPORTANT HERE!
 		  description: options.description
@@ -210,7 +213,7 @@ PaymentAccount.prototype.authorize=function(order){
       return deferred.promise;
 		}
 
-		karibou.charge.create(handleAccount.wallet_id,{
+		bank.charge.create(handleAccount.wallet_id,{
 		  amount: Math.round(order.getTotalPrice(config.payment.reserve)*100),
 		  currency: "CHF",
 		  capture:false, /// ULTRA IMPORTANT HERE!
@@ -263,7 +266,7 @@ PaymentAccount.prototype.cancel=function(order,reason){
 	  	return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
 	  }
 
-		karibou.charge.cancel(handleAccount.wallet_id,{
+		bank.charge.cancel(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt()
 		})
 		.then(function(refund,wallet) {
@@ -310,7 +313,7 @@ PaymentAccount.prototype.refund=function(order,reason, amount){
 	  	return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
 	  }
 
-		karibou.charge.refund(handleAccount.wallet_id,{
+		bank.charge.refund(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt(),
 			amount:amount&&Math.round(amount*100)
 		}).then(function(refund,wallet) {
@@ -358,7 +361,7 @@ PaymentAccount.prototype.capture=function(order,reason){
 	  	return Q.reject(new Error('Aucune transaction est attachée à votre commande'))
 	  }
 
-		karibou.charge.capture(handleAccount.wallet_id,{
+		bank.charge.capture(handleAccount.wallet_id,{
 			id:order.payment.transaction.decrypt(),
 			amount:Math.round(order.getTotalPrice()*100)
 		}).then(function(charge,wallet) {

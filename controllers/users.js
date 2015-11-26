@@ -7,6 +7,7 @@ var db = require('mongoose'),
     Users= db.model('Users'),
     password = require('password-generator'),
     validate = require('./validate/validate'),
+    bank = require("karibou-wallet")(),
     errorHelper = require('mongoose-error-helper').errorHelper;
 
 
@@ -64,6 +65,9 @@ exports.me = function (req, res, next)  {
       if(config.disqus){
         user.context.disqus=user.getDisquSSO();
       }
+      user=user.toObject();
+      user.bvr=bank.mod10gen(user.id+'0');
+
       res.json(user);
   });
 };
