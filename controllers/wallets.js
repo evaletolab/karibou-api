@@ -144,11 +144,16 @@ exports.createWallet=function (req,res) {
   var giftcard;
   var alias=req.body.payment.alias;
   var amount=parseFloat(req.body.amount);
+
+  //
+  // 
+  var print=(req.body.print)?(1.00):0.0;
+
   payment.for(req.body.payment.issuer).charge({
-    amount: payment.fees(req.body.payment.issuer,amount)+amount,
+    amount: payment.fees(req.body.payment.issuer,amount+print)+(amount+print),
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
   },alias,req.user).then(function(charge) {
-    assert((charge.amount/100)>=amount);
+    assert((charge.amount/100)>=(amount+print));
     //
     // create the giftcode
     var wallet={
@@ -164,7 +169,7 @@ exports.createWallet=function (req,res) {
     giftcard=wallet;
     var transfer={
       amount:Math.round(amount*100),
-      description:'Crédit de '+req.body.amount+' fr',
+      description:'Crédit de '+amount+' fr',
       type:'credit'
     };
     return bank.transfer.create(wallet.wid,transfer);
