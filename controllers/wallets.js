@@ -38,6 +38,9 @@ exports.listWallet=function (req,res) {
   var filters={};
   if(!req.user.isAdmin()){
     filters.id=req.user.id;
+  }else
+  if(req.query.id){
+    filters.id=req.query.id;
   }
 
   bank.wallet.retrieveAllGift(filters).then(function (wallets) {
