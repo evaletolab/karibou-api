@@ -161,6 +161,10 @@ PaymentPostfinance.prototype.addCard=function (user,payment) {
 
 }
 
+PaymentPostfinance.prototype.charge=function(options,alias,user){
+  return Q.reject(new Error("Impossible de payer avec cette méthode"));
+}
+
 //
 // authorize a new payment for this order
 PaymentPostfinance.prototype.authorize=function(order){

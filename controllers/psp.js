@@ -8,6 +8,7 @@ var _ = require('underscore'),
     db = require('mongoose'),
     http = require('http'),
     validate = require('./validate/validate'),
+    postfinance =require('node-postfinance'),
     payment = require('../app/payment'),
     debug = require('debug')('api'),
     errorHelper = require('mongoose-error-helper').errorHelper;
@@ -78,14 +79,71 @@ exports.psp=function(req,res){
 
 //
 // PSP append alias in user.payment[] 
-exports.pspForm=function(req,res){
-  payment.for('postfinance card').ecommerceForm(req.user,function (err, card, form) {
+exports.pspAlias=function(req,res){
+
+  var user=req.user,
+      hostname=req.hostname;
+  //
+  // prepare the card
+  var postfinanceCard = {
+    paymentMethod: 'postfinance card',
+    email:user.email.address,
+    firstName: user.name.givenName,
+    lastName: user.name.familyName,
+  };
+
+  var card = new postfinance.Card(postfinanceCard);
+  var alias=(user.id+card.issuer.toLowerCase()).hash()
+
+  var options={
+    alias:alias, 
+    aliasUsage:'Karibou payment',
+    title:'Enregistrement de votre carte chez Postfinance',
+    bgcolor:'#F2F4F2',
+    tp:"http://"+hostname+"/v1/psp/std",
+    paramplus:'createAlias=true&user='+user.id,
+  }
+
+  // generate form
+  card.publishForEcommerce(options,function(err,res) {
     if(err){
       return res.send(400,errorHelper(err))
     }
-    res.json(form)
-  })
+    res.json(res)
+  });
+
 }
+expiry.pspCharge=function (req,res) {
+  var user=req.user,
+      hostname=req.hostname,
+      amount=parseFloat(req.body.amount);
+
+  //
+  // prepare the card
+  var postfinanceCard = {
+    paymentMethod: 'postfinance card',
+    email:user.email.address,
+    firstName: user.name.givenName,
+    lastName: user.name.familyName,
+  };
+
+  var card = new postfinance.Card(postfinanceCard);
+
+  var options={
+    amount:amount,
+    title:'Charger de votre compte avec votre carte chez Postfinance',
+    bgcolor:'#F2F4F2',
+    tp:"http://"+hostname+"/v1/psp/std",
+    paramplus:'transferWallet=true&user='+user.id,
+  }
+
+  // generate form
+  card.publishForEcommerce(options,function(err,res) {
+    if(err){
+      return res.send(400,errorHelper(err))
+    }
+    res.json(res)
+  });}
 
 
 //

@@ -5,12 +5,15 @@ var Q=require('q');
 var bank = require("karibou-wallet")();
 
 
-function parseError(err, handleAccount,order) {
+function parseError(err, handleAccount,order,user) {
 
 	//
 	// get an email on error
 	var context={wallet:handleAccount};
 
+	if(user){
+		context.email=user.email;		
+	}
 	if(order){
 		context.email=order.email;
 		context.oid=order.oid;
@@ -88,7 +91,7 @@ PaymentAccount.prototype.checkCard=function(user,alias){
 	    deferred.resolve(wallet);
 	  })
 	  .then(undefined,function (err) {
-	    deferred.reject(parseError(err,handleAccount));
+	    deferred.reject(parseError(err,handleAccount,0,user));
 	  });
 
 	// return promise
@@ -146,7 +149,7 @@ PaymentAccount.prototype.addCard=function(user, payment){
     	};
 	    return callback(result, wallet);
 	  }).then(undefined,function (error) {
-	    callback(parseError(error));
+	    callback(parseError(error,0,0,user));
 		});
 
 		return deferred.promise;
@@ -187,7 +190,7 @@ PaymentAccount.prototype.charge=function (options,alias,user) {
 
 			callback(null,result,wallet);
 		}).then(undefined,function (err) {
-			callback(parseError(err,handleAccount));
+			callback(parseError(err,handleAccount,0,user));
 		})	  
 
 		return deferred.promise;

@@ -199,6 +199,26 @@ describe("api.wallets", function(){
           _.extend(giftWallet,res.body);
           res.should.have.status(200);
           res.body.balance.should.equal(1000);
+          res.body._charged.should.equal(1020);
+          done()
+        });
+    });
+
+
+    it('POST /v1/wallets delphine create 10 (str) fr giftcard with print return 200',function(done){
+      var payment={
+        number:"xxxx-xxxx-xxxx-4444", expiry:"12/2029",name:'TO OLI',issuer:'tester',
+        alias:(delphine.id+'').hash().crypt()
+      },amount='10';
+      request(app)
+        .post('/v1/wallets')
+        .send({payment:payment,amount:amount,print:true})
+        .set('cookie', delphine.cookie)
+        .end(function (err,res) {
+          // _.extend(giftWallet,res.body);
+          res.should.have.status(200);
+          res.body.balance.should.equal(1000);
+          res.body._charged.should.equal(1122);
           done()
         });
     });

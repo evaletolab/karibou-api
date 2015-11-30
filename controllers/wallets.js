@@ -144,6 +144,7 @@ exports.createWallet=function (req,res) {
   var giftcard;
   var alias=req.body.payment.alias;
   var amount=parseFloat(req.body.amount);
+  var charged=0;
 
   //
   // 
@@ -153,7 +154,11 @@ exports.createWallet=function (req,res) {
     amount: payment.fees(req.body.payment.issuer,amount+print)+(amount+print),
     description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
   },alias,req.user).then(function(charge) {
+    //
+    // payment fees makes amout bigger
     assert((charge.amount/100)>=(amount+print));
+    charged=charge.amount;
+
     //
     // create the giftcode
     var wallet={
@@ -189,6 +194,9 @@ exports.createWallet=function (req,res) {
     };
     bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-new');
     bus.emit('activity.create',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
+    //
+    // this makes test happy
+    wallet._charged=charged;
 
     return res.json(wallet);    
   }
