@@ -743,6 +743,10 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         var payment=_.find(customer.payments,function (p) {
           return(p.alias===paymentData.alias)
         })
+        if(!payment){
+          return callback('Olala, nous n\'avons pas trouver le mode de paiement que vous avez sélectionné. Veuillez recharger la page merci!');
+        }
+        
         order.payment.expiry=payment.expiry;
       }
 
