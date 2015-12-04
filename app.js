@@ -76,6 +76,20 @@ require("karibou-wallet")({
   }
 });
 
+//
+// configure postfinance
+var settings={};
+settings.allowMultipleSetOption = false;
+settings.sandbox = config.payment.postfinance.sandbox; 
+settings.enabled = config.payment.postfinance.enabled||false; 
+settings.debug = config.payment.postfinance.debug||false; 
+settings.pspid = config.payment.postfinance.pspid;
+settings.apiUser=config.payment.postfinance.apiUser;
+settings.apiPassword = config.payment.postfinance.apiPassword;
+settings.shaSecret = config.payment.postfinance.shaSecret;
+
+require("node-postfinance").configure(settings);
+
 
 // load models
 files = require("fs").readdirSync( './models' );

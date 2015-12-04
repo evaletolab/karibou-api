@@ -92,6 +92,7 @@ module.exports = {
       enabled:true,
       sandbox:true,
       debug:true,
+      tp:"http://localhost:4000/v1/psp/std",
       pspid:process.env.PSPID||'test',
       apiUser:process.env.PFUSER||'test',
       apiPassword:process.env.PFSECRET||'test',

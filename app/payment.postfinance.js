@@ -3,19 +3,6 @@ var events = require("events");
 var bus = require('../app/bus');
 var Q=require('q');
 var postfinance =require('node-postfinance');
-var settings={};
-
-settings.allowMultipleSetOption = false;
-settings.sandbox = config.payment.postfinance.sandbox||true; 
-settings.enabled = config.payment.postfinance.enabled||false; 
-settings.debug = config.payment.postfinance.debug||false; 
-settings.pspid = config.payment.postfinance.pspid;
-settings.apiUser=config.payment.postfinance.apiUser;
-settings.apiPassword = config.payment.postfinance.apiPassword;
-settings.shaSecret = config.payment.postfinance.shaSecret;
-
-
-postfinance.configure(settings);
 
 var PaymentPostfinance=function(_super){
 	this.postfinance=postfinance;
@@ -54,42 +41,6 @@ PaymentPostfinance.prototype.alias=function(id,payment){
 
 PaymentPostfinance.prototype.isValidSha=function (payload) {
   return this.postfinance.isValidSha(payload);
-}
-
-PaymentPostfinance.prototype.ecommerceForm=function(user,callback){
-
-	//
-	// prepare the card
-  var postfinanceCard = {
-    paymentMethod: 'postfinance card',
-    email:user.email.address,
-    firstName: user.name.givenName,
-    lastName: user.name.familyName,
-  };
-
-  // add addresse
-	if(user.addresses.length){
-		postfinanceCard.address1=user.addresses[0].streetAdress;
-		postfinanceCard.zip=user.addresses[0].postalCode
-		postfinanceCard.city=user.addresses[0].region
-	}
-  var card = new postfinance.Card(postfinanceCard);
-  var alias=(user.id+card.issuer.toLowerCase()).hash()
-
-  var options={
-  	alias:alias, 
-  	aliasUsage:'Karibou payment',
-  	title:'Enregistrement de votre carte chez Postfinance',
-  	bgcolor:'#F2F4F2',
-  	tp:"http://api.karibou.evaletolab.ch/v1/psp/std",
-  	paramplus:'createAlias=true&user='+user.id,
-  }
-
-  // generate form
-  card.publishForEcommerce(options,function(err,res) {
-  	if(!res.alias)res.alias=alias.crypt()
-		return callback(err,card, res)  		
-  });
 }
 
 

@@ -77,12 +77,15 @@ exports.psp=function(req,res){
 
 }
 
-//
-// PSP append alias in user.payment[] 
-exports.pspAlias=function(req,res){
 
+exports.pspCharge=function (req,res) {
   var user=req.user,
-      hostname=req.hostname;
+      amount=parseFloat(req.body.amount);
+
+  if(!amount||!user.id||!user.email||!user.email.status){
+    return res.send(400,'psp format error!')
+  }
+
   //
   // prepare the card
   var postfinanceCard = {
@@ -90,60 +93,34 @@ exports.pspAlias=function(req,res){
     email:user.email.address,
     firstName: user.name.givenName,
     lastName: user.name.familyName,
+    inline:true
   };
 
   var card = new postfinance.Card(postfinanceCard);
-  var alias=(user.id+card.issuer.toLowerCase()).hash()
 
-  var options={
-    alias:alias, 
-    aliasUsage:'Karibou payment',
-    title:'Enregistrement de votre carte chez Postfinance',
-    bgcolor:'#F2F4F2',
-    tp:"http://"+hostname+"/v1/psp/std",
-    paramplus:'createAlias=true&user='+user.id,
-  }
 
-  // generate form
-  card.publishForEcommerce(options,function(err,res) {
+  transaction = new postfinance.Transaction({
+    operation: 'capture',
+    amount:amount,
+    orderId: 'TX'+Date.now(),
+    email:user.email.address,
+    inline:{
+      title:'Charger de votre compte avec votre carte Postfinance',
+      bgcolor:'#F2F4F2',
+      tp:config.payment.postfinance.tp,
+      paramplus:'transferWallet=true&user='+user.id,
+    }
+  });
+
+
+  transaction.process(card, function(err,form){
     if(err){
       return res.send(400,errorHelper(err))
     }
-    res.json(res)
+    res.json(form)
   });
 
 }
-expiry.pspCharge=function (req,res) {
-  var user=req.user,
-      hostname=req.hostname,
-      amount=parseFloat(req.body.amount);
-
-  //
-  // prepare the card
-  var postfinanceCard = {
-    paymentMethod: 'postfinance card',
-    email:user.email.address,
-    firstName: user.name.givenName,
-    lastName: user.name.familyName,
-  };
-
-  var card = new postfinance.Card(postfinanceCard);
-
-  var options={
-    amount:amount,
-    title:'Charger de votre compte avec votre carte chez Postfinance',
-    bgcolor:'#F2F4F2',
-    tp:"http://"+hostname+"/v1/psp/std",
-    paramplus:'transferWallet=true&user='+user.id,
-  }
-
-  // generate form
-  card.publishForEcommerce(options,function(err,res) {
-    if(err){
-      return res.send(400,errorHelper(err))
-    }
-    res.json(res)
-  });}
 
 
 //

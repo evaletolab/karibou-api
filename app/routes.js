@@ -6,6 +6,7 @@ module.exports = function(app, config, passport) {
 
   var api       = require(path+'api');
   var wallets   = require(path+'wallets');
+  var psp       = require(path+'psp');
   var stats     = require(path+'stats');
   var auth 			= require(path+'auth');
   var home 			= require(path+'home');
@@ -96,7 +97,7 @@ module.exports = function(app, config, passport) {
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
 
   //PSP 
-  //app.get('/v1/users/:id/psp', users.ensureMe, api.pspForm);
+  app.get('/v1/users/:id/psp', users.ensureMe, psp.pspCharge);
   app.get('/v1/users', auth.ensureAdmin, users.list);
   app.get('/v1/users/sessions', auth.ensureAdmin,api.sessions);
   app.post('/v1/users/:id', users.ensureMeOrAdmin,users.update);
