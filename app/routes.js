@@ -95,9 +95,6 @@ module.exports = function(app, config, passport) {
   //
   // user
   app.get('/v1/users/me', auth.ensureAuthenticated, users.me);
-
-  //PSP 
-  app.get('/v1/users/:id/psp', users.ensureMe, psp.pspCharge);
   app.get('/v1/users', auth.ensureAdmin, users.list);
   app.get('/v1/users/sessions', auth.ensureAdmin,api.sessions);
   app.post('/v1/users/:id', users.ensureMeOrAdmin,users.update);
@@ -151,8 +148,9 @@ module.exports = function(app, config, passport) {
 
 
   // PSP gateway
-  // app.get ('/v1/psp/std',api.pspStd)
-  // app.post('/v1/psp/:token/webhook',api.psp)
+  app.get ('/v1/psp/std',psp.pspStd)
+  app.post('/v1/psp/:token/webhook',psp.webhook)
+  app.get('/v1/users/:id/psp', users.ensureMe, psp.pspCharge);
   
   //
   // email validation

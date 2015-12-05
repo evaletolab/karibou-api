@@ -20,7 +20,7 @@ var _ = require('underscore'),
 // only used for online alias creation
 // we can save POstfinance Card payment method one we get a valid webhook
 // FIXME this should be in the postfinance module 
-exports.psp=function(req,res){
+exports.webhook=function(req,res){
 
   //
   // checks webhook config 
@@ -82,7 +82,7 @@ exports.pspCharge=function (req,res) {
   var user=req.user,
       amount=parseFloat(req.body.amount);
 
-  if(!amount||!user.id||!user.email||!user.email.status){
+  if(/*!amount||*/!user.id||!user.email||!user.email.status){
     return res.send(400,'psp format error!')
   }
 
@@ -101,11 +101,10 @@ exports.pspCharge=function (req,res) {
 
   transaction = new postfinance.Transaction({
     operation: 'capture',
-    amount:amount,
+    amount:amount||100,
     orderId: 'TX'+Date.now(),
     email:user.email.address,
     inline:{
-      title:'Charger de votre compte avec votre carte Postfinance',
       bgcolor:'#F2F4F2',
       tp:config.payment.postfinance.tp,
       paramplus:'transferWallet=true&user='+user.id,
