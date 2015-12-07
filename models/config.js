@@ -41,7 +41,7 @@ var Config = new Schema({
     home:{
       love:Boolean,
       path:String
-    }
+    },
 
     //
     // defines keys
