@@ -8,6 +8,13 @@ module.exports = {
       post:{limitMS:500}
     },
 
+    //
+    // select display on home
+    bundle:{
+      path:'test-de-publication',
+      love:false
+    },
+
     document:{
       types:['recipe','post','bundle','page']
     },

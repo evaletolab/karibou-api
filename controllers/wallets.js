@@ -54,12 +54,12 @@ exports.listWallet=function (req,res) {
 exports.countGiftcode=function (req,res) {
   // retrieve all giftcards
   bank.wallet.retrieveAllGift({}).then(function (wallets) {
-    var amount=0;
+    var amount=0, offset=config.payment.karibou.offset||0;
     wallets.forEach(function (wallet) {
       amount+=wallet.transfers[wallet.transfers.length-1].amount;
     });
 
-    res.json({amount:amount,quatity:wallets.length});
+    res.json({amount:amount,quatity:wallets.length+offset});
   }).then(undefined, function (error) {
     return res.send(400,errorHelper(err))
   });
