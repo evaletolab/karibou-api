@@ -37,6 +37,13 @@ var Config = new Schema({
     }],
 
     //
+    // home
+    home:{
+      love:Boolean,
+      path:String
+    }
+
+    //
     // defines keys
     keys:{
       pubStripe:String,
