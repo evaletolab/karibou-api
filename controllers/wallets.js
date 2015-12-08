@@ -46,7 +46,7 @@ exports.listWallet=function (req,res) {
   bank.wallet.retrieveAllGift(filters).then(function (wallets) {
     res.json(wallets);
   }).then(undefined, function (error) {
-    return res.send(400,errorHelper(err))
+    return res.send(400,error.message||error);
   });
 
 };
@@ -61,7 +61,7 @@ exports.countGiftcode=function (req,res) {
 
     res.json({amount:amount,quatity:wallets.length+offset});
   }).then(undefined, function (error) {
-    return res.send(400,error.message)
+    return res.send(400,error.message||error);
   });
 
 };
