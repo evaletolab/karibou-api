@@ -61,7 +61,7 @@ exports.countGiftcode=function (req,res) {
 
     res.json({amount:amount,quatity:wallets.length+offset});
   }).then(undefined, function (error) {
-    return res.send(400,errorHelper(err))
+    return res.send(400,error.message)
   });
 
 };
