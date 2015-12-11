@@ -153,7 +153,7 @@ exports.register=function(auth){
  */
 exports.product = function(req){
     if (!req.body)return;
-    if(req.body.title) check(req.body.title,"Le nom n'est pas valide").len(3, 64).isText();
+    if(req.body.title) check(req.body.title,"Le titre n'est pas valide").len(3, 64).isText();
 
 
     if(req.body.details){

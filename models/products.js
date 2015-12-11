@@ -303,7 +303,7 @@ Product.statics.create = function(p,s,callback){
  
       //
       // slug this product
-      if(!p.slug){
+      if(!p.slug&&p.title){
         p.slug=p.title.slug();
       }
       

@@ -27,22 +27,24 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
    
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
-      if(!req.body){
-        return false;
-      }
-      var vendor=(req.body.vendor._id||req.body.vendor)+'';
-      return (_.any(req.user.shops,function(s){
-        return s._id.equals(vendor);
-        // return (s._id+'')===vendor;
-      }));
+      Products.findOne({sku:req.params.sku}).exec(function (err,product) {
+        var vendor=(product.vendor+'')||'hello';
+        if (_.any(req.user.shops,function(s){
+          return s._id.equals(vendor);
+        })){
+          return next();
+        };
+
+        return res.send(401, "Your are not the owner of this product"); 
+
+      })
     }
+
+
     //
     // ensure owner
-	  if(!isUserProductOwner()){ 
-      return res.send(401, "Your are not the owner of this product"); 
-	  }
+	  isUserProductOwner();
 	
-    return next();
   }); 
 
 }

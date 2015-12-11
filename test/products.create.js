@@ -90,6 +90,18 @@ describe("products.create", function(){
   });
 
 
+  it("Error on creation of a new product without title", function(done){
+    var p=_.extend({},data.Products[0]);
+    delete(p._id);
+    delete(p.title);
+    p.categories=data.Categories[2];
+    Products.create(p,data.Shops[0],function(err,product){
+      //console.log(err)
+      err.errors.title.kind.should.equal("required");
+      done();          
+    });
+  });
+
   it("Error on creation of a new product without category", function(done){
     var p=_.clone(data.Products[0]);
     delete(p._id);
