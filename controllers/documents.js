@@ -33,6 +33,26 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
 }
 
+var queryFilterByUser=function (q,req) {
+
+  //
+  //view only visible document :
+  //    for anony => doc.published==true
+  //    for owner => doc.available==true&&owner==req.user.id
+  //    for admin => doc.available==true
+  if(!req.user){
+    q.available=true;
+    q.published=true;
+  }
+  else if(req.isAdmin()){
+    q.available=true;
+  }else{
+    q.available=true;
+    q.uid=req.user.id;    
+  }
+  return q;
+}
+
 
 
 exports.findByOwner=function (req, res) {
@@ -46,9 +66,10 @@ exports.findByOwner=function (req, res) {
 
 
 exports.findBySkus=function (req, res) {
-  var skus=req.params.sku&&req.params.sku.split(',')||[];
+  var skus=req.params.sku&&req.params.sku.split(',')||[], q={skus:skus};
 
-  Documents.findByCriteria({skus:skus},function(err,docs){
+  q=queryFilterByUser(q,req);
+  Documents.findByCriteria(q,function(err,docs){
     if (err) {
       return res.send(400,err);
     }
@@ -57,7 +78,10 @@ exports.findBySkus=function (req, res) {
 };
 
 exports.findByCategory=function (req, res) {
-  Documents.findByCriteria({type:req.params.category},function(err,docs){
+  var q={type:req.params.category};
+
+  q=queryFilterByUser(q,req);
+  Documents.findByCriteria(q,function(err,docs){
     if (err) {
       return res.send(400,err);
     }
@@ -126,6 +150,8 @@ exports.update=function (req, res) {
     return res.send(400, err.message);
   }  
 
+  var query={slug:req.params.slug};
+
   req.body.updated=Date.now();
 
   //
@@ -136,7 +162,8 @@ exports.update=function (req, res) {
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
   
-  Documents.findOne({slug:req.params.slug}).exec(function(err,doc){
+
+  Documents.findOne(query).exec(function(err,doc){
     if (!doc){
       return res.send(400,'Ooops, unknow doc '+req.params.slug);    
     }
@@ -146,6 +173,7 @@ exports.update=function (req, res) {
       req.body.signature=doc.signature;
       req.body.owner=doc.owner;
       req.body.created=doc.created;
+      req.body.published=doc.published;
     }
 
     // 
