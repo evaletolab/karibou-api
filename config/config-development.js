@@ -85,7 +85,7 @@ module.exports = {
       key:"sk_test_XtGOhmKlhARwWXHcNgyZpATg"
     },
     karibou:{
-      offset:2,
+      offset:4,
       allowNegativeBalance:700,
       apikey:"sk_test_t1im5hjyMbW6cNgyZpATg"
     },
