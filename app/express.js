@@ -4,14 +4,20 @@
 
 var express = require('express')
   , mongoose=require("mongoose")
-  , MongoStore = require('connect-mongo')(express)
   , bus = require('../app/bus')
   , methodOverride = require('method-override')
+  , favicon = require('serve-favicon')
+  , logger = require('morgan')
+  , compress = require('compression')
+  , cookieParser = require('cookie-parser')
+  , session = require('express-session')
+  , MongoStore = require('connect-mongo')(session)
+  , bodyParser = require('body-parser')
+  , errorHandler = require('errorhandler')
   , helmet=require('helmet')
-
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
-  , pkg = require('../package.json')
+  , pkg = require('../package.json');
 
 //
 // extend express state
@@ -20,6 +26,10 @@ if (config.express.state){
   var expstate = require('express-state')
   expstate.extend(app);
 }  
+
+//
+// get port configuration
+var port = (process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
 
   
 module.exports = function (app, config, passport) {
@@ -83,144 +93,146 @@ var tokenSession=function (req, res, next) {
   // set views path, template engine and default layout
   app.set('views', config.root+config.express.views)
   app.set('view engine', config.express['view engine'])
+  app.set('port', port);
 
-  // app.configure(function () {
-    // expose package.json to views
-    app.use(function (req, res, next) {
-      res.locals.pkg = pkg
-      next()
-    })
+  app.use(function (req, res, next) {
+    res.locals.pkg = pkg
+    next()
+  })
 
 
-    // should be placed before express.static 
-    app.use(express.compress({
-      filter: function (req, res) {
-        return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
-      },
-      level: 6
-    }))
+  // should be placed before express.static 
+  app.use(compress({
+    filter: function (req, res) {
+      return /json|text/.test(res.getHeader('Content-Type'))
+    },
+    level: 6
+  }))
+
+  //
+  // use cors
+  app.use(CORS);  
+
+
+  //app.use(favicon())
+  app.use(express.static(config.root + '/public'))
+
+  // don't use logger for test env
+  if (process.env.NODE_ENV !== 'test') {
+    logger.token('uid', function(req, res){ return req.user&&req.user.id||'anonymous'; })    
+    app.use(logger(':remote-addr - :uid - :date[iso] - :status - :method :url - :response-time ms'))
+  }
+
+
+  // cookieParser should be above session
+  app.use(cookieParser())
+
+  // bodyParser should be above methodOverride
+  app.use(helmet());  
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(methodOverride())
+
+  app.use(errorHandler({ dumpExceptions: true, showStack: true }));  
+
+
+  //
+  // cookie session
+  if (!config.express.mongoSession){
+    app.use(session({
+      secret: config.middleware.session.secret,
+      ttl:config.middleware.session.cookie.maxAge,
+      cookie: config.middleware.session.cookie,
+      proxy: true,
+      resave: false,
+      saveUninitialized: false      
+    }));
+  }
+
+
+  // express/mongo session storage
+  if (config.express.mongoSession){
+    app.use(session({
+      secret: config.middleware.session.secret,
+      ttl:config.middleware.session.cookie.maxAge,
+      cookie: config.middleware.session.cookie,
+      store: new MongoStore({mongooseConnection : mongoose.connection}),
+      proxy: true,
+      resave: false,
+      saveUninitialized: false      
+    }));
+  }
+
+
+  // use passport session
+  app.use(passport.initialize())
+  app.use(passport.session())
+
+
+
+  // connect flash for flash messages - should be declared after sessions
+  // app.use(flash())
+
+  // should be declared after session and flash
+  //app.use(helpers(pkg.name))
+
+  // adds CSRF support
+  if (process.env.NODE_ENV !== 'test' && config.express.csrf) {
+    console.log('----------- CSRF SHOULD BE CONFIGURED');
+    process.exit(1);
+
+    app.use(express.csrf())
 
     //
-    // use cors
-    app.use(CORS);  
+    // http://stackoverflow.com/questions/19566949/csrf-protection-in-expressjs
+    app.use(function(req, res, next){
+      req.cookie('XSRF-TOKEN', req.csrfToken());
+      return next()
+    })
+  }
 
 
-    app.use(express.favicon())
-    app.use(express.static(config.root + '/public'))
-
-    // don't use logger for test env
-    if (process.env.NODE_ENV !== 'test') {
-      // express.logger.token('msg', function(req, res){ 
-      //   if(res.status>=400){
-      //     console.log(res.text)
-      //     return res.text
-      //   }
-      //   return '' 
-      // })      
-      
-      app.use(express.logger(':remote-addr - :date - :method :url :status :msg - :referrer - :response-time ms'))
-    }
+  // routes should be at the last
+  // NO MORE FOR v4
+  //app.use(app.router)
 
 
-    // cookieParser should be above session
-    app.use(express.cookieParser())
 
-    // bodyParser should be above methodOverride
-    app.use(express.urlencoded())
-    app.use(express.json())
-
-    app.use(helmet());  
-
-    app.use(methodOverride())
-
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));  
-
+  // assume "not found" in the error msgs
+  // is a 404. this is somewhat silly, but
+  // valid, you can do whatever you like, set
+  // properties, use instanceof etc.
+  app.use(function(err, req, res, next){
 
     //
-    // cookie session
-    if (!config.express.mongoSession){
-      app.use(express.cookieSession({
-        secret: config.middleware.session.secret,
-        cookie: config.middleware.session.cookie
-      }));
+    // no error
+    if(!err){
+      return next()
+    }
+
+    //send emails if you want
+    if(process.env.NODE_ENV==='production'){
+      var email=req.user?req.user.email:'Anonymous';
+      var msg=JSON.stringify(
+          {error:((err.stack)?err.stack:err),user:email, url:req.originalUrl, params:req.params,body:req.body},
+          null,2
+      );
+      bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
+          {content:msg}, "simple",function(err,status){
+            console.log(err,status)
+      });
     }
 
 
-    // express/mongo session storage
-    if (config.express.mongoSession){
-      app.use(express.session({
-        secret: config.middleware.session.secret,
-        ttl:config.middleware.session.cookie.maxAge,
-        cookie: config.middleware.session.cookie,
-        store: new MongoStore({mongooseConnection : mongoose.connection})
-      }));
+    if (typeof err==='string'){
+      return res.send(400,err); 
     }
 
 
-    // use passport session
-    app.use(passport.initialize())
-    app.use(passport.session())
-
-
-
-    // connect flash for flash messages - should be declared after sessions
-    // app.use(flash())
-
-    // should be declared after session and flash
-    //app.use(helpers(pkg.name))
-
-    // adds CSRF support
-    if (process.env.NODE_ENV !== 'test' && config.express.csrf) {
-      app.use(express.csrf())
-      //
-      // http://stackoverflow.com/questions/19566949/csrf-protection-in-expressjs
-      app.use(function(req, res, next){
-        req.cookie('XSRF-TOKEN', req.csrfToken());
-        return next()
-      })
-    }
-
-
-    // routes should be at the last
-    app.use(app.router)
-
-
-
-    // assume "not found" in the error msgs
-    // is a 404. this is somewhat silly, but
-    // valid, you can do whatever you like, set
-    // properties, use instanceof etc.
-    app.use(function(err, req, res, next){
-
-      //
-      // no error
-      if(!err){
-        return next()
-      }
-
-      //send emails if you want
-      if(process.env.NODE_ENV==='production'){
-        var email=req.user?req.user.email:'Anonymous';
-        var msg=JSON.stringify(
-            {error:((err.stack)?err.stack:err),user:email, url:req.originalUrl, params:req.params,body:req.body},
-            null,2
-        );
-        bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
-            {content:msg}, "simple",function(err,status){
-              console.log(err,status)
-        });
-      }
-
-
-      if (typeof err==='string'){
-        return res.send(400,err); 
-      }
-
-
-      // error page
-      res.status(500).render('500', { error: err.stack })
-      console.error(err.stack)
-    })
+    // error page
+    res.status(500).render('500', { error: err.stack })
+    console.error(err.stack)
+  })
 
 
     // assume 404 since no middleware responded
@@ -232,7 +244,6 @@ var tokenSession=function (req, res, next) {
       })
     })
 */
-  // })
 
   // development env config
   if(app.get('env')=='development'){

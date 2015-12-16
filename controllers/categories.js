@@ -24,7 +24,7 @@ exports.list=function (req, res) {
     req.query.name&&check(req.query.name, "Le nom du filtre est invalide").len(2, 32).isText();
     req.query.type&&check(req.query.type, "Le type de catégorie est invalide").len(1, 32).isText();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
   var type=(req.query.type)?{type:req.query.type}:{};
   //if (req.query.type==='*')type={};
@@ -59,7 +59,7 @@ exports.list=function (req, res) {
   
   query.exec(function(err,cats){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
 
     //
@@ -68,7 +68,7 @@ exports.list=function (req, res) {
     if (stats){
       stats.exec(function(err,result){
         if(err){
-          return res.send(400,err);
+          return res.status(400).send(err);
         }
         // console.log(result, cats)
         cats.forEach(function(cat){
@@ -88,16 +88,16 @@ exports.get=function (req, res) {
   try{
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   Categories.findBySlug(req.params.category,function(err,cat){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
 
     if(!cat){
-      return res.send(400,"Category doesn't exist");
+      return res.status(400).send("Category doesn't exist");
     }
     
     return res.json(cat);
@@ -110,18 +110,18 @@ exports.update=function (req, res) {
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
     checkParams(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   Categories.findBySlug(req.params.category,function(err,cat){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     _.extend(cat,req.body);
     cat.slug=cat.slugName();
     cat.save(function(err){
       if(err){
-        return res.send(400,err);
+        return res.status(400).send(err);
       }
       return res.json(cat);
     });    
@@ -134,19 +134,19 @@ exports.remove=function (req, res) {
   try{
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   } 
   //
   // todo, do not remove category if product are still assigned
   db.model('Products').find({"categories.slug":req.params.category},function(err,c){
     //
     // checking is category is not linked to product or shop
-    if (err){return res.send(400,err)}
-    if(c.length>0){return res.send(400,"Impossible de supprimer une categorie associée.")}
+    if (err){return res.status(400).send(err)}
+    if(c.length>0){return res.status(400).send("Impossible de supprimer une categorie associée.")}
 
     Categories.remove({slug:req.params.category},function(err){
-      if (err){return res.send(400,err)}
-      return res.send(200);
+      if (err){return res.status(400).send(err)}
+      return res.sendStatus(200);
     });
   })
    
@@ -158,14 +158,14 @@ exports.create=function (req, res) {
   try{
     checkParams(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   Categories.create(req.body,function(err,category){
     if (err){
-      return res.send(400,err);    
+      return res.status(400).send(err);    
     }
-    return res.json(200,category);    
+    return res.json(category);    
   });
 };
 

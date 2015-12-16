@@ -20,7 +20,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
     });
   }
   if(!req.params.slug){
-    return res.send(400,"You have to specify a document (slug)");
+    return res.status(400).send("You have to specify a document (slug)");
   }
 
   if(req.user&&req.user.isAdmin()){
@@ -58,7 +58,7 @@ var queryFilterByUser=function (q,req) {
 exports.findByOwner=function (req, res) {
   Documents.findByCriteria({uid:req.user.id},function(err,docs){
     if (err) {
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(docs)    
   });
@@ -71,7 +71,7 @@ exports.findBySkus=function (req, res) {
   q=queryFilterByUser(q,req);
   Documents.findByCriteria(q,function(err,docs){
     if (err) {
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(docs)    
   });
@@ -83,7 +83,7 @@ exports.findByCategory=function (req, res) {
   q=queryFilterByUser(q,req);
   Documents.findByCriteria(q,function(err,docs){
     if (err) {
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(docs)    
   });
@@ -96,10 +96,10 @@ exports.get=function (req, res) {
 
   return Documents.findOneBySlug({slug:req.params.slug,type:req.params.category}, function (err, doc) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!doc){
-      return res.send(400,"Ce document n'existe pas");
+      return res.status(400).send("Ce document n'existe pas");
     }
     //
     // fetch products associated with this doc
@@ -120,17 +120,17 @@ exports.create=function (req, res) {
   try{  
     validate.document(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
   
   //
   // ready to create one doc
   Documents.create(req.body,req.user.id, function(err,doc){
       if(err&&err.code==11000){
-        return res.send(400,"Cet document existe déjà");    
+        return res.status(400).send("Cet document existe déjà");    
       }
       else if(err){
-        return res.send(400, errorHelper(err));    
+        return res.status(400).send( errorHelper(err));    
       }
 
       res.json(doc);            
@@ -147,7 +147,7 @@ exports.update=function (req, res) {
     validate.check(req.params.slug, "Le format SLUG du document n'est pas valide").len(3, 104).isSlug();    
     validate.document(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   var query={slug:req.params.slug};
@@ -165,7 +165,7 @@ exports.update=function (req, res) {
 
   Documents.findOne(query).exec(function(err,doc){
     if (!doc){
-      return res.send(400,'Ooops, unknow doc '+req.params.slug);    
+      return res.status(400).send('Ooops, unknow doc '+req.params.slug);    
     }
 
     // if not admin  
@@ -192,7 +192,7 @@ exports.update=function (req, res) {
 
     doc.save(function (err) {
       if (err){
-        return res.send(400,err.message||errorHelper(err));    
+        return res.status(400).send(err.message||errorHelper(err));    
       }
       return res.json(doc);  
     })
@@ -206,7 +206,7 @@ exports.remove=function (req, res) {
   try{
     validate.check(req.params.slug, "Le format SLUG du produit n'est pas valide").len(3, 100).isSlug();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   //TODO remove do not trigger post middleware, use find and remove
@@ -224,10 +224,10 @@ exports.remove=function (req, res) {
 exports.getSEO=function (req, res) {
   return Documents.findOneBySlug({slug:req.params.slug}, function (err, doc) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!doc){
-      return res.send(400,"Ce document n'existe pas");
+      return res.status(400).send("Ce document n'existe pas");
     }
     //
     // fetch products associated with this doc
@@ -269,10 +269,10 @@ exports.allSEO=function (req, res) {
   
   return Documents.findByCriteria(query,function (err, products) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!products.length){
-      return res.send(400,"Aucun produit disponible");
+      return res.status(400).send("Aucun produit disponible");
     }
 
     //

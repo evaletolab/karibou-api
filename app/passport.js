@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
   , LocalStrategy = require('passport-local').Strategy
   , TwitterStrategy = require('passport-twitter').Strategy
-  , PersonaStrategy = require('passport-persona').Strategy
+  // , PersonaStrategy = require('passport-persona').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
   , bank = require("karibou-wallet")()
 //  , GitHubStrategy = require('passport-github').Strategy
@@ -125,27 +125,27 @@ module.exports = function (app, config, passport) {
 
   }
 
-  if(config.auth.persona){
-    // use google strategy
-    passport.use(new PersonaStrategy({
-        audience: config.auth.persona.audience
-      },
-      function(email, done) {
-        Users.findOrCreate({provider:'persona', "email.address": email }, function (err, user) {
-          return done(err, user);
-        });
-      }
-    ));    
+  // if(config.auth.persona){
+  //   // use google strategy
+  //   passport.use(new PersonaStrategy({
+  //       audience: config.auth.persona.audience
+  //     },
+  //     function(email, done) {
+  //       Users.findOrCreate({provider:'persona', "email.address": email }, function (err, user) {
+  //         return done(err, user);
+  //       });
+  //     }
+  //   ));    
 
-    // define route
-    app.post('/auth/browserid', 
-      passport.authenticate('persona', { failureRedirect:'/login' }),
-      function(req,res){
-        return res.json(req.user)
-      }
-    );
+  //   // define route
+  //   app.post('/auth/browserid', 
+  //     passport.authenticate('persona', { failureRedirect:'/login' }),
+  //     function(req,res){
+  //       return res.json(req.user)
+  //     }
+  //   );
 
-  }
+  // }
 /***
 
   // use github strategy

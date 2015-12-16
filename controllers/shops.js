@@ -20,7 +20,7 @@ function isUserShopOwner(req){
 
 exports.ensureShopLimit=function(req, res, next) {
   if (!req.user.isAdmin() && req.user.shops.length>0){
-    return res.send(401, "Vous ne pouvez plus ajouter de nouvelles boutiques");
+    return res.status(401).send( "Vous ne pouvez plus ajouter de nouvelles boutiques");
   }
   return next();
 }
@@ -30,7 +30,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
 	if (!req.isAuthenticated()) {
-      return res.send(401);
+      return res.sendStatus(401);
 	}
 
   // if admin, we've done here
@@ -40,7 +40,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure owner
 	if(!isUserShopOwner(req)){
-    return res.send(401, "Your are not the owner of this shop");
+    return res.status(401).send( "Your are not the owner of this shop");
 	}
 
   return next();
@@ -55,18 +55,18 @@ exports.create=function (req, res) {
   try{
     validate.shop(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   //
   // not valide user can't create shop
   if(req.user.email.status!==true){
-    return res.send(400,'Votre compte doit être validé pour pouvoir créer une boutique');
+    return res.status(400).send('Votre compte doit être validé pour pouvoir créer une boutique');
   }
 
   db.model('Shops').create(req.body, req.user, function(err,shop){
     if(err){
-      return res.send(400,errorHelper(err.message||err));
+      return res.status(400).send(errorHelper(err.message||err));
     }
 
     //
@@ -85,7 +85,7 @@ exports.remove=function (req, res) {
   try{
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   //
@@ -97,7 +97,7 @@ exports.remove=function (req, res) {
 
   db.model('Shops').remove({urlpath:req.params.shopname},function(err){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     return res.send(200);
   });
@@ -110,7 +110,7 @@ exports.get=function (req, res) {
   try{
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var query=Shops.findOneShop({urlpath:req.params.shopname});
@@ -121,11 +121,11 @@ exports.get=function (req, res) {
 
   query.exec(function (err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
 
     if (!shop){
-      return res.send(400,"Cannot find the shop "+req.params.shopname);
+      return res.status(400).send("Cannot find the shop "+req.params.shopname);
     }
 
     return res.json(shop);
@@ -140,16 +140,16 @@ exports.getSEO=function (req, res) {
   try{
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   Shops.findOneShop({urlpath:req.params.shopname}).exec(function (err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
 
     if (!shop){
-      return res.send(400,"Cannot find the shop "+req.params.shopname);
+      return res.status(400).send("Cannot find the shop "+req.params.shopname);
     }
 
     //
@@ -181,10 +181,10 @@ exports.allSEO=function (req, res) {
   }
   return db.model('Shops').find(query,function (err, shops) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!shops.length){
-      return res.send(400,"Aucune boutique disponible");
+      return res.status(400).send("Aucune boutique disponible");
     }
 
     //
@@ -220,16 +220,16 @@ exports.email=function(req,res){
     validate.check(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(3, 600).isText();
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
   db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!shop){
-      return res.send(400,"Cette boutique n'existe pas");
+      return res.status(400).send("Cette boutique n'existe pas");
     }
 
     //
@@ -247,7 +247,7 @@ exports.email=function(req,res){
                  content,
                  "shop-question", function(err, status){
       if(err){
-        return res.send(400,errorHelper(err));
+        return res.status(400).send(errorHelper(err));
       }
 
       res.json(200);
@@ -264,14 +264,14 @@ exports.askStatus=function(req,res){
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
     //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!shop){
-      return res.send(400,"Cette boutique n'existe pas");
+      return res.status(400).send("Cette boutique n'existe pas");
     }
     if ((typeof shop.status)==='number'){
       // check the time elapsed from the last askStatus
@@ -280,7 +280,7 @@ exports.askStatus=function(req,res){
       // max 1 mail by month
       console.log(elapsed,Date.now(),shop.status, Date.now()-shop.status,oneday)
       if (elapsed<config.mail.validate.time)
-        return res.send(400,"Une demande d'activiation est déjà en cours");
+        return res.status(400).send("Une demande d'activiation est déjà en cours");
     }
 
     shop.status=Date.now();
@@ -296,7 +296,7 @@ exports.askStatus=function(req,res){
                  content,
                  "shop-status", function(err, status){
       if(err){
-        return res.send(400,errorHelper(err));
+        return res.status(400).send(errorHelper(err));
       }
 
       res.json(200,shop);
@@ -313,16 +313,16 @@ exports.status=function(req,res){
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").isSlug().len(3, 34);
     if(req.body.status===undefined)throw new Error("Invalid request");;
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
   db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
     if (err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     if(!shop){
-      return res.send(400,"Cannot find the shop");
+      return res.status(400).send("Cannot find the shop");
     }
     shop.updateStatus(req.body.status,function(err){
       return res.json(shop);
@@ -338,7 +338,7 @@ exports.update=function(req,res){
     validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
     validate.shop(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   //
@@ -364,11 +364,11 @@ exports.update=function(req,res){
 
   Shops.findOne({urlpath:req.params.shopname}).select('+account.fees').exec(function(err,shop){
     if (err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
 
     if (!shop){
-      return res.send(400,'Ooops, unknow shop '+req.params.shopname);    
+      return res.status(400).send('Ooops, unknow shop '+req.params.shopname);    
     }
 
     // if not admin silently fix   
@@ -389,7 +389,7 @@ exports.update=function(req,res){
 
     shop.save(function (err) {
       if (err){
-        return res.send(400,err.message||errorHelper(err));    
+        return res.status(400).send(err.message||errorHelper(err));    
       }
       return res.json(shop);  
     })
@@ -407,7 +407,7 @@ exports.list=function (req, res) {
     validate.ifCheck(req.query.valid, "Le format de validation n'est pas valide").is(/^(true|false|yes|no)$/);
     validate.ifCheck(req.query.group, "Le format de groupe n'est pas valide").len(1, 34).is(/^[a-z0-9-.]+$/);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   function getShops(where){
@@ -441,7 +441,7 @@ exports.list=function (req, res) {
 
     query.populate('catalog').exec(function (err,shops){
       if (err){
-        return res.send(400,err);
+        return res.status(400).send(err);
       }
       //
       // as we dont know how to group by with mongo
@@ -459,10 +459,10 @@ exports.list=function (req, res) {
   if (req.params.category){
     return db.model('Categories').findBySlug(req.params.category,function(e,c){
       if (e){
-        return res.send(400,e);
+        return res.status(400).send(e);
       }
       if (!c){
-        return res.send(400,"Il n'existe pas de catégorie "+req.params.category);
+        return res.status(400).send("Il n'existe pas de catégorie "+req.params.category);
       }
       return getShops({catalog:c._id});
     });

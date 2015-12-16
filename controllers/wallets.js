@@ -19,7 +19,7 @@ exports.ensureAdminOrOwner=function (req, res, next) {
   //
   // ensure auth
   if (!req.isAuthenticated()) { 
-      return res.send(401); 
+      return res.sendStatus(401); 
   }
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
   if(alias&&parseInt(alias.id)===req.user.id){
@@ -28,7 +28,7 @@ exports.ensureAdminOrOwner=function (req, res, next) {
 
   // if not admin, 
   if (!req.user.isAdmin()) { 
-      return res.send(401,"Cette fonctionalité est réservée a un administrateur ou au propriétaire");  
+      return res.status(401).send("Cette fonctionalité est réservée a un administrateur ou au propriétaire");  
   }
   
   return next();
@@ -46,7 +46,7 @@ exports.listWallet=function (req,res) {
   bank.wallet.retrieveAllGift(filters).then(function (wallets) {
     res.json(wallets);
   }).then(undefined, function (error) {
-    return res.send(400,error.message||error);
+    return res.status(400).send(error.message||error);
   });
 
 };
@@ -61,7 +61,7 @@ exports.countGiftcode=function (req,res) {
 
     res.json({amount:amount,quatity:wallets.length+offset});
   }).then(undefined, function (error) {
-    return res.send(400,error.message||error);
+    return res.status(400).send(error.message||error);
   });
 
 };
@@ -72,12 +72,12 @@ exports.registerGiftcode=function (req,res) {
   try{
     validate.registerWallet(req.body)
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
   if(!alias){
-    res.send(400,"Wrong wallet id");
+    res.status(400).send("Wrong wallet id");
   }
   var card={
     name:req.body.name,
@@ -92,7 +92,7 @@ exports.registerGiftcode=function (req,res) {
     res.json(wallet)
   }).then(undefined,function (error) {
     bus.emit('system.message',"[karibou-wallet] error giftcard "+card.number,{error:error,user:req.user.email});
-    res.send(400,error.message||error);
+    res.status(400).send(error.message||error);
   })
 
 }
@@ -100,7 +100,7 @@ exports.registerGiftcode=function (req,res) {
 exports.getWallet=function (req,res) {
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user);
   if(!alias){
-    req.send(400,"Wrong wallet id");
+    res.status(400).send("Wrong wallet id");
   }
 
   //
@@ -108,7 +108,7 @@ exports.getWallet=function (req,res) {
   bank.wallet.retrieve(alias.wallet_id).then(function (wallet) {
     res.json(wallet);
   }).then(undefined, function (error) {
-    res.send(400,error.message||error);
+    res.status(400).send(error.message||error);
   });
 
 };
@@ -116,7 +116,7 @@ exports.getWallet=function (req,res) {
 exports.getGiftWallet=function (req,res) {
 
   if(!req.params.card){
-    return res.send(400,"Hoho, missing data here!")
+    return res.status(400).send("Hoho, missing data here!")
   }
 
 
@@ -125,7 +125,7 @@ exports.getGiftWallet=function (req,res) {
   bank.wallet.retrieveOneGift(req.params.card).then(function (wallet) {
     res.json(wallet);
   }).then(undefined, function (error) {
-    res.send(400,error.message||error);
+    res.status(400).send(error.message||error);
   });
 
 };
@@ -133,16 +133,16 @@ exports.getGiftWallet=function (req,res) {
 exports.updateWallet=function (req,res) {
   var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user),giftcard;
   if(!alias){
-    return res.send(400,"Wrong wallet id");
+    return res.status(400).send("Wrong wallet id");
   }
-  res.send(400,'Not implemented');
+  res.status(400).send('Not implemented');
 };
 
 exports.createWallet=function (req,res) {
   try{
     validate.createWallet(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   var giftcard;
   var alias=req.body.payment.alias;
@@ -204,7 +204,7 @@ exports.createWallet=function (req,res) {
     return res.json(wallet);    
   }
   ).then(undefined, function (err) {
-    return res.send(400,err.message||errorHelper(err))
+    return res.status(400).send(err.message||errorHelper(err))
   });
 
 };
@@ -214,7 +214,7 @@ exports.transferWallet=function (req,res) {
   try{
     validate.createWallet(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var userWallet;
@@ -240,7 +240,7 @@ exports.transferWallet=function (req,res) {
     return res.json(wallet);    
   }
   ).then(undefined, function (err) {
-    return res.send(400,err.message||errorHelper(err))
+    return res.status(400).send(err.message||errorHelper(err))
   });
 
 };

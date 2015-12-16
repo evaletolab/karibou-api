@@ -35,7 +35,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
           return next();
         };
 
-        return res.send(401, "Your are not the owner of this product"); 
+        return res.status(401).send( "Your are not the owner of this product"); 
 
       })
     }
@@ -60,7 +60,7 @@ exports.create=function (req, res) {
     validate.check(req.params.shopname, "Vous devez définir une boutique avec un format valide").len(3, 64).isSlug();    
     validate.product(req,res);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
   
   
@@ -68,21 +68,21 @@ exports.create=function (req, res) {
   // this is not true for admin user
   Shops.findOneShop({urlpath:req.params.shopname},function (err,shop){
     if (err){
-      return res.send(400, errorHelper(err));    
+      return res.status(400).send( errorHelper(err));    
     }
     if(!shop){
-      return res.send(400, 'Vous devez utiliser une boutique qui vous appartient');          
+      return res.status(400).send( 'Vous devez utiliser une boutique qui vous appartient');          
     }
     // var s=_.find(shops,function(shop){return shop.urlpath===req.params.shopname});
     // if (!s){
-    //   return res.send(400, "Vous devez utiliser une boutique qui vous appartient");    
+    //   return res.status(400).send( "Vous devez utiliser une boutique qui vous appartient");    
     // }
 
     //
     // ready to create one product
     Products.create(req.body,shop, function(err,product){
         if(err){
-          return res.send(400, errorHelper(err));    
+          return res.status(400).send( errorHelper(err));    
         }
 
         //
@@ -115,7 +115,7 @@ exports.love=function (req, res) {
   if(req.query.popular){
     return Products.findPopularByUser(criteria,function (err,products) {
       if (err) {
-        return res.send(400,err);
+        return res.status(400).send(err);
       }
       return res.json(products)    
     }) 
@@ -123,7 +123,7 @@ exports.love=function (req, res) {
 
   Products.findBySkus(req.user.likes,function(err,products){
     if (err) {
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(products)    
   })
@@ -156,7 +156,7 @@ exports.list=function (req, res) {
     validate.ifCheck(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();    
     validate.ifCheck(req.params.details, "Le format des détails n'est pas valide").len(1, 34).is(/^[a-z0-9-+.]+$/);    
   }catch(e){
-    return res.send(400,e.message);
+    return res.status(400).send(e.message);
   }
   var query=_.extend(req.query,req.params);
 
@@ -172,7 +172,7 @@ exports.list=function (req, res) {
   return Products.findByCriteria(query,function (err, products) {
     var results=products;
     if (err) {
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     
     //
@@ -223,10 +223,10 @@ exports.list=function (req, res) {
 exports.get=function (req, res) {
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!product){
-      return res.send(400,"Ce produit n'existe pas");
+      return res.status(400).send("Ce produit n'existe pas");
     }
     return res.json(product);
   });
@@ -237,10 +237,10 @@ exports.get=function (req, res) {
 exports.getSEO=function (req, res) {
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!product){
-      return res.send(400,"Ce produit n'existe pas");
+      return res.status(400).send("Ce produit n'existe pas");
     }
     //
     // setup the model 
@@ -276,10 +276,10 @@ exports.allSEO=function (req, res) {
   
   return Products.findByCriteria(query,function (err, products) {
     if (err) {
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!products.length){
-      return res.send(400,"Aucun produit disponible");
+      return res.status(400).send("Aucun produit disponible");
     }
 
     //
@@ -346,7 +346,7 @@ exports.update=function (req, res) {
     validate.check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();    
     validate.product(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
   //
   // with angular in UI we got some issue with the _id value
@@ -369,17 +369,17 @@ exports.update=function (req, res) {
   
   Products.findOne({sku:req.params.sku}).populate('vendor').exec(function(err,product){
     if (!product){
-      return res.send(400,'Ooops, unknow product '+req.params.sku);    
+      return res.status(400).send('Ooops, unknow product '+req.params.sku);    
     }
 
     // if not admin  
     if(!req.user.isAdmin()){
       if(req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
-        return res.send(401, "Your are not allowed to do that, arch!");    
+        return res.status(401).send( "Your are not allowed to do that, arch!");    
       }
 
       if(!product.vendor._id.equals(req.body.vendor)){
-        return res.send(400,'Ooops, unknow product vendor '+req.body.vendor);          
+        return res.status(400).send('Ooops, unknow product vendor '+req.body.vendor);          
       }
     }
 
@@ -400,7 +400,7 @@ exports.update=function (req, res) {
 
     product.save(function (err) {
       if (err){
-        return res.send(400,err.message||errorHelper(err));    
+        return res.status(400).send(err.message||errorHelper(err));    
       }
       return res.json(product);  
     })
@@ -414,7 +414,7 @@ exports.remove=function (req, res) {
   try{
     validate.check(req.params.sku, "Le format SKU du produit n'est pas valide").len(3, 34).isNumeric();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
   //TODO remove do not trigger post middleware, use find and remove

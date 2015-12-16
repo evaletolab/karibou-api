@@ -142,16 +142,11 @@ console.log("generate random key:",require('crypto').randomBytes(32).toString('b
 //
 //
 // start the server
-var port = (process.env.C9_PORT || process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || config.express.port);
 var host = (process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP || config.express.host || 'localhost');
 
-// manage c9 env
-if (process.env.C9_PORT ){
-    host='0.0.0.0';
-}
 
 var count=0;
-app.listen(port,host).on('connection', function(socket) {
+app.listen(app.get('port'),host).on('connection', function(socket) {
   console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
   socket.on('end',function(){
     console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);

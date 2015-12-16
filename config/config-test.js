@@ -91,7 +91,8 @@ module.exports = {
   express: {
     port: process.env.PORT || 4000,
     views: '/views',
-    'view engine': 'jade'
+    'view engine': 'jade',
+    mongoSession:false
   },
 
  /**
@@ -164,7 +165,7 @@ module.exports = {
       */
 
   		secret:'cp3a2v0elt955h9uqhgmskplhg85ljjm',
-      key: 'sid',
+      key: ['sid'],
       cookie: {
         path: '/',
         httpOnly: true,

@@ -22,7 +22,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
   if (!req.isAuthenticated()) {
-      return res.send(401);
+      return res.sendStatus(401);
   }
 
   // if admin, we've done here
@@ -33,7 +33,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   // ensure owner
   db.model('Orders').findOne({'customer.id':req.user.id,oid:req.params.oid}).exec(function(e,o){
     if(!o){
-      return res.send(401, "Your are not the owner of this order");
+      return res.status(401).send( "Your are not the owner of this order");
     }
     next()
   })
@@ -44,7 +44,7 @@ exports.ensureHasShopOrAdmin=function(req, res, next) {
   //
   // ensure auth
   if (!req.isAuthenticated()) {
-      return res.send(401);
+      return res.sendStatus(401);
   }
 
   // if admin, we've done here
@@ -52,7 +52,7 @@ exports.ensureHasShopOrAdmin=function(req, res, next) {
     return next();
 
   if(!req.user.shops || !req.user.shops.length){
-    return res.send(401,"Vous n'avez pas de boutique")
+    return res.status(401).send("Vous n'avez pas de boutique")
   }
 
 
@@ -63,7 +63,7 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
   //
   // ensure auth
   if (!req.isAuthenticated()) {
-      return res.send(401);
+      return res.sendStatus(401);
   }
 
   // if admin, we've done here
@@ -71,7 +71,7 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
     return next();
 
   if(!req.user.shops || !req.user.shops.length){
-    return res.send(401,"Vous n'avez pas de boutique boutique")
+    return res.status(401).send("Vous n'avez pas de boutique boutique")
   }
   // ensure that all items in this update bellongs to this user
   // req.user.shops.$.urlpathreq.body.items.$.vendor
@@ -82,7 +82,7 @@ exports.ensureShopOwnerOrAdmin=function(req, res, next) {
     //console.log('---------',req.user.email.address,slugs)
     //console.log('---------',items[item].vendor,items[item].vendor, req.user.email.address)
     if(slugs.indexOf(items[item].vendor+'')==-1){
-      return res.send(401,'Cet article '+items[item].sku+' n\'appartient pas à votre boutique')
+      return res.status(401).send('Cet article '+items[item].sku+' n\'appartient pas à votre boutique')
     }
   }
 
@@ -98,7 +98,7 @@ exports.ensureValidAlias=function(req,res,next){
 
   if(req.body.issuer) issuer=req.body.issuer;
   else if(req.body.payment.issuer)issuer=req.body.payment.issuer;
-  else return res.send(401,"Impossible de valider l'alias de paiement (2)")
+  else return res.status(401).send("Impossible de valider l'alias de paiement (2)")
 
   //
   // FIXME HUGLY FIX
@@ -109,10 +109,10 @@ exports.ensureValidAlias=function(req,res,next){
   if (req.params.alias) alias=req.params.alias;
   else if(req.body.alias) alias=req.body.alias;
   else if(req.body.payment.alias)alias=req.body.payment.alias;
-  else return res.send(401,"Impossible de valider l'alias de paiement (1)")
+  else return res.status(401).send("Impossible de valider l'alias de paiement (1)")
 
   if(!req.user.isValidAlias(alias,issuer)){
-    return res.send(401,"La méthode de paiement utilisée n'est pas valide (0)")
+    return res.status(401).send("La méthode de paiement utilisée n'est pas valide (0)")
   }
 
   return next();
@@ -212,7 +212,7 @@ exports.list = function(req,res){
     validate.ifCheck(req.params.shopname, "La boutique n'est pas valide").len(3, 34).isSlug()
     validate.orderFind(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   var criteria={}
 
@@ -233,7 +233,7 @@ exports.list = function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
 
     return res.json(orders)
@@ -249,7 +249,7 @@ exports.listByShop = function(req,res){
     validate.check(req.params.shopname, "Le format de la boutique n'est pas valide").len(3, 34).isSlug()
     validate.orderFind(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   var criteria={}
 
@@ -263,7 +263,7 @@ exports.listByShop = function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(Orders.filterByShop(orders,criteria.shop))
   });
@@ -277,7 +277,7 @@ exports.listByShopOwner = function(req,res){
   try{
     validate.orderFind(req);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   var criteria={}
 
@@ -292,7 +292,7 @@ exports.listByShopOwner = function(req,res){
   // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(Orders.filterByShop(orders,criteria.shop))
   });
@@ -303,12 +303,12 @@ exports.get = function(req,res){
   try{
     validate.check(req.params.oid, "Le format de la commande n'est pas valide").isInt()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   Orders.findOne({oid:req.params.oid}).exec(function(err,order){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }
     return res.json(order)
   })
@@ -318,17 +318,17 @@ exports.verifyItems = function(req,res){
   try{
     validate.orderItems(req.body.items)
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var items=req.body.items;
   if(!items || !Array.isArray(items)){
-    return res.send(400, "Vos articles ne sont pas valides");
+    return res.status(400).send( "Vos articles ne sont pas valides");
   }
 
   db.model('Orders').checkItems(items,function(err,products, vendors, errors){
     if(err){
-      return res.send(400, err);
+      return res.status(400).send( err);
     }
     return res.json({errors:errors})
   });
@@ -344,19 +344,19 @@ exports.create=function(req,res){
   try{
     validate.order(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   Orders.create(req.body.items, req.user, req.body.shipping, req.body.payment,
     function(err,order){
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
 
 
     // items issue?
     if(order.errors){
-      return res.json(200, order);
+      return res.json( order);
     }
 
     var oid=order.oid;
@@ -403,16 +403,16 @@ exports.updateItem=function(req,res){
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
     validate.orderItems(req.body,true); // true => do not check all fields
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
   Orders.updateItem(req.params.oid, req.body, function(err,order){
     if(err){
-      return res.send(400, (err));
+      return res.status(400).send( (err));
     }
     if(req.user.isAdmin()){
-      return res.json(200,order)
+      return res.json(order)
     }
 
     //
@@ -422,7 +422,7 @@ exports.updateItem=function(req,res){
     });
 
     var filtered=Orders.filterByShop([order],shop)
-    return res.json(200,filtered[0])
+    return res.json(filtered[0])
   });
 }
 
@@ -434,15 +434,15 @@ exports.updateShipping=function(req,res){
     validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean();
     validate.ifCheck(req.body.bags, "Le nombre de sac n'est pas valide").isInt();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
   Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,orders){
     if(err){
-      return res.send(400, (err));
+      return res.status(400).send( (err));
     }
-    return res.json(200,orders)
+    return res.json(orders)
   });
 }
 
@@ -455,16 +455,16 @@ exports.updateCollect=function(req,res){
     validate.check(req.body.when, "La date de livraison n'est pas valide").isDate()
     validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
 
   Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,orders){
     if(err){
-      return res.send(400, (err));
+      return res.status(400).send( (err));
     }
-    return res.json(200,orders)
+    return res.json(orders)
   });
 }
 
@@ -474,11 +474,11 @@ exports.cancel=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
   db.model('Orders').onCancel(req.params.oid,req.body.reason,function(err,order){
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
 
     //
@@ -499,7 +499,7 @@ exports.cancel=function(req,res){
           if(err)console.log('---------------------------cancel',order.oid,err)
         })
 
-    return res.json(200,order)
+    return res.json(order)
   })
 }
 
@@ -510,12 +510,12 @@ exports.refund=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   db.model('Orders').onRefund(req.params.oid,req.body.amount,function(err,order){
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
 
     //
@@ -537,7 +537,7 @@ exports.refund=function(req,res){
           if(err)console.log('---------------------------refund',order.oid,err)
         })
 
-    return res.json(200,order)
+    return res.json(order)
   })
 }
 
@@ -548,12 +548,12 @@ exports.capture=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   db.model('Orders').findOne({oid:req.params.oid}).select('+payment.transaction').exec(function(err,order){
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
 
     // items issue?
@@ -593,7 +593,7 @@ exports.capture=function(req,res){
       })
       .fail(function(err){
         bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});
-        return res.json(400,err.message)        
+        return res.status(400).send(err.message)        
       })
 
 
@@ -607,28 +607,28 @@ exports.remove=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   return Orders.findOne({oid:req.params.oid}).exec(function(err,order){
 
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
 
     if(!order){
-      return res.send(400,"La commande n'existe pas")
+      return res.status(400).send("La commande n'existe pas")
     }
 
     // constraint the remove?
     //if(['voided','refunded'].indexOf(order.payment.status)===-1){
-    //  return res.send(400,"Impossible de supprimer une commande avec le status: "+order.payment.status))
+    //  return res.status(400).send("Impossible de supprimer une commande avec le status: "+order.payment.status))
     //}
 
     // delete
     order.remove(function(err){
       if(err)return res.json(400,errorHelper(err.message||err))
-      return res.json(200,{})
+      return res.json({})
     });
 
   });
@@ -644,7 +644,7 @@ exports.informShopToOrders=function(req,res){
     validate.check(new Date(req.body.when),"La date n'est pas valide").isDate()
     validate.ifCheck(req.body.content,"Le votre message n'est pas valide (entre 3 et 600 caractères)").len(0, 600).isText();
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
 
@@ -666,7 +666,7 @@ exports.informShopToOrders=function(req,res){
   // get orders prepared for each shop mail
   Orders.prepareOrdersForMail(when,shop,closed,function (err,contents) {
     if(err){
-      return res.send(400,errorHelper(err.message||err));
+      return res.status(400).send(errorHelper(err.message||err));
     }
     for(var s in contents){
       contents[s].origin=req.header('Origin')||config.mail.origin;
@@ -734,13 +734,13 @@ exports.informShopToOrders=function(req,res){
         });
         rejected=_.uniq(rejected);
         if(rejected.length){
-          return res.send(400,"les mails suivant n'ont pas été envoyés :"+rejected.join(','));
+          return res.status(400).send("les mails suivant n'ont pas été envoyés :"+rejected.join(','));
         }
         // console.log('mail',sentMails)
         return res.json(contents);
       },function (err) {
         // TODO if only one msg got an error???
-        return res.send(400,errorHelper(err.message||err));
+        return res.status(400).send(errorHelper(err.message||err));
       })
 
     })
@@ -757,7 +757,7 @@ exports.invoicesByUsers=function(req,res){
     if(!req.params.month)throw new Error('Le mois est obligatoire');
     if(req.params.year){}
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var criteria={}, result=[];
@@ -780,7 +780,7 @@ exports.invoicesByUsers=function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.send(400,errorHelper(err.message||err));
+      return res.status(400).send(errorHelper(err.message||err));
     }
     // sort by date and customer
     function byDateAndUser(o1,o2){
@@ -832,7 +832,7 @@ exports.invoicesByShops=function(req,res){
     if(!req.params.month)throw new Error('Le mois est obligatoire');
     if(req.params.year){}
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var criteria={}, result=[], showAll=req.query.all||false, output=req.query.output||'json';
@@ -874,7 +874,7 @@ exports.invoicesByShops=function(req,res){
 
   Orders.generateRepportForShop(criteria,function(err,repport){
     if(err){
-      return res.send(400,errorHelper(err.message||err));
+      return res.status(400).send(errorHelper(err.message||err));
     }
     res.json(repport)
   });
@@ -888,7 +888,7 @@ exports.invoicesByShops2=function(req,res){
     if(!req.params.month)throw new Error('Le mois est obligatoire');
     if(req.params.year){}
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
 
   var criteria={}, result=[], showAll=req.query.all||false, today=new Date(),output=req.query.output||'json';
@@ -918,7 +918,7 @@ exports.invoicesByShops2=function(req,res){
 
   Orders.getCAByYearMonthAndVendor(criteria,function(err,repport){
     if(err){
-      return res.send(400,errorHelper(err.message||err));
+      return res.status(400).send(errorHelper(err.message||err));
     }
     res.json(repport[criteria.year][criteria.month])
   });

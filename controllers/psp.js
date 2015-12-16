@@ -45,7 +45,7 @@ exports.webhook=function(req,res){
   //
   // validate SHA
   if(!payment.for(req.body.BRAND).isValidSha(req.body)){
-    return res.send(400,"The calculated hash values and the transmitted hash values do not coincide.");
+    return res.status(400).send("The calculated hash values and the transmitted hash values do not coincide.");
   }
 
   var alias=(req.body.user+req.body.BRAND.toLowerCase()).hash(), safePayment={}
@@ -62,10 +62,10 @@ exports.webhook=function(req,res){
 
   // Users.findOne({id: req.body.user}, function(err,user){
   //   if(err){
-  //     return res.send(400,errorHelper(err))
+  //     return res.status(400).send(errorHelper(err))
   //   }
   //   if(!user){
-  //     return res.send(400, "Utilisateur inconnu");
+  //     return res.status(400).send( "Utilisateur inconnu");
   //   }
 
   //   return user.addAndSavePayment(safePayment,function (err) {
@@ -83,7 +83,7 @@ exports.pspCharge=function (req,res) {
       amount=parseFloat(req.body.amount);
 
   if(/*!amount||*/!user.id||!user.email||!user.email.status){
-    return res.send(400,'psp format error!')
+    return res.status(400).send('psp format error!')
   }
 
   //
@@ -114,7 +114,7 @@ exports.pspCharge=function (req,res) {
 
   transaction.process(card, function(err,form){
     if(err){
-      return res.send(400,errorHelper(err))
+      return res.status(400).send(errorHelper(err))
     }
     res.json(form)
   });
