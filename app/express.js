@@ -127,7 +127,6 @@ var tokenSession=function (req, res, next) {
   // cookieParser should be above session
   app.use(cookieParser())
 
-  // bodyParser should be above methodOverride
   app.use(helmet());  
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -143,7 +142,7 @@ var tokenSession=function (req, res, next) {
       secret: config.middleware.session.secret,
       ttl:config.middleware.session.cookie.maxAge,
       cookie: config.middleware.session.cookie,
-      proxy: true,
+      proxy: config.express.proxy,
       resave: false,
       saveUninitialized: false      
     }));
@@ -157,7 +156,7 @@ var tokenSession=function (req, res, next) {
       ttl:config.middleware.session.cookie.maxAge,
       cookie: config.middleware.session.cookie,
       store: new MongoStore({mongooseConnection : mongoose.connection}),
-      proxy: true,
+      proxy: config.express.proxy,
       resave: false,
       saveUninitialized: false      
     }));
@@ -169,12 +168,6 @@ var tokenSession=function (req, res, next) {
   app.use(passport.session())
 
 
-
-  // connect flash for flash messages - should be declared after sessions
-  // app.use(flash())
-
-  // should be declared after session and flash
-  //app.use(helpers(pkg.name))
 
   // adds CSRF support
   if (process.env.NODE_ENV !== 'test' && config.express.csrf) {
@@ -190,11 +183,6 @@ var tokenSession=function (req, res, next) {
       return next()
     })
   }
-
-
-  // routes should be at the last
-  // NO MORE FOR v4
-  //app.use(app.router)
 
 
 
@@ -225,7 +213,7 @@ var tokenSession=function (req, res, next) {
 
 
     if (typeof err==='string'){
-      return res.send(400,err); 
+      return res.status(400).send(err); 
     }
 
 
@@ -235,15 +223,6 @@ var tokenSession=function (req, res, next) {
   })
 
 
-    // assume 404 since no middleware responded
-/*    
-    app.use(function(req, res, next){
-      res.status(404).render('404', {
-        url: req.originalUrl,
-        error: 'Not found'
-      })
-    })
-*/
 
   // development env config
   if(app.get('env')=='development'){
