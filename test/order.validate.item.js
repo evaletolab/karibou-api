@@ -77,11 +77,11 @@ describe("orders.validate.item", function(){
     items[0].price=items[0].finalprice=33;
 
 
+
     //
     // starting process of order,
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
-
       should.exist(order.errors)
       order.errors[0]['1000001'].should.containEql('Le prix de votre produit')
       done();          

@@ -197,6 +197,7 @@ Orders.statics.findByCriteria=finds.findByCriteria;
 
 //
 // import manage API
+Orders.statics.validateParams = core.validateParams;
 Orders.statics.updateItem = core.updateItem;
 Orders.statics.updateLogistic =core.updateLogistic;
 Orders.statics.coreCreate =core.coreCreate;
@@ -257,9 +258,6 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   if(!item.category){
     item.category=product.categories.name
   }
-
-
-
 
 
   //
@@ -404,48 +402,36 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   }
 
 
-  return cb(null,item,vendor)
-
-  // mongoose.model('Products').findOneBySku(itecreatem.sku,function(err,product){
-  // })
-
-}
+  return cb(null,item,vendor);
+};
 
 //
 // check items a new order
-Orders.statics.checkItems = function(shipping, items, callback){
+Orders.statics.checkItems = function(shipping, items, products, callback){
   assert(items);
+  assert(products);
   assert(callback);
   var db=this
-    , Orders=db.model('Orders')
-    , Products=db.model('Products')
+    , Orders=db.model('Orders');
 
-  items=_.sortBy(items,function(i){return i.sku});
-  var skus=_.uniq(items.map(function(item){return item.sku}));
-  Products.findBySkus(skus).populate('vendor','+account.fees').sort("sku").exec(function(err,products){
+
+  var vendors=[], errors=[], product;
+  for (var i = 0; i <items.length; i++) {
+    // get product by sku
+    product=_.findWhere(products,{sku:items[i].sku});
     //
-    // check SKU
-    if(skus.length!==products.length){
-      return callback("Certains produits sélectionnés n'existent plus, vérifier votre panier")
-    }
-
-    var vendors=[], errors=[], product;
-    for (var i = 0; i <items.length; i++) {
-      // get product by sku
-      product=_.findWhere(products,{sku:items[i].sku});
+    // check an item
+    Orders.checkItem(shipping, items[i],product,function(err,item, vendor){
+      if(vendor)vendors.push(vendor);
+      var error={}; error[item.sku]=err;
       //
-      // check an item
-      Orders.checkItem(shipping, items[i],product,function(err,item, vendor){
-        if(vendor)vendors.push(vendor);
-        var error={}; error[item.sku]=err;
-        //
-        // collect error by product
-        err&&errors.push(error)
-      })
-    };
-    return callback(err,products,vendors, errors)
-  });
-}
+      // collect error by product
+      err&&errors.push(error);
+    })
+  };
+
+  return callback(null,products,vendors, errors)
+};
 
 //
 // status == created, payment == pending
@@ -492,7 +478,7 @@ Orders.methods.updateProductQuantityAndSave=function(callback){
       // FIXME error in this place is an issue!!!
       throw new Error("rollback not implemented: "+(err.message||err));
   })
-}
+};
 
 //
 // status == reserved||fulfilled, payment==pending||refund||voided 
@@ -549,8 +535,7 @@ Orders.methods.rollbackProductQuantityAndClose=function(reason, callback){
 
     return callback(err);
   });
-
-}
+};
 
 
 //
@@ -561,120 +546,52 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   assert(shipping);
   assert(callback);
   var db=this
-    , now =new Date()
-    , Orders=db.model('Orders')
-    , order={};
-
-
-  // remove min/sec to compute the timeleft for shipping
-  now.setHours(now.getHours(),0,0,0)
-
-  //
-  // simple items check
-  if(!items.length){
-    return callback("items are required.")
-  }
-
-  //
-  // check shipping maintenance
-  if(config.shop.maintenance.active){
-    return callback("Les livraisons ne sont pas possibles pour l'instant")    
-  }
-
-  //
-  // check the shipping day
-  if(!shipping.when){
-    return callback("La date de livraison est obligatoire")
-  }
-  // be sure that is a Date object
-  shipping.when=new Date(shipping.when)
-
-
-  if(config.shop.noshipping&&config.shop.noshipping.length){
-    for (var i = config.shop.noshipping.length - 1; i >= 0; i--) {
-      var noshipping=config.shop.noshipping[i];
-      var from = new Date(noshipping.from);
-      var to=new Date(noshipping.to);
-      var msg="Les livraisons sont interrompues jusqu'au "+Orders.formatDate(to);
-      from.setHours(1,0,0,0);
-      to.setHours(1,0,0,0);
-      if((shipping.when>=from && shipping.when<to)){
-        return callback(noshipping.reason||msg)      
-      }
-
-    };
-  }
-
-
+    , Orders=this.model('Orders'), vendors=[], skus=[],products=[];
 
 
   //
-  // check that shipping day is available on: config.shop.order.weekdays
-  if (config.shop.order.weekdays.indexOf(shipping.when.getDay())==-1){
-    return callback("La date de livraison n'est pas valable")
-  }
+  // check all parameters
+  debug('validate params  %s on %s with %d items',shipping.name,shipping.when,items.length);
+  this.validateParams(items,customer,shipping,paymentData)
+  .then(function  (argument) {
 
-  var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
-  if(Math.abs((when-now.getTime())/3600000) < config.shop.order.timelimit){
-    return callback("Cette date de livraison n'est plus disponible.")
-  }
+    //
+    // sort items by SKU (important to map them with products !)
+    items=_.sortBy(items,function(i){return i.sku});
 
-  // if shipping time is defined (important for differents timezone)
-  if(shipping.hours){
-    shipping.when.setHours(shipping.hours,0,0,0)    
-  }
+    //
+    // get list of products
+    skus=_.uniq(items.map(function(item){return item.sku}));
+    products=[];
+
+    return db.model('Products')
+                .findBySkus(skus)
+                .populate('vendor','+account.fees')
+                .sort("sku").exec();
+  })
 
   //
-  // check time for delivery
-  var times=Object.keys(config.shop.order.shippingtimes)
-  if(times.indexOf(String(shipping.when.getHours()))==-1){
-    return callback("L'heure de livraison n'est pas valable")
-  }
-
-
-  // early test
-  // make sure that payment issuer belongs to this customer
-  try{
-
-    if(!paymentData||!customer.id ||!payment.for(paymentData.issuer).isPaymentObjectValid(paymentData)){
-      return callback("Votre commande est incomplète, l'ordre ne peut pas êtree passé")
-    } 
-
-    if(!payment.for(paymentData.issuer).isValidAlias(paymentData.alias,customer, paymentData.issuer)){
-      return callback("Votre méthode de paiement est invalide, l'ordre ne peut pas être passé")
+  // map items with local products
+  .then(function (ps) {
+    products=ps;
+    if(skus.length!==products.length){
+      return callback("Certains produits sélectionnés n'existent plus, vérifier votre panier");
     }
 
-  }catch(error){
-    return callback(error.message)    
-  }
-
+    //
+    // chain OID creation
+    return db.model('Sequences').nextOrder();
+  })
 
   //
   // get unique Order identifier
-  db.model('Sequences').nextOrder().then(function(oid){
-    //
-    // set oid
-    order.oid=oid;
+  // and create order
+  .then(function(oid){
 
     //
-    // checking customer data
-    if(!customer.email||customer.email.status!==true){
-      return callback('valid email is required.')
-    }
-
-    //
-    // checking shipping data
-    if (!shipping ||Object.keys(shipping).length<3
-                  ||!shipping.name
-                  ||!shipping.streetAdress
-                  ||!shipping.floor
-                  ||!shipping.postalCode
-                  ||!shipping.region){
-      return callback('shipping address is missing or imcomplet.')
-    }
-
-
-    Orders.checkItems(shipping, items,function(err, products,vendors, errors){
+    // check products and vendors
+    debug('check order %s products  %s on %s with %d items',oid,shipping.name,shipping.when,items.length);
+    return Orders.checkItems(shipping, items,products,function(err, products,vs, errors){
       //
       // unknow issue?
       if(err){
@@ -687,99 +604,26 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
         return callback(null,{errors:errors})
       }
 
-
-
-
-      debug('create new orders for %s on %s with %d items',shipping.name,shipping.when,items.length)
-
       //
-      // attache items on success,
-      order.items=items;
-      order.vendors=_.uniq(vendors,false,function(e){return e.slug;});
+      // attache items/vendors when success,
+      vendors=_.uniq(vs,false,function(e){return e.slug;});
 
-
-      //
-      // adding customer info and email (check validity)
-      order.customer={
-        id:customer.id,
-        merchant:customer.merchant,
-        displayName:customer.displayName,
-        created:customer.created,
-        status:customer.status,
-        addresses:customer.addresses,
-        phoneNumbers:customer.phoneNumbers,
-        name:customer.name,
-        email:customer.email
-      }
-      order.email=customer.email.address;
-
-      //
-      // adding shipping address (minimum 3 fields
-      // for general error msg)
-      order.shipping={
-        name:shipping.name,
-        note:shipping.note,
-        streetAdress:shipping.streetAdress,
-        floor:shipping.floor,
-        postalCode:shipping.postalCode,
-        region:shipping.region,
-        geo:shipping.geo,
-        when:shipping.when
-      };
-
-      //
-      // adding paymentData
-      order.payment={
-        alias:paymentData.alias,
-        number:paymentData.number,
-        issuer:paymentData.issuer,
-        fees:{shipping:null}
-      };
-
-      //
-      // save the payment expiry 
-      // TODO throw error if no payment is available
-      if(customer.payments&&customer.payments.length){
-        var payment=_.find(customer.payments,function (p) {
-          return(p.alias===paymentData.alias)
-        })
-        if(!payment){
-          return callback('Olala, nous n\'avons pas trouver le mode de paiement que vous avez sélectionné. Veuillez recharger la page merci!');
-        }
-        
-        order.payment.expiry=payment.expiry;
-      }
-
-
-      //
-      // ready to create one order
-      var dborder =new Orders(order);
-
-      dborder.payment.fees.shipping=dborder.getShippingPrice()
-
-      //
-      // update product stock
-      return dborder.updateProductQuantityAndSave(function(e,o){
-        if(e){return callback(e)}
-        //
-        // rank this order
-        o.computeRankAndSave(callback);
-
-      })
-
-
-
+      return Orders.coreCreate(oid, items,customer,shipping,paymentData,vendors);
 
     });
 
-  },function (err) {
-    if(err){
-      callback((err));
-      return;
-    }
+  })
+  //
+  // finally update stocks
+  .then(function (order) {
+    order.updateProductQuantityAndSave(callback);
+  })
+
+  //
+  // catch all errors
+  .then(undefined,function (err) {
+    callback(errorHelper(err.message||err))
   });
-
-
 };
 
 
