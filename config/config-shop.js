@@ -19,13 +19,13 @@ module.exports = {
 
     shipping:{
       average:115, // average 
-      discountA:2,  // half price 5.4@18% & 4.5@15%
+      discountA:145,    // half price 5.4@18% & 4.5@15%
       discountB:180,    // 180 full price 11.7@18% & 9.75@15%
       price:{
         hypercenter:10,
         periphery:17.90
       }, // shipping price
-      priceA:5,
+      priceA:2.5,
       priceB:5,
       periphery:["1219","1231"]
     },

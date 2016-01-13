@@ -274,7 +274,7 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
-      err.should.containEql("Votre méthode de paiement est inconnue")
+      err.should.containEql("Votre méthode de paiement est invalide")
       done();          
     });
   });    

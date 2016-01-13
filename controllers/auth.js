@@ -16,10 +16,10 @@ var passport_Authenticate=function(req, res, next){
   return passport.authenticate('local', function(err, user, info) {
 
     if (err) { 
-      return res.send(400,errorHelper(err)); 
+      return res.status(400).send(errorHelper(err)); 
     }
     if (!user) { 
-      return res.send(400,"L'utilisateur ou le mot de passe est incorrect"); 
+      return res.status(400).send("L'utilisateur ou le mot de passe est incorrect"); 
     }
     
     //
@@ -29,12 +29,12 @@ var passport_Authenticate=function(req, res, next){
     /* account is not valid */
     if (!user.isAdmin() && !user.status){
       console.log("ERROR","Votre compte est désactivé")    
-      return res.send(401,"Votre compte est désactivé");
+      return res.status(401).send("Votre compte est désactivé");
     }
     
     req.logIn(user, function(err) {
 
-      if (err) { return res.send(403,err); }
+      if (err) { return res.status(403).send(err); }
       return res.json(req.user);
     });
 
@@ -43,13 +43,13 @@ var passport_Authenticate=function(req, res, next){
 
 exports.ensureAuthenticated=function(req, res, next) {
 	if (!req.isAuthenticated()) { 
-      return res.send(401, "Vous devez ouvrir une session");	
+      return res.status(401).send( "Vous devez ouvrir une session");	
 	}
 	
 	//
 	// admin user doenst depend on valid status
 	if (!req.user.isAdmin()&&!req.user.status) { 
-      return res.send(401, "Votre compte n'est pas actif");	
+      return res.status(401).send( "Votre compte n'est pas actif");	
 	}
 	
   return next();
@@ -57,13 +57,13 @@ exports.ensureAuthenticated=function(req, res, next) {
 
 exports.ensureUserValid=function(req, res, next) {
 	if (!req.isAuthenticated()) { 
-      return res.send(401, "Vous devez ouvrir une session");	
+      return res.status(401).send( "Vous devez ouvrir une session");	
 	}
 	
 	//
 	// admin user doenst depend on valid status
 	if (!req.user.isAdmin()&&!req.user.status) { 
-      return res.send(401, "Votre compte n'est pas actif");	
+      return res.status(401).send( "Votre compte n'est pas actif");	
 	}
   return next();
 }
@@ -73,12 +73,12 @@ exports.ensureAdmin=function(req, res, next) {
   //
   // ensure auth
 	if (!req.isAuthenticated()) { 
-      return res.send(401);	
+      return res.sendStatus(401);	
 	}
 
   // if not admin, 
   if (!req.user.isAdmin()) { 
-      return res.send(401,"Cette fonctionalité est réservée a un administrateur");	
+      return res.status(401).send("Cette fonctionalité est réservée a un administrateur");	
 	}
 	
   return next();
@@ -88,12 +88,12 @@ exports.ensureLogisticOrAdmin=function(req,res,next){
   //
   // ensure auth
   if (!req.isAuthenticated()) { 
-      return res.send(401); 
+      return res.sendStatus(401); 
   }
 
   // if not admin, 
   if (!req.user.isAdmin()&&!req.user.hasRole('logistic')) { 
-      return res.send(401,"Cette fonctionalité est réservée à la logistique");  
+      return res.status(401).send("Cette fonctionalité est réservée à la logistique");  
   }
   
   return next();
@@ -105,17 +105,17 @@ exports.checkPassword=function(req, res, next) {
     var len=config.shop.system.password.len;
     validate.check(req.body.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   }catch(err){  
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }   
 
   // verify passwd
   req.user.verifyPassword(req.body.password, function(err, passwordCorrect) {
     if (err) { 
-      res.send(400, err)
+      res.status(400).send( err)
     }
 
     if (!passwordCorrect) { 
-      return res.send(400, "Cette action est protégée. Le mot de passe est incorrect"); 
+      return res.status(400).send( "Cette action est protégée. Le mot de passe est incorrect"); 
     }
     return next();
   });  
@@ -123,13 +123,7 @@ exports.checkPassword=function(req, res, next) {
 
 
 exports.logout = function (req, res) {
-      req.logout();      
-      //res.clearCookie('connect.sid', { path: '/' });
-      if (req.param('redirect')){
-        var redirect=req.param('redirect')
-        return res.redirect('/');
-      }
-      
+      req.logout();            
       res.json({status:'bye'});
 };
 
@@ -147,7 +141,7 @@ exports.login_post=function(req, res, next) {
       }
       validate.authenticate(req.body)
   }catch(err){  
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
   
   //
@@ -189,7 +183,7 @@ exports.register_post= function(req, res,next) {
 
 
     }catch(err){
-       return res.send(400, err.message);
+       return res.status(400).send( err.message);
     }  
     var reg={}
     if(req.body.addresses&&req.body.addresses.length)reg.addresses=req.body.addresses;
@@ -199,22 +193,22 @@ exports.register_post= function(req, res,next) {
     // setup a simple timer to prevent scripted multiple post 
     // setTimeout(function() {
       db.model('Users')
-      .register(req.param('email'),
-                req.param('firstname'),
-                req.param('lastname'),
-                req.param('password'),
-                req.param('confirm'),
+      .register(req.body.email,
+                req.body.firstname,
+                req.body.lastname,
+                req.body.password,
+                req.body.confirm,
                 reg,
         function(err,user){
           if(err&&err.code==11000){
-            return res.send(400,"Cet adresse email est déjà utilisée");    
+            return res.status(400).send("Cet utilisateur existe déjà");    
           }else
           if (err){
-            return res.send(400,errorHelper(err));    
+            return res.status(400).send(errorHelper(err));    
           }
 
           if (!user){
-            return res.send(400,"Erreur inconnue lors de la création du compte");    
+            return res.status(400).send("Erreur inconnue lors de la création du compte");    
           }
 
           user.createWallet(function (err) {
@@ -229,7 +223,7 @@ exports.register_post= function(req, res,next) {
               if(err){
                 bus.emit('system.message',"[karibou-register.mail] karibou error: ",
                   {message:err.message,stack:err.stack});
-                return res.send(400,err)
+                return res.status(400).send(err)
               }
 
               //

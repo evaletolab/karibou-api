@@ -24,13 +24,13 @@ exports.create=function (req, res) {
   try{
     check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 34).isEmail();    
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }  
 
 
   db.model('Emails').create(req.user, function(err,validate){
     if(err){
-      return res.send(400,err);
+      return res.status(400).send(err);
     }      
     
     var content=req.user;
@@ -44,7 +44,7 @@ exports.create=function (req, res) {
       if(err){
         console.log(err,status)
         return validate.remove(function(){
-          return res.send(400,'Oops, quelque chose est allé de travers avec la messagerie: '+err.message);
+          return res.status(400).send('Oops, quelque chose est allé de travers avec la messagerie: '+err.message);
         });
 
       }      
@@ -62,13 +62,13 @@ exports.validate=function (req, res) {
     check(req.params.uid).len(40).isAlphanumeric();    
     check(req.params.email).len(3,40).isEmail();    
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send( err.message);
   }
     
   Emails.validate(req.params.uid,req.params.email,function (err,user){
 
     if (err){
-      return res.send(400,err);    
+      return res.status(400).send(err);    
     }
     
 
@@ -81,7 +81,7 @@ exports.validate=function (req, res) {
 exports.list=function (req, res) {
   Emails.find({})/*.where("status",true)*/.exec(function (err,emails){
     if (err){
-      return res.send(400,errorHelper(err));    
+      return res.status(400).send(errorHelper(err));    
     }
     
 

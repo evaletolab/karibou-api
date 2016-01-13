@@ -20,7 +20,7 @@ var _ = require('underscore'),
 exports.favoriteProductsVsUsers = function(req,res){
   db.model('Orders').favoriteProductsVsUsers(function (err, stats) {
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
     res.json(stats);
   });
@@ -33,7 +33,7 @@ exports.favoriteProductsVsUsers = function(req,res){
 exports.ordersByPostalVsUsersByPostal=function (req,res) {
   db.model('Orders').ordersByPostalVsUsersByPostal({},function (err,stats) {
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
     res.json(stats);
   });
@@ -45,7 +45,7 @@ exports.ordersByPostalVsUsersByPostal=function (req,res) {
 exports.ordersByUsers=function (req,res) {
   db.model('Orders').ordersByUsers({},function (err,stats) {
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
     res.json(stats);
   });
@@ -57,7 +57,7 @@ exports.ordersByUsers=function (req,res) {
 exports.getSellValueByYearAndWeek = function(req,res){
   db.model('Orders').getSellValueByYearAndWeek({},function (err, stats) {
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
     res.json(stats);
   });
@@ -77,7 +77,7 @@ exports.getCAByYearMonthAndVendor = function(req,res){
 
   db.model('Orders').getCAByYearMonthAndVendor(filter,function (err, stats) {
     if(err){
-      return res.send(400, errorHelper(err.message||err));
+      return res.status(400).send( errorHelper(err.message||err));
     }
     res.json(stats);
   });

@@ -150,7 +150,7 @@ describe("api.documents", function(){
         .expect(400,done);
     });    
 
-    it.skip('POST /v1/documents should return 200   ',function(done){
+    it('POST /v1/documents should return 200   ',function(done){
       var doc=_.extend({},data.Documents[0]);
       request(app)
         .post('/v1/documents')

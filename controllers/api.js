@@ -50,7 +50,7 @@ exports.saveConfig = function(req, res) {
   try{
     validate.config(req.body);
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send(err.message);
   }
 
   db.model('Config').saveMain(req.body,function(err,conf) {
@@ -63,7 +63,7 @@ exports.saveConfig = function(req, res) {
 
 exports.trace = function(req, res) {
     if(origins.indexOf(req.params.key)==-1){
-      return res.send(401,"invalid token")
+      return res.status(401).send("invalid token")
     }
     bus.emit('trace.error',req.params.key,req.body);
 
@@ -82,7 +82,7 @@ exports.trace = function(req, res) {
 
 exports.message = function(req, res) {
     if(origins.indexOf(req.params.key)==-1){
-      // return res.send(401,"invalid token")
+      // return res.status(401).send("invalid token")
     }
     var mail={
       title:"[karibou-subscribe] : "
@@ -128,7 +128,7 @@ exports.email=function(req,res){
     validate.ifCheck(req.body.product,"Le nom du produit n'est pas valide (entre 1 et 200 caractères)").len(1, 200).isText();
     if(!req.user&&!req.body.email)throw new Error("Vous devez avoir une identité");
   }catch(err){
-    return res.send(400, err.message);
+    return res.status(400).send(err.message);
   }
 
   var content={};
@@ -149,7 +149,7 @@ exports.email=function(req,res){
                  content,
                  "karibou-question", function(err, status){
       if(err){
-        return res.send(400,errorHelper(err));
+        return res.status(400).send(errorHelper(err));
       }
 
       res.json(content);
@@ -161,10 +161,10 @@ exports.email=function(req,res){
   // send email @shop
   db.model('Shops').findOne({urlpath:req.body.shopname}).populate('owner').exec(function(err,shop){
     if (err){
-      return res.send(400,errorHelper(err));
+      return res.status(400).send(errorHelper(err));
     }
     if(!shop){
-      return res.send(400,"Cette boutique n'existe pas");
+      return res.status(400).send("Cette boutique n'existe pas");
     }
 
     //
@@ -177,7 +177,7 @@ exports.email=function(req,res){
                  content,
                  "karibou-question", function(err, status){
       if(err){
-        return res.send(400,errorHelper(err));
+        return res.status(400).send(errorHelper(err));
       }
 
       res.json(content);
@@ -202,7 +202,7 @@ exports.activities=function (req,res) {
 
   db.model('Activities').findByCrireria(criteria,function (err,activities) {
     if(err){
-      return res.send(400,errorHelper(err))
+      return res.status(400).send(errorHelper(err))
     }
     res.json(activities);
   })
@@ -212,11 +212,11 @@ exports.activities=function (req,res) {
 exports.sessions = function(req, res) {
   require('mongoose').connection.db.collection('sessions',function(err,sessions){
     if(err){
-      return res.send(400,errorHelper(err))
+      return res.status(400).send(errorHelper(err))
     }
     sessions.find({}).toArray(function(err,sess){
       if(err){
-        return res.send(400,errorHelper(err))
+        return res.status(400).send(errorHelper(err))
       }
       return res.json(sess)
     })
@@ -237,7 +237,7 @@ exports.sitemap=function(req,res){
   // else
   require('mongoose').model('Products').findByCriteria({'query.status':true,'available':true},function(err,products){
     if(err){
-      return req.send(400,errorHelper(err))
+      return req.status(400).send(errorHelper(err))
     }
     var prefix="/products/";
     var urls=[], lastm;
@@ -276,7 +276,7 @@ exports.robots=function(req,res){
   rb+="Allow: /v1/category\n";
   rb+="Allow: /v1/cdn\n";
   rb+="Allow: /v1/shops\n";
-  res.send(200,rb);
+  res.status(200).send(rb);
 }
 
 
@@ -294,13 +294,13 @@ exports.github=function(req,res){
   //
   // checks webhook config 
   if(!config.admin.webhook||!config.admin.webhook.secret){
-    return res.send(400,'CI error (1)')
+    return res.status(400).send('CI error (1)')
   }
 
   //
   // checks push release
   if(req.body.ref.indexOf(config.admin.webhook.release)===-1){
-    return res.send(400,'CI error (2)')    
+    return res.status(400).send('CI error (2)')    
   }
 
   //
@@ -312,16 +312,16 @@ exports.github=function(req,res){
 
 
   if(!sig||!event||!id){
-    return res.send(400,'CI error (3)')
+    return res.status(400).send('CI error (3)')
   }
 
   if(sig!==verify){
     console.log('gihub sig verification error',sig,verify)
-    return res.send(400,'CI verification error')
+    return res.status(400).send('CI verification error')
   }
 
   if (req.body.ref.indexOf(config.admin.webhook.release)===-1) {
-    return res.send(200)
+    return res.sendStatus(200)
   }
 
   console.log('============')
@@ -337,5 +337,5 @@ exports.github=function(req,res){
   });
 
   // CI done
-  return res.send(200)
+  return res.sendStatus(200)
 }
