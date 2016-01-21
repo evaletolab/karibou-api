@@ -34,7 +34,7 @@ exports.ensureAdminOrOwner=function (req, res, next) {
   return next();
 }
 
-exports.listWallet=function (req,res) {
+exports.listGiftWallet=function (req,res) {
   var filters={};
   if(!req.user.isAdmin()){
     filters.id=req.user.id;
@@ -42,8 +42,47 @@ exports.listWallet=function (req,res) {
   if(req.query.id){
     filters.id=req.query.id;
   }
+  if(req.query.email){
+    filters.email=req.query.email+'';
+  }
+
+  if(req.query.gt){
+    filters.gt=parseFloat(req.query.gt)
+  }
+  if(req.query.lt){
+    filters.lt=parseFloat(req.query.lt)
+  }
+
 
   bank.wallet.retrieveAllGift(filters).then(function (wallets) {
+    res.json(wallets);
+  }).then(undefined, function (error) {
+    return res.status(400).send(error.message||error);
+  });
+
+};
+
+exports.listAllWallet=function (req,res) {
+  var filters={};
+  if(!req.user.isAdmin()){
+    filters.id=req.user.id;
+  }else
+  if(req.query.id){
+    filters.id=req.query.id;
+  }
+  if(req.query.email){
+    filters.email=req.query.email+'';
+  }
+
+  if(req.query.gt){
+    filters.gt=parseFloat(req.query.gt)
+  }
+  if(req.query.lt){
+    filters.lt=parseFloat(req.query.lt)
+  }
+
+
+  bank.wallet.retrieveAll(filters).then(function (wallets) {
     res.json(wallets);
   }).then(undefined, function (error) {
     return res.status(400).send(error.message||error);
