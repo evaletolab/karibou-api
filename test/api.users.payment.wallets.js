@@ -110,16 +110,29 @@ describe("api.wallets", function(){
       });
     });  
 
-    it('GET /v1/wallets for non admin should return 200',function(done){
+    it('GET /v1/wallets/giftcard for non admin should return 200',function(done){
+      request(app)
+        .get('/v1/wallets/giftcard')
+        .set('cookie', delphine.cookie)
+        .end(function (err,res) {
+          res.should.have.status(200);
+          done()
+        });
+    });
+
+    it('GET /v1/wallets for non admin should return 401',function(done){
       request(app)
         .get('/v1/wallets')
         .set('cookie', delphine.cookie)
-        .expect(200,done);
+        .end(function (err,res) {
+          res.should.have.status(401);
+          done()
+        });
     });
 
-    it('GET /v1/wallets for admin should return 200',function(done){
+    it('GET /v1/wallets/giftcard for admin should return 200',function(done){
       request(app)
-        .get('/v1/wallets')
+        .get('/v1/wallets/giftcard')
         .set('cookie', admin.cookie)
         .end(function (err,res) {
           res.should.have.status(200);
@@ -127,6 +140,7 @@ describe("api.wallets", function(){
           done()
         });
     });
+
 
     it('GET /v1/wallets/012345 should return 401',function(done){
       request(app)
