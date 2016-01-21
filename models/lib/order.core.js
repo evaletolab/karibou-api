@@ -249,6 +249,25 @@ exports.updateLogistic = function(query,options, callback){
   assert(options);
   var saveTasks=[], Q=require('q');
 
+  //
+  // this is the simple case, just update the logistic price
+  if(!isNaN(parseFloat(options.amount))){
+    if(!query.oid){
+      return callback('updateLogistic missing order selector ')
+    }
+    return this.findOne(query,function(err,order){
+      if(err){
+        return callback(err)
+      } 
+      order.payment.fees.shipping=parseFloat(options.amount);
+      order.save(function (err) {
+        if(err){return callback(err)}
+        callback(null,order)
+      });
+
+    });
+  }
+
   if(options.status === undefined && options.bags===undefined){
     return callback("updateLogistic missing shipping param");          
   }

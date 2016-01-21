@@ -96,6 +96,15 @@ describe("orders.logistic", function(){
     })
   });
 
+  it('change order shipping fees ',function(done){
+    Orders.updateLogistic({oid:2000007}, {amount:1.40},function (err, order) {
+      should.not.exist(err)
+      should.exist(order)
+      order.payment.fees.shipping.should.equal(1.4)
+      done()
+    })
+  });
+
 
   it('mark order collected get an error when missing date',function(done){
     Orders.updateLogistic({'vendors.slug':'un-autre-shop'}, {status:true},function (err, orders) {
