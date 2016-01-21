@@ -431,7 +431,10 @@ exports.updateShipping=function(req,res){
   // check && validate input 
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt();
-    validate.check(req.body.status, "Le status de logistique n'est pas valide").isBoolean();
+    if(!req.body.status&&req.body.amount===undefined){
+      throw new Error("La logistique ne peut pas être modifiée de cette manière");
+    }
+    validate.ifCheck(req.body.status, "Le status de logistique n'est pas valide").isBoolean();
     validate.ifCheck(req.body.bags, "Le nombre de sac n'est pas valide").isInt();
   }catch(err){
     return res.status(400).send( err.message);
