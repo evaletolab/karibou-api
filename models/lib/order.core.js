@@ -251,7 +251,7 @@ exports.updateLogistic = function(query,options, callback){
 
   //
   // this is the simple case, just update the logistic price
-  if(parseFloat(options.amount)!==NaN){
+  if(!isNaN(parseFloat(options.amount))){
     if(!query.oid){
       return callback('updateLogistic missing order selector ')
     }
@@ -262,7 +262,7 @@ exports.updateLogistic = function(query,options, callback){
       order.payment.fees.shipping=parseFloat(options.amount);
       order.save(function (err) {
         if(err){return callback(err)}
-        callback(0,order)
+        callback(null,order)
       });
 
     });
