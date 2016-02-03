@@ -16,6 +16,14 @@ exports.createWallet=function (walletInfo) {
   check(walletInfo.payment.alias,  "Ce mode de paiement n'est pas valide").isText().len(6,256);
 }
 
+exports.creditWallet=function (walletInfo) {
+  check(walletInfo.amount,"La valeur du montant n'est pas valide").isFloat();
+  if(['credit','debit'].indexOf(walletInfo.type)===-1){
+    throw new Error("Ce type de paiement n'est pas valide");
+  }
+  ifCheck(walletInfo.refid,  "La REF du paiement n'est pas valide").isText().len(0,512);
+  check(walletInfo.description,  "La description du paiement n'est pas valide").isText().len(6,512);
+}
 
 exports.registerWallet=function (card) {
   if(!card){

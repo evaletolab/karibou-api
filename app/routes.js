@@ -80,8 +80,10 @@ module.exports = function(app, config, passport) {
   app.get ('/v1/wallets/giftcard/:card', auth.ensureAuthenticated,wallets.getGiftWallet);
   app.get ('/v1/wallets/:alias', wallets.ensureAdminOrOwner,wallets.getWallet);
   app.post('/v1/wallets', auth.ensureAuthenticated,wallets.createWallet);
-  app.post('/v1/wallets/:alias', wallets.ensureAdminOrOwner,wallets.updateWallet);
   app.post('/v1/wallets/register/:alias', wallets.ensureAdminOrOwner,wallets.registerGiftcode);
+  app.post('/v1/wallets/expiry/:wid', auth.ensureAdmin,wallets.updateExpiry);
+  app.post('/v1/wallets/credit/:wid', auth.ensureAdmin,wallets.creditWallet);
+  app.post('/v1/wallets/:wid', auth.ensureAdmin,wallets.updateBANK);
 
 
   //
