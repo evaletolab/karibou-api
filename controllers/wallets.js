@@ -316,7 +316,7 @@ exports.creditWallet=function (req,res) {
     return res.json(wallet);    
   }
   ).then(undefined, function (err) {
-    bus.emit('activity.error',req.user,{type:'Wallets',key:'wid',id:wallet.wid},err);
+    //bus.emit('activity.error',req.user,{type:'Wallets',key:'wid'},err);
     return res.status(400).send(err.message||errorHelper(err))
   });
 
