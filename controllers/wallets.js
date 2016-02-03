@@ -303,6 +303,8 @@ exports.creditWallet=function (req,res) {
     var bank_tr={
       iban:req.body.bank.iban,
       bic:req.body.bank.bic,
+      account:req.body.bank.account,
+      sic:req.body.bank.sic,
       name:req.body.bank.name
     };
 
