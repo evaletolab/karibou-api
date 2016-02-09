@@ -17,6 +17,7 @@ var express = require('express')
   , helmet=require('helmet')
 //  , flash = require('connect-flash')
 //  , helpers = require('view-helpers')
+  , i18n = require("i18n-2")
   , pkg = require('../package.json');
 
 //
@@ -184,6 +185,32 @@ var tokenSession=function (req, res, next) {
     })
   }
 
+  //
+  // i18n middleware
+  if (config.shared.i18n){
+    i18n.expressBind(app, {
+        locales:config.shared.i18n.locales,
+        defaultLocale: config.shared.i18n.defaultLocale,
+        directory: __dirname + '/locales'
+    });  
+
+
+    // This is how you'd set a locale from req.cookies.
+    // Don't forget to set the cookie either on the client or in your Express app.
+    app.use(function(req, res, next) {
+
+        //
+        // update locale in session
+        if(req.query.lang && config.shared.i18n && config.shared.i18n.locales.indexOf(req.query.lang)!==-1){
+          req.session.lang=req.query.lang;
+        }
+       
+        if(req.session.lang){
+          req.i18n.setLocale(req.session.lang);
+        }
+        next();
+    });
+  }
 
 
   // assume "not found" in the error msgs
