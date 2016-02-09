@@ -25,8 +25,11 @@ config.cors.allowedDomains.forEach(function(origin){
 
 exports.index = function(app){
   return function(req, res) {
+    // route introspection has changed since express 4.0
+    // see http://stackoverflow.com/questions/14934452/how-to-get-all-registered-routes-in-express
+    // based on app._router.stack
     var model={ 
-      api: app.routes, 
+      api: app.mountpath, 
       user: req.user, 
       filter:function(api){
         return _.filter(api, function(route){return route.path.indexOf("/v1")>-1;});

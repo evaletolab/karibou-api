@@ -2,7 +2,10 @@ doctype html
 html(itemscope itemtype="http://schema.org/Product")
   head
     // http://schema.org/Product
-    title: =product.title+' ('+product.pricing.part+')'
+    if product.details.local
+      title: ='Terroir - '+product.title+' ('+product.pricing.part+')'
+    else
+      title: =product.title+' ('+product.pricing.part+')'
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
     meta(name='robots', content='index,follow')
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
@@ -69,7 +72,7 @@ html(itemscope itemtype="http://schema.org/Product")
         if product.details.homemade
           li( class="label label-success") Artisanal
         if product.details.local
-          li(  class="label label-success") Local
+          li(  class="label label-success") Terroir et Local
         if product.details.gluten
           li(  class="label label-success") Sans gluten
         if product.details.bio

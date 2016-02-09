@@ -54,6 +54,7 @@ bus.on('mailchimp.subscribe',mailchimp.subscribe)
 bus.on('activity.create',activity.create);
 bus.on('activity.update',activity.update);
 bus.on('activity.delete',activity.delete);
+bus.on('activity.error',dummy);
 
 //
 // bus.on('',function(mail,cb){})
