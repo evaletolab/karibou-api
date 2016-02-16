@@ -59,7 +59,6 @@ describe("products.find.more", function(){
       should.not.exist(err);
       should.exist(products);
       products.length.should.equal(1)
-      console.log('--------------',products)
       done();
     });  
 
