@@ -6,7 +6,7 @@ var dbtools = require("./fixtures/dbtools");
 var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.more.js']);
 
-describe("api.products.find", function(){
+describe("api.products.find.status", function(){
   var request= require('supertest');
   var _=require('underscore');
   

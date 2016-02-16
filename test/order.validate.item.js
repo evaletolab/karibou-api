@@ -8,7 +8,7 @@ var data = dbtools.fixtures(["Users.js","Categories.js","Orders.validate.js"]);
 
 var Products=db.model('Products')
   , Orders=db.model('Orders')
-  , weekdays=config.shop.order.weekdays
+  , weekdays=config.shared.order.weekdays
   , today=new Date()
   , toshortDay
   , toNextDay
@@ -40,11 +40,11 @@ describe("orders.validate.item", function(){
 
   before(function(done){
 
-    config.shop.order.weekdays=[0,1,2,3,4,5,6];
+    config.shared.order.weekdays=[0,1,2,3,4,5,6];
     toshortDay=Orders.findCurrentShippingDay();
     okDay=Orders.findNextShippingDay();
     okDay.setHours(11,0,0,0)
-    shipping.when=toNextDay=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[3]);
+    shipping.when=toNextDay=Orders.jumpToNextWeekDay(okDay,config.shared.order.weekdays[3]);
     toNextDay.setHours(11,0,0,0)
 
 
@@ -62,7 +62,7 @@ describe("orders.validate.item", function(){
 
   
   after(function(done){
-    config.shop.order.weekdays=weekdays;
+    config.shared.order.weekdays=weekdays;
     dbtools.clean(function(){    
       done();
     });    

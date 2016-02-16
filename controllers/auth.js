@@ -102,7 +102,7 @@ exports.ensureLogisticOrAdmin=function(req,res,next){
 
 exports.checkPassword=function(req, res, next) {
   try{
-    var len=config.shop.system.password.len;
+    var len=config.shared.system.password.len;
     validate.check(req.body.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   }catch(err){  
     return res.status(400).send( err.message);
@@ -148,7 +148,7 @@ exports.login_post=function(req, res, next) {
   // setup a simple timer to prevent scripted multiple post 
   setTimeout(function() {
     passport_Authenticate(req, res, next)
-  }, config.shop.system.post.limitMS);
+  }, config.shared.system.post.limitMS);
 
 };
 
@@ -247,6 +247,6 @@ exports.register_post= function(req, res,next) {
           })
       });
 
-    // }, config.shop.system.post.limitMS);
+    // }, config.shared.system.post.limitMS);
 };
 

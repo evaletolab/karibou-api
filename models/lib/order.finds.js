@@ -11,7 +11,7 @@ exports.findByTimeoutAndNotPaid = function(callback){
   var q={
     closed:null,
     "payment.status":{'$nin':['paid','authorized']},
-    created:{"$lte": new Date().getTime()-config.shop.order.timeoutAndNotPaid*1000}
+    created:{"$lte": new Date().getTime()-config.shared.order.timeoutAndNotPaid*1000}
   }
 
 

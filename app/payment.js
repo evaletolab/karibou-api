@@ -260,9 +260,9 @@ Payment.prototype.for=function(issuer){
 //
 // compute fees in regard of issuer
 Payment.prototype.fees=function(issuer, amount){
-  for(var p in config.shop.order.gateway){
-    if(config.shop.order.gateway[p].label===issuer){
-      return config.shop.order.gateway[p].fees*amount
+  for(var p in config.shared.order.gateway){
+    if(config.shared.order.gateway[p].label===issuer){
+      return config.shared.order.gateway[p].fees*amount
     }
   }
   // 

@@ -62,6 +62,12 @@ mongoose.connect(config.mongo.name,{server:{safe:true, auto_reconnect:true}},fun
     }
 });
 
+//mongoose.set('debug', function (collectionName, method, query, doc) {
+ // Here query is what you are looking for.
+ // so whatever you want to do with the query
+ // would be done in here
+ // console.log('DEBUG ------------------',query)
+//})
 
 //
 // configure karibou-wallet
@@ -103,7 +109,7 @@ mongoose.model('Config').getMain(function(err,c){
     console.log('Ooops error when reading stored config',err)
     process.exit(1)    
   }
-  _.extend(config.shop,c)
+  _.extend(config.shared,c)
 })
 
 var app = express()
@@ -147,9 +153,9 @@ var host = (process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP
 
 var count=0;
 app.listen(app.get('port'),host).on('connection', function(socket) {
-  console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
+  // console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
   socket.on('end',function(){
-    console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
+    // console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
   })
 
 })

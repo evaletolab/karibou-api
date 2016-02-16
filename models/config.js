@@ -16,17 +16,57 @@ var Config = new Schema({
     //
     // display message wheb maintenance (that mean that all shipping are off)
     maintenance:{
-      reason:{type:String},
+      reason:{en:String,fr:String,de:String},
       active:{type:Boolean,default:false}
     },
 
     //
     // display message on front
     messages:[{
-      content:{type: String},
+      content:{en:String,fr:String,de:String},
       active:{type: Boolean,default:false},
       updated:{type:Date, default: Date.now}
     }],
+
+
+    //
+    // home
+    home:{
+      // display love in home?
+      love:Boolean,
+      // display campagn page in home?
+      path:String,
+      about:{
+        en:String,
+        de:String,
+        fr:String,
+        image:String
+      },
+      siteName:{
+        en:String,
+        de:String,
+        fr:String,
+        image:String
+      },
+      tagLine:{
+        en:String,
+        de:String,
+        fr:String,
+        image:String
+      },
+      footer:{
+        en:String,
+        de:String,
+        fr:String,
+        image:String
+      },
+      views:[{
+        name:{en:String,fr:String,de:String},
+        weight:{type:Number,default:1},
+        url:String
+      }]
+    },
+
 
     // 
     // select no shipping dates
@@ -37,11 +77,15 @@ var Config = new Schema({
     }],
 
     //
-    // home
-    home:{
-      love:Boolean,
-      path:String
-    },
+    // menu
+    menu:[{
+      name:{en:String,fr:String,de:String},
+      url:String,
+      weight:{type:Number,default:1},
+      group:{type:String,default:'main'},
+      active:Boolean
+    }],
+
 
     //
     // defines keys
@@ -75,7 +119,7 @@ Config.statics.saveMain=function(c, cb) {
     if(e){return cb(err)};
     _.extend(conf,c);
     conf.save(function(e,c) {
-      _.extend(config.shop,conf.toObject())
+      _.extend(config.shared,conf.toObject())
       cb(e,c)
     })
   });

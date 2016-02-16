@@ -33,13 +33,13 @@ exports.registerWallet=function (card) {
   check(card.name,  "Le nom associé à votre carte n'est pas valide").isText().len(6,150);
 }
 
-exports.document=function (doc) {
+exports.document=function (doc, lang) {
     // check(doc.created,"La date de création n'est pas valide").isDate();
     // check(doc.updated,"La date de création n'est pas valide").isDate();
-    check(doc.title,"Le titre n'est pas valide").isText().len(2, 100);
-    check(doc.content,"Le contenu n'est pas valide (max 1'500 caratères)").isText().len(2, 1500);
+    check(doc.title[lang],"Le titre n'est pas valide").isText().len(2, 100);
+    check(doc.content[lang],"Le contenu n'est pas valide (max 1'500 caratères)").isText().len(2, 1500);
 
-    ifCheck(doc.photo.header,"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
+    ifCheck(doc.photo.header[lang],"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
 
     for( var i in doc.photo.bundle){
       check(doc.photo.bundle[i],"Le photo n'est pas valide (2)").len(6, 200).isImgUrl();
@@ -49,7 +49,7 @@ exports.document=function (doc) {
       check(doc.skus[i],"Le SKU du produit n'est pas valide: "+doc.skus[i]).isNumeric();
     };
 
-    if(config.shop.document.types.indexOf(doc.type)===-1){
+    if(config.shared.document.types.indexOf(doc.type)===-1){
       throw new Error("Le type du document n'est pas valable ");
     }
 
@@ -57,11 +57,11 @@ exports.document=function (doc) {
     check(doc.published,"La validité du produit n'est pas valide: "+doc.published).isBoolean();
 }
 
-exports.config = function(conf){
+exports.config = function(conf,lang){
   for( var i in conf.noshipping){
     check(conf.noshipping[i].from,"La date de fermeture n'est pas valide").isDate();
     check(conf.noshipping[i].to,"La date de réouverture n'est pas valide").isDate();
-    check(conf.noshipping[i].reason,"La description pour l'interruption des livraisons n'est pas valide").isText().len(2, 300);
+    check(conf.noshipping[i].reason[lang],"La description pour l'interruption des livraisons n'est pas valide").isText().len(2, 300);
   }
 }
 
@@ -130,20 +130,20 @@ exports.payment=function(payment, alias){
 
 
 exports.password=function(auth){
-  var len=config.shop.system.password.len;
+  var len=config.shared.system.password.len;
   check(auth.new,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   check(auth.email,"Entrez une adresse mail valide").isEmail();
 }
 
 exports.authenticate=function(auth){
-  var len=config.shop.system.password.len;
+  var len=config.shared.system.password.len;
   check(auth.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   check(auth.email,"Entrez une adresse mail valide").isEmail();
   check(auth.provider,"Erreur interne de format [provider]").len(3, 64);
 }
 
 exports.register=function(auth){
-  var len=config.shop.system.password.len;
+  var len=config.shared.system.password.len;
   check(auth.password,"Votre mot de passe doit contenir au moins "+len+" caractères").len(len, 64);
   check(auth.email,"Entrez une adresse mail valide").isEmail();
   check(auth.lastname,"Le format du nom doit contenir au moins 2 caractères").isText().len(2, 64);

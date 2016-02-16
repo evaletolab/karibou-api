@@ -6,7 +6,7 @@ var dbtools = require("./fixtures/dbtools");
 var should = require("should");require("should-http");
 var data = dbtools.fixtures(["Users.js","Categories.js","Shops.js",'Products.more.js']);
 
-describe("api.products.find", function(){
+describe("DEPRECATED api.products.find.sort", function(){
   var request= require('supertest');
 
   var _=require('underscore');
@@ -28,7 +28,7 @@ describe("api.products.find", function(){
   });
 
   /** SORTING AND GROUPING */
-  it("GET 200,/v1/products?sort=categories.weight", function(done){
+  it.skip("GET 200,/v1/products?sort=categories.weight", function(done){
     request(app)
       .get("/v1/products?sort=categories.weight")
       .expect('Content-Type', /json/)
@@ -44,7 +44,7 @@ describe("api.products.find", function(){
       });
   });
 
-  it("GET 200,/v1/products?sort=categories.name", function(done){
+  it.skip("GET 200,/v1/products?sort=categories.name", function(done){
     request(app)
       .get("/v1/products?sort=categories.name")
       .expect('Content-Type', /json/)
@@ -60,7 +60,7 @@ describe("api.products.find", function(){
       });
   });
 
-  it("GET 200,/v1/products?group=categories.name&sort=categories.name", function(done){
+  it.skip("GET 200,/v1/products?group=categories.name&sort=categories.name", function(done){
     request(app)
       .get("/v1/products?group=categories.name&sort=categories.name")
       .expect('Content-Type', /json/)

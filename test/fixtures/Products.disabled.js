@@ -12,7 +12,7 @@ var more=require('./Users');
 var Orders=require('mongoose').model('Orders');
 var closed=Orders.findNextShippingDay();
 closed.setHours(0,1,0,0);
-var when1=Orders.jumpToNextWeekDay(closed,config.shop.order.weekdays[2]);
+var when1=Orders.jumpToNextWeekDay(closed,config.shared.order.weekdays[2]);
 var when2=new Date(when1.getTime()+86400000*10);
 var when3=new Date(when1.getTime()-86400000*20);
 var when4=new Date(when1.getTime()-86400000*19);

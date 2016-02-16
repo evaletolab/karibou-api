@@ -2,16 +2,16 @@ var ObjectId = require('mongodb').ObjectID;
 var c=require('./Categories');
 var u=require('./Users');
 var Orders=require('mongoose').model('Orders');
-var weekdays=config.shop.order.weekdays;
+var weekdays=config.shared.order.weekdays;
 
 //
 // use the same dates in the test and this fixture
 
-config.shop.order.weekdays=[0,1,2,3,4,5,6];
+config.shared.order.weekdays=[0,1,2,3,4,5,6];
 var okDay=Orders.findNextShippingDay();
-var when1=Orders.jumpToNextWeekDay(okDay,config.shop.order.weekdays[2]);
+var when1=Orders.jumpToNextWeekDay(okDay,config.shared.order.weekdays[2]);
 var when2=new Date(when1.getTime()+86400000*3);
-config.shop.order.weekdays=weekdays;
+config.shared.order.weekdays=weekdays;
 
 // console.log('---------------ok',okDay);
 // console.log('---------------when1',when1);

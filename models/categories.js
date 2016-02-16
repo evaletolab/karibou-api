@@ -18,7 +18,7 @@ var Categories = new Schema({
     cover:{type:String, unique:false},
     color:{type:String, unique:false},    
     weight:{type:Number, min:0},    
-    type:{type:String, unique:false, default:"Category",enum:config.shop.category.types}
+    type:{type:String, unique:false, default:"Category",enum:config.shared.category.types}
 });
 
 

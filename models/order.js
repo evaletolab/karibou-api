@@ -38,12 +38,12 @@ if(config.mongo.multiple){
 //  });
 
 // Orders Model
-var EnumOrderStatus    =config.shop.order.status;
-var EnumCancelReason   =config.shop.order.cancelreason;
-var EnumFinancialStatus=config.shop.order.financialstatus;
-var EnumOrderMethod   =_.map(config.shop.order.gateway,
+var EnumOrderStatus    =config.shared.order.status;
+var EnumCancelReason   =config.shared.order.cancelreason;
+var EnumFinancialStatus=config.shared.order.financialstatus;
+var EnumOrderMethod   =_.map(config.shared.order.gateway,
                             function(e){return e.label});
-var EnumShippingMode   =config.shop.order.shippingmode;
+var EnumShippingMode   =config.shared.order.shippingmode;
 
 var Orders = new Schema({
    /** order identifier */
@@ -81,6 +81,10 @@ var Orders = new Schema({
       fees:{
         charge:Number,
         shipping:{type:Number}
+      },
+      correction:{
+        amount:Number,
+        transaction:{type:String,select:false}
       },
       /*for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
@@ -286,7 +290,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   }
 
   //
-  // check that vendor shipping day is available for: config.shop.order.weekdays
+  // check that vendor shipping day is available for: config.shared.order.weekdays
 
   if (product.vendor.available.weekdays&&product.vendor.available.weekdays.indexOf(shipping.when.getDay())==-1){
     return cb(msg9+product.vendor.name,item)
@@ -311,7 +315,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
 
   // override address based on marketplace        
   if(product.vendor.marketplace.length){
-    config.shop.marketplace.list.every(function(place){
+    config.shared.marketplace.list.every(function(place){
       // check place with date
       if(place.d&&place.d===shipping.when.getDay()){
         address=place.name;

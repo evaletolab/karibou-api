@@ -12,9 +12,9 @@ var Products=db.model('Products')
   , today=new Date()
   , toshortDay
   , okDay
-  , timelimitH=config.shop.order.timelimitH
-  , timelimit=config.shop.order.timelimit
-  , timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
+  , timelimitH=config.shared.order.timelimitH
+  , timelimit=config.shared.order.timelimit
+  , timeoutAndNotPaid=config.shared.order.timeoutAndNotPaid;
 
 
 
@@ -28,7 +28,7 @@ describe("orders.payment", function(){
 
 
   before(function(done){
-    config.shop.order.gateway[5].fees=0.02
+    config.shared.order.gateway[5].fees=0.02
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.payment.js"],db,function(err){
         should.not.exist(err);
@@ -45,27 +45,27 @@ describe("orders.payment", function(){
 
   
   after(function(done){
-    config.shop.order.gateway[5].fees=0
+    config.shared.order.gateway[5].fees=0
     dbtools.clean(function(){    
-      config.shop.order.timelimitH=timelimitH;
-      config.shop.order.timelimit=timelimit;
-      config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
+      config.shared.order.timelimitH=timelimitH;
+      config.shared.order.timelimit=timelimit;
+      config.shared.order.timeoutAndNotPaid=timeoutAndNotPaid;
       done();
     });    
   });
 
 
   it("Compute issuer fees", function(done){
-    // payment.fees('postfinance card',1).should.equal(config.shop.order.gateway[0].fees);
-    // payment.fees('postfinance card',(1).toFixed(2)).should.equal(config.shop.order.gateway[0].fees);
-    // payment.fees('postfinance card',(36.10).toFixed(2)).toFixed(2).should.equal((config.shop.order.gateway[0].fees*36.10).toFixed(2));
-    // payment.fees('postfinance card','1.00').should.equal(config.shop.order.gateway[0].fees);
-    payment.fees('american express','10').should.equal(config.shop.order.gateway[1].fees*10);
-    payment.fees('visa',1).should.equal(config.shop.order.gateway[2].fees);
-    payment.fees('paypal',1).should.equal(config.shop.order.gateway[4].fees);
-    payment.fees('invoice',1).should.equal(config.shop.order.gateway[5].fees);
-    payment.fees('tester',1).should.equal(config.shop.order.gateway[6].fees);
-    payment.fees('bitcoin',1).should.equal(config.shop.order.gateway[7].fees);
+    // payment.fees('postfinance card',1).should.equal(config.shared.order.gateway[0].fees);
+    // payment.fees('postfinance card',(1).toFixed(2)).should.equal(config.shared.order.gateway[0].fees);
+    // payment.fees('postfinance card',(36.10).toFixed(2)).toFixed(2).should.equal((config.shared.order.gateway[0].fees*36.10).toFixed(2));
+    // payment.fees('postfinance card','1.00').should.equal(config.shared.order.gateway[0].fees);
+    payment.fees('american express','10').should.equal(config.shared.order.gateway[1].fees*10);
+    payment.fees('visa',1).should.equal(config.shared.order.gateway[2].fees);
+    payment.fees('paypal',1).should.equal(config.shared.order.gateway[4].fees);
+    payment.fees('invoice',1).should.equal(config.shared.order.gateway[5].fees);
+    payment.fees('tester',1).should.equal(config.shared.order.gateway[6].fees);
+    payment.fees('bitcoin',1).should.equal(config.shared.order.gateway[7].fees);
     done();
   });   
 

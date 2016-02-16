@@ -105,7 +105,7 @@ PaymentInvoice.prototype.checkCard=function(user,alias){
     }
 
     // check open invoice
-    if(orders.length>config.shop.order.openInvoice){
+    if(orders.length>config.shared.order.openInvoice){
       return deferred.reject(new Error("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes"))
     }
 
@@ -246,7 +246,7 @@ PaymentInvoice.prototype.authorize=function(order){
       }
 
       // check open invoice
-      if(orders.length>config.shop.order.openInvoice){
+      if(orders.length>config.shared.order.openInvoice){
         return callback("Le paiement par facture n'est plus disponible lorqu'il existe des factures ouvertes")
       }
 

@@ -16,7 +16,7 @@ var db = require('mongoose')
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
  var EnumProvider="twitter facebook goolge persona local".split(' ');
- var EnumRegion=config.shop.region.list;
+ var EnumRegion=config.shared.region.list;
 
 
 // validate URL

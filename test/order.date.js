@@ -15,10 +15,10 @@ describe("orders.date", function(){
       weekdays;
 
   before(function(done){
-    timelimitH=config.shop.order.timelimitH;
-    timelimit=config.shop.order.timelimit;
-    timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
-    weekdays=config.shop.order.weekdays;
+    timelimitH=config.shared.order.timelimitH;
+    timelimit=config.shared.order.timelimit;
+    timeoutAndNotPaid=config.shared.order.timeoutAndNotPaid;
+    weekdays=config.shared.order.weekdays;
 
     //Orders.printInfo()
     // var days=['sunday','monday','tuesday', 'wednesday', 'thursday','friday','saturday']
@@ -29,10 +29,10 @@ describe("orders.date", function(){
 
   
   after(function(done){
-    config.shop.order.timelimitH=timelimitH;
-    config.shop.order.timelimit=timelimit;
-    config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
-    config.shop.order.weekdays=weekdays;
+    config.shared.order.timelimitH=timelimitH;
+    config.shared.order.timelimit=timelimit;
+    config.shared.order.timeoutAndNotPaid=timeoutAndNotPaid;
+    config.shared.order.weekdays=weekdays;
     done()
   });
 
@@ -46,8 +46,8 @@ describe("orders.date", function(){
 
 
   it("[SELLER] with a time limit at 23:00PM the current shipping day for seller is today (except for sunday)", function(done){
-    //if today time is > config.shop.order.timelimitH ==> go to next day
-    config.shop.order.timelimitH=23
+    //if today time is > config.shared.order.timelimitH ==> go to next day
+    config.shared.order.timelimitH=23
     var today=new Date(), nextSeller=Orders.findCurrentShippingDay()
 
 
@@ -63,8 +63,8 @@ describe("orders.date", function(){
   });
 
   it("[SELLER] with a time limit at 1:00AM the current shipping day for seller is today (except for sunday+1)", function(done){
-    //if today time is > config.shop.order.timelimitH ==> go to next day
-    config.shop.order.timelimitH=1
+    //if today time is > config.shared.order.timelimitH ==> go to next day
+    config.shared.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findCurrentShippingDay()
     //console.log('------> today %d, nextSeller day %d',today.getDay(),nextSeller.getDay())
 
@@ -82,8 +82,8 @@ describe("orders.date", function(){
 
 
   it("[CUSTOMER] with a preparation time limit of 24H before 23:00 the current shipping day is today+1 (except for saturday+2)", function(done){
-    config.shop.order.timelimit=24
-    config.shop.order.timelimitH=23
+    config.shared.order.timelimit=24
+    config.shared.order.timelimitH=23
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
@@ -99,8 +99,8 @@ describe("orders.date", function(){
 
 
   it("[CUSTOMER] with a preparation time limit of 24H before 1:00 the current shipping day is today+2 (except for friday+3)", function(done){
-    config.shop.order.timelimit=24
-    config.shop.order.timelimitH=1
+    config.shared.order.timelimit=24
+    config.shared.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
@@ -115,8 +115,8 @@ describe("orders.date", function(){
   });  
 
   it("[CUSTOMER] with a preparation time limit of 48H before 23:00 the current shipping day is today+2 (except for friday+3)", function(done){
-    config.shop.order.timelimit=48
-    config.shop.order.timelimitH=23
+    config.shared.order.timelimit=48
+    config.shared.order.timelimitH=23
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
@@ -132,8 +132,8 @@ describe("orders.date", function(){
 
 
   it("[CUSTOMER] with a preparation time limit of 48H before 1:00 the current shipping day is today+3 (except for wednesday+4)", function(done){
-    config.shop.order.timelimit=48
-    config.shop.order.timelimitH=1
+    config.shared.order.timelimit=48
+    config.shared.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
@@ -148,8 +148,8 @@ describe("orders.date", function(){
   });
 
   it("[CUSTOMER] with a preparation time limit of 49H before 1:00 the current shipping day is today+4 (except for tuesday+5)", function(done){
-    config.shop.order.timelimit=49
-    config.shop.order.timelimitH=1
+    config.shared.order.timelimit=49
+    config.shared.order.timelimitH=1
     var today=new Date(), nextSeller=Orders.findNextShippingDay()
 
     //
@@ -164,18 +164,18 @@ describe("orders.date", function(){
   });
 
   it("[CUSTOMER] one week of shipping days", function(done){
-    config.shop.order.timelimit=24
-    config.shop.order.timelimitH=1
+    config.shared.order.timelimit=24
+    config.shared.order.timelimitH=1
     var today=new Date(), all=Orders.findOneWeekOfShippingDay()
 
-    config.shop.order.timelimit.should.not.be.above((all[0].getTime()-Date.now())/3600000)
+    config.shared.order.timelimit.should.not.be.above((all[0].getTime()-Date.now())/3600000)
 
     parseFloat((all[all.length-1].getTime()-all[0].getTime())/86400000).should.be.below(7)
 
     all.forEach(function(n,i){
       // deprecated use containEql(n.getDay())
-      n.getHours().should.not.be.above(config.shop.order.timelimitH)
-      config.shop.order.weekdays.should.containEql(n.getDay())
+      n.getHours().should.not.be.above(config.shared.order.timelimitH)
+      config.shared.order.weekdays.should.containEql(n.getDay())
     })
     
 
@@ -183,11 +183,11 @@ describe("orders.date", function(){
   });  
 
   it("A[CUSTOMER] preparing the order at sunday, the delivery day is wednesday", function(done){
-    config.shop.order.weekdays=[0,1,2,3,4,5,6]
-    config.shop.order.timelimit=41  
-    config.shop.order.timelimitH=1
+    config.shared.order.weekdays=[0,1,2,3,4,5,6]
+    config.shared.order.timelimit=41  
+    config.shared.order.timelimitH=1
     var today=new Date();
-    delete config.shop.order.weekdays[(today.getDay())]
+    delete config.shared.order.weekdays[(today.getDay())]
     Orders.findNextShippingDay().getDay().should.equal((today.getDay()+3)%7)      
     done();
   });

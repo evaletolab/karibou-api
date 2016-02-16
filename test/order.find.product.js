@@ -53,34 +53,73 @@ describe("orders.find.product", function(){
   });
 
   it("find popular product for user evaleto", function(done){
+    // popular evaleto
+    // 1000004 2
+    // 1000002 4
+    // 1000003 2
+    // 1000001 1    
     var criteria={
       email: "evaleto@gmail.com",
+      windowtime:2,
+      minhit:1,
+      maxcat:4,     
     }
-    db.model('Products').findPopularByUser(criteria, function(err,products){
-      should.not.exist(err)
+    db.model('Products').findPopular(criteria, function(err,products){
+      should.not.exist(err);
       products.length.should.equal(4)
       done();
     });
   });
 
+  it("find popular product for user evaleto (maxcat=1)", function(done){
+    // popular evaleto
+    // 1000002 4
+    // 1000003 2
+    // 1000001 1    
+    var criteria={
+      email: "evaleto@gmail.com",
+      windowtime:2,
+      minhit:1,
+      maxcat:1,     
+    }
+    db.model('Products').findPopular(criteria, function(err,products){
+      should.not.exist(err);
+      products.length.should.equal(3)
+      done();
+    });
+  });
   it("find popular product for user delphine", function(done){
+    // popular delphine
+    // 1000003 1
+    // 1000002 1
+    // 1000004 1    
     var criteria={
       email: "delphine@gmail.com",
+      windowtime:2,
+      minhit:1,
+      maxcat:4
     }
-    db.model('Products').findPopularByUser(criteria, function(err,products){
-      should.not.exist(err)
+    db.model('Products').findPopular(criteria, function(err,products){
+      should.not.exist(err);
       products.length.should.equal(3)
       done();
     });
   });
 
   it("find popular && liked product for user evaleto", function(done){
+    // popular & likes evaleto
+    // 1000005 love
+    // 1000004 2
+    // 1000002 4
+    // 1000003 2
+    // 1000001 1
+
     var criteria={
       email: "evaleto@gmail.com",
       likes:[1000005]
     }
-    db.model('Products').findPopularByUser(criteria, function(err,products){
-      should.not.exist(err)
+    db.model('Products').findPopular(criteria, function(err,products){
+      should.not.exist(err);
       products.length.should.equal(5)
       // products.should.containEql(1000005)
       // products.forEach(function (product) {
@@ -90,6 +129,23 @@ describe("orders.find.product", function(){
     });
   });
 
+  it("find popular product for all users ", function(done){
+    // TODO fixture is incomplet popular for all 
+    // 1000004 2
+    // 1000002 4
+    // 1000003 2
+    // 1000001 1
+    var criteria={
+      windowtime:2,
+      minhit:1,
+      maxcat:4
+    }
+    db.model('Products').findPopular(criteria, function(err,products){
+      should.not.exist(err)
+      products.length.should.equal(4)
+      done();
+    });
+  });
 
 });
 

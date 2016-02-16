@@ -13,7 +13,7 @@ var db = require('mongoose'),
 exports.index = function(app){
   return function(req, res) {
     var model={ 
-      api: app.routes, 
+      api: app._router.stack, 
       user: req.user, 
       _:_, 
       filter:function(api){

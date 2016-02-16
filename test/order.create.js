@@ -26,7 +26,7 @@ describe("orders.create", function(){
           },
           primary: true,
           region: "GE",
-          when:Orders.jumpToNextWeekDay(new Date(),config.shop.order.weekdays[0])
+          when:Orders.jumpToNextWeekDay(new Date(),config.shared.order.weekdays[0])
       }
     , payment={alias:((customer.id+'').hash().crypt()),issuer:"tester",number:'12xxxxxxxxx3456'},
     okDay,
@@ -37,8 +37,8 @@ describe("orders.create", function(){
   before(function(done){
 
     // init dates
-    //config.shop.order.weekdays=[0,1,2,3,4,5,6]
-    weekdays=config.shop.order.weekdays;
+    //config.shared.order.weekdays=[0,1,2,3,4,5,6]
+    weekdays=config.shared.order.weekdays;
     okDay=Orders.findNextShippingDay();
     toshortDay=Orders.findCurrentShippingDay();
     okDayBadTime=new Date(okDay)
@@ -57,7 +57,7 @@ describe("orders.create", function(){
 
   
   after(function(done){
-    config.shop.order.weekdays=weekdays;
+    config.shared.order.weekdays=weekdays;
     dbtools.clean(function(){    
       done();
     });    
@@ -332,7 +332,7 @@ describe("orders.create", function(){
     });
   });    
 
-  it("Error:selected shipping day is to short to prepare an order (date < config.shop.order.timelimit)", function(done){
+  it("Error:selected shipping day is to short to prepare an order (date < config.shared.order.timelimit)", function(done){
     shipping.when=toshortDay;
     items=[]
     items.push(Orders.prepare(data.Products[0], 1, ""))

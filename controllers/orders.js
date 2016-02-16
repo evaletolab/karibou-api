@@ -140,12 +140,12 @@ function parseCriteria(criteria, req){
   }
 
   if (req.query.payment &&
-      config.shop.order.financialstatus.indexOf(req.query.payment)!=-1){
+      config.shared.order.financialstatus.indexOf(req.query.payment)!=-1){
     criteria.payment=req.query.payment
   }
 
   if (req.query.reason &&
-      config.shop.order.cancelreason.indexOf(req.query.reason)!=-1){
+      config.shared.order.cancelreason.indexOf(req.query.reason)!=-1){
     criteria.reason=req.query.reason
   }
 
@@ -153,7 +153,7 @@ function parseCriteria(criteria, req){
   if (req.query.fulfillments){
     // check all status? generate error?
     req.query.fulfillments.split(',').forEach(function (fulfillment) {
-      // (config.shop.order.status.indexOf(fulfillment)!=-1)
+      // (config.shared.order.status.indexOf(fulfillment)!=-1)
     })
     criteria.fulfillment=req.query.fulfillments
   }

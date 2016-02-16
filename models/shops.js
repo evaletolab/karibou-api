@@ -8,8 +8,8 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
   
-var EnumPlace=config.shop.marketplace.list;
-var EnumRegion=config.shop.region.list;
+var EnumPlace=config.shared.marketplace.list;
+var EnumRegion=config.shared.region.list;
 
 var Shops = new Schema({
     version:{type:Number, default: 1},
@@ -86,7 +86,7 @@ var Shops = new Schema({
     // - > is available/displayed for shop owner and admin ONLY
     // - > is saved on each order to compute bill 
     account:{
-      fees:{type:Number,select:false, default:config.shop.generalFees},
+      fees:{type:Number,select:false, default:config.shared.generalFees},
       updated:{type:Date, default: Date.now}
     },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
