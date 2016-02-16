@@ -169,13 +169,6 @@ exports.getGiftWallet=function (req,res) {
 
 };
 
-exports.updateWallet=function (req,res) {
-  var alias=payment.for('wallet').decodeAlias(req.params.alias,req.user),giftcard;
-  if(!alias){
-    return res.status(400).send("Wrong wallet id");
-  }
-  res.status(400).send('Not implemented');
-};
 
 exports.createWallet=function (req,res) {
   try{
@@ -187,6 +180,7 @@ exports.createWallet=function (req,res) {
   var alias=req.body.payment.alias;
   var amount=parseFloat(req.body.amount);
   var charged=0;
+  var stripeCharge={};
 
   //
   // 
@@ -200,13 +194,13 @@ exports.createWallet=function (req,res) {
     // payment fees makes amout bigger
     assert((charge.amount/100)>=(amount+print));
     charged=charge.amount;
-
+    _.extend(stripeCharge,charge);
     //
     // create the giftcode
     var wallet={
       id:req.user.id,
       email:req.user.email.address,
-      description:'Créer une carte kdo karibou',
+      description:'Carte cadeau karibou.ch',
       giftcode:true    
     };
     return bank.wallet.create(wallet);
@@ -217,12 +211,12 @@ exports.createWallet=function (req,res) {
     var transfer={
       amount:Math.round(amount*100),
       description:'Crédit de '+amount+' fr',
+      refid:stripeCharge.id,
       type:'credit'
     };
-    return bank.transfer.create(wallet.wid,transfer);
+    return bank.transfer.create(wallet.wid,transfer,{account:'karibou.ch',name:'stripe'});
   }).then(function (transfer,w) {
-    var wallet=giftcard;
-    return bank.wallet.retrieve(wallet.wid)
+    return bank.wallet.retrieve(giftcard.wid)
   }).then(function (wallet) {
     //
     // send mail
@@ -249,36 +243,82 @@ exports.createWallet=function (req,res) {
 };
 
 
-exports.transferWallet=function (req,res) {
+
+exports.updateBANK=function (req,res) {
+  // req.params.wid
+  // update.name as str
+  // update.external_account => ['bic','name','address1','address2','iban']
+
+
+  var wid=decodeURIComponent(req.params.wid);
+  bank.wallet.updateBank(wid,req.body).then(function (wallet) {
+    res.json(wallet);
+  }).then(undefined, function (err) {
+    return res.status(400).send(err.message||errorHelper(err))
+  });
+
+};
+
+exports.updateExpiry=function (req,res) {
+  // req.params.wid
+  // req.body.expiry => expiry MM/YYYY
+
+  var wid=decodeURIComponent(req.params.wid);
+  bank.wallet.updateExpiry(wid,req.body.expiry).then(function (wallet) {
+    bus.emit('activity.update',req.user,{type:'Wallets',key:'wid',id:wid},req.body);
+    res.json(wallet);
+  }).then(undefined, function (err) {
+    bus.emit('activity.error',req.user,{type:'Wallets',key:'wid',id:wid},{expiry:req.body.expiry,error:err});
+    return res.status(400).send(err.message||errorHelper(err))
+  });
+
+};
+
+
+
+exports.creditWallet=function (req,res) {
   try{
-    validate.createWallet(req.body);
+    validate.creditWallet(req.body);
   }catch(err){
     return res.status(400).send( err.message);
   }
 
-  var userWallet;
-  var wid=req.params.wid;
+  var wid=decodeURIComponent(req.params.wid);
   var amount=parseFloat(req.body.amount);
+
+  //
+  // checking wallet owner
   bank.wallet.retrieve(wid).then(function (wallet) {
+
     //
-    // save the wallet reference    
-    userWallet=wallet;
+    // check transfer wallet.id === req.body.id
+
     var transfer={
       amount:Math.round(amount*100),
-      description:'Crédit de '+req.body.amount+' fr',
-      type:'credit'
+      description:req.body.description,
+      refid:req.body.refid,
+      type:req.body.type,
     };
-    return bank.transfer.create(wallet.wid,transfer);
-  }).then(function (transfer,w) {
-    return bank.wallet.retrieve(userWallet.wid)
-  }).then(function (wallet) {
-    //
-    // send mail
+
+    var bank_tr={
+      iban:req.body.bank.iban,
+      bic:req.body.bank.bic,
+      account:req.body.bank.account,
+      sic:req.body.bank.sic,
+      name:req.body.bank.name
+    };
+
+
+
+    return bank.transfer.create(wid,transfer,bank_tr);
+  }).then(function (transfer,wallet ) {
+
     bus.emit('activity.update',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
 
     return res.json(wallet);    
   }
   ).then(undefined, function (err) {
+    //bus.emit('activity.error',req.user,{type:'Wallets',key:'wid'},err);
     return res.status(400).send(err.message||errorHelper(err))
   });
 
