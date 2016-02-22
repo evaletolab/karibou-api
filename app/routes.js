@@ -174,8 +174,8 @@ module.exports = function(app, config, passport) {
   app.get('/v1/products/shops',shops.ensureOwnerOrAdmin,products.findByOwner);
   app.get('/v1/products/love',auth.ensureAuthenticated,products.love);
   app.get('/v1/products/:sku',products.get);
-  app.get('/v1/products',products.list);
-  app.get('/v1/products/category/:category',products.list);
+  app.get('/v1/products',cached,products.list);
+  app.get('/v1/products/category/:category',cached,products.list);
   app.get('/v1/products/location/:location',products.list);
   app.get('/v1/products/category/:category/details/:details',products.list);
   app.get('/v1/products/location/:location/category/:category',products.list);

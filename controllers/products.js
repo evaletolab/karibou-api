@@ -286,7 +286,11 @@ exports.list=function (req, res) {
       result=result.concat(items);
     }
     result=uniq_sku(result);
-    console.log('--------------- time 1',Date.now()-now);
+    // result=_.sortBy(result,function(prod) {
+    //     return prod.categories.weight;
+    //     // return [prod.category.weight, prod.category.name].join("_");      
+    // })
+    // console.log('--------------- time 1',Date.now()-now);
 
     res.json(result);
   }).then(undefined,function(error) {
