@@ -129,6 +129,20 @@ module.exports = {
 	  apikey:'f39e0560aedf625a03b0b06dbcb015907c1a3736'
 	},
 
+  /**
+   * min (0-59), hour (0-23), day (1-31), month (1-12), weekday (0-6, 0 = Sunday)
+   * example : 10 23 * * 0,3  =>  23:10 each Sunday,Wednesday
+   *           59 * * * * => each 59 minutes 
+   */
+  cron:[
+    {time:'* * * * *',task:'cron.test'},
+    {time:'10 23 * * 0,3',task:'order.mail.havest'},
+    {time:'59 *  * * *',task:'order.mail.customer'}
+  ],
+
+  timezone:"Europe/Zurich",
+
+
  /**
   * Time to validate an email 3 minutes
   */

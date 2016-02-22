@@ -1,8 +1,10 @@
 var bus = require("./bus"),
     mailchimp =require("./bus.routes.mailchimp"),
     activity =require("./bus.routes.activity"),
+    cron =require("./bus.routes.cron")(bus),
     dummy=function(){},
     onTrace, onMessage;
+
 
 
 onTrace=function(token,error){
@@ -24,6 +26,7 @@ onMessage=function(title,content){
 onPush=function(event,git){
   console.log("github ----------------",sig,id,event,req.body)
 }
+
 
 
 //

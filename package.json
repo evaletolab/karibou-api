@@ -13,6 +13,7 @@
     "compression": "^1.6.0",
     "connect-mongo": "0.x",
     "cookie-parser": "1.x",
+    "cron": "^1.1.0",
     "debug": "2.x",
     "ejs": "^1.0.0",
     "email-templates": "1.x",
