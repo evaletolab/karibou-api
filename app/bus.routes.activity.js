@@ -37,3 +37,8 @@ exports.delete=function(who, what, content, cb) {
 };
 
 
+exports.error=function(who, what, content, cb) {
+  what.action='error';
+  return log(who,what,content,cb);
+};
+

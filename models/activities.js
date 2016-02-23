@@ -8,7 +8,7 @@ var debug   = require('debug')('activities')
   , Schema  = mongoose.Schema
   , ObjectId= Schema.Types.ObjectId;
   
-var EnumAction="create update delete".split(' ');
+var EnumAction="create update delete error".split(' ');
 
 
 var Activity = new Schema({
