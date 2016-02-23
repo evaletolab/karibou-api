@@ -265,7 +265,7 @@ exports.list=function (req, res) {
     var result=[], sz,items;
     for(var k in groupedA){
       // init
-      console.log('######## cat',k);
+      // console.log('######## cat',k);
       if(!groupedP[k])groupedP[k]=[];
       if(!groupedD[k])groupedD[k]=[];
       if(!groupedH[k])groupedH[k]=[];
@@ -273,7 +273,7 @@ exports.list=function (req, res) {
       if(!groupedA[k])groupedA[k]=[];
       items=[];
 
-      // console.log('-------------- PDHLA',k,groupedP[k].length,groupedD[k].length,groupedH[k].length,groupedL[k].length,groupedA[k].length);
+      console.log('-------------- PDHLA',k,groupedP[k].length,groupedD[k].length,groupedH[k].length,groupedL[k].length,groupedA[k].length);
 
       items=items.concat(groupedP[k].slice(0,maxcat-1));
       items=items.concat(groupedD[k]);
