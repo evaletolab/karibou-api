@@ -5,6 +5,7 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
+  , Promise = mongoose.Promise
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
   
@@ -185,21 +186,19 @@ Shops.methods.getDiff=function (next) {
 // validate shop
 //   valid: true, invalid: Date, deleted:false
 Shops.methods.updateStatus=function(valid,callback){
-  // special case
-  if (valid===undefined && callback===undefined){
-  }
-  
-  //
-  // 
+  assert(valid!==undefined);  
+  var promise = new Promise;
+  if(callback){promise.addBack(callback);}
+
+  this.status=true;
   if(valid!==true){
     this.status=Date.now();
-    return this.save(callback)
   }
   
-  //
-  // 
-  this.status=true;
-  return this.save(callback)
+  this.save(function(err,user) {
+    promise.resolve(err,user);
+  })
+  return promise;
 }
 
 //

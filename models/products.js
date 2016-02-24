@@ -331,7 +331,7 @@ Product.statics.findPopular = function(criteria, callback){
 
   var skus=[], 
       today=new Date(), 
-      windowtime=(parseInt(criteria.windowtime)||4)-1, 
+      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||3)), 
       thisYear=today.getFullYear(),
       thisMonth=today.getMonth(),
       maxcat=criteria.maxcat||4;
@@ -344,7 +344,10 @@ Product.statics.findPopular = function(criteria, callback){
   }
 
   // constrain popular to a single user
-  var select={ $or:[{'payment.status': 'paid'},{'payment.status': 'invoice'}]};
+  var select={ 
+    $or:[{'payment.status': 'paid'},{'payment.status': 'invoice'}],
+    'shipping.when':{$gte:windowtime}
+  };
   if(criteria.email){
     select.email=criteria.email;
   }

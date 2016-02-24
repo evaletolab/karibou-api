@@ -135,9 +135,8 @@ module.exports = {
    *           59 * * * * => each 59 minutes 
    */
   cron:[
-    {time:'* * * * *',task:'cron.test'},
     {time:'10 23 * * 0,3',task:'order.mail.havest'},
-    {time:'59 *  * * *',task:'order.mail.customer'}
+    {time:'00 *  * * *',task:'order.mail.reminder'}
   ],
 
   timezone:"Europe/Zurich",

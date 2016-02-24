@@ -144,9 +144,9 @@ describe("Users", function(){
      });
    });  
 
-  it.skip("retrieves by email", function(done){
-    db.model('Users').findByEmail(currentUsers.email, function(doc){
-      doc.email.address.should.equal("test@test.com");
+  it("retrieves by email", function(done){
+    db.model('Users').findByEmail("evaleto@gluck.com").then(function(doc){
+      doc.email.address.should.equal("evaleto@gluck.com");
       done();
     });
   });

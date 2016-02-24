@@ -1,6 +1,7 @@
 var bus = require("./bus"),
     mailchimp =require("./bus.routes.mailchimp"),
     activity =require("./bus.routes.activity"),
+    users =require("./bus.routes.users"),
     cron =require("./bus.routes.cron")(bus),
     dummy=function(){},
     onTrace, onMessage;
@@ -45,6 +46,7 @@ bus.on('order.create',dummy)
 bus.on('order.rollback',dummy)
 bus.on('order.update.items',dummy)
 bus.on('order.cancel',dummy)
+bus.on('order.mail.reminder',users.reminder)
 
 //
 // bus message for users

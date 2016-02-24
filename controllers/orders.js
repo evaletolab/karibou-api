@@ -712,7 +712,7 @@ exports.informShopToOrders=function(req,res){
               bus.emit('sendmail',shop.owner.email.address,
                    "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
                     contents[shop.urlpath],"order-prepare",function (err,res) {
-                      if(err){defer.reject(err)}
+                      if(err){return defer.reject(err)}
                       defer.resolve(res)
                     });
               return defer.promise;
