@@ -2,7 +2,7 @@ var Users = require('mongoose').model('Users'),
     Orders=require('mongoose').model('Orders')
     Q=require('q');
   
-exports.reminder=function(cron) {
+exports.reminder=function(cron,bus) {
   var now=new Date(), reminder={
     weekdays:[now.getDay()],
     time:now.getHours()

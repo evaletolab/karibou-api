@@ -10,7 +10,7 @@ module.exports =function(bus) {
   if(config.cron&&config.cron.length){
     config.cron.forEach(function(cron) {
       var job=new CronJob(cron.time, function() {
-        bus.emit(cron.task,cron);
+        bus.emit(cron.task,cron,bus);
       }, null, true, config.timezone);  
 
       console.log('DEBUG cronjob: install task',cron)
