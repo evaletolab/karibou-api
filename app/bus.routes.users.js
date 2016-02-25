@@ -5,12 +5,14 @@ var Users = require('mongoose').model('Users'),
 exports.reminder=function(cron) {
   var now=new Date(), reminder={
     weekdays:[now.getDay()],
-    time:now.getTime()
+    time:now.getHours()
   };
 
+  console.log('----------------- CRON',JSON.stringify(reminder))
   //
   // list all users that subscribe to a reminder!
   Users.findByReminder(reminder).then(function(users) {
+    console.log('----------------- reminder',users.length)
     var promises=users.map(function(user) {
       var defer=Q.defer(), mail={
         user:user,
