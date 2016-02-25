@@ -154,14 +154,14 @@ Product.methods.removeCategories=function(cats,callback){
 
 */
 Product.post('save',function (product) {
-  console.log('-----------------RESET CACHE')
+  // console.log('-----------------RESET CACHE')
   cache.reset();
 });
 
 Product.post('remove',function (product) {
   //
   // clean likes for all users
-  console.log('-----------------RESET CACHE')
+  // console.log('-----------------RESET CACHE')
   cache.reset();
 
   db.model('Users').find({'likes':product.sku}).exec(function (err,users) {
@@ -346,7 +346,7 @@ Product.statics.findPopular = function(criteria, callback){
 
   var skus=[], 
       today=new Date(), 
-      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||3)), 
+      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||1)), 
       thisYear=today.getFullYear(),
       thisMonth=today.getMonth(),
       maxcat=criteria.maxcat||4;
