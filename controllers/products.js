@@ -164,7 +164,6 @@ exports.list=function (req, res) {
   var query=_.extend(req.query,req.params), 
       popular=[],loves=[],discount=[],home=[],promise,promises=[Q.when([])];// set of products
 
-  
   if(!req.user||!req.user.isAdmin()){
     query.status=true;
     //FIXME WTF is this shit req.query.status=req.user.shops??
@@ -176,7 +175,7 @@ exports.list=function (req, res) {
 
   // if popular products are requested  
   // options: email, maxcat,likes,available
-  if(query.popular){
+  if(query.popular && query.email){
     promise=Products.findPopular({email:query.email,status:true, available:query.available,maxcat:query.maxcat});
     promises.push(promise);
     promise.then(function(products) {
@@ -187,7 +186,7 @@ exports.list=function (req, res) {
 
   // in love
   // options user.likes
-  if(query.love){
+  if(query.love&&req.user&&req.user.likes){
     promise=Products.findBySkus(req.user.likes).exec();
     promises.push(promise);
     promise.then(function(products) {
@@ -199,7 +198,7 @@ exports.list=function (req, res) {
 
   //
   // in home
-  if(query.home){
+  if(query.home&&query.maxcat){
     promise=Products.findByCriteria({status:true,instock:true,available:true,home:true});
     promises.push(promise);
     promise.then(function(products) {
