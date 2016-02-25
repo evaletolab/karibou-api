@@ -14,6 +14,7 @@ var _=require('underscore');
 var mongoose = require('mongoose')
   , Orders = mongoose.model('Orders')
   , Schema = mongoose.Schema
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 24,max:50})
   , ObjectId = Schema.Types.ObjectId;
   
 
@@ -152,10 +153,17 @@ Product.methods.removeCategories=function(cats,callback){
 };
 
 */
+Product.post('save',function (product) {
+  console.log('-----------------RESET CACHE')
+  cache.reset();
+});
 
 Product.post('remove',function (product) {
   //
   // clean likes for all users
+  console.log('-----------------RESET CACHE')
+  cache.reset();
+
   db.model('Users').find({'likes':product.sku}).exec(function (err,users) {
     users.forEach(function (user) {
       user.removeLikes(product.sku)
@@ -164,7 +172,6 @@ Product.post('remove',function (product) {
 })
 
 Product.on('index', function(err,o) {
-  console.log('-------------- Product.index',err,o)
 });
 
 Product.methods.getPrice=function(){
@@ -300,6 +307,8 @@ Product.statics.create = function(p,s,callback){
           return callback(err)
         }
 
+        cache.reset();
+
         Products.findOne({_id:product._id})
                .populate('vendor')
                .populate('categories').exec(callback)
@@ -326,8 +335,14 @@ Product.statics.create = function(p,s,callback){
 Product.statics.findPopular = function(criteria, callback){
   assert(criteria);
 
-  var promise = new mongoose.Promise;
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria);
   if(callback){promise.addBack(callback);}
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
 
   var skus=[], 
       today=new Date(), 
@@ -336,12 +351,6 @@ Product.statics.findPopular = function(criteria, callback){
       thisMonth=today.getMonth(),
       maxcat=criteria.maxcat||4;
 
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
-  }
 
   // constrain popular to a single user
   var select={ 
@@ -382,7 +391,7 @@ Product.statics.findPopular = function(criteria, callback){
      // {$unwind: '$contains' },
      {$sort:{'_id':1,'contains.hit':1}},
   function (err, result) {
-    if(err){return cb(err);}
+    if(err){return promise.reject(err);}
 
 
     if(result&&result.length){
@@ -426,6 +435,7 @@ Product.statics.findPopular = function(criteria, callback){
       if(err){
         return promise.reject(err);
       }
+      cache.set(cacheKey,products);
       promise.resolve(null,products);
     });
   })
@@ -491,9 +501,15 @@ Product.statics.findByCriteria = function(criteria, callback){
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
 
-  var promise = new mongoose.Promise;
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria);
   if(callback){promise.addBack(callback);}
       
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
       
   var query=Products.find({})
               .populate(['vendor','vendor.owner','categories']),
@@ -666,6 +682,7 @@ Product.statics.findByCriteria = function(criteria, callback){
            .populate('categories')
            .populate({path:'categories',select:'weight name'}).exec(function (err,products) {
             // console.log('---------- 4 exec', Date.now()-now,products.length)
+             cache.set(cacheKey,products);
              promise.resolve(err,products);
            });
 

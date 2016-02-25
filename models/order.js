@@ -11,6 +11,7 @@ var mongoose = require('mongoose')
   , stats=require('./lib/order.stats')
   , finds=require('./lib/order.finds')
   , core=require('./lib/order.core')
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 24,max:50})
   , payment = require('../app/payment')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId
