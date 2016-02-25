@@ -690,13 +690,13 @@ exports.informShopToOrders=function(req,res){
       .exec(function(err,shops){  
 
       //
-      // extract full shop detailsand sent mail
-      shops.forEach(function (shop) {
-
+      // extract full shop details, list products and sent mail
+      promises=shops.map(function (shop) {
         contents[shop.urlpath].shop=shop;
-
+        var defer=Q.defer();
+        
         //
-        // get lowstock product by shops
+        // TODO missing test for low stock products
         db.model('Products').findByCriteria({
           lowstock:true,
           available:true,
@@ -704,36 +704,30 @@ exports.informShopToOrders=function(req,res){
         },function (err,products) {
           contents[shop.urlpath].products=products;
 
-          //
-          // this shop is ready for sendmail 
-          promises.push(
-            (function () {
-              var defer=Q.defer();
-              bus.emit('sendmail',shop.owner.email.address,
-                   "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
-                    contents[shop.urlpath],"order-prepare",function (err,res) {
-                      if(err){return defer.reject(err)}
-                      defer.resolve(res)
-                    });
-              return defer.promise;
-            })()
-          );
 
+          bus.emit('sendmail',shop.owner.email.address,
+               "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
+                contents[shop.urlpath],"order-prepare",function (err,res) {
+                  if(err){return defer.reject(err)}
+                  defer.resolve(res);
+                });          
+        });
 
-        })
+        return defer.promise;
+      });
 
-      })
 
 
 
       //
       // waiting on results
       Q.all(promises).then(function (sentMails) {
+
         //
         // TODO parse content of sentMails to get rejected mails
         var rejected=[];
         sentMails.forEach(function (sent) {
-          rejected=rejected.concat(sent[0].rejected);
+          rejected=rejected.concat(sent.rejected);
         });
         rejected=_.uniq(rejected);
         if(rejected.length){
