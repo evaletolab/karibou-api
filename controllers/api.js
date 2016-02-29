@@ -50,9 +50,11 @@ exports.config = function(req, res) {
 
 
 exports.saveConfig = function(req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   try{
     validate.config(req.body,lang);
   }catch(err){
+    console.log('-----------------',err)
     return res.status(400).send(err.message);
   }
 

@@ -36,28 +36,23 @@ var Config = new Schema({
       love:Boolean,
       // display campagn page in home?
       path:String,
-      about:{
-        en:String,
-        de:String,
-        fr:String,
+      siteName:{
+        en:String,de:String,fr:String,
         image:String
       },
-      siteName:{
-        en:String,
-        de:String,
-        fr:String,
+      about:{
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
         image:String
       },
       tagLine:{
-        en:String,
-        de:String,
-        fr:String,
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
         image:String
       },
       footer:{
-        en:String,
-        de:String,
-        fr:String,
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
         image:String
       },
       views:[{
@@ -112,7 +107,8 @@ Config.statics.getMain=function(cb) {
     }
     return cb(null,c)
   });
-}
+};
+
 Config.statics.saveMain=function(c, cb) {
   var Config=mongoose.model('Config');
   Config.findOne({cid:'main'}).select('-__v').exec(function(e,conf){
@@ -123,7 +119,7 @@ Config.statics.saveMain=function(c, cb) {
       cb(e,c)
     })
   });
-}
+};
 
 
 Config.set('autoIndex', config.mongo.ensureIndex);

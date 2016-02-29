@@ -31,14 +31,14 @@ exports.execute = function(db, script, callback){
       }
 
       if(!conf.home){
-        conf.home={
-          views:[],
-          siteName:{},
-          tagLine:{},
-          about:{},
-          footer:{},
-        };
+        conf.home={};  
       }
+
+      conf.home.views=[];
+      conf.home.siteName={};
+      conf.home.tagLine={h:{},p:{}};
+      conf.home.about={h:{},p:{}};
+      conf.home.footer={h:{},p:{}};
 
 
       configs.save(conf,function(err){
