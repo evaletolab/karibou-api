@@ -54,7 +54,6 @@ exports.saveConfig = function(req, res) {
   try{
     validate.config(req.body,lang);
   }catch(err){
-    console.log('-----------------',err)
     return res.status(400).send(err.message);
   }
 
