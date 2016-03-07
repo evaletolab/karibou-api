@@ -70,9 +70,15 @@ Document.statics.create = function(doc,uid,callback){
   assert(callback);
 	var Documents=this;    
 
-        
-  doc.slug=doc.title.slug();
+  if(!doc.slug){
+    doc.slug=[];  
+  }
+  if(doc.title.fr)doc.slug.push(doc.title.fr.slug());
+  if(doc.title.en)doc.slug.push(doc.title.en.slug());
+  if(doc.title.de)doc.slug.push(doc.title.de.slug());
   doc.owner=uid;
+
+        
 
   //
   // ready to create one product
