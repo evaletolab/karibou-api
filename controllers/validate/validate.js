@@ -37,9 +37,9 @@ exports.document=function (doc, lang) {
     // check(doc.created,"La date de création n'est pas valide").isDate();
     // check(doc.updated,"La date de création n'est pas valide").isDate();
     check(doc.title[lang],"Le titre n'est pas valide").isText().len(2, 100);
-    check(doc.content[lang],"Le contenu n'est pas valide (max 1'500 caratères)").isText().len(2, 1500);
+    check(doc.content[lang],"Le contenu n'est pas valide (max 2'500 caratères)").isText().len(2, 4000);
 
-    ifCheck(doc.photo.header[lang],"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
+    ifCheck(doc.photo.header,"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
 
     for( var i in doc.photo.bundle){
       check(doc.photo.bundle[i],"Le photo n'est pas valide (2)").len(6, 200).isImgUrl();
