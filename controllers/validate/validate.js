@@ -37,7 +37,7 @@ exports.document=function (doc, lang) {
     // check(doc.created,"La date de création n'est pas valide").isDate();
     // check(doc.updated,"La date de création n'est pas valide").isDate();
     check(doc.title[lang],"Le titre n'est pas valide").isText().len(2, 100);
-    check(doc.content[lang],"Le contenu n'est pas valide (max 2'500 caratères)").isText().len(2, 4000);
+    check(doc.content[lang],"Le contenu n'est pas valide (max 8'500 caratères)").isText().len(2, 8500);
 
     ifCheck(doc.photo.header,"Le photo n'est pas valide (1)").len(6, 200).isImgUrl();
 
