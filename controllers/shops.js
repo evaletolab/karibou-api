@@ -135,6 +135,8 @@ exports.get=function (req, res) {
 //
 // get for SEO
 exports.getSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
+
   //
   // check shop owner
   try{
@@ -158,6 +160,9 @@ exports.getSEO=function (req, res) {
       shop: shop, 
       user: req.user, 
       _:_,
+      getLocal:function(item){
+        if(item) return item[lang];return item;
+      },
       weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
       prependUrlImage:function (url) {
         if(url&&url.indexOf('//')===0){
@@ -175,6 +180,7 @@ exports.getSEO=function (req, res) {
 //
 // get product SEO
 exports.allSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
 
   var query={
     status:true
@@ -197,6 +203,9 @@ exports.allSEO=function (req, res) {
         shops: shops, 
         user: req.user, 
         _:_,
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){

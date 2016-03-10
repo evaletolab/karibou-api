@@ -245,24 +245,28 @@ exports.list=function (req, res) {
       });
     }
 
+    function keys(obj) {
+      return Object.keys(obj);
+    }
+
     if(!query.maxcat){
       return res.json(products)
     }
 
     //
     // replace product by popular
-
     var groupedP=group_cat(popular);
     var groupedD=group_cat(discount);
     var groupedH=group_cat(home);
     var groupedL=group_cat(loves);
     var groupedA=group_cat(products); // FULL SET OR FULL POPULAR
 
+    var groupedCats=_.uniq([].concat(keys(groupedP),keys(groupedD),keys(groupedH),keys(groupedL),keys(groupedA)));
 
     //
     // time to fill or replace with 1) discount 2) home
     var result=[], sz,items;
-    for(var k in groupedA){
+    for(var k in groupedCats){
       // init
       // console.log('######## cat',k);
       if(!groupedP[k])groupedP[k]=[];
@@ -316,6 +320,7 @@ exports.get=function (req, res) {
 //
 // get product SEO
 exports.getSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
       return res.status(400).send(errorHelper(err));
@@ -329,6 +334,9 @@ exports.getSEO=function (req, res) {
       product: product, 
       user: req.user, 
       _:_,
+      getLocal:function(item){
+        if(item) return item[lang];return item;
+      },
       weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
       prependUrlImage:function (url) {
         if(url&&url.indexOf('//')===0){
@@ -346,6 +354,7 @@ exports.getSEO=function (req, res) {
 //
 // get product SEO
 exports.allSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
 
   var query={
     status:true,
@@ -373,6 +382,9 @@ exports.allSEO=function (req, res) {
         products: products, 
         user: req.user, 
         _:_,
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){

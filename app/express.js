@@ -243,10 +243,11 @@ var tokenSession=function (req, res, next) {
       return res.status(400).send(err); 
     }
 
+    console.error(err)
+    console.error(err.stack)
 
     // error page
-    res.status(500).render('500', { error: err.stack })
-    console.error(err.stack)
+    res.render('500', { error: err.stack })
   })
 
 

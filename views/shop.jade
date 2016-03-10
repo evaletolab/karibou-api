@@ -36,22 +36,19 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
   body
     div(class="container")
       div(class="header clearfix")
-        nav
-          ul(class="nav nav-pills pull-right")
-            li(role="presentation" class="_active hide")
-              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): | La charte
-            li(role="presentation", class="hide")
-              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |A propos
+        nav(class="navbar navbar-default")
+          ul(class="nav navbar-nav ")
+            - each menu in config.shared.menu
+              li(role="presentation" class="")
+                if menu.active
+                  a( href="#{menu.url}"): | !{getLocal(menu.name)} 
+            li(role="presentation" class=""): a( href="/shops") Les boutiques
+
         h3( class="text-muted"): |Karibou Marketplace
 
 
       div(class="jumbotron")
         h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
-      div(class="list-group")
-          a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md" class="list-group-item"): |Comment ça marche
-          a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md" class="list-group-item"): |Notre charte
-          a(href="/shops" class="list-group-item"): |Les boutiques
-          a(href="/products" class="list-group-item"): |Les produits
 
       h1: =shop.name
       div: =shop.description

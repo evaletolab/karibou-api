@@ -5,6 +5,7 @@ require('../app/config');
 var db = require('mongoose'),
     Shops = db.model('Shops'),
     Documents = db.model('Documents'),
+    Remarkable= require('remarkable'),
     validate = require('./validate/validate'),
     _=require('underscore'),
     errorHelper = require('mongoose-error-helper').errorHelper;
@@ -241,6 +242,9 @@ exports.remove=function (req, res) {
 //
 // get doc SEO
 exports.getSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
+  var converter = new Remarkable();
+
   return Documents.findOneBySlug({slug:req.params.slug}, function (err, doc) {
     if (err) {
       return res.status(400).send(errorHelper(err));
@@ -256,9 +260,14 @@ exports.getSEO=function (req, res) {
       // setup the model 
       var model={ 
         doc: doc, 
+        lang:lang,
         products:products,
         user: req.user, 
         _:_,
+        md:converter,  
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){
             url='https:'+url;

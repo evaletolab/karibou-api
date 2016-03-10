@@ -138,6 +138,8 @@ module.exports = function(app, config, passport) {
   // app.get('/shop/:shopname', shops.getSEO);
   app.get('/seo/shop/:shopname', shops.getSEO);
   app.get('/seo/shop/:shopname/products/:sku/:slug?', products.getSEO);
+  app.get('/seo/content/:slug', docs.getSEO);
+
 
   //
   // system

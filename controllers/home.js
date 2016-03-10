@@ -40,6 +40,9 @@ exports.SEO = function(req,res){
         categories:cats,
         user: req.user, 
         _:_,
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){
             url='https:'+url;
