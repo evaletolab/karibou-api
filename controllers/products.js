@@ -262,13 +262,14 @@ exports.list=function (req, res) {
     var groupedA=group_cat(products); // FULL SET OR FULL POPULAR
 
     var groupedCats=_.uniq([].concat(keys(groupedP),keys(groupedD),keys(groupedH),keys(groupedL),keys(groupedA)));
+      
 
     //
     // time to fill or replace with 1) discount 2) home
     var result=[], sz,items;
     for(var k in groupedCats){
+      k=groupedCats[k];
       // init
-      // console.log('######## cat',k);
       if(!groupedP[k])groupedP[k]=[];
       if(!groupedD[k])groupedD[k]=[];
       if(!groupedH[k])groupedH[k]=[];
