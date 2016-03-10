@@ -120,7 +120,6 @@ module.exports = {
 
   // TODO load by env
   mongo:{
-    name_:'mongodb://karibou:bha50fXirO23VQIhwH3liEHJOvv1teMriUoM1hziHI@c109.lamppost.8.mongolayer.com:10109,c116.lamppost.9.mongolayer.com:10116/karibou-devel?replicaSet=set-54aba8cafff44497f4006d98',
     name:'mongodb://localhost/karibou-devel',
     ensureIndex:true,
     multiple_:'mongodb://localhost/karibou-core'
