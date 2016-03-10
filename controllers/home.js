@@ -30,7 +30,8 @@ exports.welcome = function(req,res){
 
 
 exports.SEO = function(req,res){
-  
+    var lang=req.session.lang||config.shared.i18n.defaultLocale;
+
     //
     // get the list of cats
     db.model('Categories').find({},function (err,cats) {
