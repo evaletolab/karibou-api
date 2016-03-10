@@ -14,7 +14,7 @@ exports.execute = function(db, script, callback){
 
       //
       // convert maintenance.reason
-      if(!conf.maintenance.reason.fr){
+      if(!conf.maintenance.reason||!conf.maintenance.reason.fr){
         conf.maintenance.reason={fr:conf.maintenance.reason};
       }
 
