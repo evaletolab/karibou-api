@@ -429,7 +429,9 @@ Product.statics.findPopular = function(criteria, callback){
       filters.available=true;
       filters.instock=true;
     }
-
+    if(criteria.discount){
+      filters.discount=true;
+    }
 
     var query=mongoose.model('Products').findByCriteria(filters,function (err, products) {
       if(err){

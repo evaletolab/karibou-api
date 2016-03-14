@@ -109,6 +109,9 @@ exports.love=function (req, res) {
     minhit:parseInt(req.query.minhit)||1,
     available:(req.query.available&&req.query.available=='true')
   }
+  if(req.query.windowtime){
+    criteria.windowtime=req.query.windowtime;
+  }
 
   //
   // we ask for popular 
