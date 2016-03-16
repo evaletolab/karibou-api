@@ -40,8 +40,14 @@ var Config = new Schema({
         en:String,de:String,fr:String,
         image:String
       },
+      shop:{
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
       about:{
         h:{en:String,de:String,fr:String},
+        t:{en:String,de:String,fr:String},
         p:{en:String,de:String,fr:String},
         image:String
       },
