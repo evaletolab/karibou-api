@@ -40,16 +40,26 @@ exports.favoriteProductsVsUsers=function(cb){
 
 
 exports.ordersByUsers=function (filter,cb) {
-  var Orders=this, Users=db.model('Users'), results={};
+  var Orders=this, Users=db.model('Users'), results={}, match={}, today=new Date();
+
+  if(filter.year){
+    match.year=parseInt(filter.year)||match.year;
+  }
+
   Orders.aggregate(
      [
        { $match: { 'payment.status': 'paid'  }},
-       {$project:{items:1,
-                 shipping:1,
-                 email:1,
-                 customer:1
+       {$project:{
+             month:{ $month:"$shipping.when"}, 
+             week: { $week: "$shipping.when"}, 
+             year: { $year: "$shipping.when" },
+             items:1,
+             shipping:1,
+             email:1,
+             customer:1
        }},
        {$sort:{'shipping.when':-1}},
+       {$match: match  },
        {$group:
            {
              _id:"$email",
@@ -237,7 +247,6 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
   //
   // filter by month, year, thismonth,shop 
   filter=filter||{};
-  match.year=today.getFullYear();
   if(filter.year){
     match.year=parseInt(filter.year)||match.year;
   }
