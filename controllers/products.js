@@ -107,6 +107,7 @@ exports.love=function (req, res) {
     email:req.user.email.address,
     likes:req.user.likes,
     minhit:parseInt(req.query.minhit)||1,
+    maxcat:parseInt(req.query.maxcat)||4,
     available:(req.query.available&&req.query.available=='true')
   }
   if(req.query.windowtime){
