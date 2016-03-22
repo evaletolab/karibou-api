@@ -31,10 +31,10 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
   }
 
   //
-  // check shipping maintenance
-  if(config.shared.maintenance.active){
-    return promise.reject(new Error("Les livraisons ne sont pas possibles pour l'instant"));  
-  }
+  // TODO remove this, check shipping maintenance
+  // if(config.shared.maintenance.active){
+  //   return promise.reject(new Error("Les livraisons ne sont pas possibles pour l'instant"));  
+  // }
 
   //
   // check the shipping day
