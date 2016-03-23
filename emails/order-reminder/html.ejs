@@ -2,20 +2,11 @@
 <div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
 <% } %>Bonjour <%= user.name.givenName %>,<br/>
 <br/>
-C'est peut être le moment de faire ces courses chez <a href="<%= origin %>">karibou.ch</a>?
-<br/>
-<%if (products.length) {%>
-<ul>
-	<li>Les commerçants vous proposent,</li>
-<% for(var i=0; i<products.length; i++) {%>
-   <li><a href="<%= origin %>/products/<%= products[i].sku %>"><%= products[i].title %></a></li>
-<% } %>
-</ul>
-<% } %>
+C'est peut-être le moment de faire ses courses chez <a href="<%= origin %>">vos commerçants préférés</a>?
 <br/>
 
 Avec nos meilleurs messages,<br/>
-James de l'équipe Karibou
+L'équipe de Karibou.ch
 <br/>
 ----<br/>
-modifier votre alarme <%= origin %>/account/reminder<br/>
+Modifiez votre alarme <%= origin %>/account/reminder<br/>
