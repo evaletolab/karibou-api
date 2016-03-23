@@ -13,7 +13,7 @@ var db = require('mongoose'),
 exports.index = function(app){
   return function(req, res) {
     var model={ 
-      api: app.routes, 
+      api: app._router.stack, 
       user: req.user, 
       _:_, 
       filter:function(api){
@@ -30,7 +30,8 @@ exports.welcome = function(req,res){
 
 
 exports.SEO = function(req,res){
-  
+    var lang=req.session.lang||config.shared.i18n.defaultLocale;
+
     //
     // get the list of cats
     db.model('Categories').find({},function (err,cats) {
@@ -40,6 +41,9 @@ exports.SEO = function(req,res){
         categories:cats,
         user: req.user, 
         _:_,
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){
             url='https:'+url;

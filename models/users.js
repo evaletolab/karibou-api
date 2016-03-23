@@ -1,10 +1,12 @@
 
+var assert = require("assert");
 var db = require('mongoose')
   , Schema   = db.Schema
   , ObjectId = Schema.ObjectId
   , validate = require('mongoose-validate')
 	, passport = require('passport')
   , karibou = require('karibou-wallet')()
+  , Promise = db.Promise
   , payment = require('../app/payment')
   , bus = require('../app/bus')
   , validator = require('../app/validator')
@@ -16,7 +18,7 @@ var db = require('mongoose')
  /* Enumerations for field validation */
  var EnumGender="homme femme".split(' ');
  var EnumProvider="twitter facebook goolge persona local".split(' ');
- var EnumRegion=config.shop.region.list;
+ var EnumRegion=config.shared.region.list;
 
 
 // validate URL
@@ -115,6 +117,13 @@ validate.postal = function (value) {
 
     merchant:{type:Boolean},
 
+    reminder:{
+      active:{type: Boolean,default:false},
+      weekdays:[Number],
+      time:{type:Number,min:0,max:23}
+    },
+
+
     // this is the stripe 
     gateway_id:{type:String, unique: true, select:false,sparse: true},
 
@@ -189,14 +198,41 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
 
 
-UserSchema.statics.findByEmail = function(email, success, fail){
-  return this.model('Users').findOne({'email.address':email}).populate('shops').exec(function(err,user){
-    if(err){
-      fail(err)
-    }else{
-      success(user);
-    }
+UserSchema.statics.findByReminder = function(reminder,callback){
+  assert(reminder);
+  var promise = new Promise, query={
+    'reminder.active':true,
+    'reminder.weekdays':[100],
+    'reminder.time':100
+  };
+  if(callback){promise.addBack(callback);}
+
+
+  if(reminder.weekdays){
+    query['reminder.weekdays']={$in:reminder.weekdays};
+  }
+  if(reminder.time){
+    query['reminder.time']=reminder.time;
+  }
+
+  this.model('Users').find(query).exec(function(err,users){
+    promise.resolve(err,users);
   });
+
+  return promise;
+};
+
+
+
+UserSchema.statics.findByEmail = function(email, callback){
+  assert(email);
+  var promise = new Promise;
+  if(callback){promise.addBack(callback);}
+
+  this.model('Users').findOne({'email.address':email}).populate('shops').exec(function(err,user){
+    promise.resolve(err,user);
+  });
+  return promise;
 };
 
 UserSchema.statics.findByToken = function(token, success, fail){
@@ -513,6 +549,8 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ex
 
 UserSchema.statics.updateStatus=function(id, status,callback){
 	var Users=this.model('Users');
+  var promise = new Promise;
+  if(callback){promise.addBack(callback);}
 
 
   return Users.findOne(id).populate('shops').exec(function (err, user) {
@@ -529,16 +567,17 @@ UserSchema.statics.updateStatus=function(id, status,callback){
       if(err){
         return callback(err)
       }
-      //
-      // update all shops
-      require('async').forEach(user.shops, function(shop,cb){
-          shop.updateStatus(status,function(err){
-            cb(err)
-          });
+      var promises=user.shops.map(function(shop) {
+        return shop.updateStatus(status);
+      })
+
+      Q.allSettled(promises).then(function () {
+        promise.resolve(null,user)
       },function(err){
-        callback(err,user);
+        promise.reject(err)
       });
     });
+    return promise;
 
   });
 }
@@ -552,13 +591,15 @@ UserSchema.statics.updateStatus=function(id, status,callback){
 UserSchema.statics.findAndUpdate=function(id, u,callback){
 	var Users=this.model('Users');
   //http://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
+  var promise = new Promise;
+  if(callback){promise.addBack(callback);}
 
-  return Users.findOne({id:id}).exec(function (err, user) {
+  Users.findOne({id:id}).exec(function (err, user) {
     if(err){
-      return callback(err);
+      return promise.reject(err);
     }
     if(!user){
-      return callback("Utilisateur inconnu");
+      return promise.reject(new Error("Utilisateur inconnu"));
     }
 
     if (u.name&&u.name.familyName){
@@ -610,6 +651,11 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
     // END OF ADMIN
     //
 
+    //
+    // update reminder
+    if(u.reminder){
+      user.reminder=_.extend({},user.reminder||{},u.reminder);
+    }
 
     // 
     // user update email
@@ -632,7 +678,7 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
     }
 
     if(primary>1){
-      return callback("Il ne peut pas y avoir deux adresses principales");
+      return promise.reject(new Error("Il ne peut pas y avoir deux adresses principales"));
     }
 
     //
@@ -646,8 +692,11 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
 
     user.updated=Date.now();
 
-    user.save(callback);
+    user.save(function (err,user) {
+      promise.resolve(err,user);
+    });
   });
+  return promise;
 };
 
 

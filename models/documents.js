@@ -15,18 +15,28 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.Types.ObjectId;
   
+var EnumDocumentType=function (type) {
+  if(!config.shared){
+    return false;
+  }
+  var types=config.shared.document.types.slice(0);
+  if(config.shared.home){
+    for (var i = config.shared.home.views.length - 1; i >= 0; i--) {
+      types.push(config.shared.home.views[i].name.toLowerCase());
+    };
 
-var EnumDocumentType=config.shop.document.types;
+  }
 
-
+  return (types.indexOf(type.toLowerCase())!==-1);
+};
 
 
 // Product Model
 var Document = new Schema({
-  title:{type: String, required: true },
-  header:{type: String, required: true },
-  slug:{type: String, required: true, unique:true },
-  content:{type:String, required:true},
+  title:{en:String,fr:String,de:String},
+  header:{en:String,fr:String,de:String},
+  slug:[{type: String, required: true, unique:true }],
+  content:{en:String,fr:String,de:String},
    
   photo:{
     header:{type:String},
@@ -40,7 +50,12 @@ var Document = new Schema({
   published:{type:Boolean,default:false},
 
   skus:[Number],
-  type: {type:String, required:true,  enum:EnumDocumentType},
+  type: {type:String, required:true
+         ,validate: {
+          validator: EnumDocumentType,
+          message: '{VALUE} is not a valid document type!'
+         }
+        },
   owner:{type:Number, requiered:true},
   signature:{type:String, requiered:true}
 
@@ -55,9 +70,15 @@ Document.statics.create = function(doc,uid,callback){
   assert(callback);
 	var Documents=this;    
 
-        
-  doc.slug=doc.title.slug();
+  if(!doc.slug){
+    doc.slug=[];  
+  }
+  if(doc.title.fr)doc.slug.push(doc.title.fr.slug());
+  if(doc.title.en)doc.slug.push(doc.title.en.slug());
+  if(doc.title.de)doc.slug.push(doc.title.de.slug());
   doc.owner=uid;
+
+        
 
   //
   // ready to create one product
@@ -71,9 +92,6 @@ Document.statics.findOneBySlug = function(criteria, callback){
   var query=this.findOne({slug:criteria.slug});
 
   if(criteria.type){
-    if(EnumDocumentType.indexOf(criteria.type)===-1){
-      return callback("Le type du document n'est pas valable: "+type);
-    }
     query.where({type:category})
   }
 
@@ -87,9 +105,6 @@ Document.statics.findByCriteria = function(criteria, callback){
   //
   // fondByType
   if(criteria.type){
-    if(EnumDocumentType.indexOf(criteria.type)===-1){
-      return callback("Le type du document n'est pas valable: "+criteria.type);
-    }
     query=query.where({type:criteria.type});
   }
 

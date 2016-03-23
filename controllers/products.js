@@ -107,13 +107,17 @@ exports.love=function (req, res) {
     email:req.user.email.address,
     likes:req.user.likes,
     minhit:parseInt(req.query.minhit)||1,
+    maxcat:parseInt(req.query.maxcat)||4,
     available:(req.query.available&&req.query.available=='true')
+  }
+  if(req.query.windowtime){
+    criteria.windowtime=req.query.windowtime;
   }
 
   //
   // we ask for popular 
   if(req.query.popular){
-    return Products.findPopularByUser(criteria,function (err,products) {
+    return Products.findPopular(criteria,function (err,products) {
       if (err) {
         return res.status(400).send(err);
       }
@@ -147,10 +151,13 @@ exports.findByOwner=function (req, res) {
 // /v1/shops/:shopname/products/category/:category
 // /v1/shops/:shopname/products/category/:category/details/:details
 
+// get a mix of those lists
+// popular, home, love, discount, maxcat
+
 exports.list=function (req, res) {
   //
   // check inputs
-  
+  var now =Date.now(), Q=require('q');
   try{
     validate.ifCheck(req.params.category, "Le format de la catégorie n'est pas valide").isSlug()
     validate.ifCheck(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();    
@@ -158,63 +165,146 @@ exports.list=function (req, res) {
   }catch(e){
     return res.status(400).send(e.message);
   }
-  var query=_.extend(req.query,req.params);
+  var query=_.extend(req.query,req.params), 
+      popular=[],loves=[],discount=[],home=[],promise,promises=[Q.when([])];// set of products
 
-  
   if(!req.user||!req.user.isAdmin()){
-    req.query.status=true;
+    query.status=true;
     //FIXME WTF is this shit req.query.status=req.user.shops??
-    if(req.user)req.query.status=req.user.shops;
+    if(req.user)query.status=req.user.shops;
+  }else{
+    // constraint popular product
+    query.email=req.user.email.address;
   }
-  
+
+  // if popular products are requested  
+  // options: email, maxcat,likes,available
+  if(query.popular && query.email){
+    promise=Products.findPopular({email:query.email,status:true, available:query.available,maxcat:query.maxcat});
+    promises.push(promise);
+    promise.then(function(products) {
+      // console.log('---------- popular',products.length, Date.now()-now)
+      popular=products;
+    });
+  }
+
+  // in love
+  // options user.likes
+  if(query.love&&req.user&&req.user.likes){
+    promise=Products.findBySkus(req.user.likes).exec();
+    promises.push(promise);
+    promise.then(function(products) {
+      // console.log('---------- loves',products.length, Date.now()-now)
+      loves=products;
+    });
+    delete query.love;
+  }
 
   //
-  return Products.findByCriteria(query,function (err, products) {
-    var results=products;
-    if (err) {
-      return res.status(400).send(err);
+  // in home
+  if(query.home&&query.maxcat){
+    promise=Products.findByCriteria({status:true,instock:true,available:true,home:true});
+    promises.push(promise);
+    promise.then(function(products) {
+      // console.log('---------- home',products.length, Date.now()-now)
+      home=products;
+    });
+    delete query.home;
+  }
+
+  //
+  // in discount
+  if(query.discount){
+    promise=Products.findByCriteria({status:true,instock:true,available:true,discount:true});
+    promises.push(promise);
+    promise.then(function(products) {
+      // console.log('---------- discount',products.length, Date.now()-now)
+      discount=products;
+    });
+    delete query.discount;
+  }
+
+  Q.all(promises).then(function(argument) {
+    if(query.popular){
+      return Products.findPopular({status:true, available:query.available,maxcat:query.maxcat});
     }
-    
-    //
-    // sort=categories.weight
-    // as we dont know how to sort cross-documents with mongo
-    if (req.query.sort){    
-      var sort=req.query.sort.split('.'); 
-      //console.log(req.query.sort, sort)
-      results=_.sortBy(results,function(product){
-          if(sort.length==1){
-            return product[sort[0]];
-          }else if(sort.length==2){
-            if(Array.isArray(product[sort[0]]))
-              return product[sort[0]][0][sort[1]];
-            return product[sort[0]][sort[1]];
-          }else if(sort.length==3){
-            return product[sort[0]][sort[1]][sort[2]];
-          }
+    // FIX this approach is working until we have a large amount of products
+    return Products.findByCriteria(query);
+  }).then(function(products) {
+
+    // console.log('--------------- ALL 0',products.length,Date.now()-now,query);
+    var maxcat=query.maxcat||4;
+
+    // unique sku
+    function uniq_sku(arr) {
+      return _.uniq(arr, function(product, key, a) { 
+        return product.sku;
       });
     }
 
-
-    //
-    // group=categories.name
-    // as we dont know how to group cross-documents with mongo
-    if (req.query.group){   
-      var group=req.query.group.split('.'); 
-      results=_.groupBy(results,function(product){
-          if(group.length==1){
-            return product[group[0]];
-          }else if(group.length==2){
-            if(Array.isArray(product[group[0]]))
-              return product[group[0]][0][group[1]];
-            return product[group[0]][group[1]];            
-          }else if(group.length==3){
-            return product[group[0]][group[1]][group[2]];
-          }
+    // group by cat
+    function group_cat(arr) {
+      return _.groupBy(arr||[],function(p) {
+        return p.categories&&p.categories.name||'undefined';
       });
     }
-    
-    return res.json(results);
-  });
+
+    function keys(obj) {
+      return Object.keys(obj);
+    }
+
+    if(!query.maxcat){
+      return res.json(products)
+    }
+
+    //
+    // replace product by popular
+    var groupedP=group_cat(popular);
+    var groupedD=group_cat(discount);
+    var groupedH=group_cat(home);
+    var groupedL=group_cat(loves);
+    var groupedA=group_cat(products); // FULL SET OR FULL POPULAR
+
+    var groupedCats=_.uniq([].concat(keys(groupedP),keys(groupedD),keys(groupedH),keys(groupedL),keys(groupedA)));
+      
+
+    //
+    // time to fill or replace with 1) discount 2) home
+    var result=[], sz,items;
+    for(var k in groupedCats){
+      k=groupedCats[k];
+      // init
+      if(!groupedP[k])groupedP[k]=[];
+      if(!groupedD[k])groupedD[k]=[];
+      if(!groupedH[k])groupedH[k]=[];
+      if(!groupedL[k])groupedL[k]=[];
+      if(!groupedA[k])groupedA[k]=[];
+      items=[];
+
+      console.log('-------------- PDHLA',k,groupedP[k].length,groupedD[k].length,groupedH[k].length,groupedL[k].length,groupedA[k].length);
+
+      items=items.concat(groupedP[k].slice(0,maxcat-1));
+      items=items.concat(groupedD[k]);
+      items=items.concat(groupedH[k]);
+      items=items.concat(groupedL[k]);
+      items=items.concat(groupedA[k]);
+      items=uniq_sku(items).slice(0,maxcat);
+
+
+      result=result.concat(items);
+    }
+    result=uniq_sku(result);
+    // result=_.sortBy(result,function(prod) {
+    //     return prod.categories.weight;
+    //     // return [prod.category.weight, prod.category.name].join("_");      
+    // })
+    // console.log('--------------- time 1',Date.now()-now);
+
+    res.json(result);
+  }).then(undefined,function(error) {
+    res.status(400).send(error);
+  })
+
 };
 
 //
@@ -235,6 +325,7 @@ exports.get=function (req, res) {
 //
 // get product SEO
 exports.getSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   return Products.findOneBySku(req.params.sku, function (err, product) {
     if (err) {
       return res.status(400).send(errorHelper(err));
@@ -248,6 +339,9 @@ exports.getSEO=function (req, res) {
       product: product, 
       user: req.user, 
       _:_,
+      getLocal:function(item){
+        if(item) return item[lang];return item;
+      },
       weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
       prependUrlImage:function (url) {
         if(url&&url.indexOf('//')===0){
@@ -265,6 +359,7 @@ exports.getSEO=function (req, res) {
 //
 // get product SEO
 exports.allSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
 
   var query={
     status:true,
@@ -292,6 +387,9 @@ exports.allSEO=function (req, res) {
         products: products, 
         user: req.user, 
         _:_,
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         weekdays:"Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi".split(','),
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){

@@ -5,11 +5,12 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
+  , Promise = mongoose.Promise
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
   
-var EnumPlace=config.shop.marketplace.list;
-var EnumRegion=config.shop.region.list;
+var EnumPlace=config.shared.marketplace.list;
+var EnumRegion=config.shared.region.list;
 
 var Shops = new Schema({
     version:{type:Number, default: 1},
@@ -86,7 +87,7 @@ var Shops = new Schema({
     // - > is available/displayed for shop owner and admin ONLY
     // - > is saved on each order to compute bill 
     account:{
-      fees:{type:Number,select:false, default:config.shop.generalFees},
+      fees:{type:Number,select:false, default:config.shared.generalFees},
       updated:{type:Date, default: Date.now}
     },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
@@ -185,21 +186,19 @@ Shops.methods.getDiff=function (next) {
 // validate shop
 //   valid: true, invalid: Date, deleted:false
 Shops.methods.updateStatus=function(valid,callback){
-  // special case
-  if (valid===undefined && callback===undefined){
-  }
-  
-  //
-  // 
+  assert(valid!==undefined);  
+  var promise = new Promise;
+  if(callback){promise.addBack(callback);}
+
+  this.status=true;
   if(valid!==true){
     this.status=Date.now();
-    return this.save(callback)
   }
   
-  //
-  // 
-  this.status=true;
-  return this.save(callback)
+  this.save(function(err,user) {
+    promise.resolve(err,user);
+  })
+  return promise;
 }
 
 //

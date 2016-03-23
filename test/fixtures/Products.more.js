@@ -20,7 +20,7 @@ exports.Products=[{
      attributes:{
         available:true,
         comment:false, 
-        discount:false
+        discount:true
      },
 
      pricing: {
@@ -47,7 +47,8 @@ exports.Products=[{
      attributes:{
         available:true,
         comment:false, 
-        discount:false
+        discount:false,
+        home:true
      },
      pricing: {
         stock:10, 

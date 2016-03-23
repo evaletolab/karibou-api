@@ -43,21 +43,22 @@ exports.index = function(app){
 
 exports.config = function(req, res) {
   if (req.user&&req.user.isAdmin()) { 
-    //config.shop.env=process.env;
+    //config.shared.env=process.env;
   }
-  res.json(config.shop);
+  res.json(config.shared);
 };
 
 
 exports.saveConfig = function(req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   try{
-    validate.config(req.body);
+    validate.config(req.body,lang);
   }catch(err){
     return res.status(400).send(err.message);
   }
 
   db.model('Config').saveMain(req.body,function(err,conf) {
-    res.json(config.shop);
+    res.json(config.shared);
   })
 };
 

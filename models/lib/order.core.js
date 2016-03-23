@@ -31,10 +31,10 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
   }
 
   //
-  // check shipping maintenance
-  if(config.shop.maintenance.active){
-    return promise.reject(new Error("Les livraisons ne sont pas possibles pour l'instant"));  
-  }
+  // TODO remove this, check shipping maintenance
+  // if(config.shared.maintenance.active){
+  //   return promise.reject(new Error("Les livraisons ne sont pas possibles pour l'instant"));  
+  // }
 
   //
   // check the shipping day
@@ -45,9 +45,9 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
   shipping.when=new Date(shipping.when)
 
 
-  if(config.shop.noshipping&&config.shop.noshipping.length){
-    for (var i = config.shop.noshipping.length - 1; i >= 0; i--) {
-      var noshipping=config.shop.noshipping[i];
+  if(config.shared.noshipping&&config.shared.noshipping.length){
+    for (var i = config.shared.noshipping.length - 1; i >= 0; i--) {
+      var noshipping=config.shared.noshipping[i];
       var from = new Date(noshipping.from);
       var to=new Date(noshipping.to);
       var msg="Les livraisons sont interrompues jusqu'au "+Orders.formatDate(to);
@@ -62,13 +62,13 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
 
 
   //
-  // check that shipping day is available on: config.shop.order.weekdays
-  if (config.shop.order.weekdays.indexOf(shipping.when.getDay())==-1){
+  // check that shipping day is available on: config.shared.order.weekdays
+  if (config.shared.order.weekdays.indexOf(shipping.when.getDay())==-1){
     return promise.reject(new Error("La date de livraison n'est pas valable"));
   }
 
-  var when=new Date(shipping.when).setHours(config.shop.order.timelimitH,0,0,0)
-  if(Math.abs((when-now.getTime())/3600000) < config.shop.order.timelimit){
+  var when=new Date(shipping.when).setHours(config.shared.order.timelimitH,0,0,0)
+  if(Math.abs((when-now.getTime())/3600000) < config.shared.order.timelimit){
     return promise.reject(new Error("Cette date de livraison n'est plus disponible."));
   }
 
@@ -79,7 +79,7 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
 
   //
   // check time for delivery
-  var times=Object.keys(config.shop.order.shippingtimes)
+  var times=Object.keys(config.shared.order.shippingtimes)
   if(times.indexOf(String(shipping.when.getHours()))==-1){
     return promise.reject(new Error("L'heure de livraison n'est pas valable"));
   }

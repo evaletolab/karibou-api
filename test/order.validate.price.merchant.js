@@ -20,7 +20,7 @@ describe("orders.validate.price", function(){
   var oneweek=Orders.findOneWeekOfShippingDay();
   var sellerDay=Orders.findCurrentShippingDay();
   var customerDay=oneweek[0];
-  var priceB=config.shop.shipping.priceB;
+  var priceB=config.shared.shipping.priceB;
 
 
   //price depends on:
@@ -33,7 +33,7 @@ describe("orders.validate.price", function(){
     dbtools.clean(function(e){
       data.Users[1].merchant=true;
       data.Users[2].merchant=true;
-      config.shop.shipping.priceB=6;
+      config.shared.shipping.priceB=6;
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.price.js"],db,function(err){
         should.not.exist(err);
         done();
@@ -46,7 +46,7 @@ describe("orders.validate.price", function(){
     dbtools.clean(function(){    
       data.Users[1].merchant=false;
       data.Users[2].merchant=false;
-      config.shop.shipping.priceB=priceB;
+      config.shared.shipping.priceB=priceB;
       done();
     });    
   });
@@ -95,7 +95,7 @@ describe("orders.validate.price", function(){
 
   it("check order 145fr and postalCode is 1219, got merchant price ", function(done){
     db.model('Orders').find({oid:2000010}, function(err,order){
-      var discountPeriphery=config.shop.shipping.price.periphery;
+      var discountPeriphery=config.shared.shipping.price.periphery;
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
       order[0].getTotalPrice().should.equal(160.05); //3.10=roundCHF((145+17.90-6)*1.02) 

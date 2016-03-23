@@ -16,32 +16,77 @@ var Config = new Schema({
     //
     // display message wheb maintenance (that mean that all shipping are off)
     maintenance:{
-      reason:{type:String},
+      reason:{en:String,fr:String,de:String},
       active:{type:Boolean,default:false}
     },
 
     //
     // display message on front
     messages:[{
-      content:{type: String},
+      content:{en:String,fr:String,de:String},
       active:{type: Boolean,default:false},
       updated:{type:Date, default: Date.now}
     }],
 
+
+    //
+    // home
+    home:{
+      // display love in home?
+      love:Boolean,
+      // display campagn page in home?
+      path:String,
+      siteName:{
+        en:String,de:String,fr:String,
+        image:String
+      },
+      shop:{
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
+      about:{
+        h:{en:String,de:String,fr:String},
+        t:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
+      tagLine:{
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
+      footer:{
+        h:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
+      views:[{
+        name:{en:String,fr:String,de:String},
+        weight:{type:Number,default:1},
+        url:String
+      }]
+    },
+
+
     // 
     // select no shipping dates
     noshipping:[{
-      reason:{type: String},
+      reason:{en:String,fr:String,de:String},
       from:{type:Date},
       to:{type:Date}
     }],
 
     //
-    // home
-    home:{
-      love:Boolean,
-      path:String
-    },
+    // menu
+    menu:[{
+      name:{en:String,fr:String,de:String},
+      url:String,
+      weight:{type:Number,default:1},
+      group:{type:String,default:'main'},
+      active:Boolean
+    }],
+
 
     //
     // defines keys
@@ -68,18 +113,19 @@ Config.statics.getMain=function(cb) {
     }
     return cb(null,c)
   });
-}
+};
+
 Config.statics.saveMain=function(c, cb) {
   var Config=mongoose.model('Config');
   Config.findOne({cid:'main'}).select('-__v').exec(function(e,conf){
     if(e){return cb(err)};
     _.extend(conf,c);
     conf.save(function(e,c) {
-      _.extend(config.shop,conf.toObject())
+      _.extend(config.shared,conf.toObject())
       cb(e,c)
     })
   });
-}
+};
 
 
 Config.set('autoIndex', config.mongo.ensureIndex);

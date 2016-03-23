@@ -24,7 +24,7 @@ var Products=db.model('Products'),
     },
     okDay, 
     toshortDay,
-    weekdays=config.shop.order.weekdays;
+    weekdays=config.shared.order.weekdays;
 
 
 
@@ -61,7 +61,7 @@ describe("api.orders.create", function(){
   
   after(function(done){
     dbtools.clean(function(){    
-      config.shop.order.weekdays=weekdays;
+      config.shared.order.weekdays=weekdays;
       done();
     });    
   });

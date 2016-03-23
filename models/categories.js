@@ -11,14 +11,16 @@ var mongoose = require('mongoose')
 var Categories = new Schema({
     name: {type:String, unique:true, index:true},
     slug: {type:String, unique:true, index:true},
-    description:{type:String, unique:false},
+    description:{type:String},
     weight:{type:Number, min:0},
-    group:{type:String, unique:false},
-    image:{type:String, unique:false},
-    cover:{type:String, unique:false},
-    color:{type:String, unique:false},    
+    group:{type:String},
+    image:{type:String},
+    cover:{type:String},
+    color:{type:String},    
+    active:{type:Boolean, default:true},    
+    home:{type:Boolean, default:false},    
     weight:{type:Number, min:0},    
-    type:{type:String, unique:false, default:"Category",enum:config.shop.category.types}
+    type:{type:String, default:"Category",enum:config.shared.category.types}
 });
 
 

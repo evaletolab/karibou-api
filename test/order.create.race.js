@@ -11,9 +11,9 @@ var Products=db.model('Products')
   , today=new Date()
   , toshortDay
   , okDay
-  , timelimitH=config.shop.order.timelimitH
-  , timelimit=config.shop.order.timelimit
-  , timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
+  , timelimitH=config.shared.order.timelimitH
+  , timelimit=config.shared.order.timelimit
+  , timeoutAndNotPaid=config.shared.order.timeoutAndNotPaid;
 
 
 
@@ -68,9 +68,9 @@ describe("orders.create.race", function(){
     data.Products[0].pricing.stock=10
     data.Products[1].pricing.stock=10
     data.Products[2].pricing.stock=10
-    config.shop.order.timelimitH=timelimitH;
-    config.shop.order.timelimit=timelimit;
-    config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
+    config.shared.order.timelimitH=timelimitH;
+    config.shared.order.timelimit=timelimit;
+    config.shared.order.timeoutAndNotPaid=timeoutAndNotPaid;
     done();
     });    
   });
@@ -151,7 +151,7 @@ describe("orders.create.race", function(){
           })
 
         })
-      },config.shop.order.timeoutAndNotPaid*1800)
+      },config.shared.order.timeoutAndNotPaid*1800)
     });
   });   
 

@@ -33,12 +33,15 @@ html
   body
     div(class="container")
       div(class="header clearfix")
-        nav
-          ul(class="nav nav-pills pull-right")
-            li(role="presentation" class="_active hide")
-              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): | La charte
-            li(role="presentation", class="hide")
-              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |A propos
+        nav(class="navbar navbar-default")
+          ul(class="nav navbar-nav ")
+            - each menu in config.shared.menu
+              li(role="presentation" class="")
+                if menu.active
+                  a( href="#{menu.url}"): | !{getLocal(menu.name)} 
+            li(role="presentation" class=""): a( href="/shops") Les boutiques
+
+
         h3( class="text-muted"): |Karibou Marketplace
 
 
@@ -46,16 +49,6 @@ html
         h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
         img(src="/img/hello-home.jpg", class="img-responsive img")
 
-      // remove this, its useless 
-        ul(class="list-group")
-            li(class="list-group-item")
-                a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |Comment ça marche
-            li(class="list-group-item")
-                a(href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): |Notre charte
-            li(class="list-group-item")
-                a(href="/shops"): |Les boutiques
-            li(class="list-group-item")
-                a(href="/products"): |Les produits
 
 
       div(class="list-group")

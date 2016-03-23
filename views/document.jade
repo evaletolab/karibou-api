@@ -1,0 +1,75 @@
+doctype html
+html(itemscope itemtype="http://schema.org/Article")
+  head
+    // http://schema.org/Article
+    title: =getLocal(doc.title)+' ('+doc.type+')'
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(name='robots', content='index,follow')
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    meta(name='revised', content='#{doc.updated}')
+
+
+    // Place this data between the <head> tags of your website 
+    meta( name="description", content="#{getLocal(doc.header)}")
+
+    // Schema.org markup for Google+ 
+    meta( itemprop="name", content="#{getLocal(doc.title)}")
+    meta( itemprop="description", content="#{getLocal(doc.header)}")
+    meta( itemprop="image", content="#{prependUrlImage(doc.photo.header)}")
+
+    // Twitter Card data 
+    meta( name="twitter:card", content="article")
+    meta( name="twitter:title", content="#{getLocal(doc.title)}")
+    meta( name="twitter:description", content="#{getLocal(doc.header)}")
+    meta( name="twitter:creator", content="#{doc.signature}")
+    meta( name="twitter:image", content="#{prependUrlImage(doc.photo.header)}")
+
+    // Open Graph data
+    meta( property="og:title", content="#{getLocal(doc.title)}" )
+    meta( property="og:type", content="article" )
+    meta( property="og:url", content="https://karibou.ch/content/#{doc.slug[0]}" )
+    meta( property="og:image", content="#{prependUrlImage(doc.photo.header)}-/resize/600x/" )
+    meta( property="og:description", content="#{getLocal(doc.header)}" )
+    meta( property="og:site_name", content="https://karibou.ch" )
+
+    // Full example with review and price
+    // https://schema.org/price
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+    link(href="/css/style.css", rel="stylesheet")
+  body
+    div(class="container")
+
+      div(class="header clearfix")
+        nav(class="navbar navbar-default")
+          ul(class="nav navbar-nav ")
+            - each menu in config.shared.menu
+              li(role="presentation" class="")
+                if menu.active
+                  a( href="#{menu.url}"): | !{getLocal(menu.name)} 
+            li(role="presentation" class=""): a( href="/shops") Les boutiques
+
+
+      div(class="header clearfix")
+        nav
+          ul(class="nav nav-pills pull-right")
+            li(role="presentation" class="_active hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/la%20charte.md"): | La charte
+            li(role="presentation", class="hide")
+              a( href="https://github.com/evaletolab/karibou-doc/blob/master/pages/about.md"): |A propos
+        h3( class="text-muted"): |Karibou Marketplace
+
+
+
+
+      h1(itemprop="name"): =getLocal(doc.title)
+      div(itemprop="description")
+        !{md.render(getLocal(doc.header))}
+        if doc.photo.header
+          img(src='#{prependUrlImage(doc.photo.header)}-/resize/600x/', class="img-responsive")
+
+      div
+        !{md.render(getLocal(doc.content))}
+
+
+      h4 
+        !{(doc.updated).toDateString()} , by  #{doc.signature}

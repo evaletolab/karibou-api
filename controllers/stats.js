@@ -74,6 +74,9 @@ exports.getCAByYearMonthAndVendor = function(req,res){
   if(req.query.month){
     filter['month']=req.query.month;
   }
+  if(req.query.year){
+    filter['year']=req.query.year;
+  }
 
   db.model('Orders').getCAByYearMonthAndVendor(filter,function (err, stats) {
     if(err){

@@ -5,9 +5,9 @@ var orders = require('mongoose').model('Orders');
 
 // this fixture focus on order with 
 //  - different dates (today, next shipping day, next week), 
-//  - config.shop.financialstatus  ("pending","authorized","partially_paid","paid", "partially_refunded" ...)
-//  - config.shop.cancelreason ("customer", "fraud", "inventory", "other")
-//  - config.shop.status ("fulfilled","partial","fulfilled", "shipped","failure")
+//  - config.shared.financialstatus  ("pending","authorized","partially_paid","paid", "partially_refunded" ...)
+//  - config.shared.cancelreason ("customer", "fraud", "inventory", "other")
+//  - config.shared.status ("fulfilled","partial","fulfilled", "shipped","failure")
 //
 // build orders with
 //  - 2 users

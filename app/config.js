@@ -21,9 +21,9 @@ try {
   //
   // make the configuration visible  
   global.config= require(config);
+  global.config.root=rootPath;
+  global.config.shared=require('../config/config-shared'+test);
 
-  config = '../config/config-shop'+test;
-  global.config=_.extend(global.config,{root:rootPath},require(config))
   module.exports=global.config;
   
   debug('environment: ' + env);

@@ -11,9 +11,9 @@ var Products=db.model('Products')
   , today=new Date()
   , toshortDay
   , okDay
-  , timelimitH=config.shop.order.timelimitH
-  , timelimit=config.shop.order.timelimit
-  , timeoutAndNotPaid=config.shop.order.timeoutAndNotPaid;
+  , timelimitH=config.shared.order.timelimitH
+  , timelimit=config.shared.order.timelimit
+  , timeoutAndNotPaid=config.shared.order.timeoutAndNotPaid;
 
 
 
@@ -57,9 +57,9 @@ describe("orders.create.success", function(){
   
   after(function(done){
     dbtools.clean(function(){    
-      config.shop.order.timelimitH=timelimitH;
-      config.shop.order.timelimit=timelimit;
-      config.shop.order.timeoutAndNotPaid=timeoutAndNotPaid;
+      config.shared.order.timelimitH=timelimitH;
+      config.shared.order.timelimit=timelimit;
+      config.shared.order.timeoutAndNotPaid=timeoutAndNotPaid;
       done();
     });    
   });
@@ -103,7 +103,7 @@ describe("orders.create.success", function(){
 
       //
       // check shipping fees
-      order.payment.fees.shipping.should.equal(config.shop.shipping.price.hypercenter)
+      order.payment.fees.shipping.should.equal(config.shared.shipping.price.hypercenter)
 
       //
       // check financial status after creation
@@ -112,9 +112,9 @@ describe("orders.create.success", function(){
 
       //
       // verify shipping time
-      // console.log('-shipping time',config.shop.order.shippingtimes)
+      // console.log('-shipping time',config.shared.order.shippingtimes)
       // console.log('-shipping time',order.shipping.when)
-      Object.keys(config.shop.order.shippingtimes)[0].should.equal('11');
+      Object.keys(config.shared.order.shippingtimes)[0].should.equal('11');
       order.shipping.when.getHours().should.equal(11);
       //
       // check items fields, price and finalprice
@@ -145,7 +145,7 @@ describe("orders.create.success", function(){
       order.vendors.length.should.be.above(1)
 
       // check subtotal
-      //config.shop.marketplace.shipping
+      //config.shared.marketplace.shipping
       //order.payment.issuer
       order.getSubTotal().should.equal(31.8)
       // check total with fees
@@ -243,7 +243,7 @@ describe("orders.create.success", function(){
         oids.should.containEql(orders[1].oid)
         done();
       })
-    },config.shop.order.timeoutAndNotPaid*1000+10)
+    },config.shared.order.timeoutAndNotPaid*1000+10)
   }); 
 
   it.skip("you can rollback an order only if fulfillments=='partial', payment!=='paid' and closed is null",function(done){

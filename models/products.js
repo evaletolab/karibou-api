@@ -14,11 +14,12 @@ var _=require('underscore');
 var mongoose = require('mongoose')
   , Orders = mongoose.model('Orders')
   , Schema = mongoose.Schema
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 24,max:50})
   , ObjectId = Schema.Types.ObjectId;
   
 
 var EnumOGM="Avec Sans".split(' ');
-var EnumLocation=config.shop.product.location;
+var EnumLocation=config.shared.product.location;
 
 var Manufacturer = new Schema({
     name: {type:String, unique:true, required:true},
@@ -34,7 +35,7 @@ var Manufacturer = new Schema({
 // Product Model
 
 var Product = new Schema({
-   sku: { type: Number, required: true, unique:true },
+   sku: { type: Number, required: true, unique:true, index: true },
    title: { type: String, required: true },
    slug: { type: String, required: false },
    
@@ -54,10 +55,10 @@ var Product = new Schema({
    },  
    
    attributes:{
-      home:{type:Boolean, default:false},
+      home:{type:Boolean, default:false, index: true},
       available:{type:Boolean, default:true},
       comment:{type:Boolean, default:false},
-      discount:{type:Boolean, default:false}
+      discount:{type:Boolean, default:false, index: true}
    },
 
    quantity:{
@@ -76,7 +77,7 @@ var Product = new Schema({
    }],
 
    pricing: {
-      stock:{type:Number, min:0, requiered:true}, 
+      stock:{type:Number, min:0, requiered:true, index: true}, 
       price:{type:Number, min:0, requiered:true},
       part:{type:String, requiered:true},
       discount:{type:Number, min:0, requiered:true},
@@ -101,7 +102,7 @@ var Product = new Schema({
    // Relations  (manufacturer should NOT BE MANDATORY)
    manufacturer:{type: Schema.Types.ObjectId, ref : 'Manufacturers'}, 
    categories:{type: Schema.Types.ObjectId, ref : 'Categories' , requiered:true},
-   vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true}  
+   vendor:{type: Schema.Types.ObjectId, ref : 'Shops', requiered:true, index:true}  
 });
 
 
@@ -120,27 +121,6 @@ Manufacturer.statics.create=function(m,cb){
 };
 
 
-//
-// map an array of Values defined by the key to an array of Category.
-// - throw an error if one element doesn't exist
-Manufacturer.statics.map = function(values, callback){
-  var db=this;  
-
-  require('async').map(values, function(value,cb){
-  
-    if((typeof value)!=="object"){
-      //
-      // reformat selector, as the default field name is _id
-      value={_id:value};
-    }
-
-  	db.model('Manufacturers').find(value,function(err,map){
-  	  cb(err,map);
-  	});      
-  },function(err,maps){
-    callback(err,maps);
-  });	
-};
 
 //db.userSchema.update({"username" : USERNAME}, { "$addToSet" : { "followers" : ObjectId}})
 /** NO MORE AVAILABE
@@ -173,16 +153,26 @@ Product.methods.removeCategories=function(cats,callback){
 };
 
 */
+Product.post('save',function (product) {
+  // console.log('-----------------RESET CACHE')
+  cache.reset();
+});
 
 Product.post('remove',function (product) {
   //
   // clean likes for all users
+  // console.log('-----------------RESET CACHE')
+  cache.reset();
+
   db.model('Users').find({'likes':product.sku}).exec(function (err,users) {
     users.forEach(function (user) {
       user.removeLikes(product.sku)
     })
   })
 })
+
+Product.on('index', function(err,o) {
+});
 
 Product.methods.getPrice=function(){
   if(this.attributes.discount && this.pricing.discount)
@@ -317,6 +307,8 @@ Product.statics.create = function(p,s,callback){
           return callback(err)
         }
 
+        cache.reset();
+
         Products.findOne({_id:product._id})
                .populate('vendor')
                .populate('categories').exec(callback)
@@ -332,41 +324,90 @@ Product.statics.create = function(p,s,callback){
 
 
 
-Product.statics.findPopularByUser = function(criteria, callback){
-  assert(criteria.email);
+/**
+ * find popular products (by user or for all)
+ *   - windowtime (def 4 month), considering a lasped time to compute popular sku
+ *   - email, constrain popular to one user
+ *   - maxcat (def 4), constrain a maximum sku by category 
+ *   - likes, a list of product to append
+ *   - available (def true), product must be available for order
+ */
+Product.statics.findPopular = function(criteria, callback){
+  assert(criteria);
 
-  var skus=[], today=new Date(), windowtime=(parseInt(criteria.windowtime)||2)-1, thisYear=today.getFullYear();
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria);
+  if(callback){promise.addBack(callback);}
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
   }
 
 
+  var skus=[], 
+      today=new Date(), 
+      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||1)), 
+      thisYear=today.getFullYear(),
+      thisMonth=today.getMonth(),
+      maxcat=criteria.maxcat||4;
+
+
+  // constrain popular to a single user
+  var select={ 
+    $or:[{'payment.status': 'paid'},{'payment.status': 'invoice'}],
+    'shipping.when':{$gte:windowtime}
+  };
+  if(criteria.email){
+    select.email=criteria.email;
+  }
+
+  if(thisMonth<windowtime){
+    thisYear={$in:[thisYear,thisYear-1]};
+  }
 
   //
   // get items last 3 month sku by 
   this.model('Orders').aggregate(
-     { $match: { 'payment.status': 'paid', email:criteria.email  } },
+     { $match: select },
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
      { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 }, 'year':thisYear } },     
      {$unwind: '$items' },
      {$group:
-       {
-         _id:"$items.sku",
-         month:{$first:"$month"},
-         hit: { $sum: 1 }
-       }
-    },
-    {$match: { 'hit': {$gte:criteria.minhit||1} }},     
-    {$sort:{month:-1}},
+         {
+           _id:"$items.sku",
+           category:{"$first":"$items.category"},
+           title:{"$first":"$items.title"},
+           month:{"$first":"$month"},
+           hit: { $sum: 1 }
+         }
+     },
+     {$group:{
+        _id:"$category",
+        contains:{$addToSet:{sku:"$_id",title:"$title",hit:"$hit"}},
+        nb:{$sum:1}
+     }},
+     // {$unwind: '$contains' },
+     {$sort:{'_id':1,'contains.hit':1}},
   function (err, result) {
+    if(err){return promise.reject(err);}
+
+
     if(result&&result.length){
-      result.forEach(function (item) {
-        skus.push(item._id)
+      // iterate on category
+      result.forEach(function (category) {
+        // sort 
+        category.contains.sort(function(a,b) {
+          if(a.hit>b.hit) return -1;
+          if(a.hit<b.hit) return 1;
+          return 0;
+        }).every(function (item, i) {
+          // console.log(category._id, item.sku,item.hit,i)
+          skus.push(item.sku);
+          if((i)>=(maxcat-1)) return false;
+          return true;
+        })
       })
     }
 
@@ -388,34 +429,44 @@ Product.statics.findPopularByUser = function(criteria, callback){
       filters.available=true;
       filters.instock=true;
     }
+    if(criteria.discount){
+      filters.discount=true;
+    }
 
-    var query=mongoose.model('Products').findByCriteria(filters,cb);
-                // .populate(['vendor','vendor.owner','categories']);
-
-    // var query=mongoose.model('Products')
-    //             .find({})
-    //             .where('sku')
-    //               .in(skus)
-    //             .populate(['vendor','vendor.owner','categories']);
-  
-    // return query.exec(cb)      
+    var query=mongoose.model('Products').findByCriteria(filters,function (err, products) {
+      if(err){
+        return promise.reject(err);
+      }
+      cache.set(cacheKey,products);
+      promise.resolve(null,products);
+    });
   })
-
+  return promise; 
 };
 
 
 Product.statics.findBySkus = function(skus, callback){
-  var cb=function(err, products){
-    callback(err,products);
-  };
-  if (typeof callback !== 'function') {
-    cb=undefined;
-  }
-  var query=this.model('Products').find({sku:{
-    $in:skus
-  }}).populate(['vendor','vendor.owner','categories']);
+  // var promise = new mongoose.Promise;
+  // if(callback){promise.addBack(callback);}
 
-  if (cb) return query.exec(cb)
+  var query=this.model('Products').find({sku:{
+    $in:skus,
+  }}).populate('vendor')
+     .populate('categories')
+     .populate({path:'categories',select:'weight name'});
+
+  //
+  // only available products ?
+  // query=query.where("pricing.stock").gt(0).where("attributes.available",true);
+
+  // query.exec(function(err,prods) {
+  //   promise.resolve(err,prods);
+  // });
+
+  if(callback){
+    return query.exec(callback);
+  }
+
   return query;
 
 };
@@ -428,7 +479,10 @@ Product.statics.findOneBySku = function(sku, callback){
     cb=undefined;
   }
 
-  return this.model('Products').findOne({sku:sku}).populate(['vendor','vendor.owner','categories']).exec(cb);
+  return this.model('Products').findOne({sku:sku})
+           .populate('vendor')
+           .populate('categories')
+           .populate({path:'categories',select:'weight name'}).exec(cb);
 };
 
 
@@ -448,163 +502,200 @@ Product.statics.findByCriteria = function(criteria, callback){
   var Products=this.model('Products'), 
       Categories=this.model('Categories'),
       Shops=this.model('Shops');
+
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria);
+  if(callback){promise.addBack(callback);}
       
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
       
   var query=Products.find({})
-              .populate(['vendor','vendor.owner','categories']);
+              .populate(['vendor','vendor.owner','categories']),
+      available=false,
+      shop=false,
+      category=false;
   
+  var now=Date.now();
 
   //console.log(criteria)
   
-  require('async').waterfall([
-    function(cb){
-      //
-      // by available shops status could be a boolean or a lst of shop
-      if (criteria.status){
-        // specify the date 
-        var nextShippingDays=Orders.findOneWeekOfShippingDay();
-        nextShippingDays[0].setHours(1,0,0,0);
-        nextShippingDays[nextShippingDays.length-1].setHours(1,0,0,0);
-        // console.log('filter date',nextShippingDays)
-        var q={'$or':[
-          {'$and':[{status:true},{'$or':[
-            {'available.active':{'$ne':true}},
-            {'available.from':{'$gte':nextShippingDays[0]}} 
-          ]}]},
-          {'$and':[{status:true},{'$or':[
-            {'available.active':{'$ne':true}},
-            {'available.to':{'$lte':nextShippingDays[nextShippingDays.length-1]}}
-          ]}]},
-          {'$and':[{status:true},{'available.active':{'$exists':false}}]}
-        ]};
-
-
-        Shops.find(q).select('_id').exec(function(err,available){
-          available=available.map(function (a) {
-            return a._id;
-          })
-          if (Array.isArray(criteria.status)){
-            console.log('FIXME --------------->',criteria.status)
-            criteria.status.forEach(function(s){
-              available.push(s._id)
-            })            
-          }
-          return cb(err,available);
-        });
-      }else cb(false,false);
-    },
-
-    function(available, cb){
-      //
-      // by shop
-      if (criteria.shopname){        
-        Shops.findOne({urlpath:criteria.shopname},function(err,shop){
-          if(!shop){return cb("La boutique n'existe pas");}
-          return cb(err,available, shop);
-        });
-      }else cb(false,available, false);
-    },
-    function(available, shop, cb){
-      //
-      // by category
-      if (criteria.category){
-        Categories.findOne({slug:criteria.category},function(err,category){
-          if(!category){return cb("La catégorie n'existe pas");}
-          return cb(err,available, shop,category);
-        });
-      }else cb(false,available, shop,false);
-    }],
-    function(err,available, shop, category){
-      if(err) return callback(err);
-
-
-      //
-      // !shop && available
-      if (available &&!shop){
-        query=query.where("vendor").in(available);
-      }else
-
-      //
-      // shop && !available
-      if(shop&&!available){
-        query=query.where("vendor",shop._id);
-      }else
-      
-      //
-      // shop && available && available.find(shop._id)
-      if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s)}))){        
-        query=query.where("vendor",shop._id);
-      }else 
-      
-      //
-      // shop && available && !available.find(shop._id)
-      if(shop&&available){
-        return query.where("status",'abcd01234').exec(callback);
-        //return callback(false,[])
-      }
-      
-
-      //
-      // filter by Category ID
-      if(category){
-        query=query.where("categories",category._id);
-      }  
-
-      //
-      // filter by geo location 
-      if (criteria.location){
-      }
-      
-      //
-      // filter by details
-      if (criteria.details){
-        var details=criteria.details.split(/[+,]/);
-        details.forEach(function(detail){
-          query=query.where("details."+detail,true);
-        });        
-      }
-
-      //
-      // only available products ?
-      if(criteria.available!==undefined){
-        query=query.where("attributes.available",(criteria.available));
-      }
-
-      //
-      // only available products ?
-      if(criteria.instock!==undefined){
-        query=query.where("pricing.stock").gt(0);
-      }
-
-      //
-      // only low stock products ?
-      if(criteria.lowstock!==undefined){
-        query=query.where("pricing.stock").lt(5);
-      }
-
-      //
-      // filter by SKUs
-      if(criteria.skus){
-        query=query.where("sku").in(criteria.skus)
-      }
-
-      //
-      // available at home ?
-      if(criteria.home!==undefined){
-        query=query.where("attributes.home",(criteria.home));
-      }
-
-
-      if(callback){
-        //.populate({path:'categories',select:'weight name'})
-        return query.populate('vendor')
-               .populate('categories')
-               .populate({path:'categories',select:'weight name'}).exec(callback);
-      }
+  //
+  // by available shops status could be a boolean or a lst of shop
+  (function () {
+    var promiseStatus= new mongoose.Promise;
+    if (!criteria.status){
+      return promiseStatus.resolve(null,false);
     }
-  );
 
-  return query;
+    // specify the date 
+    var nextShippingDays=Orders.findOneWeekOfShippingDay();
+    nextShippingDays[0].setHours(1,0,0,0);
+    nextShippingDays[nextShippingDays.length-1].setHours(1,0,0,0);
+    var q={'$or':[
+      {'$and':[{status:true},{'$or':[
+        {'available.active':{'$ne':true}},
+        {'available.from':{'$gte':nextShippingDays[0]}} 
+      ]}]},
+      {'$and':[{status:true},{'$or':[
+        {'available.active':{'$ne':true}},
+        {'available.to':{'$lte':nextShippingDays[nextShippingDays.length-1]}}
+      ]}]},
+      {'$and':[{status:true},{'available.active':{'$exists':false}}]}
+    ]};
+
+
+    Shops.find(q).select('_id').exec(function(err,available){
+      available=available.map(function (a) {
+        return a._id;
+      })
+      if (Array.isArray(criteria.status)){
+        console.log('FIXME --------------->',criteria.status)
+        criteria.status.forEach(function(s){
+          available.push(s._id)
+        })            
+      }
+      // return cb(err,available);
+      promiseStatus.resolve(err,available)
+    });
+    return promiseStatus;
+  })().then(function (available) {
+    var promiseShop= new mongoose.Promise;
+
+    //
+    // by shop
+    if (!criteria.shopname){        
+      return promiseShop.resolve(null,available, false);
+    }
+
+    Shops.findOne({urlpath:criteria.shopname},function(err,shop){
+      if(!shop){
+        return promiseShop.reject(new Error("La boutique n'existe pas"))
+      }
+      promiseShop.resolve(err,available, shop);
+    });
+
+    return promiseShop;
+  }).then(function (available, shop) {
+    var promiseCategory= new mongoose.Promise;
+
+    //
+    // by category
+    if (!criteria.category){
+      return promiseCategory.resolve(null,available, shop,false)
+    }
+    Categories.findOne({slug:criteria.category},function(err,category){
+      if(!category){
+        return promiseCategory.reject(new Error("La catégorie n'existe pas"));
+      }
+      promiseCategory.resolve(err,available, shop,category);
+    });
+    return promiseCategory;
+  }).then(function (available, shop, category) {
+  
+
+    //
+    // !shop && available
+    if (available &&!shop){
+      query=query.where("vendor").in(available);
+    }else
+
+    //
+    // shop && !available
+    if(shop&&!available){
+      query=query.where("vendor",shop._id);
+    }else
+    
+    //
+    // shop && available && available.find(shop._id)
+    if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s)}))){        
+      query=query.where("vendor",shop._id);
+    }else 
+    
+    //
+    // shop && available && !available.find(shop._id)
+    if(shop&&available){
+      return promise.resolve(null,[]);
+    }
+    
+
+    //
+    // filter by Category ID
+    if(category){
+      query=query.where("categories",category._id);
+    }  
+
+    //
+    // filter by geo location 
+    if (criteria.location){
+    }
+    
+    //
+    // filter by details
+    if (criteria.details){
+      var details=criteria.details.split(/[+,]/);
+      details.forEach(function(detail){
+        query=query.where("details."+detail,true);
+      });        
+    }
+
+    //
+    // with discount
+    if(criteria.discount!==undefined){
+      query=query.where("attributes.discount",criteria.discount);      
+    }
+
+    //
+    // only available products ?
+    if(criteria.available!==undefined){
+      query=query.where("attributes.available",(criteria.available));
+    }
+
+    //
+    // only available products ?
+    if(criteria.instock!==undefined){
+      query=query.where("pricing.stock").gt(0);
+    }
+
+    //
+    // only low stock products ?
+    if(criteria.lowstock!==undefined){
+      query=query.where("pricing.stock").lt(5);
+    }
+
+    //
+    // filter by SKUs
+    if(criteria.skus){
+      query=query.where("sku").in(criteria.skus)
+    }
+
+    //
+    // available at home ?
+    if(criteria.home!==undefined){
+      query=query.where("attributes.home",(criteria.home));
+    }
+     
+    // console.log('---------- 3 exec', Date.now()-now)
+
+    query.populate('vendor')
+           .populate('categories')
+           .populate({path:'categories',select:'weight name'}).exec(function (err,products) {
+            // console.log('---------- 4 exec', Date.now()-now,products.length)
+             cache.set(cacheKey,products);
+             promise.resolve(err,products);
+           });
+
+  }).then(undefined,function (error) {
+    //
+    // ON ERROR
+    //
+    promise.reject(error);
+  })
+
+  return promise;
 
 };
 

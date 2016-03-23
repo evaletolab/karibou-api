@@ -5,6 +5,7 @@ require('../app/config');
 var db = require('mongoose'),
     Shops = db.model('Shops'),
     Documents = db.model('Documents'),
+    Remarkable= require('remarkable'),
     validate = require('./validate/validate'),
     _=require('underscore'),
     errorHelper = require('mongoose-error-helper').errorHelper;
@@ -44,7 +45,7 @@ var queryFilterByUser=function (q,req) {
     q.available=true;
     q.published=true;
   }
-  else if(req.isAdmin()){
+  else if(req.user.isAdmin()){
     q.available=true;
   }else{
     q.available=true;
@@ -65,17 +66,6 @@ exports.findByOwner=function (req, res) {
 };
 
 
-exports.findBySkus=function (req, res) {
-  var skus=req.params.sku&&req.params.sku.split(',')||[], q={skus:skus};
-
-  q=queryFilterByUser(q,req);
-  Documents.findByCriteria(q,function(err,docs){
-    if (err) {
-      return res.status(400).send(err);
-    }
-    return res.json(docs)    
-  });
-};
 
 exports.findByCategory=function (req, res) {
   var q={type:req.params.category};
@@ -114,11 +104,25 @@ exports.get=function (req, res) {
   });
 };
 
+exports.findBySkus=function (req, res) {
+  var skus=req.params.sku&&req.params.sku.split(',')||[], q={skus:skus};
+
+  q=queryFilterByUser(q,req);
+  Documents.findByCriteria(q,function(err,docs){
+    if (err) {
+      return res.status(400).send(err);
+    }
+    return res.json(docs)    
+  });
+};
+
+
 //
 // creation
 exports.create=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   try{  
-    validate.document(req.body);
+    validate.document(req.body,lang);
   }catch(err){
     return res.status(400).send( err.message);
   }  
@@ -139,13 +143,18 @@ exports.create=function (req, res) {
 
 };
 
+
 // Single update
 exports.update=function (req, res) {
   //
   // check && validate input field
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
   try{
     validate.check(req.params.slug, "Le format SLUG du document n'est pas valide").len(3, 104).isSlug();    
-    validate.document(req.body);
+    validate.document(req.body,lang);
+    if(!lang){
+      throw new Error('default locale is not selected');
+    }
   }catch(err){
     return res.status(400).send( err.message);
   }  
@@ -159,6 +168,7 @@ exports.update=function (req, res) {
   delete(req.body._id);
   delete(req.body.__v);
   delete(req.body.slug);
+  delete(req.body.products);
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
   
@@ -167,6 +177,7 @@ exports.update=function (req, res) {
     if (!doc){
       return res.status(400).send('Ooops, unknow doc '+req.params.slug);    
     }
+
 
     // if not admin  
     if(!req.user.isAdmin()){
@@ -177,11 +188,19 @@ exports.update=function (req, res) {
     }
 
     // 
-    // slug this doc TODO the slug change the final url && url can be bookmarked!! WE SHOULD SAVE SLUG VERSIONS
-    if(req.body.title&&doc.title!==req.body.title){
-      doc.slug=req.body.title.slug();
+    // slug this doc 
+    if(req.body.title&&doc.title[lang]!==req.body.title[lang]){
+      doc.slug.push(req.body.title[lang].slug());
+      doc.slug=_.uniq(doc.slug);
     }    
 
+    //
+    // normalize skus
+    if(req.body.skus&&req.body.skus.length){
+      for (var i = req.body.skus.length - 1; i >= 0; i--) {
+        req.body.skus[i]=req.body.skus[i].sku||req.body.skus[i];
+      };
+    }
 
     // do the update
     _.extend(doc,req.body)
@@ -190,7 +209,9 @@ exports.update=function (req, res) {
       doc.skus=_.uniq(doc.skus);
     }
 
+
     doc.save(function (err) {
+      console.log(err)
       if (err){
         return res.status(400).send(err.message||errorHelper(err));    
       }
@@ -198,7 +219,6 @@ exports.update=function (req, res) {
     })
   });
 };
-
 
 // remove a single doc
 exports.remove=function (req, res) {
@@ -222,6 +242,9 @@ exports.remove=function (req, res) {
 //
 // get doc SEO
 exports.getSEO=function (req, res) {
+  var lang=req.session.lang||config.shared.i18n.defaultLocale;
+  var converter = new Remarkable();
+
   return Documents.findOneBySlug({slug:req.params.slug}, function (err, doc) {
     if (err) {
       return res.status(400).send(errorHelper(err));
@@ -237,9 +260,14 @@ exports.getSEO=function (req, res) {
       // setup the model 
       var model={ 
         doc: doc, 
+        lang:lang,
         products:products,
         user: req.user, 
         _:_,
+        md:converter,  
+        getLocal:function(item){
+          if(item) return item[lang];return item;
+        },
         prependUrlImage:function (url) {
           if(url&&url.indexOf('//')===0){
             url='https:'+url;

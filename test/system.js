@@ -211,10 +211,10 @@ describe("system", function(){
         }
 
         app.get('/race/condition/1', queued(function(req, res){
-            setTimeout(function(){res.send(200,'task1')},50);            
+            setTimeout(function(){res.send('task1')},50);            
         }));        
         app.get('/race/condition/2',queued(function(req, res){
-          setTimeout(function(){res.send(200,'task2')},0);            
+          setTimeout(function(){res.send('task2')},0);            
         }));        
 
         request(app).get('/race/condition/1')

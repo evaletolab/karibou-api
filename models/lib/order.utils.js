@@ -42,9 +42,9 @@ exports.print=function(order){
 exports.printInfo=function(){
   var now=new Date()
   console.log("-- now it's   ", now);
-  console.log("-- available shipping days   ", config.shop.order.weekdays.join(','));
-  console.log("-- order payment timelimite (s)   ", config.shop.order.timeoutAndNotPaid);
-  console.log("-- order preparation timelimit (hours)   ", config.shop.order.timelimit);
+  console.log("-- available shipping days   ", config.shared.order.weekdays.join(','));
+  console.log("-- order payment timelimite (s)   ", config.shared.order.timeoutAndNotPaid);
+  console.log("-- order preparation timelimit (hours)   ", config.shared.order.timelimit);
   console.log("--    ");
   console.log("-- next shipping day for customers  ", this.findNextShippingDay());
   console.log("-- next shipping day for sellers  ", this.findCurrentShippingDay());
@@ -115,7 +115,7 @@ exports.getShippingPrice=function(factor){
   //
   // get the base of price depending the shipping sector
   function getShippingSectorPrice(postalCode) {
-    if(config.shop.shipping.periphery.indexOf(postalCode)!==-1){
+    if(config.shared.shipping.periphery.indexOf(postalCode)!==-1){
       return 'periphery';
     }
     return 'hypercenter';
@@ -124,7 +124,7 @@ exports.getShippingPrice=function(factor){
   //
   // get the base of price depending the shipping sector
   var distance=getShippingSectorPrice(this.shipping.postalCode);
-  var price=config.shop.shipping.price[distance];
+  var price=config.shared.shipping.price[distance];
 
 
   // check if value exist, (after creation) 
@@ -143,18 +143,18 @@ exports.getShippingPrice=function(factor){
   //
   // TODO TESTING MERCHANT ACCOUNT
   if (this.customer.merchant===true){
-    return roundCHF(price-config.shop.shipping.priceB);
+    return roundCHF(price-config.shared.shipping.priceB);
   }
 
   
   // implement 3) get free shipping!
-  if (config.shop.shipping.discountB&&this.getSubTotal()>=config.shop.shipping.discountB){
-    return roundCHF(price-config.shop.shipping.priceB);
+  if (config.shared.shipping.discountB&&this.getSubTotal()>=config.shared.shipping.discountB){
+    return roundCHF(price-config.shared.shipping.priceB);
   }
 
   // implement 3) get half shipping!
-  else if (config.shop.shipping.discountA&&this.getSubTotal()>=config.shop.shipping.discountA){
-    return roundCHF(price-config.shop.shipping.priceA);
+  else if (config.shared.shipping.discountA&&this.getSubTotal()>=config.shared.shipping.discountA){
+    return roundCHF(price-config.shared.shipping.priceA);
   }
 
 
@@ -183,8 +183,8 @@ exports.getTotalPrice=function(factor){
 
   //
   // add gateway fees
-  for (var gateway in config.shop.order.gateway){
-    gateway=config.shop.order.gateway[gateway]
+  for (var gateway in config.shared.order.gateway){
+    gateway=config.shared.order.gateway[gateway]
     if (gateway.label===this.payment.issuer){
       total+=total*gateway.fees;
       break;
@@ -229,7 +229,7 @@ exports.formatDate=function(date, withTime){
   var d=format.weekdays[when.getDay()]
   var day=when.getDate()
   // set time
-  var time='';if(withTime)time=" de "+config.shop.order.shippingtimes[when.getHours()];
+  var time='';if(withTime)time=" de "+config.shared.order.shippingtimes[when.getHours()];
 
   return d+" "+day+" "+m+" "+when.getFullYear()+time;
 }
@@ -362,12 +362,12 @@ exports.findOneWeekOfShippingDay=function(){
   var next=this.findNextShippingDay(), all=[], nextDate=next
 
   // get current day in the array
-  var idxDay=config.shop.order.weekdays.indexOf(next.getDay());
+  var idxDay=config.shared.order.weekdays.indexOf(next.getDay());
 
   //
   // end of week
-  for (var i = idxDay; i < config.shop.order.weekdays.length; i++) {
-    nextDate=new Date((config.shop.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
+  for (var i = idxDay; i < config.shared.order.weekdays.length; i++) {
+    nextDate=new Date((config.shared.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
     nextDate.setHours(next.getHours(),0,0,0)
     all.push(nextDate)
   };
@@ -379,14 +379,14 @@ exports.findOneWeekOfShippingDay=function(){
   //
   // next week
   for (var i = 0; i < idxDay; i++) {
-    nextDate=new Date((config.shop.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
+    nextDate=new Date((config.shared.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
     nextDate.setHours(next.getHours(),0,0,0)
     all.push(nextDate)
   };
 
 
 
-  // config.shop.order.weekdays.forEach(function(day){
+  // config.shared.order.weekdays.forEach(function(day){
   //   // next = 2
   //   // all=[1,2,4]
   //   // result =[2,4,1]
@@ -396,12 +396,12 @@ exports.findOneWeekOfShippingDay=function(){
   //       nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
   //       nextDate.setHours(next.getHours(),0,0,0)
   //       console.log('before-----------',nextDate.getDay())
-  //       if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+  //       if(config.shared.order.weekdays.indexOf(nextDate.getDay())!=-1)
   //         all.push(nextDate)
   //   }else if(day>=next.getDay()){
   //       nextDate=new Date((day-next.getDay())*86400000+next.getTime())
   //       nextDate.setHours(next.getHours(),0,0,0)
-  //       if(config.shop.order.weekdays.indexOf(nextDate.getDay())!=-1)
+  //       if(config.shared.order.weekdays.indexOf(nextDate.getDay())!=-1)
   //         all.push(nextDate)
   //   }
   // })
@@ -416,16 +416,16 @@ exports.findOneWeekOfShippingDay=function(){
 exports.findNextShippingDay=function(tl,th){
   var now=new Date(), 
       next, 
-      timelimit=tl||config.shop.order.timelimit,
-      timelimitH=th||config.shop.order.timelimitH;
+      timelimit=tl||config.shared.order.timelimit,
+      timelimitH=th||config.shared.order.timelimitH;
       // 24h == 86400000
 
       // remove min/sec
       now.setHours(now.getHours(),0,0,0)
 
   // looking for end of the week 
-  for (var i = 0; i < config.shop.order.weekdays.length; i++) {
-    var day=config.shop.order.weekdays[i];
+  for (var i = 0; i < config.shared.order.weekdays.length; i++) {
+    var day=config.shared.order.weekdays[i];
     if(day>=now.getDay()){
       // a valid day is at least>=timelimit 
       next=new Date(now.getTime()+86400000*(day-now.getDay()))      
@@ -439,8 +439,8 @@ exports.findNextShippingDay=function(tl,th){
   }
 
   // looking for begin of the week 
-  for (var i = 0; i < config.shop.order.weekdays.length; i++) {
-    var day=config.shop.order.weekdays[i];
+  for (var i = 0; i < config.shared.order.weekdays.length; i++) {
+    var day=config.shared.order.weekdays[i];
     if(day<now.getDay()){
       next=new Date((7-now.getDay()+day)*86400000+now.getTime());
       next.setHours(timelimitH,0,0,0)
@@ -461,7 +461,7 @@ exports.findNextShippingDay=function(tl,th){
 
 /* return the current shipping day this is for sellers*/
 exports.findCurrentShippingDay=function(){
-  var timelimitH=Number(Object.keys(config.shop.order.shippingtimes).sort()[0])+8
+  var timelimitH=Number(Object.keys(config.shared.order.shippingtimes).sort()[0])+8
   timelimitH=23;
   return this.findNextShippingDay(0.1,Number(timelimitH))
 }

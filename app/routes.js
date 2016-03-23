@@ -138,10 +138,12 @@ module.exports = function(app, config, passport) {
   // app.get('/shop/:shopname', shops.getSEO);
   app.get('/seo/shop/:shopname', shops.getSEO);
   app.get('/seo/shop/:shopname/products/:sku/:slug?', products.getSEO);
+  app.get('/seo/content/:slug', docs.getSEO);
+
 
   //
   // system
-  app.get ('/v1/config', cached, api.config);
+  app.get ('/v1/config', api.config);
   app.post('/v1/config', auth.ensureAdmin, api.saveConfig);
   app.post('/v1/trace/:key', api.trace);
   app.post('/v1/comment', api.email);
@@ -174,8 +176,8 @@ module.exports = function(app, config, passport) {
   app.get('/v1/products/shops',shops.ensureOwnerOrAdmin,products.findByOwner);
   app.get('/v1/products/love',auth.ensureAuthenticated,products.love);
   app.get('/v1/products/:sku',products.get);
-  app.get('/v1/products',products.list);
-  app.get('/v1/products/category/:category',products.list);
+  app.get('/v1/products',cached,products.list);
+  app.get('/v1/products/category/:category',cached,products.list);
   app.get('/v1/products/location/:location',products.list);
   app.get('/v1/products/category/:category/details/:details',products.list);
   app.get('/v1/products/location/:location/category/:category',products.list);
