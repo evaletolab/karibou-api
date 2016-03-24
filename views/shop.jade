@@ -40,7 +40,7 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
           ul(class="nav navbar-nav ")
             - each menu in config.shared.menu
               li(role="presentation" class="")
-                if menu.active
+                if menu.active && (['karibou','howto','links'].indexOf(menu.group)!==-1)
                   a( href="#{menu.url}"): | !{getLocal(menu.name)} 
             li(role="presentation" class=""): a( href="/shops") Les boutiques
 
