@@ -76,7 +76,7 @@ module.exports = {
           "Plan-les-Ouates,GE","Pregny-Chambésy,GE","Presinge,GE","Puplinge,GE",
           "Russin,GE","Satigny,GE","Soral,GE","Thônex,GE","Troinex,GE","Vandoeuvres,GE",
           "Vernier,GE","Versoix,GE","Veyrier,GE", 
-	  "Tanney,VD",
+	  "Tannay,VD",
           "Reignier, France"
     ]
   },
