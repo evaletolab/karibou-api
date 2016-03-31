@@ -168,19 +168,21 @@ exports.list=function (req, res) {
   var query=_.extend(req.query,req.params), 
       popular=[],loves=[],discount=[],home=[],promise,promises=[Q.when([])];// set of products
 
+  // force product status == true
   if(!req.user||!req.user.isAdmin()){
     query.status=true;
-    //FIXME WTF is this shit req.query.status=req.user.shops??
-    if(req.user)query.status=req.user.shops;
-  }else{
-    // constraint popular product
-    query.email=req.user.email.address;
+  }
+  
+  //
+  // filter to shops products
+  if(req.user&&query.shopname){
+      query.status=req.user.shops||[];
   }
 
   // if popular products are requested  
   // options: email, maxcat,likes,available
-  if(query.popular && query.email){
-    promise=Products.findPopular({email:query.email,status:true, available:query.available,maxcat:query.maxcat});
+  if(query.popular && req.user){
+    promise=Products.findPopular({email:req.user.email.address,status:true, available:query.available,maxcat:query.maxcat});
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- popular',products.length, Date.now()-now)
