@@ -97,6 +97,65 @@ module.exports = function (app) {
  
 
   //
+  // give an array of days (in the form [0..6]) and return the ordered dates corresponding (starting from today)
+  // Sun(0), Mon, tuesday, wednesday, thursday, Freeday, Saterday
+  Date.dayToDates=function(days, offset){
+    var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[];    
+    days=days||[];
+
+    //
+    // starting from today
+    days.forEach(function (day) {
+      if((day-today)>=0) {
+        result.push(new Date(now.getTime()+(day-today)*h24));
+      }
+    });
+
+    // this is splitted in 2 loops to make the list ordered!
+    // going to next week  ()
+    days.forEach(function (day) {
+      if((day-today)<0) {
+        result.push(new Date(now.getTime()+(day-today)*h24+week));
+      }
+    });
+    return result;
+  };
+
+  //
+  // Compute the next potential shipping day. 
+  // It depends on the hours needed to harvest/prepare a placed order
+  Date.potentialShippingDay=function(){
+    var now=new Date();
+
+    //
+    // timelimitH is hour limit to place an order
+    now.setHours(config.shared.order.timelimitH,0,0,0);
+
+    // next date depends on the hours needed to prepare a placed order
+    return new Date(now.getTime()+3600000*config.shared.order.timelimit);        
+
+  };
+
+  //  
+  // the current shipping day is short date for the placed orders
+  Date.currentShippingDay=function(){
+    return this.dayToDates(config.shared.order.weekdays)[0];
+  };
+
+  //
+  // the next shipping day
+  Date.nextShippingDay=function() {
+    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay())[0];
+  }
+
+  //
+  // a full week of available shipping days
+  Date.fullWeekShippingDays=function() {
+    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay());
+  }
+
+
+  //
   // label alphanum sort for this case "2000.10"
   Array.prototype.sortSeparatedAlphaNum=function (separator) {
     separator=separator||'.';
