@@ -154,14 +154,12 @@ Product.methods.removeCategories=function(cats,callback){
 
 */
 Product.post('save',function (product) {
-  // console.log('-----------------RESET CACHE')
   cache.reset();
 });
 
 Product.post('remove',function (product) {
   //
   // clean likes for all users
-  // console.log('-----------------RESET CACHE')
   cache.reset();
 
   db.model('Users').find({'likes':product.sku}).exec(function (err,users) {
@@ -346,7 +344,7 @@ Product.statics.findPopular = function(criteria, callback){
 
   var skus=[], 
       today=new Date(), 
-      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||1)), 
+      windowtime=new Date(Date.now()-86400000*30*parseInt(criteria.windowtime||2)), 
       thisYear=today.getFullYear(),
       thisMonth=today.getMonth(),
       maxcat=criteria.maxcat||4;
@@ -365,7 +363,7 @@ Product.statics.findPopular = function(criteria, callback){
     thisYear={$in:[thisYear,thisYear-1]};
   }
 
-  //
+  // TODO move this function to order API
   // get items last 3 month sku by 
   this.model('Orders').aggregate(
      { $match: select },
@@ -521,7 +519,6 @@ Product.statics.findByCriteria = function(criteria, callback){
   
   var now=Date.now();
 
-  //console.log(criteria)
   
   //
   // by available shops status could be a boolean or a lst of shop
@@ -531,10 +528,20 @@ Product.statics.findByCriteria = function(criteria, callback){
       return promiseStatus.resolve(null,false);
     }
 
-    // specify the date 
+    //
+    // specify full shipping week 
     var nextShippingDays=Orders.findOneWeekOfShippingDay();
     nextShippingDays[0].setHours(1,0,0,0);
     nextShippingDays[nextShippingDays.length-1].setHours(1,0,0,0);
+
+    //
+    // status===true && (
+    //   available.active!==true || available.from >= nextShippingDays[0]
+    // ) ||
+    // status===true && (
+    //   available.active!==true || available.to <= nextShippingDays[last]
+    // ) ||
+    // status === true && available.active === undefined
     var q={'$or':[
       {'$and':[{status:true},{'$or':[
         {'available.active':{'$ne':true}},
