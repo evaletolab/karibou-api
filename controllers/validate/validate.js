@@ -96,9 +96,13 @@ var user= exports.user = function(u, lean){
       ifCheck(u.name.familyName, "Votre nom de famille n'est pas valide").len(2, 100).isText();
       ifCheck(u.name.givenName,  "Votre prénom n'est pas valide").len(2, 100).isText();
     }
-    if(!lean && (!u.phoneNumbers||!u.phoneNumbers.length)){
+
+    //
+    // only when non admin and non update of reminder
+    if(!lean && !u.save_reminder && (!u.phoneNumbers||!u.phoneNumbers.length)){
       throw new Error("Vous devez définir au moins un téléphone");
     }
+
 
     for( var i in u.phoneNumbers){
       check(u.phoneNumbers[i].what,   "Votre libélé de téléphone n'est pas valide").isText().len(4, 30)
@@ -113,6 +117,10 @@ var user= exports.user = function(u, lean){
       }
       primary=u.addresses[i].primary;
       user_address(u.addresses[i])
+    }
+
+    if(u.save_reminder){
+      delete u.save_reminder;
     }
 
 }
