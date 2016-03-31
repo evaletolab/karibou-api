@@ -5,6 +5,7 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 4,max:50})
   , Promise = mongoose.Promise
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
@@ -95,6 +96,10 @@ var Shops = new Schema({
 });
 
 
+Shops.post('save',function (product) {
+  cache.reset();
+});
+
 
 Shops.statics.create = function(shop,user, callback){
   assert(shop);
@@ -182,6 +187,13 @@ Shops.methods.getDiff=function (next) {
   return result;
 }
 
+Shops.methods.print=function() {
+  var self=this;
+  console.log("-- urlpath  , status ", self.urlpath, self.name, self.status);
+  console.log("   available ", JSON.stringify(self.available));
+  console.log("   account   ", JSON.stringify(self.account));
+}
+
 //
 // validate shop
 //   valid: true, invalid: Date, deleted:false
@@ -228,6 +240,79 @@ Shops.statics.update=function(id,s,callback){
  
     return shop.save(callback);
   });
+};
+
+
+//
+// Lister les boutiques disponibles dans les dates données
+// - tester si la boutique est fermée (aux dates données)
+// - tester si la boutique livre aux dates données
+// - si il y a plusieurs dates, il suffit qu'une soit ok pour la boutique soit retournée
+// or:
+//   status === true && (available === true && from < selectedShippingDay)
+//   status === true && (available === true && from > selectedShippingDay)
+//   status === true && (available.weekdays === selectedShippingDay.getDay() )
+Shops.statics.findAvailable=function(rangeDates,callback) {
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify([rangeDates]);
+  if(callback){promise.addBack(callback);}
+      
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
+  var q={
+    status:true
+  };
+
+  //
+  // specify full shipping week 
+  var days=[0,1,2,3,4,5,6];
+  if(rangeDates.length){
+    rangeDates[0].setHours(1,0,0,0);
+    rangeDates[rangeDates.length-1].setHours(1,0,0,0);
+    days=rangeDates.map(function(r) {
+      return r.getDay();
+    });
+
+    //
+    // filter by date only when range exist
+    q['$or']=[
+      {'available.active':{'$ne':true}},
+      {'available.from':{'$gte':rangeDates[0]}},
+      {'available.to':{'$lte':rangeDates[rangeDates.length-1]}}
+    ];
+  }
+  
+  q['available.weekdays']={'$in':days};
+
+  //
+  // status===true && (
+  //   available.active!==true || available.from >= rangeDates[0] || available.to <= rangeDates[last]
+  // ) ||
+  // status === true && available.active === undefined
+  // var q={'$or':[
+  //   {'$and':[{status:true},{'$or':[
+  //     {'available.active':{'$ne':true}},
+  //     {'available.from':{'$gte':rangeDates[0]}} 
+  //   ]}]},
+  //   {'$and':[{status:true},{'$or':[
+  //     {'available.active':{'$ne':true}},
+  //     {'available.to':{'$lte':rangeDates[rangeDates.length-1]}}
+  //   ]}]},
+  //   {'$and':[{status:true},{'available.active':{'$exists':false}}]}
+  //   ],
+  //   status:true,'weekdays':{'$in':[0]}
+  // };
+  console.log('---------------------------',JSON.stringify(q))
+
+  this.find(q).exec(function(err,shops){
+    cache.set(cacheKey,shops);
+    promise.resolve(err,shops);    
+  });
+
+  return promise;
 };
 
 Shops.statics.findByUser=function(u,callback){
