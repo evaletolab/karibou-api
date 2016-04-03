@@ -5,7 +5,7 @@ var assert = require("assert");
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , validate = require('mongoose-validate')
-  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 4,max:50})
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 12,max:50})
   , Promise = mongoose.Promise
   , ObjectId = Schema.ObjectId
   , _ = require('underscore');
@@ -235,6 +235,12 @@ Shops.statics.update=function(id,s,callback){
     //
     // get catalog from object._id or _id
     s.owner&&delete(s.owner);
+    //
+    // normalize times
+    if(s.available){
+      s.available.from&&s.available.from.setHours(0,0,0,0);
+      s.available.to&&s.available.to.setHours(0,0,0,0);
+    }
     _.extend(shop,s);
 
  
@@ -270,18 +276,24 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
   // specify full shipping week 
   var days=[0,1,2,3,4,5,6];
   if(rangeDates.length){
-    rangeDates[0].setHours(1,0,0,0);
-    rangeDates[rangeDates.length-1].setHours(1,0,0,0);
+    rangeDates[0].setHours(0,0,0,0);
     days=rangeDates.map(function(r) {
       return r.getDay();
     });
+
+    // if rangesDate == 1
+    if(rangeDates.length===1){
+      rangeDates.push(rangeDates[0].tomorrow())
+    }
+    rangeDates[rangeDates.length-1].setHours(0,0,0,0);
+    
 
     //
     // filter by date only when range exist
     q['$or']=[
       {'available.active':{'$ne':true}},
       {'available.from':{'$gte':rangeDates[0]}},
-      {'available.to':{'$lte':rangeDates[rangeDates.length-1]}}
+      {'available.to':{'$lt':rangeDates[rangeDates.length-1]}}
     ];
   }
   
@@ -305,7 +317,6 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
   //   ],
   //   status:true,'weekdays':{'$in':[0]}
   // };
-  console.log('---------------------------',JSON.stringify(q))
 
   this.find(q).exec(function(err,shops){
     cache.set(cacheKey,shops);
@@ -345,6 +356,86 @@ Shops.statics.findAllBySlug=function (slugs,callback) {
   var query=Shops.find({urlpath:{"$in":q}}).populate('owner').populate('catalog')
   if(callback)return query.exec(callback)
   return query;
+}
+
+Shops.statics.findByCriteria=function(criteria,callback) {
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria), 
+      Shops=this;
+  if(callback){promise.addBack(callback);}
+      
+
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
+  //
+  // initial find
+  function getShops(where){
+    var query=Shops.find(where);
+
+
+    if (criteria.sort){
+      console.log("sort shop by creation date: ",criteria.sort);
+      query=query.sort(criteria.sort);
+    }
+
+    // filter
+    if(criteria.status){
+      query=query.where("status",true);
+    }
+
+    //
+    //FILTER only visible shop are available:
+    //       if (criteria.user._id == shop.owner || shop.status==true)
+    if(!criteria.user||!criteria.user.isAdmin()){
+      var filter=[{'status':true}];
+      if(criteria.user){
+        filter.push({'owner':criteria.user._id});
+      }
+      query=query.or(filter);
+    }
+
+    if(criteria.user&&(criteria.user.isAdmin()||criteria.user.hasRole('logistic'))){
+      query=query.populate('owner');      
+    }
+
+    query.populate('catalog').exec(function (err,shops){
+      if (err){
+        return promise.reject(err);
+      }
+
+      //
+      // as we dont know how to group by with mongo
+      if (criteria.group){
+        grouped=_.groupBy(shops,function(shop){
+          return shop.catalog&&shop.catalog.name;
+        });
+        
+        cache.set(cacheKey,grouped);
+        return promise.resolve(null,grouped);
+      }
+
+      cache.set(cacheKey,shops);
+      return promise.resolve(null,shops);
+    });
+
+    return promise;
+  }
+
+  if (criteria.category){
+    return db.model('Categories').findBySlug(criteria.category,function(e,c){
+      if (e){
+        return promise.reject(e);
+      }
+      if (!c){
+        return promise.reject("Il n'existe pas de catégorie "+criteria.category);
+      }
+      return getShops({catalog:c._id});
+    });
+  }
+
+  return getShops({});
 }
 
 Shops.set('autoIndex', config.mongo.ensureIndex);

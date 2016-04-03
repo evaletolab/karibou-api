@@ -26,62 +26,13 @@ exports.list=function (req, res) {
   }catch(err){
     return res.status(400).send( err.message);
   }  
-  var type=(req.query.type)?{type:req.query.type}:{};
-  //if (req.query.type==='*')type={};
-  var query=Categories.find(type);
 
-
-
-  //
-  // count sku by category
-  if (req.query.stats){
-    var stats=db.model('Products').aggregate(
-      {$project : { sku : 1, categories : 1 }},
-    /*{$unwind:'$categories'},   // for array field */
-      {
-        $group:{
-          _id:"$categories", 
-          sku:{$addToSet:"$sku"}
-        }
-    });
-  }
-  //
-  // filter by group name
-  if (req.query.group){
-    query=query.where("group",new RegExp(req.query.group, "i"))
-  }
-  
-  //
-  // filter by name
-  if (req.query.name){
-    query=query.where("name",new RegExp(req.query.name, "i"))
-  }
-  
-  query.exec(function(err,cats){
-    if(err){
-      return res.status(400).send(err);
-    }
-
-    //
-    // merge aggregate with categories to obtains :
-    // the products by category
-    if (stats){
-      stats.exec(function(err,result){
-        if(err){
-          return res.status(400).send(err);
-        }
-        // console.log(result, cats)
-        cats.forEach(function(cat){
-          var stat=_.find(result,function(s){return s._id&&s._id.toString()==cat._id.toString()});          
-          cat._doc.usedBy=(stat)?stat.sku:[];
-        })
-        return res.json(cats);
-      });
-      return;
-    }
-    
+  Categories.findByCriteria(req.query).then(function(cats) {
     return res.json(cats);
+  }).then(undefined,function(err) {
+      return res.status(400).send(err);
   });
+
 };
 
 exports.get=function (req, res) {
@@ -136,20 +87,13 @@ exports.remove=function (req, res) {
   }catch(err){
     return res.status(400).send( err.message);
   } 
-  //
-  // todo, do not remove category if product are still assigned
-  db.model('Products').find({"categories.slug":req.params.category},function(err,c){
-    //
-    // checking is category is not linked to product or shop
-    if (err){return res.status(400).send(err)}
-    if(c.length>0){return res.status(400).send("Impossible de supprimer une categorie associée.")}
 
-    Categories.remove({slug:req.params.category},function(err){
-      if (err){return res.status(400).send(err)}
-      return res.sendStatus(200);
-    });
-  })
-   
+  Categories.removeBySlug(req.params.category).then(function() {
+    res.sendStatus(200);
+  },function(err){
+    res.status(400).send(err)
+  });
+
 };
 
 
