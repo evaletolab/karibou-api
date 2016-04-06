@@ -3,6 +3,7 @@ var debug = require('debug')('categories');
 var assert = require("assert");
 
 var mongoose = require('mongoose')
+  , cache = require("lru-cache")({maxAge:1000 * 60 * 60 * 12,max:50})
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
   
@@ -23,10 +24,38 @@ var Categories = new Schema({
     type:{type:String, default:"Category",enum:config.shared.category.types}
 });
 
+Categories.post('save',function (product) {
+  cache.reset();
+});
+
+Categories.post('remove',function (product) {
+  cache.reset();
+});
 
 Categories.methods.slugName=function(){
   return this.name.slug();
 };
+
+Categories.statics.removeBySlug=function (slug,callback) {
+  var promise = new mongoose.Promise, Categories=this;
+  if(callback){promise.addBack(callback);}
+
+  // check if there is products associated
+  db.model('Products').find({"categories.slug":slug}).exec().then(function (prods) {
+    if(prods.length){
+      return promise.reject(new Error("Impossible de supprimer une categorie associée."));
+    }
+    return Categories.remove({slug:slug});
+  }).then(function() {
+    cache.reset();
+    promise.resolve();
+  }).then(undefined,function(err) {
+    // on error!
+    promise.reject(err);
+  });
+
+  return promise;
+}
 
 
 Categories.statics.create = function(cats, callback){
@@ -95,6 +124,84 @@ Categories.statics.findByName = function(n, callback){
     callback(e,cat);
   });
 };
+
+
+
+Categories.statics.findByCriteria=function (criteria,callback) {
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(criteria), 
+      Categories=this;
+  if(callback){promise.addBack(callback);}
+      
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
+  //
+  // initial find
+  var type=(criteria.type)?{type:criteria.type}:{};
+  var query=Categories.find(type);
+
+
+
+  //
+  // count sku by category
+  if (criteria.stats){
+    var stats=db.model('Products').aggregate(
+      {$project : { sku : 1, categories : 1 }},
+      {
+        $group:{
+          _id:"$categories", 
+          sku:{$addToSet:"$sku"}
+        }
+    });
+  }
+  //
+  // filter by group name
+  if (criteria.group){
+    query=query.where("group",new RegExp(criteria.group, "i"))
+  }
+  
+  //
+  // filter by name
+  if (criteria.name){
+    query=query.where("name",new RegExp(criteria.name, "i"))
+  }
+  
+  query.exec(function(err,cats){
+    if(err){
+      return promise.reject(err);
+    }
+
+    //
+    // return categories
+    if (!stats){
+      cache.set(cacheKey,cats);
+     return promise.resolve(null,cats);
+    }
+
+
+    //
+    // merge aggregate with categories to obtains :
+    // the products by category
+    stats.exec(function(err,result){
+      if(err){
+        return promise.reject(err);
+      }
+      cats.forEach(function(cat){
+        var stat=_.find(result,function(s){return s._id&&s._id.toString()==cat._id.toString()});          
+        cat._doc.usedBy=(stat)?stat.sku:[];
+      });
+      cache.set(cacheKey,cats);
+      return promise.resolve(null,cats);
+    });
+    
+  });
+
+  return promise;
+
+}
+
 Categories.set('autoIndex', config.mongo.ensureIndex);
 module.exports =mongoose.model('Categories', Categories);
 

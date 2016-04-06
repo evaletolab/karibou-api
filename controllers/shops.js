@@ -419,63 +419,15 @@ exports.list=function (req, res) {
     return res.status(400).send( err.message);
   }
 
-  function getShops(where){
-    var query=Shops.find(where);
+  var criteria=_.extend({},req.query);
+  criteria.user=req.user;
+  criteria.catalog=req.params.category;
 
+  Shops.findByCriteria(criteria).then(function(shops) {
+    return res.json(shops);
+  }).then(undefined,function(err) {
+      return res.status(400).send(err);
+  });
 
-    if (req.query.sort){
-      console.log("sort shop by creation date: ",req.query.sort);
-      query=query.sort(req.query.sort);
-    }
-
-    // filter
-    if(req.query.status){
-      query=query.where("status",true);
-    }
-
-    //
-    //FILTER only visible shop are available:
-    //       if (req.user._id == shop.owner || shop.status==true)
-    if(!req.user||!req.user.isAdmin()){
-      var filter=[{'status':true}];
-      if(req.user){
-        filter.push({'owner':req.user._id});
-      }
-      query=query.or(filter);
-    }
-
-    if(req.user&&(req.user.isAdmin()||req.user.hasRole('logistic'))){
-      query=query.populate('owner');      
-    }
-
-    query.populate('catalog').exec(function (err,shops){
-      if (err){
-        return res.status(400).send(err);
-      }
-      //
-      // as we dont know how to group by with mongo
-      if (req.query.group){
-        grouped=_.groupBy(shops,function(shop){
-          return shop.catalog&&shop.catalog.name;
-        });
-        return res.json(grouped);
-      }
-
-      return res.json(shops);
-    });
-  }
-
-  if (req.params.category){
-    return db.model('Categories').findBySlug(req.params.category,function(e,c){
-      if (e){
-        return res.status(400).send(e);
-      }
-      if (!c){
-        return res.status(400).send("Il n'existe pas de catégorie "+req.params.category);
-      }
-      return getShops({catalog:c._id});
-    });
-  }
-  return getShops({});
 
 };
