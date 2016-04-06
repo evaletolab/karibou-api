@@ -121,6 +121,19 @@ module.exports = function (app) {
     return result;
   };
 
+
+  Date.prototype.tomorrow=function() {
+    var tomorrow=new Date(this);
+    tomorrow.setDate(tomorrow.getDate()+1);
+    return tomorrow;
+  }
+
+  Date.prototype.plusDays=function(nb) {
+    var plus=new Date(this);
+    plus.setDate(this.getDate()+nb);
+    return plus;
+  }
+
   //
   // Compute the next potential shipping day. 
   // It depends on the hours needed to harvest/prepare a placed order
