@@ -94,7 +94,8 @@ exports.get=function (req, res) {
     //
     // fetch products associated with this doc
     if(doc.skus){
-      return Documents.model('Products').findBySkus(doc.skus,function (err,products) {
+      // return Documents.model('Products').findBySkus(doc.skus,function (err,products) {
+      return Documents.model('Products').findByCriteria({status:true,available:true,skus:doc.skus},function (err,products) {
         var result=doc.toObject();
         result.products=products;
         return res.json(result);
