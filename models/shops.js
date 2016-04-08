@@ -287,7 +287,6 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
     }
     rangeDates[rangeDates.length-1].setHours(23,59,0,0);
     
-    console.log('---------------------',rangeDates[0],rangeDates[rangeDates.length-1])
     //
     // filter by date 
     q['$or']=[
@@ -299,25 +298,6 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
   }
   
   q['available.weekdays']={'$in':days};
-
-  //
-  // status===true && (
-  //   available.active!==true || available.from >= rangeDates[0] || available.to <= rangeDates[last]
-  // ) ||
-  // status === true && available.active === undefined
-  // var q={'$or':[
-  //   {'$and':[{status:true},{'$or':[
-  //     {'available.active':{'$ne':true}},
-  //     {'available.from':{'$gte':rangeDates[0]}} 
-  //   ]}]},
-  //   {'$and':[{status:true},{'$or':[
-  //     {'available.active':{'$ne':true}},
-  //     {'available.to':{'$lte':rangeDates[rangeDates.length-1]}}
-  //   ]}]},
-  //   {'$and':[{status:true},{'available.active':{'$exists':false}}]}
-  //   ],
-  //   status:true,'weekdays':{'$in':[0]}
-  // };
 
   this.find(q).exec(function(err,shops){
     cache.set(cacheKey,shops);
