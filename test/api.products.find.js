@@ -10,6 +10,8 @@ describe("api.products.find", function(){
   var request= require('supertest');
 
   var _=require('underscore');
+
+  var cookie;
   
 
   before(function(done){
@@ -61,8 +63,6 @@ describe("api.products.find", function(){
       });
   });  
 
-
-
   it("GET 200,/v1/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade", function(done){
     request(app)
       .get("/v1/products/category/"+data.Categories[3].slug+"/details/bio+natural+homemade")
@@ -74,9 +74,39 @@ describe("api.products.find", function(){
         res.body[0].vendor.should.be.an.instanceOf(Object)
         done();
       });
-
   });
   
+  it("GET 200,/v1/shops/mon-shop/products", function(done){
+    request(app)
+      .get("/v1/shops/mon-shop/products")
+      .end(function(err, res){
+        res.should.have.status(200);
+        res.body.length.should.equal(0);
+        done();
+      });
+  });  
+
+  it('POST /login should return 200 ',function(done){
+    request(app)
+      .post('/login')
+      .send({ email: "evaleto@gmail.com", password:'password', provider:'local' })
+      .end(function(err,res){      
+        cookie = res.headers['set-cookie'];
+        done();        
+      });
+  });
+
+  it("GET 200,/v1/shops/mon-shop/products", function(done){
+    request(app)
+      .get("/v1/shops/mon-shop/products")
+      .set('cookie', cookie)
+      .end(function(err, res){
+        res.should.have.status(200);
+        res.body.length.should.equal(1);
+        done();
+      });
+  });  
+
   
 });
 

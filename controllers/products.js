@@ -175,7 +175,8 @@ exports.list=function (req, res) {
   
   //
   // filter to shops products
-  if(req.user&&query.shopname){
+  // - 
+  if(req.user&&query.shopname&&!req.user.isAdmin()){
       query.status=req.user.shops||[];
   }
 
