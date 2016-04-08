@@ -534,12 +534,12 @@ Product.statics.findByCriteria = function(criteria, callback){
     Shops.findAvailable(nextShippingDays).then(function(available) {
       available=available.map(function (a) {
         return a._id;
-      })
+      });
       if (Array.isArray(criteria.status)){
-        console.log('FIXME --------------->',criteria.status)
         criteria.status.forEach(function(s){
-          available.push(s._id)
-        })            
+          available.push(s._id);
+        });
+        console.log('FIXME --------------->',criteria.status)
       }
       promiseStatus.resolve(null,available)
     });
