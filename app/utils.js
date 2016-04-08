@@ -121,11 +121,12 @@ module.exports = function (app) {
     return result;
   };
 
+  Date.prototype.toYYYYMMDD=function() {
+    return ''+this.getFullYear()+this.getMonth()+this.getDate();
+  }
 
   Date.prototype.tomorrow=function() {
-    var tomorrow=new Date(this);
-    tomorrow.setDate(tomorrow.getDate()+1);
-    return tomorrow;
+    return this.plusDays(1);
   }
 
   Date.prototype.plusDays=function(nb) {
@@ -135,18 +136,33 @@ module.exports = function (app) {
   }
 
   //
+  // simple test : this in [d1,d2[
+  Date.prototype.in=function(d1,d2) {
+    return (this>=d1&&this<d2)
+  }
+  
+  //
   // Compute the next potential shipping day. 
   // It depends on the hours needed to harvest/prepare a placed order
   Date.potentialShippingDay=function(){
-    var now=new Date();
+    var now=new Date(), 
+        potential=new Date(now.getTime()+3600000*config.shared.order.timelimit);
 
     //
     // timelimitH is hour limit to place an order
-    now.setHours(config.shared.order.timelimitH,0,0,0);
+    if (potential.getHours()>config.shared.order.timelimitH){
+      potential.setHours(0,0,0,0);
+      return potential.plusDays(1);
+    }
+    potential.setHours(0,0,0,0);
 
     // next date depends on the hours needed to prepare a placed order
-    return new Date(now.getTime()+3600000*config.shared.order.timelimit);        
+    return potential;        
 
+  };
+
+  Date.potentialShippingWeek=function(){
+    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay());
   };
 
   //  
@@ -158,13 +174,54 @@ module.exports = function (app) {
   //
   // the next shipping day
   Date.nextShippingDay=function() {
-    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay())[0];
+    var next=Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay()),noshipping;
+
+
+    //
+    // no closed date
+    if(!config.shared.noshipping||!config.shared.noshipping.length){
+      return next[0];
+    }
+
+    // there is cloased dates
+    // next contains the potentials shipping days,
+    // we must return the first date available for shipping
+    for (var j = 0; j <next.length; j++) {
+      for (var i = 0; i<config.shared.noshipping.length; i++) {
+        noshipping=config.shared.noshipping[i];
+        if(!next[j].in(noshipping.from,noshipping.to)) return next[j];
+      }
+    }
+
+    // else 
+    // after 7 days we cant order anyway!
+    return;
   }
 
   //
   // a full week of available shipping days
   Date.fullWeekShippingDays=function() {
-    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay());
+    var next=Date.potentialShippingWeek(), lst=[];
+
+
+    //
+    // no closed date
+    if(!config.shared.noshipping||!config.shared.noshipping.length){
+      return next;
+    }
+
+    // there is cloased dates
+    // next contains the potentials shipping days,
+    // we must return the first date available for shipping
+    next.forEach(function(shippingday) {
+      config.shared.noshipping.forEach(function(noshipping) {
+        if(!shippingday.in(noshipping.from,noshipping.to)){
+          lst.push(shippingday);
+        }
+      });
+    });
+
+    return lst;
   }
 
 
