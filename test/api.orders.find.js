@@ -75,8 +75,7 @@ describe("api.orders.find", function(){
         should.not.exist(err)
         res.body.length.should.equal(2)
         for(var o in res.body){
-          (currentShippingDay.getTime()).should.equal(new Date(res.body[o].shipping.when).getTime())
-          // console.log("vendors",res.body[o].vendors)
+          (currentShippingDay.toYYYYMMDD()).should.equal(new Date(res.body[o].shipping.when).toYYYYMMDD())
         }
         done()
       });  
@@ -91,7 +90,7 @@ describe("api.orders.find", function(){
         should.not.exist(err)
         res.body.length.should.equal(3)
         for(var o in res.body){          
-          (currentShippingDay).getTime().should.equal(new Date(res.body[o].shipping.when).getTime())
+          (currentShippingDay).toYYYYMMDD().should.equal(new Date(res.body[o].shipping.when).toYYYYMMDD())
         }
         done()
       });  
