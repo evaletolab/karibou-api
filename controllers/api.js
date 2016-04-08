@@ -45,6 +45,7 @@ exports.config = function(req, res) {
   if (req.user&&req.user.isAdmin()) { 
     //config.shared.env=process.env;
   }
+  config.shared.shippingweek=Date.fullWeekShippingDays();
   res.json(config.shared);
 };
 
