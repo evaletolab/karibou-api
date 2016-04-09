@@ -678,6 +678,7 @@ exports.informShopToOrders=function(req,res){
       // a message can be append to the mail 
       contents[s].more=req.body.content||''
       contents[s].withHtml=true;
+      // contents[s].
 
     }
 
@@ -703,9 +704,10 @@ exports.informShopToOrders=function(req,res){
           shopname:shop.urlpath
         },function (err,products) {
           contents[shop.urlpath].products=products;
+          // console.log('---------------',JSON.stringify(shop.owner,null,2))
+          // console.log('---------------',JSON.stringify(contents[shop.urlpath],null,2))
 
-
-          bus.emit('sendmail',shop.owner.email.address,
+          bus.emit('sendmail',shop.owner&&shop.owner.email.address,
                "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
                 contents[shop.urlpath],"order-prepare",function (err,res) {
                   if(err){return defer.reject(err)}
