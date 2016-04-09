@@ -59,7 +59,7 @@ background-color: #fff;
 
 <%if (develMode) {%>
 <div><strong style="color:green">TEST -- TEST -- TEST</strong><br/></div>
-<% } %>Bonjour <%= shop.owner %>,<br/>
+<% } %>Bonjour <%= shop.owner.name.givenName %>,<br/>
 
 Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen %></u>. La collecte s'effectuera entre 10h30 et 14h00 au plus tard.<br/>
 <br/>
@@ -87,7 +87,7 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 		<td><%= items[i].finalprice.toFixed(2) %> </td>
 	</tr>
     <%if (i<(items.length-1)&&items[i+1].changeCustomer) {%>
-    <tr style="border-bottom: 1px solid black;"></tr>
+    <tr style="border-bottom: 2px solid #aaa;height:1px;background-color:#667"><td colspan="6"></td></tr>
     <% } %>
 	<% } %>
 </tbody>
