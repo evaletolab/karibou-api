@@ -284,11 +284,11 @@ exports.list=function (req, res) {
       if(!groupedA[k])groupedA[k]=[];
       items=[];
 
-      console.log('-------------- PDHLA',k,groupedP[k].length,groupedD[k].length,groupedH[k].length,groupedL[k].length,groupedA[k].length);
+      console.log('-------------- HPDLA',k,groupedH[k].length,groupedP[k].length,groupedD[k].length,groupedL[k].length,groupedA[k].length);
 
+      items=items.concat(groupedH[k]);
       items=items.concat(groupedP[k].slice(0,maxcat-1));
       items=items.concat(groupedD[k]);
-      items=items.concat(groupedH[k]);
       items=items.concat(groupedL[k]);
       items=items.concat(groupedA[k]);
       items=uniq_sku(items).slice(0,maxcat);
