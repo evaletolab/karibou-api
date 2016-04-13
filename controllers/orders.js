@@ -704,11 +704,13 @@ exports.informShopToOrders=function(req,res){
         },function (err,products) {
           contents[shop.urlpath].products=products;
 
-
           bus.emit('sendmail',shop.owner.email.address,
                "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
                 contents[shop.urlpath],"order-prepare",function (err,res) {
-                  if(err){return defer.reject(err)}
+                  if(err){
+                    console.log('DEBUG--------------',JSON.stringify(err,null,2))
+                    return defer.reject(err);
+                  }
                   defer.resolve(res);
                 });          
         });

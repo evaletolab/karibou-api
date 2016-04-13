@@ -54,13 +54,15 @@ exports.prepareOrdersForMail=function (when,shops,closed, cb) {
     shops.forEach(function (shop) {
       var content={};items=[];
       Orders.filterByShop(orders,shop).forEach(function(order){
-          order.items.forEach(function(item){
-          item.rank=order.rank;
-          item.oid=order.oid;
-          item.name=order.customer.name;
-          item.email=order.customer.email.address;
-          items.push(item)
-        });
+          order.items.forEach(function(item, idx){
+            if(idx===0)item.changeCustomer=true;        
+            item.rank=order.rank;
+            item.oid=order.oid;
+            item.name=order.customer.name;
+            item.email=order.customer.email.address;
+            items.push(item)
+            // console.log(item.name,item.changeCustomer)
+          });
       });    
 
       // 

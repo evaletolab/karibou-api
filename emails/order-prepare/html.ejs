@@ -79,13 +79,16 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 	<tr>
 		<td style="text-align:center"><b><%= items[i].rank %></b> </td>
 		<td><a href="mailto:<%= items[i].email %>"><%= items[i].name.familyName %></a> </td>
-		<td style="text-align:right"><%= items[i].quantity %>x </td>
+		<td style="text-align:right"><span style="<%if (items[i].quantity>1) {%>color:red<% } %>"> <%= items[i].quantity %>x </span></td>
 		<td><%= items[i].title %> (<%= items[i].part %>) <%if (items[i].variant&&items[i].variant.title) {%>
       <br/>option: <%= items[i].variant.title %><% } %>
     </td>
 		<td><%= items[i].price.toFixed(2) %> </td>
 		<td><%= items[i].finalprice.toFixed(2) %> </td>
 	</tr>
+    <%if (i<(items.length-1)&&items[i+1].changeCustomer) {%>
+    <tr style="border-bottom: 2px solid #aaa;height:1px;background-color:#667"><td colspan="6"></td></tr>
+    <% } %>
 	<% } %>
 </tbody>
 </table>
