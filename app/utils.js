@@ -102,10 +102,11 @@ module.exports = function (app) {
   Date.dayToDates=function(days, offset){
     var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[];    
     days=days||[];
+    days=days.sort(); // sort days in a week
 
     //
     // starting from today
-    days.forEach(function (day) {
+    days.forEach(function (day,i) {
       if((day-today)>=0) {
         result.push(new Date(now.getTime()+(day-today)*h24));
       }
@@ -118,6 +119,7 @@ module.exports = function (app) {
         result.push(new Date(now.getTime()+(day-today)*h24+week));
       }
     });
+
     return result;
   };
 
@@ -201,7 +203,7 @@ module.exports = function (app) {
   //
   // a full week of available shipping days
   Date.fullWeekShippingDays=function() {
-    var next=Date.potentialShippingWeek(), lst=[];
+    var next=Date.potentialShippingWeek(), lst=[], find=false;
 
 
     //
@@ -214,11 +216,16 @@ module.exports = function (app) {
     // next contains the potentials shipping days,
     // we must return the first date available for shipping
     next.forEach(function(shippingday) {
-      config.shared.noshipping.forEach(function(noshipping) {
-        if(!shippingday.in(noshipping.from,noshipping.to)){
-          lst.push(shippingday);
-        }
+      find=_.find(config.shared.noshipping,function(noshipping) {
+        return shippingday.in(noshipping.from,noshipping.to);
       });
+      if(!find) lst.push(shippingday)
+    });
+
+    //
+    // sorting dates
+    lst=lst.sort(function(a,b){
+      return a.getTime() - b.getTime();
     });
 
     return lst;
