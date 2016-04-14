@@ -426,6 +426,7 @@ Product.statics.findPopular = function(criteria, callback){
       filters.status=true;
       filters.available=true;
       filters.instock=true;
+      filters.when=criteria.when;
     }
     if(criteria.discount){
       filters.discount=true;
@@ -537,6 +538,8 @@ Product.statics.findByCriteria = function(criteria, callback){
     }
 
     Shops.findAvailable(nextShippingDays).then(function(available) {
+      // les-potagers-de-gaia 547836ee8b8cf18304bbbe15
+      // sandrine-guy-producteurs 547cd1428b8cf18304bbbe35
       available=available.map(function (a) {
         return a._id;
       });
