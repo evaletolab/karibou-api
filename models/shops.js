@@ -259,7 +259,7 @@ Shops.statics.update=function(id,s,callback){
 //   status === true && (available === true && to > selectedShippingDay)
 //   status === true && (available.weekdays === selectedShippingDay.getDay() )
 Shops.statics.findAvailable=function(rangeDates,callback) {
-  var promise = new mongoose.Promise, cacheKey=JSON.stringify([rangeDates]);
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(rangeDates);
   if(callback){promise.addBack(callback);}
       
 
