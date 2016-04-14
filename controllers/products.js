@@ -28,7 +28,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
       Products.findOne({sku:req.params.sku}).exec(function (err,product) {
-        var vendor=(product.vendor+'')||'hello';
+        var vendor=(product&&product.vendor+'')||'hello';
         if (_.any(req.user.shops,function(s){
           return s._id.equals(vendor);
         })){
