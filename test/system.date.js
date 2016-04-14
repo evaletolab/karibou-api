@@ -60,6 +60,7 @@ describe("system.date", function(){
     done()    
   });
 
+
   it("[SELLER] with a time limit at 1:00AM the current shipping day for seller is today (except for sunday+1)", function(done){
     //if today time is > config.shared.order.timelimitH ==> go to next day
     config.shared.order.timelimitH=1;
@@ -168,6 +169,10 @@ describe("system.date", function(){
     config.shared.order.timelimitH=1;
     var today=new Date(), all=Date.fullWeekShippingDays();
 
+    //
+    // should have more date than the weekdays available
+    all.length.should.equal(config.shared.order.weekdays.length);
+
     config.shared.order.timelimit.should.not.be.above((all[0].getTime()-Date.now())/3600000);
 
     parseFloat((all[all.length-1].getTime()-all[0].getTime())/86400000).should.be.below(7);
@@ -182,7 +187,37 @@ describe("system.date", function(){
     done();          
   });  
 
-  it("A[CUSTOMER] preparing the order at sunday, the delivery day is wednesday", function(done){
+  it("[CUSTOMER] one week of shipping days when noshipping is set", function(done){
+    config.shared.order.timelimit=24;
+    config.shared.order.timelimitH=1;
+    var today=new Date(), all=[];
+    config.shared.noshipping=[];
+    config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(-1),reason:'1'});
+    config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(-1),reason:'2'});
+
+    all=Date.fullWeekShippingDays();
+
+    all.length.should.equal(config.shared.order.weekdays.length);    
+
+    done();          
+  });  
+
+  it("[CUSTOMER] when noshipping is set to the full week, ", function(done){
+    config.shared.order.timelimit=24;
+    config.shared.order.timelimitH=1;
+    var today=new Date(), all=[];
+    config.shared.noshipping=[];
+    config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(10),reason:'3'});
+    all=Date.fullWeekShippingDays();
+
+    all.length.should.equal(0);    
+    config.shared.noshipping=[]
+    done();          
+  });  
+
+
+
+  it("[CUSTOMER] preparing the order at sunday, the delivery day is wednesday", function(done){
     config.shared.order.weekdays=[0,1,2,3,4,5,6]
     config.shared.order.timelimit=41  
     config.shared.order.timelimitH=1
