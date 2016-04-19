@@ -148,7 +148,7 @@ module.exports = {
     //
     // stripe uncaptured charges expire in 7 days
     // https://support.stripe.com/questions/does-stripe-support-authorize-and-capture 
-    uncapturedTimeLimit:7,
+    uncapturedTimeLimit:6,
 
     /* order date range between day1 to day2 max 11:00. Lapse time = timelimit */
     timelimitH:10,
