@@ -28,7 +28,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
   return isUserAdminOrWithRole(req, res, next,function(){
     function isUserProductOwner(){
       Products.findOne({sku:req.params.sku}).exec(function (err,product) {
-        var vendor=(product.vendor+'')||'hello';
+        var vendor=(product&&product.vendor+'')||'hello';
         if (_.any(req.user.shops,function(s){
           return s._id.equals(vendor);
         })){
@@ -183,7 +183,7 @@ exports.list=function (req, res) {
   // if popular products are requested  
   // options: email, maxcat,likes,available
   if(query.popular && req.user){
-    promise=Products.findPopular({email:req.user.email.address,status:true, available:query.available,maxcat:query.maxcat});
+    promise=Products.findPopular({email:req.user.email.address,status:true, available:query.available,maxcat:query.maxcat,when:query.when});
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- popular',products.length, Date.now()-now)
@@ -206,7 +206,7 @@ exports.list=function (req, res) {
   //
   // in home
   if(query.home&&query.maxcat){
-    promise=Products.findByCriteria({status:true,instock:true,available:true,home:true});
+    promise=Products.findByCriteria({status:true,instock:true,available:true,home:true,when:query.when});
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- home',products.length, Date.now()-now)
@@ -218,7 +218,7 @@ exports.list=function (req, res) {
   //
   // in discount
   if(query.discount){
-    promise=Products.findByCriteria({status:true,instock:true,available:true,discount:true});
+    promise=Products.findByCriteria({status:true,instock:true,available:true,discount:true,when:query.when});
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- discount',products.length, Date.now()-now)
@@ -229,7 +229,7 @@ exports.list=function (req, res) {
 
   Q.all(promises).then(function(argument) {
     if(query.popular){
-      return Products.findPopular({status:true, available:query.available,maxcat:query.maxcat});
+      return Products.findPopular({status:true, available:query.available,maxcat:query.maxcat,when:query.when});
     }
     // FIX this approach is working until we have a large amount of products
     return Products.findByCriteria(query);

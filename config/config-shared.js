@@ -145,6 +145,11 @@ module.exports = {
     // -> une commande le lundi à 20:00 .... mercredi 10:00 == 38h* minimum pour deux matinées
     timelimit:36,
 
+    //
+    // stripe uncaptured charges expire in 7 days
+    // https://support.stripe.com/questions/does-stripe-support-authorize-and-capture 
+    uncapturedTimeLimit:6,
+
     /* order date range between day1 to day2 max 11:00. Lapse time = timelimit */
     timelimitH:10,
 
@@ -154,6 +159,8 @@ module.exports = {
     //
     // Dimanche(0), Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi
     weekdays:[2,5],  
-    shippingtimes:{16:"16:00 à 18:00"}
+    shippingtimes:{
+      16:"16:00 à 18:00"
+    }
   }
 };

@@ -426,6 +426,7 @@ Product.statics.findPopular = function(criteria, callback){
       filters.status=true;
       filters.available=true;
       filters.instock=true;
+      filters.when=criteria.when;
     }
     if(criteria.discount){
       filters.discount=true;
@@ -530,43 +531,25 @@ Product.statics.findByCriteria = function(criteria, callback){
 
     //
     // specify full shipping week 
-    var nextShippingDays=Orders.findOneWeekOfShippingDay();
-    nextShippingDays[0].setHours(1,0,0,0);
-    nextShippingDays[nextShippingDays.length-1].setHours(1,0,0,0);
+    var nextShippingDays=Date.fullWeekShippingDays(8);
+    // specify a custom date
+    if(criteria.when){
+      nextShippingDays=[new Date(criteria.when)];
+    }
 
-    //
-    // status===true && (
-    //   available.active!==true || available.from >= nextShippingDays[0]
-    // ) ||
-    // status===true && (
-    //   available.active!==true || available.to <= nextShippingDays[last]
-    // ) ||
-    // status === true && available.active === undefined
-    var q={'$or':[
-      {'$and':[{status:true},{'$or':[
-        {'available.active':{'$ne':true}},
-        {'available.from':{'$gte':nextShippingDays[0]}} 
-      ]}]},
-      {'$and':[{status:true},{'$or':[
-        {'available.active':{'$ne':true}},
-        {'available.to':{'$lte':nextShippingDays[nextShippingDays.length-1]}}
-      ]}]},
-      {'$and':[{status:true},{'available.active':{'$exists':false}}]}
-    ]};
-
-
-    Shops.find(q).select('_id').exec(function(err,available){
+    Shops.findAvailable(nextShippingDays).then(function(available) {
+      // les-potagers-de-gaia 547836ee8b8cf18304bbbe15
+      // sandrine-guy-producteurs 547cd1428b8cf18304bbbe35
       available=available.map(function (a) {
         return a._id;
-      })
+      });
       if (Array.isArray(criteria.status)){
-        console.log('FIXME --------------->',criteria.status)
         criteria.status.forEach(function(s){
-          available.push(s._id)
-        })            
+          available.push(s._id);
+        });
+        console.log('FIXME --------------->',criteria.status)
       }
-      // return cb(err,available);
-      promiseStatus.resolve(err,available)
+      promiseStatus.resolve(null,available)
     });
     return promiseStatus;
   })().then(function (available) {

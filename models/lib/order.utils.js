@@ -359,109 +359,16 @@ exports.jumpToNextWeekDay=function(date, jump) {
 
 /* return array of one week of shipping days available for customers*/
 exports.findOneWeekOfShippingDay=function(){
-  var next=this.findNextShippingDay(), all=[], nextDate=next
-
-  // get current day in the array
-  var idxDay=config.shared.order.weekdays.indexOf(next.getDay());
-
-  //
-  // end of week
-  for (var i = idxDay; i < config.shared.order.weekdays.length; i++) {
-    nextDate=new Date((config.shared.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
-    nextDate.setHours(next.getHours(),0,0,0)
-    all.push(nextDate)
-  };
-
-  //
-  // ellapsed time before the end of week
-  nextDate=new Date((7-nextDate.getDay())*86400000+nextDate.getTime());
-
-  //
-  // next week
-  for (var i = 0; i < idxDay; i++) {
-    nextDate=new Date((config.shared.order.weekdays[i]-nextDate.getDay())*86400000+nextDate.getTime());
-    nextDate.setHours(next.getHours(),0,0,0)
-    all.push(nextDate)
-  };
-
-
-
-  // config.shared.order.weekdays.forEach(function(day){
-  //   // next = 2
-  //   // all=[1,2,4]
-  //   // result =[2,4,1]
-  //   console.log('day, next day--------',day, next.getDay())
-  //   if(day<next.getDay()){
-  //     // 7-5+1=3 => 5+3=(8%)
-  //       nextDate=new Date((7-next.getDay()+day)*86400000+next.getTime());
-  //       nextDate.setHours(next.getHours(),0,0,0)
-  //       console.log('before-----------',nextDate.getDay())
-  //       if(config.shared.order.weekdays.indexOf(nextDate.getDay())!=-1)
-  //         all.push(nextDate)
-  //   }else if(day>=next.getDay()){
-  //       nextDate=new Date((day-next.getDay())*86400000+next.getTime())
-  //       nextDate.setHours(next.getHours(),0,0,0)
-  //       if(config.shared.order.weekdays.indexOf(nextDate.getDay())!=-1)
-  //         all.push(nextDate)
-  //   }
-  // })
-
-  return all.sort(function(a,b){
-    // Turn your strings into dates, and then subtract them
-    // to get a value that is either negative, positive, or zero.
-    return a.getTime() - b.getTime();
-  });
+  return Date.fullWeekShippingDays();
 }
 
-exports.findNextShippingDay=function(tl,th){
-  var now=new Date(), 
-      next, 
-      timelimit=tl||config.shared.order.timelimit,
-      timelimitH=th||config.shared.order.timelimitH;
-      // 24h == 86400000
-
-      // remove min/sec
-      now.setHours(now.getHours(),0,0,0)
-
-  // looking for end of the week 
-  for (var i = 0; i < config.shared.order.weekdays.length; i++) {
-    var day=config.shared.order.weekdays[i];
-    if(day>=now.getDay()){
-      // a valid day is at least>=timelimit 
-      next=new Date(now.getTime()+86400000*(day-now.getDay()))      
-      next.setHours(timelimitH,0,0,0)
-      // console.log('----- this week -- delta 1',((next.getTime()-now.getTime())/3600000),timelimit,(day-now.getDay()))
-      if(((next.getTime()-now.getTime())/3600000)>timelimit){
-        //console.log('return this',next)
-        return next;
-      }
-    }
-  }
-
-  // looking for begin of the week 
-  for (var i = 0; i < config.shared.order.weekdays.length; i++) {
-    var day=config.shared.order.weekdays[i];
-    if(day<now.getDay()){
-      next=new Date((7-now.getDay()+day)*86400000+now.getTime());
-      next.setHours(timelimitH,0,0,0)
-      // console.log('----- next week -- delta 2',((next.getTime()-now.getTime())/3600000),timelimit,((7-now.getDay()+day)))
-      if(((next.getTime()-now.getTime())/3600000)>timelimit){
-        //console.log('for next week',next)
-        return next;
-      }
-    }
-
-  }
-
-
-
+exports.findNextShippingDay=function(){
+  return Date.nextShippingDay();
 }
 
 
 
 /* return the current shipping day this is for sellers*/
 exports.findCurrentShippingDay=function(){
-  var timelimitH=Number(Object.keys(config.shared.order.shippingtimes).sort()[0])+8
-  timelimitH=23;
-  return this.findNextShippingDay(0.1,Number(timelimitH))
+  return Date.currentShippingDay();
 }

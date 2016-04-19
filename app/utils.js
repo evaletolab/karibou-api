@@ -99,13 +99,14 @@ module.exports = function (app) {
   //
   // give an array of days (in the form [0..6]) and return the ordered dates corresponding (starting from today)
   // Sun(0), Mon, tuesday, wednesday, thursday, Freeday, Saterday
-  Date.dayToDates=function(days, offset){
-    var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[];    
+  Date.dayToDates=function(days, offset, limit){
+    var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[], potential;    
     days=days||[];
+    days=days.sort(); // sort days in a week
 
     //
     // starting from today
-    days.forEach(function (day) {
+    days.forEach(function (day,i) {
       if((day-today)>=0) {
         result.push(new Date(now.getTime()+(day-today)*h24));
       }
@@ -115,25 +116,61 @@ module.exports = function (app) {
     // going to next week  ()
     days.forEach(function (day) {
       if((day-today)<0) {
-        result.push(new Date(now.getTime()+(day-today)*h24+week));
+        potential=new Date(now.getTime()+(day-today)*h24+week);
+        if(!limit||potential<limit){
+          result.push(potential);
+        }
       }
     });
+
     return result;
   };
 
+  Date.prototype.toYYYYMMDD=function() {
+    return ''+this.getFullYear()+this.getMonth()+this.getDate();
+  }
+
+  Date.prototype.tomorrow=function() {
+    return this.plusDays(1);
+  }
+
+  Date.prototype.plusDays=function(nb) {
+    var plus=new Date(this);
+    plus.setDate(this.getDate()+nb);
+    return plus;
+  }
+
+  //
+  // simple test : this in [d1,d2[
+  Date.prototype.in=function(d1,d2) {
+    return (this>=d1&&this<d2)
+  }
+  
   //
   // Compute the next potential shipping day. 
   // It depends on the hours needed to harvest/prepare a placed order
   Date.potentialShippingDay=function(){
-    var now=new Date();
+    var now=new Date(), 
+        potential=new Date(now.getTime()+3600000*config.shared.order.timelimit);
 
     //
     // timelimitH is hour limit to place an order
-    now.setHours(config.shared.order.timelimitH,0,0,0);
+    if (potential.getHours()>config.shared.order.timelimitH){
+      potential.setHours(0,0,0,0);
+      return potential.plusDays(1);
+    }
+    potential.setHours(0,0,0,0);
 
     // next date depends on the hours needed to prepare a placed order
-    return new Date(now.getTime()+3600000*config.shared.order.timelimit);        
+    return potential;        
 
+  };
+
+  Date.potentialShippingWeek=function(){
+    return Date.dayToDates(
+        config.shared.order.weekdays,
+        Date.potentialShippingDay()
+      );
   };
 
   //  
@@ -145,13 +182,80 @@ module.exports = function (app) {
   //
   // the next shipping day
   Date.nextShippingDay=function() {
-    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay())[0];
+    var next=Date.dayToDates(
+          config.shared.order.weekdays,
+          Date.potentialShippingDay()
+        ),noshipping;
+
+
+    //
+    // no closed date
+    if(!config.shared.noshipping||!config.shared.noshipping.length){
+      return next[0];
+    }
+
+    // there is cloased dates
+    // next contains the potentials shipping days,
+    // we must return the first date available for shipping
+    for (var j = 0; j <next.length; j++) {
+      for (var i = 0; i<config.shared.noshipping.length; i++) {
+        noshipping=config.shared.noshipping[i];
+        if(!next[j].in(noshipping.from,noshipping.to)) return next[j];
+      }
+    }
+
+    // else 
+    // after 7 days we cant order anyway!
+    return;
   }
 
   //
-  // a full week of available shipping days
-  Date.fullWeekShippingDays=function() {
-    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay());
+  // a full week of available shipping days 
+  // limit to nb days (default is <7) 
+  Date.fullWeekShippingDays=function(limit) {
+    var next=Date.potentialShippingWeek(), lst=[], find=false, today=new Date();
+
+    //
+    // default date limit is defined by
+    limit=limit||config.shared.order.uncapturedTimeLimit;
+    limit=limit&&today.plusDays(limit+0);
+
+    function format(lst) {
+      //
+      // sorting dates
+      lst=lst.sort(function(a,b){
+        return a.getTime() - b.getTime();
+      });
+
+      //
+      // limit lenght of a week
+      return lst.filter(function(date) {
+        return (!limit||date<limit);
+      })
+
+    }
+
+
+    //
+    // no closed date
+    if(!config.shared.noshipping||!config.shared.noshipping.length){
+      return format(next);
+    }
+
+    // there is cloased dates
+    // next contains the potentials shipping days,
+    // we must return the first date available for shipping
+    next.forEach(function(shippingday) {
+      find=_.find(config.shared.noshipping,function(noshipping) {
+        return shippingday.in(noshipping.from,noshipping.to);
+      });
+      if(!find) lst.push(shippingday)
+    });
+
+
+
+
+    return format(lst);
   }
 
 

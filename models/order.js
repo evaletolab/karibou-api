@@ -153,6 +153,7 @@ var Orders = new Schema({
 
    shipping:{
       when:{type:Date, required:true},
+      hours:{type:Number, required:false},
       name:{type:String, required:true},
       note:{type:String},
       streetAdress:{type:String,required:true},

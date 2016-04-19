@@ -170,7 +170,8 @@ exports.coreCreate = function(oid,items,customer,shipping,paymentData, vendors,c
     postalCode:shipping.postalCode,
     region:shipping.region,
     geo:shipping.geo,
-    when:shipping.when
+    when:shipping.when,
+    hours:shipping.hours
   };
 
   //

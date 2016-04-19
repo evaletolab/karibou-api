@@ -10,17 +10,17 @@ var more=require('./Users');
 //product 5 available , shop was closed in past
 
 var Orders=require('mongoose').model('Orders');
-var closed=Orders.findNextShippingDay();
-closed.setHours(0,1,0,0);
-var when1=Orders.jumpToNextWeekDay(closed,config.shared.order.weekdays[2]);
-var when2=new Date(when1.getTime()+86400000*10);
+var closed=new Date().plusDays(2);
+closed.setHours(0,0,0,0);
+var when1=closed.plusDays(7);
+var when2=when1.plusDays(10);
 var when3=new Date(when1.getTime()-86400000*20);
 var when4=new Date(when1.getTime()-86400000*19);
 
 
-// console.log('---------------closed',closed);
-// console.log('---------------when1',when1);
-// console.log('---------------when2',when2);
+console.log('---------------closed',closed);
+console.log('---------------when1',when1);
+console.log('---------------when2',when2);
 
 exports.Products=[{
     _id : new ObjectId(), 
@@ -224,6 +224,7 @@ exports.Shops=[{
       active:true,
       from:closed,
       to:when2,
+      weekdays:[0,1,2,3,4,5,6]
     },
     address:{
             region: "Genève",
@@ -252,6 +253,7 @@ exports.Shops=[{
       active:true,
       from:when1,
       to:when2,
+      weekdays:[0,1,2,3,4,5,6]
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
@@ -284,6 +286,7 @@ exports.Shops=[{
       active:true,
       from:when3,
       to:when4,
+      weekdays:[0,1,2,3,4,5,6]
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",

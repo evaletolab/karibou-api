@@ -131,6 +131,7 @@ module.exports = {
 
     /* order is in timeout if payment status != 'paid' and created<1s (timeoutAndNotPaid)*/
     timeoutAndNotPaid:0.2,
+    uncapturedTimeLimit:7,
 
     //
     // Dimanche*, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi(

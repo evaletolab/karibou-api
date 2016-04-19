@@ -256,10 +256,10 @@ Shops.statics.update=function(id,s,callback){
 // - si il y a plusieurs dates, il suffit qu'une soit ok pour la boutique soit retournée
 // or:
 //   status === true && (available === true && from < selectedShippingDay)
-//   status === true && (available === true && from > selectedShippingDay)
+//   status === true && (available === true && to > selectedShippingDay)
 //   status === true && (available.weekdays === selectedShippingDay.getDay() )
 Shops.statics.findAvailable=function(rangeDates,callback) {
-  var promise = new mongoose.Promise, cacheKey=JSON.stringify([rangeDates]);
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify(rangeDates);
   if(callback){promise.addBack(callback);}
       
 
@@ -283,40 +283,21 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
 
     // if rangesDate == 1
     if(rangeDates.length===1){
-      rangeDates.push(rangeDates[0].tomorrow())
+      rangeDates.push(new Date(rangeDates[0]))
     }
-    rangeDates[rangeDates.length-1].setHours(0,0,0,0);
+    rangeDates[rangeDates.length-1].setHours(23,59,0,0);
     
-
     //
-    // filter by date only when range exist
+    // filter by date 
     q['$or']=[
       {'available.active':{'$ne':true}},
-      {'available.from':{'$gte':rangeDates[0]}},
-      {'available.to':{'$lt':rangeDates[rangeDates.length-1]}}
+      {'available.to':{'$lte':rangeDates[rangeDates.length-1]}},
+      {'available.from':{'$gt':rangeDates[0]}}
     ];
+
   }
   
   q['available.weekdays']={'$in':days};
-
-  //
-  // status===true && (
-  //   available.active!==true || available.from >= rangeDates[0] || available.to <= rangeDates[last]
-  // ) ||
-  // status === true && available.active === undefined
-  // var q={'$or':[
-  //   {'$and':[{status:true},{'$or':[
-  //     {'available.active':{'$ne':true}},
-  //     {'available.from':{'$gte':rangeDates[0]}} 
-  //   ]}]},
-  //   {'$and':[{status:true},{'$or':[
-  //     {'available.active':{'$ne':true}},
-  //     {'available.to':{'$lte':rangeDates[rangeDates.length-1]}}
-  //   ]}]},
-  //   {'$and':[{status:true},{'available.active':{'$exists':false}}]}
-  //   ],
-  //   status:true,'weekdays':{'$in':[0]}
-  // };
 
   this.find(q).exec(function(err,shops){
     cache.set(cacheKey,shops);
