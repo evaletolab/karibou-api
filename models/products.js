@@ -531,7 +531,7 @@ Product.statics.findByCriteria = function(criteria, callback){
 
     //
     // specify full shipping week 
-    var nextShippingDays=Orders.findOneWeekOfShippingDay();
+    var nextShippingDays=Date.fullWeekShippingDays(8);
     // specify a custom date
     if(criteria.when){
       nextShippingDays=[new Date(criteria.when)];
