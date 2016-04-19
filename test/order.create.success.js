@@ -86,6 +86,7 @@ describe("orders.create.success", function(){
     items[1].variant={title:'Variation A'}
 
     shipping.when=okDay
+    shipping.hours=okDay.getHours();
     // shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
 
 
@@ -116,6 +117,7 @@ describe("orders.create.success", function(){
       // console.log('-shipping time',order.shipping.when)
       Object.keys(config.shared.order.shippingtimes)[0].should.equal('11');
       order.shipping.when.getHours().should.equal(11);
+      order.shipping.hours.should.equal(11);
       //
       // check items fields, price and finalprice
       should.exist(order.items[0].part)

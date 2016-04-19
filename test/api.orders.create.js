@@ -51,9 +51,8 @@ describe("api.orders.create", function(){
         // this vendor id is conflict with others tests
         Products.findOne({sku:1000003}).exec(function (e,p) {
           p.vendor='515ec12e56a8d5961e000006';
-          p.save();
+          p.save(done);
         })
-        done();
       });
     });      
   });
