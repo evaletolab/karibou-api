@@ -99,8 +99,8 @@ module.exports = function (app) {
   //
   // give an array of days (in the form [0..6]) and return the ordered dates corresponding (starting from today)
   // Sun(0), Mon, tuesday, wednesday, thursday, Freeday, Saterday
-  Date.dayToDates=function(days, offset){
-    var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[];    
+  Date.dayToDates=function(days, offset, limit){
+    var now=offset||new Date(), today=now.getDay(), h24=86400000, week=86400000*7, result=[], potential;    
     days=days||[];
     days=days.sort(); // sort days in a week
 
@@ -116,7 +116,10 @@ module.exports = function (app) {
     // going to next week  ()
     days.forEach(function (day) {
       if((day-today)<0) {
-        result.push(new Date(now.getTime()+(day-today)*h24+week));
+        potential=new Date(now.getTime()+(day-today)*h24+week);
+        if(!limit||potential<limit){
+          result.push(potential);
+        }
       }
     });
 
@@ -164,7 +167,10 @@ module.exports = function (app) {
   };
 
   Date.potentialShippingWeek=function(){
-    return Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay());
+    return Date.dayToDates(
+        config.shared.order.weekdays,
+        Date.potentialShippingDay()
+      );
   };
 
   //  
@@ -176,7 +182,10 @@ module.exports = function (app) {
   //
   // the next shipping day
   Date.nextShippingDay=function() {
-    var next=Date.dayToDates(config.shared.order.weekdays,Date.potentialShippingDay()),noshipping;
+    var next=Date.dayToDates(
+          config.shared.order.weekdays,
+          Date.potentialShippingDay()
+        ),noshipping;
 
 
     //
@@ -201,15 +210,36 @@ module.exports = function (app) {
   }
 
   //
-  // a full week of available shipping days
-  Date.fullWeekShippingDays=function() {
-    var next=Date.potentialShippingWeek(), lst=[], find=false;
+  // a full week of available shipping days 
+  // limit to nb days (default is <7) 
+  Date.fullWeekShippingDays=function(limit) {
+    var next=Date.potentialShippingWeek(), lst=[], find=false, today=new Date();
+
+    //
+    // default date limit is defined by
+    limit=limit||config.shared.order.uncapturedTimeLimit;
+    limit=limit&&today.plusDays(limit+0);
+
+    function format(lst) {
+      //
+      // sorting dates
+      lst=lst.sort(function(a,b){
+        return a.getTime() - b.getTime();
+      });
+
+      //
+      // limit lenght of a week
+      return lst.filter(function(date) {
+        return (!limit||date<limit);
+      })
+
+    }
 
 
     //
     // no closed date
     if(!config.shared.noshipping||!config.shared.noshipping.length){
-      return next;
+      return format(next);
     }
 
     // there is cloased dates
@@ -222,13 +252,10 @@ module.exports = function (app) {
       if(!find) lst.push(shippingday)
     });
 
-    //
-    // sorting dates
-    lst=lst.sort(function(a,b){
-      return a.getTime() - b.getTime();
-    });
 
-    return lst;
+
+
+    return format(lst);
   }
 
 

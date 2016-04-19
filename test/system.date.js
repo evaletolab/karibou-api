@@ -167,7 +167,8 @@ describe("system.date", function(){
   it("[CUSTOMER] one week of shipping days", function(done){
     config.shared.order.timelimit=24;
     config.shared.order.timelimitH=1;
-    var today=new Date(), all=Date.fullWeekShippingDays();
+    var today=new Date(), all=Date.fullWeekShippingDays(9);
+
 
     //
     // should have more date than the weekdays available
@@ -187,6 +188,25 @@ describe("system.date", function(){
     done();          
   });  
 
+  it("[CUSTOMER] one week of shipping days with a time limit for the next 9 days", function(done){
+    config.shared.order.timelimit=24;
+    config.shared.order.timelimitH=1;
+    var today=new Date(), all=Date.fullWeekShippingDays();
+
+    console.log('--------',all.map(function(d) {
+      return d.getDay();
+    }))
+
+    //
+    // should have more date than the weekdays available
+    all.length.should.equal(config.shared.order.weekdays.length-1);
+
+    
+
+    done();          
+  });  
+
+
   it("[CUSTOMER] one week of shipping days when noshipping is set", function(done){
     config.shared.order.timelimit=24;
     config.shared.order.timelimitH=1;
@@ -195,7 +215,7 @@ describe("system.date", function(){
     config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(-1),reason:'1'});
     config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(-1),reason:'2'});
 
-    all=Date.fullWeekShippingDays();
+    all=Date.fullWeekShippingDays(8);
 
     all.length.should.equal(config.shared.order.weekdays.length);    
 
