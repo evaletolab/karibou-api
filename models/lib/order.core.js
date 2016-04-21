@@ -54,7 +54,7 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
       from.setHours(1,0,0,0);
       to.setHours(1,0,0,0);
       if((shipping.when>=from && shipping.when<to)){
-        return promise.reject(new Error(noshipping.reason||msg));
+        return promise.reject(new Error(noshipping.reason.fr||msg));
       }
 
     };
