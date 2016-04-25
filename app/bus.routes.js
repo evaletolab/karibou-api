@@ -8,8 +8,9 @@ var bus = require("./bus"),
 
 
 
-onTrace=function(token,error){
+onTrace=function(token,error,user){
     var msg=JSON.stringify(error,null,2);
+
     bus.emit( "sendmail",
               "evaleto@gmail.com","[karibou-ui] : "+error.name,
               {content:msg}, "simple");

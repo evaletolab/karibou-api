@@ -87,7 +87,9 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 		<td><%= items[i].finalprice.toFixed(2) %> </td>
 	</tr>
     <%if (i<(items.length-1)&&items[i+1].changeCustomer) {%>
-    <tr style="border-bottom: 2px solid #aaa;height:1px;background-color:#667"><td colspan="6"></td></tr>
+    <tr><td colspan="6">
+      <hr>
+    </td></tr>
     <% } %>
 	<% } %>
 </tbody>

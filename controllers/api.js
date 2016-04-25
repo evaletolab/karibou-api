@@ -71,16 +71,6 @@ exports.trace = function(req, res) {
       return res.status(401).send("invalid token")
     }
     bus.emit('trace.error',req.params.key,req.body);
-
-    if(req.body.stacktrace&&req.body.stacktrace.frames.length){
-      var len=req.body.stacktrace.frames.length
-      console.log("ERROR[UI]",
-        req.body.message,
-        req.body.request.headers, 
-        req.body.request.url, 
-        req.body.site, 
-        req.body.stacktrace.frames[len-1].pre_context)
-    }
     res.json({});
 };
 
