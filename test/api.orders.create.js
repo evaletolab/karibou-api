@@ -198,7 +198,7 @@ describe("api.orders.create", function(){
 
     items=_.sortBy(items,function(i){return i.title});
 
-    var when=toshortDay
+    var when=toshortDay.plusDays(-7);
     when.setHours(1,0,0,0)
     shipping.when=when;
 
