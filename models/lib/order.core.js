@@ -68,7 +68,7 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
   }
 
   var when=new Date(shipping.when).setHours(config.shared.order.timelimitH,0,0,0)
-  if(Math.abs((when-now.getTime())/3600000) < config.shared.order.timelimit){
+  if(((when-now.getTime())/3600000) < config.shared.order.timelimit){
     return promise.reject(new Error("Cette date de livraison n'est plus disponible."));
   }
 
