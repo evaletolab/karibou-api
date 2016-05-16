@@ -202,7 +202,6 @@ describe("api.orders.create", function(){
     when.setHours(1,0,0,0)
     shipping.when=when;
 
-    console.log('----------------',when,config.shared.order)
     var order={
       items:items,
       shipping:shipping,
