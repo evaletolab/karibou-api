@@ -42,7 +42,8 @@ if(config.mongo.multiple){
 var EnumOrderStatus    =config.shared.order.status;
 var EnumCancelReason   =config.shared.order.cancelreason;
 var EnumFinancialStatus=config.shared.order.financialstatus;
-var EnumOrderMethod   =_.map(config.shared.order.gateway,
+var EnumOrderIssue     =config.shared.issue.code;
+var EnumOrderMethod    =_.map(config.shared.order.gateway,
                             function(e){return e.label});
 var EnumShippingMode   =config.shared.order.shippingmode;
 
@@ -122,6 +123,7 @@ var Orders = new Schema({
 
       /* where is the product now? */
       fulfillment:{
+        issue:{type:String, enum: EnumOrderIssue},
         status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
         note:{type: String, required: false},
         shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}

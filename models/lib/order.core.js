@@ -424,7 +424,14 @@ exports.updateItem = function(oid,items, callback){
         // if(order.items[i].sku===item.sku){
           if(item.finalprice) order.items[i].finalprice=item.finalprice;
           if(item.note)       order.items[i].note=item.note;
-          if(item.fulfillment)order.items[i].fulfillment.status=item.fulfillment.status;
+          if(item.fulfillment){
+            if(item.fulfillment.status){
+              order.items[i].fulfillment.status=item.fulfillment.status;
+            }
+            if(item.fulfillment.issue){
+              order.items[i].fulfillment.issue=item.fulfillment.issue;
+            }
+          }
 
           //
           // take care of variant

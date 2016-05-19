@@ -93,6 +93,19 @@ module.exports = {
               "Zoug",
               "Zurich"]
   },
+
+  issue:{
+    code:[
+    "issue_missing_client_id",
+    "issue_missing_product",
+    "issue_missing_validation",
+    "issue_wrong_packing",
+    "issue_wrong_client_id",
+    "issue_wrong_product_quality",
+    "issue_late_delivry"
+    ]
+  },
+  
   order:{      
     financialstatus:["pending",
                      "authorized",

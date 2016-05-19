@@ -407,19 +407,32 @@ exports.updateItem=function(req,res){
   }
 
 
+  //
+  // verify owner
+  // no admin should not get all order details
+  var shop=_.collect(req.user.shops,function (shop) {
+    return shop.urlpath;
+  });
+
+  //
+  // security
+  if(!req.user.isAdmin()){
+    //
+    // TODO check req.body.items[i].fulfillment.quality
+    // TODO security check req.body.items.vendor in shop
+  }
+
   Orders.updateItem(req.params.oid, req.body, function(err,order){
     if(err){
       return res.status(400).send( (err));
     }
+
+    //
+    // admin only
     if(req.user.isAdmin()){
       return res.json(order)
     }
 
-    //
-    // no admin should not get all order details
-    var shop=_.collect(req.user.shops,function (shop) {
-      return shop.urlpath;
-    });
 
     var filtered=Orders.filterByShop([order],shop)
     return res.json(filtered[0])
