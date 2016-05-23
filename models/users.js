@@ -265,6 +265,11 @@ UserSchema.statics.findByCrireria = function(criteria, callback){
   if(criteria.amount){
   }
 
+  if(criteria.reminder){
+    query['reminder.active']=true;
+  }
+
+
   //
   // findByUser
   if(criteria.uid){
