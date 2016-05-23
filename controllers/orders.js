@@ -173,6 +173,16 @@ function parseCriteria(criteria, req){
     if(when!== "Invalid Date") criteria.when=when
   }
 
+  //
+  // specify the padding option to add one week after the "to" date
+  if(req.query.padding){
+    //  when padding, setup a defaultdate
+    criteria.padding=true;
+    criteria.from=new Date();
+    criteria.from.setDate(1);
+    criteria.from.setHours(1,0,0,0);
+  }
+
   // select order year
   var year=req.query.year||req.params.year;
   if(year){
@@ -195,11 +205,6 @@ function parseCriteria(criteria, req){
     criteria.to.setHours(23,0,0,0);    
   }
 
-  //
-  // specify the padding option to add one week after the "to" date
-  if(req.query.padding){
-    criteria.padding=true
-  }
 }
 
 /**
