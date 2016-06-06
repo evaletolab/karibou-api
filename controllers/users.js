@@ -236,6 +236,7 @@ exports.update=function(req,res){
       }
       return res.status(400).send(errorHelper(err.message||err));
     }
+    user.populateRoles();
     return res.json(user);
   });
 
