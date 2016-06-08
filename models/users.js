@@ -95,6 +95,12 @@ validate.postal = function (value) {
           }
     }],
 
+    /* preferred postalCode*/
+    logistic:{
+      postalCode: [String]
+    },
+
+
     /* preferred products*/
     likes: [Number],
 
@@ -655,6 +661,12 @@ UserSchema.statics.findAndUpdate=function(id, u,callback){
 
     // END OF ADMIN
     //
+
+    //
+    // update logistic
+    if(u.logistic&&u.logistic.postalCode&&Array.isArray(u.logistic.postalCode)){
+      user.logistic.postalCode=_.uniq(u.logistic.postalCode);
+    }
 
     //
     // update reminder

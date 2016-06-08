@@ -89,6 +89,10 @@ var Shops = new Schema({
     // - > is saved on each order to compute bill 
     account:{
       fees:{type:Number,select:false, default:config.shared.generalFees},
+      tva:{
+        number:{type:String,select:false},
+        fees:{type:Number,select:false},
+      },
       updated:{type:Date, default: Date.now}
     },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
@@ -179,8 +183,8 @@ Shops.methods.getDiff=function (next) {
     }
   });
 
-  if(self.accoun){
-    result.fees=self.account.fees!==next.account.fees;
+  if(self.account&&self.account.fees&&next.account){
+    result.fees=(self.account.fees!==next.account.fees)?next.account.fees:false;
   }
 
 

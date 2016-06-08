@@ -4,6 +4,7 @@ var app = require("../app");
 var db = require('mongoose');
 var should = require("should");
 var Orders=db.model('Orders');
+var moment=require("moment");
 
 describe("orders.date", function(){
   var _ = require("underscore"),
@@ -154,11 +155,8 @@ describe("orders.date", function(){
 
     //
     // sunday is off 
-    if (today.getDay()==4){
-      nextSeller.getDay().should.equal((today.getDay()+4)%7)      
-    }else{
-      nextSeller.getDay().should.equal((today.getDay()+3)%7)      
-    }
+    moment(nextSeller).diff(today,'hours').should.be.above(49);
+
 
     done();          
   });
@@ -188,7 +186,7 @@ describe("orders.date", function(){
     config.shared.order.timelimitH=1
     var today=new Date();
     delete config.shared.order.weekdays[(today.getDay())]
-    Orders.findNextShippingDay().getDay().should.equal((today.getDay()+3)%7)      
+    moment(Orders.findNextShippingDay()).diff(today,'hours').should.be.above(41)
     done();
   });
 

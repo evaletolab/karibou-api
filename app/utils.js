@@ -151,11 +151,11 @@ module.exports = function (app) {
   // It depends on the hours needed to harvest/prepare a placed order
   Date.potentialShippingDay=function(){
     var now=new Date(), 
-        potential=new Date(now.getTime()+3600000*config.shared.order.timelimit);
+        potential=new Date(now.getTime()+3600000*(config.shared.order.timelimit));
 
     //
     // timelimitH is hour limit to place an order
-    if (potential.getHours()>config.shared.order.timelimitH){
+    if (potential.getHours()>=config.shared.order.timelimitH){
       //
       // set shipping time to fix the printed countdown (eg. 'dans un jour') 16:00 vs. 12:00 
       potential.setHours(config.shared.order.timelimitH,0,0,0);

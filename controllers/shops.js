@@ -116,7 +116,7 @@ exports.get=function (req, res) {
   var query=Shops.findOneShop({urlpath:req.params.shopname});
 
   if(req.user&&req.user.isAdmin() || isUserShopOwner(req)){
-    query.select('+account.fees');
+    query.select('+account.fees +account.tva.number +account.tva.fees');
   }
 
   query.exec(function (err,shop){
@@ -371,7 +371,7 @@ exports.update=function(req,res){
 
 
 
-  Shops.findOne({urlpath:req.params.shopname}).select('+account.fees').exec(function(err,shop){
+  Shops.findOne({urlpath:req.params.shopname}).select('+account.fees +account.tva.number +account.tva.fees').exec(function(err,shop){
     if (err){
       return res.status(400).send(err);
     }
@@ -383,7 +383,7 @@ exports.update=function(req,res){
     // if not admin silently fix   
     if(!req.user.isAdmin()){
       req.body.status=shop.status;
-      req.body.account=shop.account;
+      req.body.account.fees=shop.account.fees;
     }
 
     //
