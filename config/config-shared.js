@@ -63,7 +63,7 @@ module.exports = {
     location:{
       list:[
         "1201","1202","1203","1204","1205","1206","1207","1208","1209","1227",
-        "1212","1213","1223","1224","1225","1226","1228","1231","1232","1253","1255","1256"]
+        "1212","1213","1223","1224","1225","1226","1228","1231","1232","1234","1253","1255","1256","1257","1258"]
     },
     region:{
       list:["Genève", "Carouge,GE"]
@@ -79,7 +79,7 @@ module.exports = {
           "Plan-les-Ouates,GE","Pregny-Chambésy,GE","Presinge,GE","Puplinge,GE",
           "Russin,GE","Satigny,GE","Soral,GE","Thônex,GE","Troinex,GE","Vandoeuvres,GE",
           "Vernier,GE","Versoix,GE","Veyrier,GE", 
-	  "Tannay,VD",
+      	  "Tannay,VD",
           "Reignier, France"
     ]
   },
