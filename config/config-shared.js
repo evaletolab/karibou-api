@@ -27,10 +27,10 @@ module.exports = {
     discountB:180,    // 180 full price 11.7@18% & 9.75@15%
     price:{
       hypercenter:10,
-      periphery:17.90
+      periphery:14.90
     }, // shipping price
-    priceA:2.5,
-    priceB:5,
+    priceA:2,
+    priceB:3,
     periphery:["1212","1213","1223","1224","1225","1226","1228","1231","1232","1253","1255","1256"]
   },
 
@@ -125,9 +125,9 @@ module.exports = {
     status:["failure","created","reserved","partial","fulfilled"],
     gateway:[ 
       {label:"postfinance card",fees:0.02}, 
-      {label:"american express",fees:0.029}, 
-      {label:"visa",fees:0.029}, 
-      {label:"mastercard",fees:0.029}, 
+      {label:"american express",fees:0.02}, 
+      {label:"visa",fees:0.02}, 
+      {label:"mastercard",fees:0.02}, 
       {label:"wallet", fees:0.000}, 
       {label:"invoice",fees:0.000}, 
       {label:"paypal", fees:0.034}, 
