@@ -467,12 +467,28 @@ Product.statics.findDiscountSKUs=function(callback) {
   query=query.where("attributes.discount",true);      
   query=query.where("attributes.available",true);
   query=query.where("pricing.stock").gt(0);
-  query.select('sku -_id').sort('-update').limit(20).exec(function (err,products) {
-    products=products.map(function(product) {
-      return product.sku;
+  query.select('sku vendor -_id').sort('-update').limit(100).exec(function (err,products) {
+
+    //
+    // limit 4 products by vendor 
+    var mapping={}, result=[];
+    products.forEach(function(product) {
+      if(!mapping[product.vendor]){
+        mapping[product.vendor]=[];
+      }
+      if(mapping[product.vendor].length<5){
+        mapping[product.vendor].push(product.sku);  
+      }
     });
-    cache.set(cacheKey,products);
-    promise.resolve(err,products);
+
+
+    //   
+    // collect selection
+    Object.keys(mapping).forEach(function(vendor) {
+      result=result.concat(mapping[vendor])
+    });
+    cache.set(cacheKey,result);
+    promise.resolve(err,result);
   });
 
 
