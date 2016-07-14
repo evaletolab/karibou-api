@@ -153,6 +153,9 @@ Product.methods.removeCategories=function(cats,callback){
 };
 
 */
+
+
+
 Product.post('save',function (product) {
   cache.reset();
 });
@@ -444,6 +447,39 @@ Product.statics.findPopular = function(criteria, callback){
 };
 
 
+//
+// get a list of discount sku
+// we collect only SKU to makes the api fast
+Product.statics.findDiscountSKUs=function(callback) {
+  var promise = new mongoose.Promise, cacheKey=JSON.stringify("discount");
+  if(callback){promise.addBack(callback);}
+
+  //
+
+  // already in cache?
+  var result=cache.get(cacheKey);
+  if(result){
+    return promise.resolve(null,result);
+  }
+
+
+  var query=this.model('Products').find({});
+  query=query.where("attributes.discount",true);      
+  query=query.where("attributes.available",true);
+  query=query.where("pricing.stock").gt(0);
+  query.select('sku -_id').sort('-update').limit(20).exec(function (err,products) {
+    products=products.map(function(product) {
+      return product.sku;
+    });
+    cache.set(cacheKey,products);
+    promise.resolve(err,products);
+  });
+
+
+  return promise;
+}
+
+
 Product.statics.findBySkus = function(skus, callback){
   // var promise = new mongoose.Promise;
   // if(callback){promise.addBack(callback);}
@@ -547,7 +583,7 @@ Product.statics.findByCriteria = function(criteria, callback){
         criteria.status.forEach(function(s){
           available.push(s._id);
         });
-        console.log('FIXME --------------->',criteria.status)
+        console.log('FIXME ---------------> criteria.status')
       }
       promiseStatus.resolve(null,available)
     });

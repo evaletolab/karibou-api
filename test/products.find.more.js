@@ -61,6 +61,16 @@ describe("products.find.more", function(){
       products.length.should.equal(1)
       done();
     });  
+  });
+
+  it("Find discount products SKU ", function(done){
+    Products.findDiscountSKUs(function(err,skus){
+      should.not.exist(err);
+      should.exist(skus);
+      skus.length.should.equal(1);
+      (typeof skus[0]).should.equal('number');
+      done();
+    });  
 
   });
 

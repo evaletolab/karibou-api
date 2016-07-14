@@ -115,12 +115,23 @@ exports.love=function (req, res) {
   }
 
   //
+  // append discount 
+  if(req.query.discount){
+    return Products.findDiscountSKUs(function(err,skus) {
+      if(skus&&skus.length){
+        criteria.likes=criteria.likes.concat(skus);
+      }
+
+      Products.findPopular(criteria,function (err,products) {
+        return res.json(products)    
+      }) 
+    });
+  }
+
+  //
   // we ask for popular 
   if(req.query.popular){
     return Products.findPopular(criteria,function (err,products) {
-      if (err) {
-        return res.status(400).send(err);
-      }
       return res.json(products)    
     }) 
   }

@@ -100,7 +100,7 @@ var Shops = new Schema({
 });
 
 
-Shops.post('save',function (product) {
+Shops.post('save',function () {
   cache.reset();
 });
 
