@@ -49,8 +49,8 @@ html(itemscope itemtype="http://schema.org/Article")
             li(role="presentation" class=""): a( href="/shops") Les boutiques
 
 
-      div(class="header clearfix")
-        h3( class="text-muted"): |Karibou Marketplace
+      div(class="jumbotron")
+        h2 Des produits frais, bio, votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
 
 
 
@@ -60,6 +60,11 @@ html(itemscope itemtype="http://schema.org/Article")
         !{md.render(getLocal(doc.header))}
         if doc.photo.header
           img(src='#{prependUrlImage(doc.photo.header)}-/resize/600x/', class="img-responsive")
+
+      h1: La sélection
+      - each product in products
+        img(src='#{prependUrlImage(product.photo.url)}-/resize/600x/')
+        <hr/>
 
       div
         !{md.render(getLocal(doc.content))}

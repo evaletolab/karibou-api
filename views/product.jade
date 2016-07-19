@@ -56,11 +56,10 @@ html(itemscope itemtype="http://schema.org/Product")
                   a( href="#{menu.url}"): | !{getLocal(menu.name)} 
             li(role="presentation" class=""): a( href="/shops") Les boutiques
 
-        h3( class="text-muted"): |Karibou Marketplace
 
 
       div(class="jumbotron")
-        h2 Votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
+        h2 Des produits frais, bio, votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
 
       h1(itemprop="name"): =product.title
       div(itemprop="description"): =product.details.description

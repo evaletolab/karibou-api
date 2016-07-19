@@ -255,7 +255,7 @@ exports.getSEO=function (req, res) {
     }
     //
     // fetch products associated with this doc
-    Documents.model('Products').findBySkus(doc.skus,function (err,products) {
+    Documents.model('Products').findBySkus(doc.skus||[],function (err,products) {
 
       //
       // setup the model 
