@@ -167,7 +167,13 @@ exports.email=function(req,res){
 
     //
     // send email
-    bus.emit('sendmail',[shop.owner.email.address,content.email].join(', '),
+    var address=[content.email,shop.owner.email.address];
+    if(shop.owner.email.cc){
+      address.push(shop.owner.email.cc);
+    }
+
+
+    bus.emit('sendmail',address.join(', '),
                  "Un utilisateur à une question pour votre boutique "+shop.name,
                  content,
                  "karibou-question", function(err, status){

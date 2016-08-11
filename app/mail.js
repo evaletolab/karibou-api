@@ -76,7 +76,9 @@ module.exports = function(app,bus) {
         }
         transport.sendMail(mail, cb);
         if (process.env.NODE_ENV!=='production'){
-          console.log('sendmail',text)
+          console.log('sendmail:to',mail.to)
+          console.log('sendmail:cc',mail.cc)
+          console.log('sendmail:txt',text)
         }
 
       });

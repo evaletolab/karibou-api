@@ -57,6 +57,9 @@ validate.postal = function (value) {
       address:{type : String, index:true, unique: true, sparse: true, required : false,
         validate:[validate.email, 'adresse email invalide']
       },
+      cc:{type : String, index:true, unique: true, sparse: true, required : false,
+        validate:[validate.email, 'adresse email invalide']
+      },
       status:Schema.Types.Mixed,
     },
 

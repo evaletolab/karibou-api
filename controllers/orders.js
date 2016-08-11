@@ -721,8 +721,12 @@ exports.informShopToOrders=function(req,res){
           shopname:shop.urlpath
         },function (err,products) {
           contents[shop.urlpath].products=products;
+          var address=[shop.owner.email.address];
+          if(shop.owner.email.cc){
+            address.push(shop.owner.email.cc);
+          }
 
-          bus.emit('sendmail',shop.owner.email.address,
+          bus.emit('sendmail',address.join(','),
                "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
                 contents[shop.urlpath],"order-prepare",function (err,res) {
                   if(err){
