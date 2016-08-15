@@ -96,11 +96,12 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 </table>
 
 <p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
+<span style="color:#eee;page-break-after: always;">--------------------------------------------------------------------------------</span>
 
 <!-- LIST PRODUCT TO PREPARE -->
 <%if (shop.info.detailledOrder) {%>
 <br>
-<div>Vous avez choisi d'afficher la liste complète des produits à préparer.</div>
+<h3>Vous avez choisi d'afficher la liste complète des produits à préparer.</h3>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
@@ -123,13 +124,13 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
   <% } %>
 </tbody>
 </table>
-<span style="color:#eee;">--------------------------------------------------------------------------------</span>
+<span style="color:#eee;page-break-after: always;">--------------------------------------------------------------------------------</span>
 <% } %>
 
 <!-- LIST PRODUCT OUT OF STOCK -->
 <%if (stocks.length) {%>
 <br><br>
-<div>Certains produits ne sont plus disponibles. Vous pouvez vérifier vos stocks.</div>
+<h3>Certains produits ne sont plus disponibles. Vous pouvez vérifier vos stocks.</h3>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
@@ -148,7 +149,7 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
   <% } %>
 </tbody>
 </table>
-<span style="color:#eee;">--------------------------------------------------------------------------------</span>
+<span style="color:#eee;page-break-after: always;">--------------------------------------------------------------------------------</span>
 <br><br>
 <% } %>
 
