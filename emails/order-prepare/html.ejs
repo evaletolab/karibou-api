@@ -94,6 +94,57 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 	<% } %>
 </tbody>
 </table>
+
+<!-- LIST PRODUCT TO PREPARE -->
+<%if (shop.listProducts) {%>
+<table style="border:0px">
+<thead>
+  <tr style="background-color:#eee">
+    <th style="padding:0 8px;">SKU</th>
+    <th style="padding:0 8px;text-align:right">Qté</th>
+    <th style="padding:0 8px;text-align:left">Produit (portion)</th>
+    <th style="padding:0 8px;">Total</th>
+  </tr>
+</thead>
+<tbody>
+  <% for(var i=0; i<products.length; i++) {%>
+  <tr>
+    <td style="text-align:center"><b><%= products[i].sku %></b> </td>
+    <td style="text-align:right"><span> <%= products[i].quantity %>x </span></td>
+    <td><%= products[i].title %>  <%if (products[i].option) {%>
+      <br/>option: <%= products[i].option %><% } %>
+    </td>
+    <td><%= products[i].total.toFixed(2) %> </td>
+  </tr>
+  <% } %>
+</tbody>
+</table>
+<% } %>
+
+<!-- LIST PRODUCT OUT OF STOCK -->
+<%if (stocks.length) {%>
+<table style="border:0px">
+<thead>
+  <tr style="background-color:#eee">
+    <th style="padding:0 8px;">SKU</th>
+    <th style="padding:0 8px;text-align:right">En stock</th>
+    <th style="padding:0 8px;text-align:left">Produit (portion)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr><td colspan="3">Les FINs de stock</td></tr>
+  <% for(var i=0; i<stocks.length; i++) {%>
+  <tr>
+    <td style="text-align:center"><b><%= stocks[i].sku %></b> </td>
+    <td style="text-align:right"><span> <%= stocks[i].quantity %>x </span></td>
+    <td><%= stocks[i].title %>  </td>
+    <td><%= stocks[i].pricing.stock %> </td>
+  </tr>
+  <% } %>
+</tbody>
+</table>
+<% } %>
+
 <p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
 Vous pouvez suivre les commandes ici <%= origin %>/admin/orders <br/>
 Avec mes meilleurs messages,<br/>
