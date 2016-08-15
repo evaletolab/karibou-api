@@ -96,7 +96,7 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 </table>
 
 <!-- LIST PRODUCT TO PREPARE -->
-<%if (shop.listProducts) {%>
+<%if (shop.info.detailledOrder) {%>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
@@ -123,6 +123,7 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 
 <!-- LIST PRODUCT OUT OF STOCK -->
 <%if (stocks.length) {%>
+<p>Vérifier vos stocks.</p>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
@@ -132,11 +133,9 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
   </tr>
 </thead>
 <tbody>
-  <tr><td colspan="3">Les FINs de stock</td></tr>
   <% for(var i=0; i<stocks.length; i++) {%>
   <tr>
     <td style="text-align:center"><b><%= stocks[i].sku %></b> </td>
-    <td style="text-align:right"><span> <%= stocks[i].quantity %>x </span></td>
     <td><%= stocks[i].title %>  </td>
     <td><%= stocks[i].pricing.stock %> </td>
   </tr>
