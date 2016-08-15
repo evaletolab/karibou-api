@@ -95,14 +95,17 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 </tbody>
 </table>
 
+<p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
+
 <!-- LIST PRODUCT TO PREPARE -->
 <%if (shop.info.detailledOrder) {%>
+<div>Vous avez choisi d'afficher la liste complète des produits à préparer.</div>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
     <th style="padding:0 8px;">SKU</th>
     <th style="padding:0 8px;text-align:right">Qté</th>
-    <th style="padding:0 8px;text-align:left">Produit (portion)</th>
+    <th style="padding:0 8px;text-align:left;min-width:400px">Produit (portion)</th>
     <th style="padding:0 8px;">Total</th>
   </tr>
 </thead>
@@ -123,20 +126,20 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 
 <!-- LIST PRODUCT OUT OF STOCK -->
 <%if (stocks.length) {%>
-<p>Vérifier vos stocks.</p>
+<div>Vérifier vos stocks.</div>
 <table style="border:0px">
 <thead>
   <tr style="background-color:#eee">
     <th style="padding:0 8px;">SKU</th>
-    <th style="padding:0 8px;text-align:right">En stock</th>
-    <th style="padding:0 8px;text-align:left">Produit (portion)</th>
+    <th style="padding:0 8px;text-align:left;min-width:400px">Produit </th>
+    <th style="padding:0 8px;text-align:right;width:30px">En stock</th>
   </tr>
 </thead>
 <tbody>
   <% for(var i=0; i<stocks.length; i++) {%>
   <tr>
     <td style="text-align:center"><b><%= stocks[i].sku %></b> </td>
-    <td><%= stocks[i].title %>  </td>
+    <td><%= stocks[i].title %> (<%= stocks[i].pricing.part %>) </td>
     <td><%= stocks[i].pricing.stock %> </td>
   </tr>
   <% } %>
@@ -144,7 +147,6 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 </table>
 <% } %>
 
-<p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
 Vous pouvez suivre les commandes ici <%= origin %>/admin/orders <br/>
 Avec mes meilleurs messages,<br/>
 
