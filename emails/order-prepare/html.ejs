@@ -94,8 +94,69 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
 	<% } %>
 </tbody>
 </table>
+
 <p style="color:#aaa"><b>(*)</b> inscrire le numéro de sac sur l'emballage</p>
 Vous pouvez suivre les commandes ici <%= origin %>/admin/orders <br/>
+<div style="color:#eee;page-break-after: always;">--------------------------------------------------------------------------------</div>
+
+<!-- LIST PRODUCT TO PREPARE -->
+<%if (shop.info.detailledOrder) {%>
+<br>
+<h3>Vous avez choisi d'afficher la liste complète des produits à préparer.</h3>
+<table style="border:0px">
+<thead>
+  <tr style="background-color:#eee">
+    <th style="padding:0 8px;">SKU</th>
+    <th style="padding:0 8px;text-align:right">Qté</th>
+    <th style="padding:0 8px;text-align:left;min-width:350px">Produit (portion)</th>
+    <th style="padding:0 8px;">Total</th>
+  </tr>
+</thead>
+<tbody>
+  <% for(var i=0; i<products.length; i++) {%>
+  <tr>
+    <td style="text-align:center"><a href="<%= origin %>/products/<%= products[i].sku %>"><%= products[i].sku %></a> </td>
+    <td style="text-align:right"><b> <%= products[i].quantity %>x </b></td>
+    <td><%= products[i].title %>  <%if (products[i].option) {%>
+      <br/>option: <%= products[i].option %><% } %>
+    </td>
+    <td><%= products[i].total.toFixed(2) %> </td>
+  </tr>
+  <% } %>
+</tbody>
+</table>
+<span style="color:#eee;page-break-after: always;">--------------------------------------------------------------------------------</span>
+<% } %>
+
+<!-- LIST PRODUCT OUT OF STOCK -->
+<%if (stocks.length) {%>
+<br><br>
+<h3>Gestion de vos stocks</h3>
+Certains produits sont bientôt en rupture de stock! Suivez <a href="<%= origin %>/admin/products">ce lien</a> pour modifier vos stocks.
+<!--
+<table style="border:0px;display:none">
+<thead>
+  <tr style="background-color:#eee">
+    <th style="padding:0 8px;">SKU</th>
+    <th style="padding:0 8px;text-align:right;width:30px">Stock</th>
+    <th style="padding:0 8px;text-align:left;min-width:400px">Produit </th>
+  </tr>
+</thead>
+<tbody>
+  <% for(var i=0; i<stocks.length; i++) {%>
+  <tr>
+    <td style="text-align:center"><a href="<%= origin %>/products/<%= stocks[i].sku %>"><%= stocks[i].sku %></a> </td>
+    <td style="text-align:right"><%= stocks[i].pricing.stock %> </td>
+    <td><%= stocks[i].title %> (<%= stocks[i].pricing.part %>) </td>
+  </tr>
+  <% } %>
+</tbody>
+</table>
+-->
+<dov style="color:#eee;">--------------------------------------------------------------------------------</div>
+<br><br>
+<% } %>
+
 Avec mes meilleurs messages,<br/>
 
 Delphine

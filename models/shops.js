@@ -35,6 +35,7 @@ var Shops = new Schema({
       local:{type: Boolean,default:false}      
     },
 
+
     //
     // define where this shop is available
     marketplace: [{type: String, required: false}],
@@ -78,6 +79,7 @@ var Shops = new Schema({
 
     info:{
       active:{type: Boolean,default:false},
+      detailledOrder:{type: Boolean,default:false},
       comment:{type: String}
     },
     

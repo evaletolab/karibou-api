@@ -720,13 +720,15 @@ exports.informShopToOrders=function(req,res){
           available:true,
           shopname:shop.urlpath
         },function (err,products) {
-          contents[shop.urlpath].products=products;
-          var address=[shop.owner.email.address];
+          contents[shop.urlpath].stocks=products;
+
+          var address={to:shop.owner.email.address};
           if(shop.owner.email.cc){
-            address.push(shop.owner.email.cc);
+            address.cc=shop.owner.email.cc;
           }
 
-          bus.emit('sendmail',address.join(','),
+
+          bus.emit('sendmail',address,
                "Karibou - Confirmation de vos préparations pour le "+contents[shop.urlpath].shippingWhen,
                 contents[shop.urlpath],"order-prepare",function (err,res) {
                   if(err){

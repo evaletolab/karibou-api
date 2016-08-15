@@ -139,7 +139,7 @@ exports.email=function(req,res){
   // send email @karibou
   if(!req.body.shopname){
     content.mood=req.body.mood;
-    return bus.emit('sendmail',[config.mail.info,content.email].join(', '),
+    return bus.emit('sendmail',{to:config.mail.info,from:content.email},
                  "Un utilisateur a une question pour Karibou.ch ",
                  content,
                  "karibou-question", function(err, status){
@@ -167,13 +167,13 @@ exports.email=function(req,res){
 
     //
     // send email
-    var address=[content.email,shop.owner.email.address];
+    var address={from:content.email,to:shop.owner.email.address};
     if(shop.owner.email.cc){
-      address.push(shop.owner.email.cc);
+      address.cc=shop.owner.email.cc;
     }
 
 
-    bus.emit('sendmail',address.join(', '),
+    bus.emit('sendmail',address,
                  "Un utilisateur à une question pour votre boutique "+shop.name,
                  content,
                  "karibou-question", function(err, status){
