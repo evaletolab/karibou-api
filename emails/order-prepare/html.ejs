@@ -123,8 +123,7 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
   <% } %>
 </tbody>
 </table>
-<br/>
-<span style="color:#eee;">-----------------------------------------</span>
+<span style="color:#eee;">--------------------------------------------------------------------------------</span>
 <% } %>
 
 <!-- LIST PRODUCT OUT OF STOCK -->
@@ -143,12 +142,13 @@ Vous trouverez ci-dessous les commandes à préparer pour le <u><%= shippingWhen
   <% for(var i=0; i<stocks.length; i++) {%>
   <tr>
     <td style="text-align:center"><a href="<%= origin %>/products/<%= stocks[i].sku %>"><%= stocks[i].sku %></a> </td>
-    <td><%= stocks[i].pricing.stock %> </td>
+    <td style="text-align:right"><%= stocks[i].pricing.stock %> </td>
     <td><%= stocks[i].title %> (<%= stocks[i].pricing.part %>) </td>
   </tr>
   <% } %>
 </tbody>
 </table>
+<span style="color:#eee;">--------------------------------------------------------------------------------</span>
 <br><br>
 <% } %>
 
