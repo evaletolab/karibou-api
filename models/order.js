@@ -409,6 +409,10 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     return cb(msg31,item)
   }
 
+  //
+  // format price
+  item.finalprice=parseFloat(item.finalprice.toFixed(2));
+
 
   return cb(null,item,vendor);
 };
