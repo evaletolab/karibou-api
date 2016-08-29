@@ -127,16 +127,33 @@ describe("api.orders.email", function(){
       .expect(200,function(err,res){
         var when=Orders.formatDate(sellerDay)
         should.not.exist(err)
+
         should.exist(res.body['super-shop'].items)
         should.exist(res.body['un-autre-shop'].items)
         res.body['super-shop'].items[0].sku.should.equal(1000001);
         res.body['super-shop'].shippingWhen.should.equal(when)
+
+        // 
+        // all items should belongs to the same shop
         res.body['super-shop'].items.forEach(function (item) {
           item.vendor.should.equal('super-shop');
         })
         res.body['un-autre-shop'].items.forEach(function (item) {
           item.vendor.should.equal('un-autre-shop');
         });
+
+        // 
+        // for one shop, all items == all products
+        res.body['un-autre-shop'].products.forEach(function(item) {
+          should.exist(_.find(res.body['un-autre-shop'].items, {sku:item.sku}));
+        })
+        res.body['super-shop'].products.forEach(function(item) {
+          should.exist(_.find(res.body['super-shop'].items, {sku:item.sku}));
+        })
+
+
+
+
         var count2000006=0;
         res.body['un-autre-shop'].items.map(function (i) {
           if(i.oid===2000006)count2000006++;
