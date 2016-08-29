@@ -55,11 +55,17 @@ module.exports = function(app,bus) {
 
 
         var mail={
-          from: to.from||config.mail.from,
+          from: config.mail.from,
           to: to.to||to,
           subject: subject,
           text: text
         };
+
+        //
+        // when from is specified
+        if(to.from){
+          mail.replyTo=to.from;
+        }
 
         //
         // when CC is specified

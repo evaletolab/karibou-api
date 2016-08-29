@@ -136,7 +136,10 @@ describe("orders.create.success", function(){
       //
       // checking normal price
       order.items[2].quantity.should.equal(3)
-      order.items[2].finalprice.should.equal(data.Products[0].pricing.price*3)
+
+      //
+      // order finalprice should have fixed format X.XX
+      order.items[2].finalprice.should.equal(parseFloat((data.Products[0].pricing.price*3).toFixed(2)))
 
       // checking item reservation
       order.items.forEach(function(o,i){
