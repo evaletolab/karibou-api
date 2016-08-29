@@ -50,9 +50,9 @@ exports.prepareOrdersForMail=function (when,shops,closed, cb) {
 
     //
     // filter content for each shop
-    var contents={},formatWhen=Orders.formatDate(when), items=[], products={};
+    var contents={},formatWhen=Orders.formatDate(when), items=[];
     shops.forEach(function (shop) {
-      var content={products:[]};items=[];
+      var content={products:[]};items=[], products={};
       Orders.filterByShop(orders,shop).forEach(function(order){
           order.items.forEach(function(item, idx){
             if(idx===0)item.changeCustomer=true;        
@@ -82,11 +82,11 @@ exports.prepareOrdersForMail=function (when,shops,closed, cb) {
       // map product list
       Object.keys(products).sort(function(a,b){return products[b].quantity-products[a].quantity;}).forEach(function(sku){
         content.products.push({
-          sku:sku,
+          sku:Number(sku),
           quantity:products[sku].quantity,
           title:products[sku].title,
           option:products[sku].option,
-          total:products[sku].total
+          total:parseFloat(products[sku].total.toFixed(2))
         })
       })
 

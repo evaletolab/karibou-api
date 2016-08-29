@@ -510,6 +510,9 @@ exports.Shops=[{
     urlpath:"un-autre-shop",
     catalog:c.Categories[0]._id, 
     owner:u.Users[0]._id,  //evaleto@gluck.com
+    info:{
+        detailledOrder:true
+    },
     available:{
       active:false,
       weekdays:[0,1,2,3,4,5,6]
@@ -542,6 +545,9 @@ exports.Shops=[{
     urlpath:"super-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
+    info:{
+        detailledOrder:true
+    },
     available:{
       active:false,
       weekdays:[0,1,2,3,4,5,6]
