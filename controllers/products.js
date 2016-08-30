@@ -110,8 +110,16 @@ exports.love=function (req, res) {
     maxcat:parseInt(req.query.maxcat)||4,
     available:(req.query.available&&req.query.available=='true')
   }
+  //
+  // limit past time
   if(req.query.windowtime){
     criteria.windowtime=req.query.windowtime;
+  }
+
+  //
+  // force to a logistic day
+  if(req.query.when){
+    criteria.when=new Date(req.query.when);
   }
 
   //

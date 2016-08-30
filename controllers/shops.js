@@ -275,7 +275,7 @@ exports.askStatus=function(req,res){
   }catch(err){
     return res.status(400).send( err.message);
   }
-  db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
+  db.model('Shops').findOne({urlpath:req.params.shopname}).populate('owner').exec(function(err,shop){
     if (err){
       return res.status(400).send(errorHelper(err));
     }
@@ -298,9 +298,10 @@ exports.askStatus=function(req,res){
     var content=req.user;
     content.shop=shop;
     content.origin=req.header('Origin')||config.mail.origin;
+    content.noCC=true;
     //
-    // send email
-    bus.emit('sendmail',config.mail.to,
+    // send email    
+    bus.emit('sendmail',{to:config.mail.info,from:shop.owner.email.address},
                  "Demande de publication du shop "+shop.name,
                  content,
                  "shop-status", function(err, status){
