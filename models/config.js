@@ -14,11 +14,27 @@ var Config = new Schema({
     cid:{type:String,default:'main',required: true, unique:true, trim:true},
 
     //
-    // display message wheb maintenance (that mean that all shipping are off)
+    // display message web maintenance (that mean that all shipping are off)
     maintenance:{
       reason:{en:String,fr:String,de:String},
       active:{type:Boolean,default:false}
     },
+
+
+    //
+    // display welcome message
+    welcome:{
+      message:{en:String,fr:String,de:String},
+      active:{type:Boolean,default:false}
+    },
+
+    //
+    // display welcome message
+    checkout:{
+      message:{en:String,fr:String,de:String},
+      active:{type:Boolean,default:false}
+    },
+
 
     //
     // display message on front
