@@ -126,7 +126,7 @@ module.exports = {
     gateway:[ 
       {label:"postfinance card",fees:0.00}, 
       {label:"american express",fees:0.00}, 
-      {label:"visa",fees:0.005}, 
+      {label:"visa",fees:0.000}, 
       {label:"mastercard",fees:0.0}, 
       {label:"wallet", fees:0.000}, 
       {label:"invoice",fees:0.000}, 
