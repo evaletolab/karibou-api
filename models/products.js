@@ -373,7 +373,6 @@ Product.statics.findPopular = function(criteria, callback){
      {$project:{month: { $month: "$shipping.when"}, year: { $year: "$shipping.when" },
          items:1,
      }},
-     { $match: { 'month': {$gt:today.getMonth()-windowtime,$lte:today.getMonth()+1 }, 'year':thisYear } },     
      {$unwind: '$items' },
      {$group:
          {
@@ -592,6 +591,7 @@ Product.statics.findByCriteria = function(criteria, callback){
     Shops.findAvailable(nextShippingDays).then(function(available) {
       // les-potagers-de-gaia 547836ee8b8cf18304bbbe15
       // sandrine-guy-producteurs 547cd1428b8cf18304bbbe35
+
       available=available.map(function (a) {
         return a._id;
       });
@@ -613,7 +613,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       return promiseShop.resolve(null,available, false);
     }
 
-    Shops.findOne({urlpath:criteria.shopname},function(err,shop){
+    Shops.findOne({urlpath:criteria.shopname}).select('_id').exec(function(err,shop){
       if(!shop){
         return promiseShop.reject(new Error("La boutique n'existe pas"))
       }
@@ -629,7 +629,7 @@ Product.statics.findByCriteria = function(criteria, callback){
     if (!criteria.category){
       return promiseCategory.resolve(null,available, shop,false)
     }
-    Categories.findOne({slug:criteria.category},function(err,category){
+    Categories.findOne({slug:criteria.category}).select('_id').exec(function(err,category){
       if(!category){
         return promiseCategory.reject(new Error("La catégorie n'existe pas"));
       }

@@ -305,7 +305,9 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
   
   q['available.weekdays']={'$in':days};
 
-  this.find(q).exec(function(err,shops){
+  //
+  // limit projection to _id field
+  this.find(q).select('_id urlpath').exec(function(err,shops){
     cache.set(cacheKey,shops);
     promise.resolve(err,shops);    
   });
