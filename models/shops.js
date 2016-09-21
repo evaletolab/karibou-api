@@ -77,6 +77,12 @@ var Shops = new Schema({
       comment:{type: String}
     },
 
+    discount:{
+      amount:{type: Number,min:0},
+      threshold:{type: Number,min:0},
+      active:{type: Boolean,default:false}
+    },
+
     info:{
       active:{type: Boolean,default:false},
       detailledOrder:{type: Boolean,default:false},

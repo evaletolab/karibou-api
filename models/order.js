@@ -84,11 +84,14 @@ var Orders = new Schema({
         charge:Number,
         shipping:{type:Number}
       },
-      correction:{
+
+      /* discout is an amount offer by a shop */
+      discount:[{
         amount:Number,
-        transaction:{type:String,select:false}
-      },
-      /*for security reason transaction data are encrypted */
+        vendor:{type:String}
+      }],
+
+      /* for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
    },
 
@@ -348,7 +351,8 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
       name:product.vendor.name,
       address:address,
       fees:product.vendor.account.fees,
-      geo:geo
+      geo:geo,
+      discount:product.vendor.discount
   };
 
   //
@@ -620,11 +624,13 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       // attache items/vendors when success,
       vendors=_.uniq(vs,false,function(e){return e.slug;});
 
+
       return Orders.coreCreate(oid, items,customer,shipping,paymentData,vendors);
 
     });
 
   })
+
   //
   // finally update stocks
   .then(function (order) {
