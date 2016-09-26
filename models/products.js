@@ -599,7 +599,7 @@ Product.statics.findByCriteria = function(criteria, callback){
         criteria.status.forEach(function(s){
           available.push(s._id);
         });
-        console.log('FIXME ---------------> criteria.status')
+        console.log('FIXME ---------------> criteria.status',available)
       }
       promiseStatus.resolve(null,available)
     });
@@ -649,7 +649,6 @@ Product.statics.findByCriteria = function(criteria, callback){
     return promiseCategory;
   }).then(function (available, shops, category) {
   
-      console.log('----------',available,shops)
 
     //
     // !shops && available
