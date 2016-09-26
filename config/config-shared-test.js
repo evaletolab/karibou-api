@@ -6,6 +6,7 @@ module.exports = {
     defaultLocale:'fr'
   },
 
+  shopsLimit:0,
   generalFees:0.15,
   system:{
     password:{len:5},
