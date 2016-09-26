@@ -118,7 +118,7 @@ Shops.statics.create = function(shop,user, callback){
   assert(user);
   assert(callback);
   
-  debug("create product: "+shop);
+  debug("create shop: "+shop);
 
   
 	var Shops=this.model('Shops');	
