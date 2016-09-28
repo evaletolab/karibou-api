@@ -815,8 +815,9 @@ UserSchema.statics.checkPaymentMethod=function(id,alias,callback){
       // map result
       var ret={}
       for (var i = 0;i<results.length; i++) {
+        ret[alias[i]]=results[i].value;
         if(results[i].state!=="fulfilled"){
-          ret[alias[i]]=results[i].reason.message||results[i].reason
+          ret[alias[i]]={error:results[i].reason.message||results[i].reason};
         }
       };
       callback(null, ret)
