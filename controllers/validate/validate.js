@@ -308,8 +308,15 @@ exports.shop=function(shop){
       check(shop.faq[i].a,"Vous devez écrire une réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
+    ifCheck(shop.discount.active,"Erreur system p10").isBoolean();
+    ifCheck(shop.discount.threshold,"Le format du seuil n'est pas correct").isFloat();
+    ifCheck(shop.discount.amount,"Le format du montant n'est pas correct").isFloat();
+    if(shop.discount.active&&(!shop.discount.threshold||!shop.discount.amount)){
+      throw new Error("Vous avez activé la prise en charge client sans remplir le formulaire");
+    }
+
     if (shop.available){
-      shop.available.active && check(shop.available.active,"Erreur system p10").isBoolean();
+      shop.available.active && check(shop.available.active,"Erreur system p11").isBoolean();
 
       //      
       // date should be mentioned here
@@ -321,7 +328,7 @@ exports.shop=function(shop){
     }
 
     if (shop.info){
-      shop.info.active && check(shop.info.active).isBoolean();
+      shop.info.active && check(shop.info.active,"Erreur system p12").isBoolean();
       shop.info.comment && check(shop.info.comment,"Le format du commentaire doit contenir entre 6 et 264 caractères").len(6, 264).isText();
     }
 
