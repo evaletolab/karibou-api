@@ -140,11 +140,6 @@ exports.getShippingPrice=function(factor){
   // 1) coupon for freeshipping
   //   --> this.payment.coupons
 
-  //
-  // TODO TESTING MERCHANT ACCOUNT
-  if (this.customer.merchant===true){
-    return roundCHF(price-config.shared.shipping.priceB);
-  }
 
   
   // implement 3) get free shipping!

@@ -51,7 +51,7 @@ describe("orders.validate.price", function(){
     });    
   });
 
-  it("check order price (visa+items+shipping) ", function(done){
+  it.skip("check order price (visa+items+shipping) ", function(done){
     db.model('Orders').find({oid:2100000}, function(err,order){
       should.not.exist(err)
       //
@@ -64,7 +64,7 @@ describe("orders.validate.price", function(){
     });
   });
 
-  it("check order price (+items+shipping) ", function(done){
+  it.skip("check order price (+items+shipping) ", function(done){
     db.model('Orders').find({oid:2000006}, function(err,order){
       should.not.exist(err)
       order[0].getTotalPrice().should.equal(24.5)
@@ -72,7 +72,7 @@ describe("orders.validate.price", function(){
     });
   });
 
-  it("check order 145fr, got merchant shipping price ", function(done){
+  it.skip("check order 145fr, got merchant shipping price ", function(done){
     db.model('Orders').find({oid:2000008}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
@@ -82,7 +82,7 @@ describe("orders.validate.price", function(){
     });
   });
 
-  it("check order 180fr, got merchant shipping price ", function(done){
+  it.skip("check order 180fr, got merchant shipping price ", function(done){
     db.model('Orders').find({oid:2000009}, function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
@@ -93,7 +93,7 @@ describe("orders.validate.price", function(){
   });
 
 
-  it("check order 145fr and postalCode is 1219, got merchant price ", function(done){
+  it.skip("check order 145fr and postalCode is 1219, got merchant price ", function(done){
     db.model('Orders').find({oid:2000010}, function(err,order){
       var discountPeriphery=config.shared.shipping.price.periphery;
       should.not.exist(err)
