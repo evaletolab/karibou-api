@@ -308,11 +308,13 @@ exports.shop=function(shop){
       check(shop.faq[i].a,"Vous devez écrire une réponse qui doit contenir entre 3 et 1'000 caractères").len(3, 1000).isText()
     }
 
-    ifCheck(shop.discount.active,"Erreur system p10").isBoolean();
-    ifCheck(shop.discount.threshold,"Le format du seuil n'est pas correct").isFloat();
-    ifCheck(shop.discount.amount,"Le format du montant n'est pas correct").isFloat();
-    if(shop.discount.active&&(!shop.discount.threshold||!shop.discount.amount)){
-      throw new Error("Vous avez activé la prise en charge client sans remplir le formulaire");
+    if(shop.discount){
+      ifCheck(shop.discount.active,"Erreur system p10").isBoolean();
+      ifCheck(shop.discount.threshold,"Le format du seuil n'est pas correct").isFloat();
+      ifCheck(shop.discount.amount,"Le format du montant n'est pas correct").isFloat();
+      if(shop.discount.active&&(!shop.discount.threshold||!shop.discount.amount)){
+        throw new Error("Vous avez activé la prise en charge client sans remplir le formulaire");
+      }
     }
 
     if (shop.available){
