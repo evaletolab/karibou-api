@@ -31,7 +31,7 @@ exports.ensureOwnerOrAdmin=function(req, res, next) {
 
   //
   // ensure owner
-  db.model('Orders').findOne({'customer.id':req.user.id,oid:req.params.oid}).exec(function(e,o){
+  db.model('Orders').findOne({'customer.id':req.user.id,oid:req.params.oid}).select('_id').exec(function(e,o){
     if(!o){
       return res.status(401).send( "Your are not the owner of this order");
     }

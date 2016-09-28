@@ -599,7 +599,7 @@ Product.statics.findByCriteria = function(criteria, callback){
         criteria.status.forEach(function(s){
           available.push(s._id);
         });
-        console.log('FIXME ---------------> criteria.status')
+        console.log('FIXME ---------------> criteria.status',available)
       }
       promiseStatus.resolve(null,available)
     });
@@ -613,53 +613,70 @@ Product.statics.findByCriteria = function(criteria, callback){
       return promiseShop.resolve(null,available, false);
     }
 
-    Shops.findOne({urlpath:criteria.shopname}).select('_id').exec(function(err,shop){
-      if(!shop){
+    //
+    // sure that shopname is an array
+    if(!Array.isArray(criteria.shopname)){
+      criteria.shopname=[criteria.shopname];
+    }
+
+    Shops.find({urlpath:{$in:criteria.shopname}}).select('_id').exec(function(err,shops){
+      if(!shops.length){
         return promiseShop.reject(new Error("La boutique n'existe pas"))
       }
-      promiseShop.resolve(err,available, shop);
+      //
+      // clean content
+      shops=shops.map(function(s) {
+        return s._id;
+      })
+      promiseShop.resolve(err,available, shops);
     });
 
     return promiseShop;
-  }).then(function (available, shop) {
+  }).then(function (available, shops) {
     var promiseCategory= new mongoose.Promise;
 
     //
     // by category
     if (!criteria.category){
-      return promiseCategory.resolve(null,available, shop,false)
+      return promiseCategory.resolve(null,available, shops,false)
     }
     Categories.findOne({slug:criteria.category}).select('_id').exec(function(err,category){
       if(!category){
         return promiseCategory.reject(new Error("La catégorie n'existe pas"));
       }
-      promiseCategory.resolve(err,available, shop,category);
+      promiseCategory.resolve(err,available, shops,category);
     });
     return promiseCategory;
-  }).then(function (available, shop, category) {
+  }).then(function (available, shops, category) {
   
 
     //
-    // !shop && available
-    if (available &&!shop){
+    // !shops && available
+    if (available &&!shops){
       query=query.where("vendor").in(available);
     }else
 
     //
-    // shop && !available
-    if(shop&&!available){
-      query=query.where("vendor",shop._id);
+    // shops && !available
+    if(shops&&!available){
+      query=query.where("vendor").in(shops);
     }else
     
     //
-    // shop && available && available.find(shop._id)
-    if(shop&&available&&(_.find(available,function(s){return shop._id.equals(s)}))){        
-      query=query.where("vendor",shop._id);
+    // shops && available && available.find(shops._id)
+    if(shops&&available){        
+      var okshops=[];
+      shops.forEach(function(shop) {
+        if(_.find(available,shop)){
+          okshops.push(shop);
+        }
+      })
+      query=query.where("vendor").in(okshops);
     }else 
     
     //
-    // shop && available && !available.find(shop._id)
-    if(shop&&available){
+    // shops && available && !available.find(shops._id)
+    if(shops&&available){
       return promise.resolve(null,[]);
     }
     

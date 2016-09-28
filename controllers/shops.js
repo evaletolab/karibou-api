@@ -19,7 +19,7 @@ function isUserShopOwner(req){
 }
 
 exports.ensureShopLimit=function(req, res, next) {
-  if (!req.user.isAdmin() && req.user.shops.length>0){
+  if (!req.user.isAdmin() && req.user.shops.length>(config.shared.shopsLimit||0)){
     return res.status(401).send( "Vous ne pouvez plus ajouter de nouvelles boutiques");
   }
   return next();
