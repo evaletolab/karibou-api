@@ -36,6 +36,11 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( property="og:type", content="article" )
     meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
     meta( property="og:image", content="#{prependUrlImage(product.photo.url)}-/resize/600x/" )
+    meta( property="og:image:width", content="600")
+    
+    // facebook format is  1,91:1, you need to fix height to 314px
+    // meta( property="og:image:height", content="450")
+    // https://developers.facebook.com/docs/sharing/best-practices#precaching
     meta( property="og:description", content="#{product.details.description}" )
     meta( property="og:site_name", content="https://karibou.ch" )
     meta( property="og:price:amount", content="#{product.getPrice().toFixed(2)}" )
