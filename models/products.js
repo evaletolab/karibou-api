@@ -58,6 +58,7 @@ var Product = new Schema({
       home:{type:Boolean, default:false, index: true},
       available:{type:Boolean, default:true},
       comment:{type:Boolean, default:false},
+      weigth:{type:Number, min:0,max:100, requiered:true, default:0},
       discount:{type:Boolean, default:false, index: true}
    },
 
@@ -81,6 +82,7 @@ var Product = new Schema({
       price:{type:Number, min:0, requiered:true},
       part:{type:String, requiered:true},
       discount:{type:Number, min:0, requiered:true},
+      tva:{type:Number, min:0, requiered:true},
    },
 
    photo:{
