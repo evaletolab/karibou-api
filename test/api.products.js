@@ -110,6 +110,7 @@ describe("api.products", function(){
       // shop must be managed
       // how to mockup login
       var p=_.clone(data.Products[0]);
+      p.pricing.tva=0.025;
       delete(p._id);
       request(app)
         .post('/v1/shops/bicycle-and-rocket/products')
@@ -134,6 +135,7 @@ describe("api.products", function(){
       p.title="Test more new product";
       p.details.description="Test more new product";
       p.pricing.price=10.0;
+      p.pricing.tva=0.025;
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
@@ -161,6 +163,7 @@ describe("api.products", function(){
       p.title="Test more new product";
       p.details.description="Test more new product";
       p.pricing.price=10.0;
+      p.pricing.tva=0.025;
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
@@ -187,6 +190,7 @@ describe("api.products", function(){
       p.title="Test more new product 2";
       p.details.description="Test more new product 2";
       p.pricing.price=10.0;
+      p.pricing.tva=0.025;
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
@@ -215,6 +219,7 @@ describe("api.products", function(){
       p.title="Test more new product 2";
       p.details.description="Test more new product 2";
       p.pricing.price=10.0;
+      p.pricing.tva=0.025;
       p.pricing.part="100gr";
       p.photo={url:""}
       request(app)
@@ -241,6 +246,7 @@ describe("api.products", function(){
       p.details.description="Test more new product 2";
       p.pricing.price=10.0;
       p.pricing.part="100gr";
+      p.pricing.tva=0.025;
       p.attributes.home=true;
       p.photo={url:""}
       request(app)
@@ -266,6 +272,7 @@ describe("api.products", function(){
       p.attributes.home=false;
       p.pricing.price=10.0;
       p.pricing.part="100gr";
+      p.pricing.tva=0.025;
       p.photo={url:""}
       request(app)
         .post('/v1/products/1000002')
@@ -282,7 +289,57 @@ describe("api.products", function(){
         });
     });    
       
-  
+
+    it('POST update /v1/products/1000002 TVA error',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      p.sku=123456;
+      p.categories=data.Categories[2]._id;
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.attributes.home=false;
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      p.pricing.tva=0.25;
+      p.photo={url:""}
+      request(app)
+        .post('/v1/products/1000002')
+        .set('Content-Type','application/json')
+        .set('cookie', gluck)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(400);
+          //res.body.categories.length.should.equal(2);
+          done();        
+        });
+    });      
+
+    it('POST update /v1/products/1000002 TVA error',function(done){
+      // shop must be managed
+      //p.manufacturer={_id:maker._id};
+      var p=_.clone(data.Products[0]);
+      delete(p._id);
+      p.sku=123456;
+      p.categories=data.Categories[2]._id;
+      p.title="Test more new product 2";
+      p.details.description="Test more new product 2";
+      p.attributes.home=false;
+      p.pricing.price=10.0;
+      p.pricing.part="100gr";
+      p.photo={url:""}
+      request(app)
+        .post('/v1/products/1000002')
+        .set('Content-Type','application/json')
+        .set('cookie', gluck)
+        .send(p)
+        .end(function(err,res){
+          res.should.have.status(400);
+          //res.body.categories.length.should.equal(2);
+          done();        
+        });
+    });      
 
   });
       

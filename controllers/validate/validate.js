@@ -184,8 +184,21 @@ exports.product = function(req){
       throw new Error("Vous devez définir une description de 3 à 1'300 caractères");
     }
 
+    if(req.body.attributes){
+      ifCheck(req.body.attributes.weight, "Entrez une valeur de trie valide").isInt();
+    }
+
     if(req.body.pricing){
       check(req.body.pricing.price, "La valeur du prix n'est pas correct").isFloat();
+      //
+      // TVA
+      if(req.body.pricing.tva===undefined){
+        //throw new Error("Vous devez définir une TVA dans la section prix du produit");  
+      }else
+      if([0,0.025,0.08].indexOf(req.body.pricing.tva)===-1){
+        throw new Error("La valeur de la TVA n'est pas correcte: "+req.body.pricing.tva);  
+      }
+
       req.body.pricing.discount&&check(req.body.pricing.discount, "Entrez une promotion valide").isFloat();
 
       check(req.body.pricing.stock, "Entrez une valeur de stock valide").isInt();
