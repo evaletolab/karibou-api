@@ -195,7 +195,7 @@ exports.product = function(req){
       if(req.body.pricing.tva===undefined){
         //throw new Error("Vous devez définir une TVA dans la section prix du produit");  
       }else
-      if([0,0.025,0.08].indexOf(req.body.pricing.tva)===-1){
+      if([0,0.025,0.08].indexOf(parseFloat(req.body.pricing.tva))===-1){
         throw new Error("La valeur de la TVA n'est pas correcte: "+req.body.pricing.tva);  
       }
 
