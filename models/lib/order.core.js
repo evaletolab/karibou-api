@@ -203,11 +203,17 @@ exports.coreCreate = function(oid,items,customer,shipping,paymentData, vendors,c
   }
 
 
+
   //
   // ready to create one order
   var dborder =new Orders(order);
 
   dborder.payment.fees.shipping=dborder.getShippingPrice();
+
+
+  //
+  // get discount offer by shops
+  dborder.computeDiscountAmountByShops();
 
   //
   // update rank for this valid order

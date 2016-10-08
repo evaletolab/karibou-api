@@ -111,6 +111,51 @@ var roundCHF=exports.roundCHF=function (value) {
   return parseFloat((Math.round(value*20)/20).toFixed(2))
 }
 
+//
+// compute the discount for this order
+exports.computeDiscountAmountByShops=function() {
+  var self=this;
+  //
+  // each vendors
+  this.vendors.forEach(function(vendor) {
+    //
+    //init discount
+    vendor.discount.finalprice=0;
+    
+    //
+    // this vendor offer no discount, get next one
+    if(!vendor.discount.active){
+      return;
+    }
+
+    //
+    // get amount from one vendor 
+    var vendorAmount=0.0;
+    self.items.forEach(function(item) {
+      // and item.fulfillment.status!=='failure' 
+      if (item.vendor===vendor.slug){
+        vendorAmount+=item.finalprice;  
+      }
+    });
+
+    // compute the dicount 
+    var discountMagnitude=parseInt(vendorAmount/vendor.discount.threshold);
+    vendor.discount.finalAmount=discountMagnitude*vendor.discount.amount;
+
+  });  
+
+}
+
+//
+// get amount of discount for this order
+exports.getSumDiscount=function() {
+  var amount=0;
+  this.vendors.forEach(function(vendor) {
+    amount+=vendor.discount.finalAmount;
+  });
+  return amount;
+}
+
 exports.getShippingPrice=function(factor){
   //
   // get the base of price depending the shipping sector
@@ -176,6 +221,8 @@ exports.getTotalPrice=function(factor){
   // add shipping fees (10CHF)
   total+=this.getShippingPrice();
 
+
+
   //
   // add gateway fees
   for (var gateway in config.shared.order.gateway){
@@ -185,6 +232,11 @@ exports.getTotalPrice=function(factor){
       break;
     }
   }
+
+  // 
+  // remove discout offer by shop
+  // that concern only fees (shipping+payment)
+  total-=this.getSumDiscount();
 
   // add mul factor
   factor&&(total*=factor);

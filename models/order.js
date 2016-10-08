@@ -153,7 +153,16 @@ var Orders = new Schema({
       lat:{type:Number, required: false},
       lng:{type:Number, required: false}
     },
-    collected:{type:Boolean,default:false}
+    collected:{type:Boolean,default:false},
+    //
+    // you can see values only when uid is order.owner, shop.owner, or admin 
+    // amount & threshold & finalAmount & are saved for security reason
+    discount:{
+      amount:{type:Number,min:0,select:false},
+      threshold:{type: Number,min:0,select:false},
+      finalAmount:{type: Number,min:0,select:false}
+    }
+
    }],
 
    shipping:{
@@ -187,6 +196,8 @@ Orders.statics.printInfo=utils.printInfo;
 Orders.statics.prepare=utils.prepare;
 Orders.methods.equalItem=utils.equalItem;
 Orders.methods.getShippingPrice=utils.getShippingPrice;
+Orders.methods.computeDiscountAmountByShops=utils.computeDiscountAmountByShops;
+Orders.methods.getSumDiscount=utils.getSumDiscount;
 Orders.methods.getTotalPrice=utils.getTotalPrice;
 Orders.methods.getSubTotal=utils.getSubTotal;
 Orders.methods.getDateString=utils.getDateString;
