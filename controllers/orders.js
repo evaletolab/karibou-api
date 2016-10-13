@@ -369,13 +369,17 @@ exports.create=function(req,res){
       .then(function(order){
         //
         // prepare and send mail
-        var subTotal=order.getSubTotal(),shippingFees=order.getShippingPrice();
+        var subTotal=order.getSubTotal(),
+            totalDiscount=order.getTotalDiscount(),
+            shippingFees=order.getShippingPrice(),
+            paymentFees=payment.fees(order.payment.issuer,subTotal+shippingFees);
         var mail={
           order:order,
           created:order.getDateString(order.created),
-          shippingFees:shippingFees,
-          paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
+          shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
+          paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
+          totalDiscount: totalDiscount.toFixed(2),
           shippingWhen:order.getDateString(),
           subTotal:subTotal.toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
@@ -546,6 +550,7 @@ exports.refund=function(req,res){
       created:order.getDateString(order.created),
       origin:req.header('Origin')||config.mail.origin,
       totalWithFees:order.getTotalPrice().toFixed(2),
+      discount: order.getTotalDiscount().toFixed(2),
       withHtml:true
     };
     bus.emit('sendmail',  
@@ -587,13 +592,17 @@ exports.capture=function(req,res){
 
         //
         // prepare and send mail
-        var subTotal=order.getSubTotal(),shippingFees=order.getShippingPrice();
+        var subTotal=order.getSubTotal(),
+            totalDiscount=order.getTotalDiscount(),
+            paymentFees=payment.fees(order.payment.issuer,subTotal+shippingFees),
+            shippingFees=order.getShippingPrice();
         var mail={
           order:order,
           created:order.getDateString(order.created),
-          shippingFees:shippingFees,
-          paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
+          shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
+          paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
           totalWithFees:order.getTotalPrice().toFixed(2),
+          totalDiscount: totalDiscount.toFixed(2),
           shippingWhen:order.getDateString(),
           subTotal:subTotal.toFixed(2),
           origin:req.header('Origin')||config.mail.origin,
@@ -849,78 +858,26 @@ exports.invoicesByUsers=function(req,res){
 }
 
 //
-// get repport by shop
+// get report by shop
 exports.invoicesByShops=function(req,res){
   try{
-    if(!req.params.month)throw new Error('Le mois est obligatoire');
+    if(req.params.month){}
     if(req.params.year){}
   }catch(err){
     return res.status(400).send( err.message);
   }
 
-  var criteria={}, result=[], showAll=req.query.all||false, output=req.query.output||'json';
-
-
-  criteria.closed=true;
-  criteria.fulfillment='fulfilled';
-
-  parseCriteria(criteria,req)
-
-  // get the date
-  if(criteria.from &&!criteria.to){
-    criteria.to=new Date(criteria.from);
-    criteria.to.setDate(criteria.from.daysInMonth());
-    criteria.to.setHours(23,0,0,0);
-  }
 
   //
-  // do not hide !fulfilled items
-  if(req.query.all){
-    criteria.showAll=true;
+  // grouped 
+  var criteria={grouped:true}, result=[];
+
+  if(req.params.month){
+    criteria.month=parseInt(req.params.month);
   }
-
-  //
-  // restrict to a shop name
-  // 0) no shops given => you should be admin
-  // 1) a list of shops is given => you should be admin
-  // 2) user shops  => is the default
-  if(req.user.isAdmin()){
-    // admin can specify the shops
-    if(req.query.shops){
-      criteria.shop=req.query.shops
-    }
-
-  }else{
-    // not admin and having almost one shop
-    criteria.shop=req.user.shops.map(function(i){ return i.urlpath})      
+  if(req.params.year){
+    criteria.year=parseInt(req.params.year);
   }
-
-  Orders.generateRepportForShop(criteria,function(err,repport){
-    if(err){
-      return res.status(400).send(errorHelper(err.message||err));
-    }
-    res.json(repport)
-  });
-
-}
-
-//
-// get repport by shop
-exports.invoicesByShops2=function(req,res){
-  try{
-    if(!req.params.month)throw new Error('Le mois est obligatoire');
-    if(req.params.year){}
-  }catch(err){
-    return res.status(400).send( err.message);
-  }
-
-  var criteria={}, result=[], showAll=req.query.all||false, today=new Date(),output=req.query.output||'json';
-
-
-  criteria.month=req.params.month;
-  criteria.year=req.params.year||today.getFullYear();
-
-
 
 
   //
@@ -931,7 +888,7 @@ exports.invoicesByShops2=function(req,res){
   if(req.user.isAdmin()){
     // admin can specify the shops
     if(req.query.shops){
-      criteria.shop=req.query.shops
+      criteria.shop=req.query.shops;
     }
 
   }else{
@@ -939,11 +896,14 @@ exports.invoicesByShops2=function(req,res){
     criteria.shop=req.user.shops.map(function(i){ return i.urlpath})      
   }
 
-  Orders.getCAByYearMonthAndVendor(criteria,function(err,repport){
+
+  Orders.getCAByVendor(criteria,function(err,report){
     if(err){
       return res.status(400).send(errorHelper(err.message||err));
     }
-    res.json(repport[criteria.year][criteria.month])
+    //
+    // export in CSV! http://www.mircozeiss.com/json2csv/
+    res.json(report)
   });
 
 }

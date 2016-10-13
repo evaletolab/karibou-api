@@ -108,7 +108,29 @@ var Product = new Schema({
 });
 
 
+Product.methods.print=function(product){
+  var self=product||this;
+  console.log("-- SKU  ", self.sku);
+  console.log("---      title          ",  self.title,self.slug);
+  console.log("---      price          ",  self.pricing.price,self.pricing.stock,self.pricing.part);
+  if(self.categories.name){
+    console.log("---      category       ",  self.categories.slug);
+  }else{
+    console.log("---      category       ",  self.categories);    
+  }
+  if(self.vendor.urlpath){
+    console.log("---      vendor         ",  self.vendor.urlpath);
+    console.log("---      vendor.discount",  self.vendor.discount);
+  }else{
+    console.log("---      vendor         ",  self.vendor);    
+  }
+  if(self.variants.length){
+    self.variants.forEach(function(variant) {
+      console.log("---      variant     ",  variant.title);    
+    })
+  }
 
+};
 
 //
 // API

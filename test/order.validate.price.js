@@ -49,7 +49,7 @@ describe("orders.validate.price", function(){
   });
 
   it("check order price (visa+items+shipping saved with 0) ", function(done){
-    db.model('Orders').find({oid:2100000}, function(err,order){
+    db.model('Orders').find({oid:2100000}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       // item!='failure' => E(item.price) + gateway fees + shipping fees
       // this order contains only shipping
@@ -59,7 +59,7 @@ describe("orders.validate.price", function(){
   });
 
   it("check order price (+items+shipping) ", function(done){
-    db.model('Orders').find({oid:2000006}, function(err,order){
+    db.model('Orders').find({oid:2000006}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       order[0].getTotalPrice().should.equal(30.6)
       done();
@@ -68,7 +68,7 @@ describe("orders.validate.price", function(){
 
 
   it("check order price (+items(failure)+ full shipping) ", function(done){
-    db.model('Orders').find({oid:2000007}, function(err,order){
+    db.model('Orders').find({oid:2000007}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(10);
       order[0].getTotalPrice().should.equal(20.6);
@@ -79,7 +79,7 @@ describe("orders.validate.price", function(){
 
 
   it("check order 145fr got special shipping price ", function(done){
-    db.model('Orders').find({oid:2000008}, function(err,order){
+    db.model('Orders').find({oid:2000008}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(145);
       order[0].getTotalPrice().should.equal(153);
@@ -89,7 +89,7 @@ describe("orders.validate.price", function(){
   });
 
   it("check order 180fr got special shipping price ", function(done){
-    db.model('Orders').find({oid:2000009}, function(err,order){
+    db.model('Orders').find({oid:2000009}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
       order[0].getTotalPrice().should.equal(193.8);
@@ -101,7 +101,7 @@ describe("orders.validate.price", function(){
   it("check order shipping half shipping price even with 180CHF", function(done){
     // this way you disabled the discountB
     config.shared.shipping.discountB=0;
-    db.model('Orders').find({oid:2000009}, function(err,order){
+    db.model('Orders').find({oid:2000009}).populate('+vendors.discount.finalAmount').exec(function(err,order){
       should.not.exist(err)
       order[0].getSubTotal().should.equal(180);
       order[0].getTotalPrice().should.equal(188.7);

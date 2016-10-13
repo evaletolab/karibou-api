@@ -11,7 +11,8 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 * ------------------
 * Sous total  <%= subTotal %> CHF
 * Frais de livraison <%= shippingFees %> CHF
-* Frais de paiement <%= paymentFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF<%if (totalDiscount>0) {%>
+* Rabais commerçants <%= totalDiscount %> CHF<% } %>
 * ------------------
 * Montant total <%= totalWithFees %> CHF
 *
@@ -35,7 +36,7 @@ Avec nos meilleurs messages,<br/>
  | ' / __ _ _ __ _| |__   ___  _   _ 
  |  < / _` | '__| | '_ \ / _ \| | | |
  | . \ (_| | |  | | |_) | (_) | |_| |
- |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|.ch
 </pre>    
 
 ----<br/>

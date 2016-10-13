@@ -149,6 +149,13 @@ describe("orders.create.success", function(){
       // check that vendor is correct
       order.vendors.length.should.be.above(1)
 
+      // check vendor discount
+      order.vendors.forEach(function(o,i){
+        o.discount.finalAmount.should.equal(0);
+      });
+      order.getTotalDiscount().should.equal(0)
+
+
       // check subtotal
       //config.shared.marketplace.shipping
       //order.payment.issuer

@@ -35,6 +35,7 @@ exports.print=function(order){
   }
   if(self.vendors){
     console.log("---      vendors       ",  self.vendors.map(function(v){ return v.slug}).join(','));
+    console.log("---      discount      ",  self.vendors.map(function(v){ return v.discount.finalAmount}).join(','));
     console.log("---      collected     ",  self.vendors.map(function(v){ return v.collected}).join(','));
   }
 }
@@ -124,7 +125,7 @@ exports.computeDiscountAmountByShops=function() {
     
     //
     // this vendor offer no discount, get next one
-    if(!vendor.discount.active){
+    if(!vendor.discount.threshold){
       return;
     }
 
@@ -139,7 +140,7 @@ exports.computeDiscountAmountByShops=function() {
     });
 
     // compute the dicount 
-    var discountMagnitude=parseInt(vendorAmount/vendor.discount.threshold);
+    var discountMagnitude=Math.floor(vendorAmount/vendor.discount.threshold);
     vendor.discount.finalAmount=discountMagnitude*vendor.discount.amount;
 
   });  
@@ -148,11 +149,13 @@ exports.computeDiscountAmountByShops=function() {
 
 //
 // get amount of discount for this order
-exports.getSumDiscount=function() {
+exports.getTotalDiscount=function(offset) {
   var amount=0;
+
   this.vendors.forEach(function(vendor) {
-    amount+=vendor.discount.finalAmount;
+    amount+=(vendor.discount.finalAmount||0);
   });
+
   return amount;
 }
 
@@ -236,7 +239,7 @@ exports.getTotalPrice=function(factor){
   // 
   // remove discout offer by shop
   // that concern only fees (shipping+payment)
-  total-=this.getSumDiscount();
+  total-=this.getTotalDiscount();
 
   // add mul factor
   factor&&(total*=factor);
