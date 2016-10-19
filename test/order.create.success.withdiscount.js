@@ -198,7 +198,7 @@ describe("orders.create.success.discount", function(){
         // check subtotal
         order.getSubTotal().should.equal(26.6)
         // check total with fees
-        order.getTotalPrice().should.equal(36.35)
+        order.getTotalPrice().should.equal(36.3)
 
         order.fulfillments.status="failure";
         order.payment.status='voided';
@@ -242,7 +242,7 @@ describe("orders.create.success.discount", function(){
         // check subtotal
         order.getSubTotal().should.equal(38)
         // check total with fees
-        order.getTotalPrice().should.equal(46.95)
+        order.getTotalPrice().should.equal(46.9)
 
         order.fulfillments.status="failure";
         order.payment.status='voided';
