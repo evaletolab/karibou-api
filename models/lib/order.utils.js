@@ -225,6 +225,10 @@ exports.getTotalPrice=function(factor){
   total+=this.getShippingPrice();
 
 
+  // 
+  // remove discout offer by shop
+  // total to pay
+  total-=this.getTotalDiscount();
 
   //
   // add gateway fees
@@ -236,10 +240,6 @@ exports.getTotalPrice=function(factor){
     }
   }
 
-  // 
-  // remove discout offer by shop
-  // that concern only fees (shipping+payment)
-  total-=this.getTotalDiscount();
 
   // add mul factor
   factor&&(total*=factor);
