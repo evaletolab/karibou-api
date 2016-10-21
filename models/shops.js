@@ -24,6 +24,8 @@ var Shops = new Schema({
       owner:{ type: String, required: false },
       bg:{ type: String, required: false },
       fg:{ type: String, required: false },
+      logo:{type: String, required: false },
+      others:[{type: String, required: false }],
       source:{ type: String, required: false }
     },
     
