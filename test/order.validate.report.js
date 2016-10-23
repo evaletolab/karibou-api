@@ -14,7 +14,7 @@ var Products=db.model('Products')
   , okDay;
 
 
-describe("orders.validate.repport", function(){
+describe("orders.validate.report", function(){
   var _ = require("underscore");
 
 
@@ -59,7 +59,7 @@ describe("orders.validate.repport", function(){
 
 
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.report.js"],db,function(err){
         should.not.exist(err);
         // Orders.find({}).exec(function(e,os){
         //   os.forEach(function(o){
@@ -78,46 +78,46 @@ describe("orders.validate.repport", function(){
     });    
   });
 
-  it("validate repport content ", function(done){
+  it("validate report content ", function(done){
 
     //
     // order 2000006 contains variation on
     // -> item 1000002 [un-autre-shop] + 1.-
 
-    Orders.generateRepportForShop(criteria,function(err,repport){
+    Orders.generateRepportForShop(criteria,function(err,report){
       should.not.exist(err)
-      // Object.keys(repport.shops).forEach(function (slug) {
-      //   console.log('-----',slug,repport.shops[slug])
+      // Object.keys(report.shops).forEach(function (slug) {
+      //   console.log('-----',slug,report.shops[slug])
       // })
 
 
-      repport.shops['mon-shop'].monthitems.should.equal(2);
-      repport.shops['mon-shop'].monthamount.should.equal(5);
-      repport.shops['mon-shop'].monthorders.should.equal(2);
+      report.shops['mon-shop'].monthitems.should.equal(2);
+      report.shops['mon-shop'].monthamount.should.equal(5);
+      report.shops['mon-shop'].monthorders.should.equal(2);
 
       // fees are changing for mon-shop
       //-------- mon-shop 2.5 0.15 0.375
       //last day mon-shop 2.5 0.3 0.75
-      repport.shops['mon-shop'].monthfees.should.equal(1.13);
-      repport.shops['mon-shop'].details.fees.should.equal(0.3);
+      report.shops['mon-shop'].monthfees.should.equal(1.13);
+      report.shops['mon-shop'].details.fees.should.equal(0.3);
 
-      repport.shops['super-shop'].monthitems.should.equal(3);
-      repport.shops['super-shop'].monthamount.should.equal(10);
-      repport.shops['super-shop'].monthorders.should.equal(1);
-      repport.shops['super-shop'].monthfees.should.equal(1.6);
-      repport.shops['super-shop'].details.fees.should.equal(0.16);
+      report.shops['super-shop'].monthitems.should.equal(3);
+      report.shops['super-shop'].monthamount.should.equal(10);
+      report.shops['super-shop'].monthorders.should.equal(1);
+      report.shops['super-shop'].monthfees.should.equal(1.6);
+      report.shops['super-shop'].details.fees.should.equal(0.16);
 
-      repport.shops['un-autre-shop'].monthitems.should.equal(17);
-      repport.shops['un-autre-shop'].monthamount.should.equal(55.6);
-      repport.shops['un-autre-shop'].monthorders.should.equal(4);
-      repport.shops['un-autre-shop'].monthfees.should.equal(7.78);
-      repport.shops['un-autre-shop'].details.fees.should.equal(0.14);
-      repport.monthamount.should.equal(70.6);
+      report.shops['un-autre-shop'].monthitems.should.equal(17);
+      report.shops['un-autre-shop'].monthamount.should.equal(55.6);
+      report.shops['un-autre-shop'].monthorders.should.equal(4);
+      report.shops['un-autre-shop'].monthfees.should.equal(7.78);
+      report.shops['un-autre-shop'].details.fees.should.equal(0.14);
+      report.monthamount.should.equal(70.6);
       // fees are changing for mon-shop
       //-------- mon-shop total was 9.99 + 0.375
-      repport.monthca.should.equal(10.51);
-      repport.monthitems.should.equal(22);
-      repport.monthorders.should.equal(4);
+      report.monthca.should.equal(10.51);
+      report.monthitems.should.equal(22);
+      report.monthorders.should.equal(4);
 
       // item!='failure' => E(item.price) + gateway fees + shipping fees
       // this order contains only shipping
@@ -127,7 +127,7 @@ describe("orders.validate.repport", function(){
 
   //
   //
-  it("validate repport content with the new API 2.0 for Year", function(done){
+  it("validate report content with the new API 2.0 for Year", function(done){
     var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
     Orders.getCAByVendor({year:year,grouped:true},function (err,report) {
       // report.forEach(function(report) {
@@ -169,48 +169,48 @@ describe("orders.validate.repport", function(){
 
   //
   //
-  it("validate repport content with the new API 2.0 for Month", function(done){
+  it("validate report content with the new API 2.0 for Month", function(done){
     var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
-    Orders.getCAByVendor({month:month,grouped:true},function (err,repport) {
+    Orders.getCAByVendor({month:month,grouped:true},function (err,report) {
 
       done();
     });
   });
 
-  it("validate repport content with the new API 1.0", function(done){
+  it("validate report content with the new API 1.0", function(done){
 
     //
     // order 2000006 contains variation on
     // -> item 1000002 [un-autre-shop] + 1.-
     var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
-    Orders.getCAByYearMonthAndVendor({month:month},function (err,repport) {
+    Orders.getCAByYearMonthAndVendor({month:month},function (err,report) {
       should.not.exist(err)
 
 
-      repport[year][month]['mon-shop'].items.should.equal(2);
-      repport[year][month]['mon-shop'].amount.should.equal(5);
-      repport[year][month]['mon-shop'].orders.should.equal(2);
-      repport[year][month]['mon-shop'].fees.should.equal(1.13);
-      repport[year][month]['mon-shop'].contractFees.length.should.equal(2);
+      report[year][month]['mon-shop'].items.should.equal(2);
+      report[year][month]['mon-shop'].amount.should.equal(5);
+      report[year][month]['mon-shop'].orders.should.equal(2);
+      report[year][month]['mon-shop'].fees.should.equal(1.13);
+      report[year][month]['mon-shop'].contractFees.length.should.equal(2);
       
       // FIXME select vendor fees TODO travis dont get the same value 0.15 vs 0.30
-      //repport[year][month]['mon-shop'].details.fees.should.equal(0.3);
-      repport[year][month]['super-shop'].items.should.equal(3);
-      repport[year][month]['super-shop'].amount.should.equal(10);
-      repport[year][month]['super-shop'].orders.should.equal(1);
-      repport[year][month]['super-shop'].fees.should.equal(1.6);
-      repport[year][month]['super-shop'].contractFees[0].should.equal(0.16);
+      //report[year][month]['mon-shop'].details.fees.should.equal(0.3);
+      report[year][month]['super-shop'].items.should.equal(3);
+      report[year][month]['super-shop'].amount.should.equal(10);
+      report[year][month]['super-shop'].orders.should.equal(1);
+      report[year][month]['super-shop'].fees.should.equal(1.6);
+      report[year][month]['super-shop'].contractFees[0].should.equal(0.16);
 
-      repport[year][month]['un-autre-shop'].items.should.equal(17);
-      repport[year][month]['un-autre-shop'].amount.should.equal(55.6);
-      repport[year][month]['un-autre-shop'].orders.should.equal(4);
-      repport[year][month]['un-autre-shop'].fees.should.equal(7.78);
-      repport[year][month]['un-autre-shop'].contractFees[0].should.equal(0.14);
+      report[year][month]['un-autre-shop'].items.should.equal(17);
+      report[year][month]['un-autre-shop'].amount.should.equal(55.6);
+      report[year][month]['un-autre-shop'].orders.should.equal(4);
+      report[year][month]['un-autre-shop'].fees.should.equal(7.78);
+      report[year][month]['un-autre-shop'].contractFees[0].should.equal(0.14);
 
 
-      // repport[year][month].fees.should.equal(10.51);
-      // repport[year][month].items.should.equal(22);
-      // repport[year][month].orders.should.equal(4);
+      // report[year][month].fees.should.equal(10.51);
+      // report[year][month].items.should.equal(22);
+      // report[year][month].orders.should.equal(4);
 
       done();
     })
@@ -219,16 +219,16 @@ describe("orders.validate.repport", function(){
 
 
 
-  it.skip("validate repport content for unknown year ", function(done){
+  it.skip("validate report content for unknown year ", function(done){
     setCriteriaDateByMonthAndYear(criteria,sellerDay.getMonth(),1989)
 
-    Orders.generateRepportForShop(criteria,function(err,repport){
+    Orders.generateRepportForShop(criteria,function(err,report){
       should.not.exist(err)
 
-      repport.monthamount.should.equal(0);
-      repport.monthca.should.equal(0);
-      repport.monthitems.should.equal(0);
-      repport.monthorders.should.equal(0);
+      report.monthamount.should.equal(0);
+      report.monthca.should.equal(0);
+      report.monthitems.should.equal(0);
+      report.monthorders.should.equal(0);
 
 
       // item!='failure' => E(item.price) + gateway fees + shipping fees
