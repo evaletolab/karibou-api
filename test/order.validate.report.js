@@ -139,8 +139,8 @@ describe("orders.validate.report", function(){
       report.shops['mon-shop'].amount.should.equal(5);
       report.shops['mon-shop'].orders.should.equal(2);
       report.shops['mon-shop'].fees.should.equal(1.13);
-      report.shops['mon-shop'].contractFees[0].should.equal(0.3);
-      report.shops['mon-shop'].contractFees[1].should.equal(0.15);
+      report.shops['mon-shop'].contractFees.sort()[0].should.equal(0.15);
+      report.shops['mon-shop'].contractFees.sort()[1].should.equal(0.3);
       report.shops['mon-shop'].products.length.should.equal(1);
       report.shops['mon-shop'].products[0].count.should.equal(1);
       report.shops['mon-shop'].products[0].amount.should.equal(2.5);
