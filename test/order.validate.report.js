@@ -134,6 +134,7 @@ describe("orders.validate.report", function(){
       //   console.log('------',report._id.vendor,report.items,report.amount,report.fees,report.orders)
       // })
       // console.log(JSON.stringify(results,0,2));
+      console.log('-------- TRAVIS DEBUG',report.shops['mon-shop'].contractFees)
       report.shops['mon-shop'].items.should.equal(2);
       report.shops['mon-shop'].amount.should.equal(5);
       report.shops['mon-shop'].orders.should.equal(2);
