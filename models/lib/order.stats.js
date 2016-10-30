@@ -373,7 +373,8 @@ exports.getCAByVendor=function(filter,cb) {
             contractFees:{$addToSet:"$fees"},
          }
        },
-       {$sort:{'_id.year':-1,'_id.month':-1}}
+       {$sort:{'_id.year':-1,'_id.month':-1}},
+       {allowDiskUse: true}
   ],function(err,results){
     if(err){
       return cb(err);
