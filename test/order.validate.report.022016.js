@@ -14,7 +14,7 @@ var Products=db.model('Products')
   , okDay;
 
 
-describe("orders.validate.report", function(){
+describe("orders.validate.report.022016", function(){
   var _ = require("underscore");
 
 
@@ -61,10 +61,14 @@ describe("orders.validate.report", function(){
     dbtools.clean(function(e){
       dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.report.022016.js"],db,function(err){
         should.not.exist(err);
-        // Orders.find({}).exec(function(e,os){
+        // Orders.find({'payment.status':'paid'}).exec(function(e,os){
+        //   var oid=os.map(function(o) {
+        //     return o.oid
+        //   });
         //   os.forEach(function(o){
-        //     o.print();
+        //       o.print();            
         //   })
+          
         // })
         done();
       });
@@ -99,6 +103,7 @@ describe("orders.validate.report", function(){
       report.shops['les-fromages-de-gaetan'].contractFees[0].should.equal(0.15);
 
       // report.shops['purogusto'].products.length.should.equal(48);
+     report.orders.length.should.equal(39);
 
 
       done();
