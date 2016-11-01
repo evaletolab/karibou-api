@@ -130,13 +130,9 @@ describe("orders.validate.report", function(){
   it("validate report content with the new API 2.0 for Year", function(done){
     var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
     Orders.getCAByVendor({year:year,grouped:true},function (err,report) {
-      // report.forEach(function(report) {
-      //   console.log('------',report._id.vendor,report.items,report.amount,report.fees,report.orders)
-      // })
-      // console.log(JSON.stringify(results,0,2));
       report.shops['mon-shop'].items.should.equal(2);
       report.shops['mon-shop'].amount.should.equal(5);
-      report.shops['mon-shop'].orders.should.equal(2);
+      report.shops['mon-shop'].orders.length.should.equal(2);
       report.shops['mon-shop'].fees.should.equal(1.13);
       report.shops['mon-shop'].contractFees.sort()[0].should.equal(0.15);
       report.shops['mon-shop'].contractFees.sort()[1].should.equal(0.3);
@@ -146,20 +142,20 @@ describe("orders.validate.report", function(){
 
       report.shops['super-shop'].items.should.equal(3);
       report.shops['super-shop'].amount.should.equal(10);
-      report.shops['super-shop'].orders.should.equal(1);
+      report.shops['super-shop'].orders.length.should.equal(1);
       report.shops['super-shop'].fees.should.equal(1.6);
       report.shops['super-shop'].contractFees[0].should.equal(0.16);
 
       report.shops['un-autre-shop'].items.should.equal(17);
       report.shops['un-autre-shop'].amount.should.equal(55.6);
-      report.shops['un-autre-shop'].orders.should.equal(4);
+      report.shops['un-autre-shop'].orders.length.should.equal(4);
       report.shops['un-autre-shop'].fees.should.equal(7.78);
       report.shops['un-autre-shop'].contractFees[0].should.equal(0.14);
       report.shops['un-autre-shop'].products.length.should.equal(7);
       report.amount.should.equal(70.6);
       report.ca.should.equal(10.51);
       report.items.should.equal(22);
-      report.orders.should.equal(7);
+      report.orders.length.should.equal(4);
       report.products.length.should.equal(4);
 
 
@@ -189,7 +185,7 @@ describe("orders.validate.report", function(){
 
       report[year][month]['mon-shop'].items.should.equal(2);
       report[year][month]['mon-shop'].amount.should.equal(5);
-      report[year][month]['mon-shop'].orders.should.equal(2);
+      report[year][month]['mon-shop'].orders.length.should.equal(2);
       report[year][month]['mon-shop'].fees.should.equal(1.13);
       report[year][month]['mon-shop'].contractFees.length.should.equal(2);
       
@@ -197,13 +193,13 @@ describe("orders.validate.report", function(){
       //report[year][month]['mon-shop'].details.fees.should.equal(0.3);
       report[year][month]['super-shop'].items.should.equal(3);
       report[year][month]['super-shop'].amount.should.equal(10);
-      report[year][month]['super-shop'].orders.should.equal(1);
+      report[year][month]['super-shop'].orders.length.should.equal(1);
       report[year][month]['super-shop'].fees.should.equal(1.6);
       report[year][month]['super-shop'].contractFees[0].should.equal(0.16);
 
       report[year][month]['un-autre-shop'].items.should.equal(17);
       report[year][month]['un-autre-shop'].amount.should.equal(55.6);
-      report[year][month]['un-autre-shop'].orders.should.equal(4);
+      report[year][month]['un-autre-shop'].orders.length.should.equal(4);
       report[year][month]['un-autre-shop'].fees.should.equal(7.78);
       report[year][month]['un-autre-shop'].contractFees[0].should.equal(0.14);
 

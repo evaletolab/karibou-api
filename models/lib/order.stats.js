@@ -364,7 +364,8 @@ exports.getCAByVendor=function(filter,cb) {
        // CA,FEES,DISCOUT and PRODUCTS grouped by [month,year,vendor] 
        {$group:{
          _id:{ month:"$month", year:"$year", vendor:"$_id.vendor"},
-            name:{$first:"$name"}, vendor:{$first:"$_id.vendor"},orders:{$sum:1},
+            name:{$first:"$name"}, vendor:{$first:"$_id.vendor"},
+            orders:{$addToSet:"$_id.oid"},
             items:{$sum:"$items"},
             products:{$addToSet:"$products"},
             amount:{$sum:"$amount"},
@@ -398,7 +399,7 @@ exports.getCAByVendor=function(filter,cb) {
     //
     // set output with the grouped format
     if(filter.grouped){
-      var report={shops:{},products:[]}, ca=0, items=0, orders=0, amount=0, discount=0;
+      var report={shops:{},products:[]}, ca=0, items=0, orders=[], amount=0, discount=0;
       var from=new Date();from.setDate(1);from.setHours(1,0,0,0);from.setMonth(0);
       if(filter.month){from.setMonth(filter.month-1);}
       if(filter.year){from.setFullYear(filter.year);}      
@@ -424,6 +425,7 @@ exports.getCAByVendor=function(filter,cb) {
         items+=result.items;
         discount+=result.discount;
         orders+=result.orders;
+        orders=_.union(result.orders,orders);        
       });
 
 

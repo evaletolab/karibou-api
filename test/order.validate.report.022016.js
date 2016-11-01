@@ -88,13 +88,13 @@ describe("orders.validate.report", function(){
 
       report.shops['purogusto'].items.should.equal(48);
       report.shops['purogusto'].amount.should.equal(396);
-      report.shops['purogusto'].orders.should.equal(20);
+      report.shops['purogusto'].orders.length.should.equal(20);
       report.shops['purogusto'].fees.should.equal(71.28);
       report.shops['purogusto'].contractFees[0].should.equal(0.18);
 
       report.shops['les-fromages-de-gaetan'].items.should.equal(83);
       report.shops['les-fromages-de-gaetan'].amount.should.equal(532.45);
-      report.shops['les-fromages-de-gaetan'].orders.should.equal(29);
+      report.shops['les-fromages-de-gaetan'].orders.length.should.equal(29);
       report.shops['les-fromages-de-gaetan'].fees.should.equal(79.87);
       report.shops['les-fromages-de-gaetan'].contractFees[0].should.equal(0.15);
 
@@ -105,25 +105,6 @@ describe("orders.validate.report", function(){
     });
   });
 
-
-
-  it.skip("validate report content for unknown year ", function(done){
-    setCriteriaDateByMonthAndYear(criteria,sellerDay.getMonth(),1989)
-
-    Orders.generateRepportForShop(criteria,function(err,report){
-      should.not.exist(err)
-
-      report.monthamount.should.equal(0);
-      report.monthca.should.equal(0);
-      report.monthitems.should.equal(0);
-      report.monthorders.should.equal(0);
-
-
-      // item!='failure' => E(item.price) + gateway fees + shipping fees
-      // this order contains only shipping
-      done();
-    });
-  });
 
 
 
