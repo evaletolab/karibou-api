@@ -424,7 +424,6 @@ exports.getCAByVendor=function(filter,cb) {
         amount+=result.amount;
         items+=result.items;
         discount+=result.discount;
-        orders+=result.orders;
         orders=_.union(result.orders,orders);        
       });
 
