@@ -43,6 +43,7 @@ module.exports = {
     "issue_missing_validation",
     "issue_missing_customer_support",
     "issue_wrong_packing",
+    "issue_wrong_product",
     "issue_wrong_client_id",
     "issue_wrong_product_quality",
     "issue_late_delivry"
