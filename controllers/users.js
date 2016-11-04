@@ -205,22 +205,11 @@ exports.update=function(req,res){
       delete req.body.email['status'];
     }
 
-    //
-    // admin can update the status here
-    if(req.body.status!==undefined){
-      delete req.body['status'];
-    }
-
-    //
-    // some admin updates
-    if(req.body.rank!==undefined){
-    }
-
+    delete req.body['status'];
     delete req.body['rank'];
     delete req.body['roles'];
     delete req.body['gateway_id'];
     delete req.body['merchant'];
-    delete req.body['payments'];
 
   }
 

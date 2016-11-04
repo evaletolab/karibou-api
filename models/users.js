@@ -181,6 +181,8 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
         u.id=u['email.address'].hash()
         u["email.status"]=true;
+        u['shops']=[];
+        u['payments']=[];
       }
       var newuser=new Users(u);
 
@@ -539,6 +541,8 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ex
         },
         email:{address:email,status:new Date()},
         provider:"local",
+        shops:[],
+        payments:[],
         password:password,
         created:new Date()
     });
