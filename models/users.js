@@ -84,7 +84,7 @@ validate.postal = function (value) {
 
     addresses: [{
           name: { type: String, required : true, lowercase: true, trim: true },
-          note: { type: String, trim: true },
+          note: { type: String, trim: true, default:"" },
           floor: { type: String, trim: true, required : true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
           region: { type: String, required : true, trim: true, default:"Genève", enum: EnumRegion },

@@ -213,18 +213,14 @@ exports.update=function(req,res){
 
     //
     // some admin updates
-    if(req.body.roles){
-      delete req.body['roles'];
-    }
     if(req.body.rank!==undefined){
-      delete req.body['rank'];
     }
-    if(req.body.gateway_id!==undefined){
-      delete req.body['gateway_id'];
-    }
-    if(req.body.merchant!==undefined){
-      delete req.body['merchant'];
-    }
+
+    delete req.body['rank'];
+    delete req.body['roles'];
+    delete req.body['gateway_id'];
+    delete req.body['merchant'];
+    delete req.body['payments'];
 
   }
 
