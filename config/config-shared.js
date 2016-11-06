@@ -30,8 +30,8 @@ module.exports = {
       hypercenter:11.9,
       periphery:14.90
     }, // shipping price
-    priceA:1,
-    priceB:2,
+    priceA:0,
+    priceB:0,
     periphery:["1212","1213","1218","1219","1223","1224","1225","1226","1228","1231","1232","1233","1234","1253","1255","1256","1257","1258"]
   },
 
@@ -126,10 +126,10 @@ module.exports = {
     cancelreason:["customer", "fraud", "inventory", "system","timeout","other"],
     status:["failure","created","reserved","partial","fulfilled"],
     gateway:[ 
-      {label:"postfinance card",fees:0.01}, 
+      {label:"postfinance card",fees:0.0}, 
       {label:"american express",fees:0.01}, 
-      {label:"visa",fees:0.010}, 
-      {label:"mastercard",fees:0.01}, 
+      {label:"visa",fees:0.00}, 
+      {label:"mastercard",fees:0.0}, 
       {label:"wallet", fees:0.000}, 
       {label:"invoice",fees:0.000}, 
       {label:"paypal", fees:0.034}, 

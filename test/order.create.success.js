@@ -105,6 +105,9 @@ describe("orders.create.success", function(){
       //
       // check shipping fees
       order.payment.fees.shipping.should.equal(config.shared.shipping.price.hypercenter)
+      // test gateway[6], 
+      order.payment.fees.charge.should.equal(config.shared.order.gateway[6].fees)
+
 
       //
       // check financial status after creation

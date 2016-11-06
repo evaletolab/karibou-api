@@ -208,7 +208,16 @@ exports.coreCreate = function(oid,items,customer,shipping,paymentData, vendors,c
   // ready to create one order
   var dborder =new Orders(order);
 
+  //
+  // fees
   dborder.payment.fees.shipping=dborder.getShippingPrice();
+  dborder.payment.fees.charge=config.shared.order.gateway.reduce(function(p,gateway,i) {
+    if(gateway.label===paymentData.issuer){
+      return gateway.fees;
+    }
+    return p;
+  });
+
 
 
   //

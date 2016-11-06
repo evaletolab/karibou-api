@@ -365,41 +365,45 @@ exports.create=function(req,res){
     }
 
     var oid=order.oid;
+    //
+    // authorize payment
     payment.for(order.payment.issuer).authorize(order)
       .then(function(order){
-        //
-        // prepare and send mail
-        var subTotal=order.getSubTotal(),
-            totalDiscount=order.getTotalDiscount(),
-            shippingFees=order.getShippingPrice(),
-            paymentFees=payment.fees(order.payment.issuer,subTotal+shippingFees);
-        var mail={
-          order:order,
-          created:order.getDateString(order.created),
-          shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
-          paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
-          totalWithFees:order.getTotalPrice().toFixed(2),
-          totalDiscount: totalDiscount.toFixed(2),
-          shippingWhen:order.getDateString(),
-          subTotal:subTotal.toFixed(2),
-          origin:req.header('Origin')||config.mail.origin,
-          withHtml:true
-        };
-        bus.emit('sendmail',  
-            order.email,
-            'Confirmation de votre commande Karibou '+order.oid,
-            mail,
-            'order-new',
-            function(err,status){
-              //TODO log activities
-              if(err)console.log('---------------------------create',order.oid,err)
-            })
-        return res.json(order)
-      })
-      .fail(function(err){
-        bus.emit('system.message',"[order-create] :",{error:err.message,order:order.oid,customer:order.email});
-        return res.json(400,err.message||err)        
-      })
+      //
+      // prepare and send mail
+      var subTotal=order.getSubTotal(),
+          totalDiscount=order.getTotalDiscount(), 
+          extraDiscount=order.getExtraDiscount(),      
+          shippingFees=order.getShippingPrice(),
+          paymentFees=(order.payment.fees.charge*(subTotal+shippingFees-totalDiscount)).toFixed(2);
+      var mail={
+        order:order,
+        created:order.getDateString(order.created),
+        shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
+        paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
+        totalWithFees:order.getTotalPrice().toFixed(2),
+        totalDiscount: totalDiscount.toFixed(2),
+        extraDiscount: extraDiscount,
+        shippingWhen:order.getDateString(),
+        subTotal:subTotal.toFixed(2),
+        origin:req.header('Origin')||config.mail.origin,
+        withHtml:true
+      };
+      bus.emit('sendmail',  
+          order.email,
+          'Confirmation de votre commande Karibou '+order.oid,
+          mail,
+          'order-new',
+          function(err,status){
+            //TODO log activities
+            if(err)console.log('---------------------------create',order.oid,err)
+          })
+      return res.json(order)
+    })
+    .fail(function(err){
+      bus.emit('system.message',"[order-create] :",{error:err.message,order:order.oid,customer:order.email});
+      return res.json(400,err.message||err)        
+    })
   });
 
 };
@@ -587,47 +591,49 @@ exports.capture=function(req,res){
       return res.json(400, "La commande "+req.params.oid+" n'existe pas.");
     }
 
+    //
+    // capture payment
     payment.for(order.payment.issuer).capture(order, req.body.reason)
       .then(function(order){
 
-        //
-        // prepare and send mail
-        var subTotal=order.getSubTotal(),
-            totalDiscount=order.getTotalDiscount(),
-            paymentFees=payment.fees(order.payment.issuer,subTotal+shippingFees),
-            shippingFees=order.getShippingPrice();
-        var mail={
-          order:order,
-          created:order.getDateString(order.created),
-          shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
-          paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
-          totalWithFees:order.getTotalPrice().toFixed(2),
-          totalDiscount: totalDiscount.toFixed(2),
-          shippingWhen:order.getDateString(),
-          subTotal:subTotal.toFixed(2),
-          origin:req.header('Origin')||config.mail.origin,
-          withHtml:true
-        };
-        bus.emit('sendmail',  
-            order.email,
-            'Facture de votre commande Karibou '+order.oid,
-            mail,
-            'order-billing',
-            function(err,status){
-              //TODO log activities
-              if(err)console.log('---------------------------capture',order.oid,err)
-            })
+      //
+      // prepare and send mail
+      var subTotal=order.getSubTotal(),
+          totalDiscount=order.getTotalDiscount(),
+          extraDiscount=order.getExtraDiscount(),            
+          shippingFees=order.getShippingPrice(),
+          paymentFees=(order.payment.fees.charge*(subTotal+shippingFees-totalDiscount)).toFixed(2);
+      var mail={
+        order:order,
+        created:order.getDateString(order.created),
+        shippingFees:(shippingFees-Math.max(totalDiscount-paymentFees,0)).toFixed(2),
+        paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
+        totalWithFees:order.getTotalPrice().toFixed(2),
+        totalDiscount: totalDiscount.toFixed(2),
+        extraDiscount:extraDiscount,
+        shippingWhen:order.getDateString(),
+        subTotal:subTotal.toFixed(2),
+        origin:req.header('Origin')||config.mail.origin,
+        withHtml:true
+      };
+      bus.emit('sendmail',  
+          order.email,
+          'Facture de votre commande Karibou '+order.oid,
+          mail,
+          'order-billing',
+          function(err,status){
+            //TODO log activities
+            if(err)console.log('---------------------------capture',order.oid,err)
+          })
 
 
-        return res.json(_.extend({mail:mail},order.toObject()))
-      })
-      .fail(function(err){
-        bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});
-        return res.status(400).send(err.message)        
-      })
-
-
-  })
+      return res.json(_.extend({mail:mail},order.toObject()))
+    })
+    .fail(function(err){
+      bus.emit('system.message',"[order-capture] :",{error:err.message,order:order.oid,customer:order.email});
+      return res.status(400).send(err.message)        
+    });
+  });
 
 }
 
@@ -792,28 +798,10 @@ exports.invoicesByUsers=function(req,res){
     return res.status(400).send( err.message);
   }
 
+  /** 
   var criteria={}, result=[];
 
-  // get the date
-  criteria.from=new Date();
-  if(req.params.year){
-    criteria.from.setYear(parseInt(req.params.year))
-  }
 
-  // select a shipping month
-  criteria.from.setDate(1)
-  criteria.from.setMonth(parseInt(req.params.month)-1)
-  criteria.from.setHours(1,0,0,0)
-
-  criteria.to=new Date(criteria.from);
-  criteria.to.setDate(criteria.from.daysInMonth())
-  criteria.to.setHours(23,0,0,0)
-  criteria.fulfillment='fulfilled'
-
-  Orders.findByCriteria(criteria, function(err,orders){
-    if(err){
-      return res.status(400).send(errorHelper(err.message||err));
-    }
     // sort by date and customer
     function byDateAndUser(o1,o2){
 
@@ -831,30 +819,11 @@ exports.invoicesByUsers=function(req,res){
 
     //
     // oid, date, customer, amount, fees, fees, total
-    result.push(['oid','shipping','customer','amount','sfees','pfees','status','total'])
-    orders.sort(byDateAndUser).forEach(function(order){
-      var subTotal=order.getSubTotal();
-      var shippingFees=order.getShippingPrice();
-      result.push({
-        oid:order.oid,
-        shipping:Orders.formatDate(order.shipping.when),
-        customer:order.email,
-        amount:subTotal.toFixed(2),
-        shippingFees:shippingFees,
-        paymentFees:payment.fees(order.payment.issuer,subTotal+shippingFees).toFixed(2),
-        payment:order.payment.status,
-        total:order.getTotalPrice().toFixed(2)
-      })
-      total+=parseFloat(order.getTotalPrice().toFixed(2));
-      amount+=parseFloat(order.getSubTotal().toFixed(2));
-      shipping+=shippingFees;
-    })
-    result.push(['','','',amount,shipping,'','',total])
+    result.push(['oid','shipping','customer','amount','sfees','pfees','status','total']);
 
     res.setHeader('Content-disposition', 'attachment; filename=invoices-users-'+criteria.from.getMonth()+''+criteria.from.getYear()+'.csv');
-    res.csv(result)
-
-  });
+    res.csv(result);
+    **/
 }
 
 //

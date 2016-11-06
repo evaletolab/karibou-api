@@ -192,6 +192,7 @@ Orders.methods.equalItem=utils.equalItem;
 Orders.methods.getShippingPrice=utils.getShippingPrice;
 Orders.methods.computeDiscountAmountByShops=utils.computeDiscountAmountByShops;
 Orders.methods.getTotalDiscount=utils.getTotalDiscount;
+Orders.methods.getExtraDiscount=utils.getExtraDiscount;
 Orders.methods.getTotalPrice=utils.getTotalPrice;
 Orders.methods.getSubTotal=utils.getSubTotal;
 Orders.methods.getDateString=utils.getDateString;

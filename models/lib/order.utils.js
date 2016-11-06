@@ -159,6 +159,19 @@ exports.getTotalDiscount=function(offset) {
   return amount;
 }
 
+// 
+// stotal = items + shipping - total discount
+//  total = stotal + stotal*payment.fees
+// WARNNG -- WARNNG -- WARNNG -- edit in all places 
+exports.getExtraDiscount=function() {
+  var total=this.getSubTotal();
+  var shipping=this.getShippingPrice();
+  var discount=this.getTotalDiscount();
+  var fees=this.payment.fees.charge*(total+shipping-discount)+shipping;
+  return roundCHF(Math.max(discount-fees,0));
+};
+
+
 exports.getShippingPrice=function(factor){
   //
   // get the base of price depending the shipping sector
@@ -173,6 +186,7 @@ exports.getShippingPrice=function(factor){
   // get the base of price depending the shipping sector
   var distance=getShippingSectorPrice(this.shipping.postalCode);
   var price=config.shared.shipping.price[distance];
+  var subtotal=this.getSubTotal();
 
 
   // check if value exist, (after creation) 
@@ -191,12 +205,14 @@ exports.getShippingPrice=function(factor){
 
   
   // implement 3) get free shipping!
-  if (config.shared.shipping.discountB&&this.getSubTotal()>=config.shared.shipping.discountB){
+  if (config.shared.shipping.discountB && 
+      subtotal>=config.shared.shipping.discountB){
     return roundCHF(price-config.shared.shipping.priceB);
   }
 
   // implement 3) get half shipping!
-  else if (config.shared.shipping.discountA&&this.getSubTotal()>=config.shared.shipping.discountA){
+  else if (config.shared.shipping.discountA &&
+           subtotal>=config.shared.shipping.discountA){
     return roundCHF(price-config.shared.shipping.priceA);
   }
 
@@ -232,14 +248,7 @@ exports.getTotalPrice=function(factor){
 
   //
   // add gateway fees
-  for (var gateway in config.shared.order.gateway){
-    gateway=config.shared.order.gateway[gateway]
-    if (gateway.label===this.payment.issuer){
-      total+=total*gateway.fees;
-      break;
-    }
-  }
-
+  total+=this.payment.fees.charge*total;
 
   // add mul factor
   factor&&(total*=factor);

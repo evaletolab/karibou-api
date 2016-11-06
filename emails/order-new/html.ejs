@@ -69,10 +69,11 @@ Vous trouverez ci-dessous le détail de votre commande<br/>
 * ------------------
 * Sous total  <%= subTotal %> CHF
 * Frais de livraison <%= shippingFees %> CHF
-* Frais de paiement <%= paymentFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF<%if (extraDiscount>0) {%>
+* Bonus commerçants -<%= extraDiscount %> CHF<% } %>
 * ------------------
 * Montant total provisoire <%= totalWithFees %> CHF<%if (totalDiscount>0) {%>
-* Rabais commerçants <%= totalDiscount %> CHF<% } %>
+* Rabais commerçants total <%= totalDiscount %> CHF<% } %>
 *
 </pre>
 <h4>Récapitulatif</h4>
