@@ -858,7 +858,7 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
     .fail(function(err) {
       //
       // error is tracked but card is always removed!
-      bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:alias});
+      bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:JSON.stringify(p)});
       return;
     })
   });
