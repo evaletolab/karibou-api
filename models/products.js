@@ -38,6 +38,7 @@ var Product = new Schema({
    sku: { type: Number, required: true, unique:true, index: true },
    title: { type: String, required: true },
    slug: { type: String, required: false },
+   keywords:{ type: String, required: false },
    
    details:{
       description:{type:String, required:true},
@@ -783,6 +784,26 @@ Product.statics.findByCriteria = function(criteria, callback){
 //     });
 //   });
 // };
+
+//
+// generate text index
+// db.products.find({
+//   $text:{$search:"confiture"}
+// },{
+//   score: {$meta: "textScore"}
+// }).sort({score:{$meta:"textScore"}})
+Product.index({ 
+    "title": "text",
+    "details.description":"text",
+    "details.origin":"text", 
+    "keywords":"text" 
+  }, 
+  {"weights": { 
+    "keywords":2, 
+    "title": 2, 
+    "details.origin":2 , 
+    "details.description":1 
+  },"default_language":"french"});
 
 Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);
