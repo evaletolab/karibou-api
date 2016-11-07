@@ -609,7 +609,12 @@ Product.statics.findByCriteria = function(criteria, callback){
     var nextShippingDays=Date.fullWeekShippingDays(8);
     // specify a custom date
     if(criteria.when){
+      // TODO what if date is not valid?
       nextShippingDays=[new Date(criteria.when)];
+
+      if(['on',true,'true','next'].indexOf(criteria.when)>-1){
+        nextShippingDays=nextShippingDays[0];
+      }
     }
 
     Shops.findAvailable(nextShippingDays).then(function(available) {
@@ -805,6 +810,7 @@ Product.statics.findByCriteria = function(criteria, callback){
 //     });
 //   });
 // };
+
 
 Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);
