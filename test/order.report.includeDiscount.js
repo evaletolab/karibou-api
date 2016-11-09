@@ -87,15 +87,22 @@ describe("orders.validate.report", function(){
       //   console.log('------',report._id.vendor,report.items,report.amount,report.fees,report.orders)
       // })
       // console.log(JSON.stringify(results,0,2));
-      console.log('---------',report.shops['mon-shop'].discount)
-      console.log('---------',report.shops['super-shop'].discount)
-      console.log('---------',report.shops['un-autre-shop'].discount)
+      // console.log('---------',report.shops['mon-shop'])
+      // console.log('---------',report.shops['super-shop'])
+      // console.log('---------ca  ',report.shops['un-autre-shop'].amount)
+      // console.log('---------fees',report.shops['un-autre-shop'].fees)
+      // console.log('---------disc',report.shops['un-autre-shop'].discount)
       //
       // not fulfilled should keep discount!
       report.shops['mon-shop'].discount.should.equal(0.5);
       report.shops['super-shop'].discount.should.equal(0);
       report.shops['un-autre-shop'].discount.should.equal(1.5);
 
+      //
+      // validate fees after discount reduction
+      var fees=(report.shops['un-autre-shop'].amount-report.shops['un-autre-shop'].discount)*report.shops['un-autre-shop'].contractFees[0];
+      report.shops['un-autre-shop'].
+        fees.should.equal(parseFloat(fees.toFixed(2)))
 
       done();
     });

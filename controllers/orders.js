@@ -379,7 +379,7 @@ exports.create=function(req,res){
       var mail={
         order:order,
         created:order.getDateString(order.created),
-        shippingFees:(Math.max(totalDiscount-paymentFees-shippingFees,0)).toFixed(2),
+        shippingFees:Math.max(shippingFees-Math.max(totalDiscount-paymentFees,0),0).toFixed(2),
         paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
         totalWithFees:order.getTotalPrice().toFixed(2),
         totalDiscount: totalDiscount.toFixed(2),
@@ -606,7 +606,7 @@ exports.capture=function(req,res){
       var mail={
         order:order,
         created:order.getDateString(order.created),
-        shippingFees:(Math.max(totalDiscount-paymentFees-shippingFees,0)).toFixed(2),
+        shippingFees:Math.max(shippingFees-Math.max(totalDiscount-paymentFees,0),0).toFixed(2),
         paymentFees:(Math.max(paymentFees-totalDiscount,0)).toFixed(2),
         totalWithFees:order.getTotalPrice().toFixed(2),
         totalDiscount: totalDiscount.toFixed(2),
