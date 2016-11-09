@@ -15,7 +15,7 @@ Veuillez trouver votre facture Karibou pour votre commande <%= order.oid %> du <
 * Bonus commerçants -<%= extraDiscount %> CHF<% } %>
 * ------------------
 * Montant total <%= totalWithFees %> CHF<%if (totalDiscount>0) {%>
-* Rabais commerçants total <%= totalDiscount %> CHF<% } %>
+* Rabais commerçants <%= totalDiscount %> CHF<% } %>
 *
 </div>
 <%if (order.payment.issuer==='invoice') {%>
