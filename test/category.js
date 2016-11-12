@@ -55,7 +55,7 @@ describe("Categories", function(){
       type:"Pouet"
     },function(err,m){
       should.exist(err);
-      err.message.should.equal("Categories validation failed")
+      err.message.should.equal("Error duplicate category Olivier")
       done();
     });
 

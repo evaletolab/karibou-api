@@ -36,7 +36,10 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"voided"
+            status:"voided",
+            fees:{
+                charge:0.02
+            }
         },
 
 
@@ -87,7 +90,10 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"refunded"
+            status:"refunded",
+            fees:{
+                charge:0.02
+            }
         },
 
 
@@ -138,7 +144,10 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"voided"
+            status:"voided",
+            fees:{
+                charge:0.02
+            }
         },
 
 
@@ -190,7 +199,10 @@ exports.Orders=[
             issuer: "invoice",
             alias:((u.Users[1].id+'invoice').hash().crypt()),
             transaction:'yes',
-            status:"authorized"
+            status:"authorized",
+            fees:{
+                charge:0.0
+            }
         },
 
         fulfillments: {
@@ -297,7 +309,10 @@ exports.Orders=[
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'').hash().crypt()),
             transaction:'yes',
-            status:"authorized"
+            status:"authorized",
+            fees:{
+                charge:0.02
+            }
         },
 
         fulfillments: {
@@ -403,7 +418,10 @@ exports.Orders=[
             issuer: "visa",
             number:'98xxxxxxx4123',
             alias:'0123456789012012345678901201234567890120123456789012',
-            status:"authorized"
+            status:"authorized",
+            fees:{
+                charge:0.029
+            }
         },
 
         fulfillments: {
@@ -509,7 +527,10 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"authorized"
+            status:"authorized",
+            fees:{
+                charge:0.02
+            }
         },
 
         fulfillments: {
@@ -615,7 +636,10 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"pending"
+            status:"pending",
+            fees:{
+                charge:0.02
+            }
         },
 
         fulfillments: {
@@ -708,6 +732,7 @@ exports.Orders=[
 
     }
 ];
+
 
 //
 // ------------------------ SHOPS --------------------------

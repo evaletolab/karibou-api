@@ -33,7 +33,7 @@ describe("orders.find.product", function(){
 
   before(function(done){
     dbtools.clean(function(e){
-      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.repport.js"],db,function(err){
+      dbtools.load(["../fixtures/Users.js","../fixtures/Categories.js","../fixtures/Orders.report.js"],db,function(err){
         should.not.exist(err);
         // Orders.printInfo()
         // Orders.find({}).exec(function(e,os){

@@ -30,9 +30,9 @@ module.exports = {
       hypercenter:11.9,
       periphery:14.90
     }, // shipping price
-    priceA:2,
-    priceB:3,
-    periphery:["1212","1213","1219","1223","1224","1225","1226","1228","1231","1232","1233","1234","1253","1255","1256","1257","1258"]
+    priceA:0,
+    priceB:0,
+    periphery:["1212","1213","1218","1219","1223","1224","1225","1226","1228","1231","1232","1233","1234","1253","1255","1256","1257","1258"]
   },
 
   issue:{
@@ -43,6 +43,7 @@ module.exports = {
     "issue_missing_validation",
     "issue_missing_customer_support",
     "issue_wrong_packing",
+    "issue_wrong_product",
     "issue_wrong_client_id",
     "issue_wrong_product_quality",
     "issue_late_delivry"
@@ -64,7 +65,7 @@ module.exports = {
     location:{
       list:[
         "1201","1202","1203","1204","1205","1206","1207","1208","1209","1227",
-        "1212","1213","1219","1223","1224","1225","1226","1228","1231","1232","1233","1234","1253","1255","1256","1257","1258"]
+        "1212","1213","1218","1219","1223","1224","1225","1226","1228","1231","1232","1233","1234","1253","1255","1256","1257","1258"]
     },
     region:{
       list:["Genève", "Carouge,GE"]
@@ -125,9 +126,9 @@ module.exports = {
     cancelreason:["customer", "fraud", "inventory", "system","timeout","other"],
     status:["failure","created","reserved","partial","fulfilled"],
     gateway:[ 
-      {label:"postfinance card",fees:0.00}, 
-      {label:"american express",fees:0.00}, 
-      {label:"visa",fees:0.000}, 
+      {label:"postfinance card",fees:0.0}, 
+      {label:"american express",fees:0.01}, 
+      {label:"visa",fees:0.00}, 
       {label:"mastercard",fees:0.0}, 
       {label:"wallet", fees:0.000}, 
       {label:"invoice",fees:0.000}, 
