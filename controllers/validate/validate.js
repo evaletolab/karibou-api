@@ -323,10 +323,15 @@ exports.shop=function(shop){
 
     if(shop.discount){
       ifCheck(shop.discount.active,"Erreur system p10").isBoolean();
-      ifCheck(shop.discount.threshold,"Le format du seuil n'est pas correct").isFloat();
-      ifCheck(shop.discount.amount,"Le format du montant n'est pas correct").isFloat();
+      ifCheck(shop.discount.threshold,"Le format du seuil à commandé n'est pas correct").isFloat();
+      ifCheck(shop.discount.amount,"Le format du participation financière n'est pas correct").isFloat();
       if(shop.discount.active&&(!shop.discount.threshold||!shop.discount.amount)){
-        throw new Error("Vous avez activé la prise en charge client sans remplir le formulaire");
+        throw new Error("Vous avez activé la prise en charge de la livraison sans remplir le formulaire");
+      }
+      if(shop.discount.amount&&shop.discount.threshold){
+        if(shop.discount.amount>=shop.discount.threshold){
+          throw new Error("Votre participation financière ne peut pas être plus élevé que le montant acheté");          
+        }
       }
     }
 

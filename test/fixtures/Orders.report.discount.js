@@ -7,7 +7,7 @@ var orders = require('mongoose').model('Orders');
 //  - different dates (today, next shipping day, next week), 
 //  - config.shared.financialstatus  ("pending","authorized","partially_paid","paid", "partially_refunded" ...)
 //  - config.shared.cancelreason ("customer", "fraud", "inventory", "other")
-//  - config.shared.status ("created","partial","fulfilled", "shipped","failure")
+//  - config.shared.status ("fulfilled","partial","fulfilled", "shipped","failure")
 //
 // build orders with
 //  - 2 users
@@ -15,11 +15,17 @@ var orders = require('mongoose').model('Orders');
 //  -
 
 var oneweek=orders.findOneWeekOfShippingDay();
-var sellerDay=orders.findCurrentShippingDay();
+var firstDayOfMonth=orders.findCurrentShippingDay();
+var lastDayOfMonth=new Date(firstDayOfMonth);
 var customerDay=oneweek[0];
 
 var passedday=new Date(customerDay.getTime()-86400000*7)
 
+lastDayOfMonth.setDate(lastDayOfMonth.daysInMonth());
+lastDayOfMonth.setHours(22,0,0,0);
+
+firstDayOfMonth.setDate(1);
+firstDayOfMonth.setHours(16,0,0,0);
 
 exports.Orders=[
     {
@@ -33,27 +39,57 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "tester",
+            issuer: "visa",
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"voided"
         },
 
-
         /* shipping adresse*/
-        shipping: {
-            name: "famille olivier evalet 1",
-            note: "123456",
-            streetAdress: "route de chêne 34",
-            floor: "2",
-            postalCode: "1208",
-            region: "Genève",
-            when: sellerDay,
-            geo: {
-                lat: 46.1997473,
-                lng: 6.1692497
-            }
+        shipping: { 
+            name: "famille olivier evalet 1", 
+            note: "123456", 
+            streetAdress: "route de chêne 34", 
+            floor: "2", 
+            postalCode: "1208", 
+            region: "Genève", 
+            when: lastDayOfMonth, 
+            geo: { lat: 46.1997473, lng: 6.1692497}
         },
+
+        items: [
+            {
+                sku: 1000001,
+                title: "Product 1 with cat",
+                quantity: 3,
+                price: 2.5,
+                part: "1pce",
+                note: "",
+                finalprice: 10,
+                category: "Viande",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "fulfilled"
+                }
+            },
+            {
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 3,
+                price: 3,
+                part: "100gr",
+                note: "",
+                finalprice: 10,
+                category: "Fruits",
+                vendor:"un-autre-shop",
+                fulfillment: {
+                    shipping: "grouped",
+                    status: "fulfilled"
+                }
+            }
+        ],
+
 
         /* vendors */
         vendors: [
@@ -64,8 +100,10 @@ exports.Orders=[
                 name: "un autre shop",
                 address: "TODO",
                 discount:{
-                    finaleAmount:0
-                }
+                    amount:.5,
+                    finalAmount:1.0
+                },
+                fees:.14
             }
         ],
 
@@ -90,27 +128,15 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"pending"
+            status:"paid"
         },
 
         fulfillments: {
-            status: "reserved"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
-        shipping: {
-            name: "famille olivier evalet 2",
-            note: "123456",
-            streetAdress: "route de chêne 34",
-            floor: "2",
-            postalCode: "1208",
-            region: "Genève",
-            when: sellerDay,
-            geo: {
-                lat: 46.1997473,
-                lng: 6.1692497
-            }
-        },
+        shipping: { name: "famille olivier evalet 1", note: "123456", streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", when: firstDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}},
 
         /* vendors */
         vendors: [
@@ -120,9 +146,7 @@ exports.Orders=[
                 slug: "super-shop",
                 name: "super shop",
                 address: "TODO",
-                discount:{
-                    finaleAmount:0
-                }
+                fees:.16
             },
             {
                 /* shop available !=true */
@@ -131,8 +155,10 @@ exports.Orders=[
                 name: "un autre shop",
                 address: "TODO",
                 discount:{
-                    finaleAmount:0
-                }
+                    amount:.5,
+                    finalAmount:.5
+                },
+                fees:.14
             }
         ],
         /* items */
@@ -140,16 +166,16 @@ exports.Orders=[
             {
                 sku: 1000001,
                 title: "Product 1 with cat",
-                quantity: 1,
+                quantity: 3,
                 price: 2.5,
                 part: "1pce",
                 note: "",
-                finalprice: 2.5,
+                finalprice: 10,
                 category: "Viande",
                 vendor:"super-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -159,32 +185,36 @@ exports.Orders=[
                 price: 3,
                 part: "100gr",
                 note: "",
-                finalprice: 3,
+                finalprice: 10,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
-                sku: 1000003,
-                title: "Product 3 with cat",
-                quantity: 2,
-                price: 7.6,
-                part: "0.75L",
+                sku: 1000002,
+                title: "Product 2 with cat",
+                quantity: 1,
+                price: 3,
+                part: "100gr",
                 note: "",
-                finalprice: 15.2,
-                category: "Poissons",
+                finalprice: 1,
+                category: "Fruits",
                 vendor:"un-autre-shop",
+                variant:{
+                    title:'Variation A'
+                },
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             }
         ],
 
 
+        closed:passedday,      
         created: new Date()
     },{
 
@@ -198,30 +228,22 @@ exports.Orders=[
 
         /* payment */
         payment: {
-            issuer: "tester",
+            issuer: "mastercard",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"authorized"
+            status:"paid"
         },
 
         fulfillments: {
-            status: "partial"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
-        shipping: {
-            region: "Genève",
-            when: sellerDay,
-            geo: {
-                lng: 6.1692497,
-                lat: 46.1997473
-            },
-            postalCode: "1204",
-            location: "Genève-Ville",
-            floor: "1",
-            streetAdress: "rue de carouge",
-            note: "",
-            name: "famille delphine evalet 3"
+        shipping: { 
+            name: "famille olivier evalet 1", 
+            note: "123456", 
+            streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", 
+            when: firstDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}
         },
 
         /* vendors */
@@ -232,8 +254,10 @@ exports.Orders=[
                 name: "Un autre shop",
                 address: "TODO",
                 discount:{
-                    finaleAmount:0
-                }
+                    amount:.5,
+                    finalAmount:1.0
+                },
+                fees:.14
             },
             {
                 /*shop status !=true */
@@ -242,10 +266,11 @@ exports.Orders=[
                 name: "mon shop",
                 address: "TODO",
                 discount:{
-                    finaleAmount:0
-                }
+                    amount:.5,
+                    finalAmount:.5
+                },
+                fees:.15
             }
-
         ],
         /* items */
         items: [
@@ -256,12 +281,12 @@ exports.Orders=[
                 price: 2.5,
                 part: "1pce",
                 note: "",
-                finalprice: 2.5,
+                finalprice: 10,
                 category: "Viande",
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -271,12 +296,12 @@ exports.Orders=[
                 price: 3,
                 part: "100gr",
                 note: "",
-                finalprice: 3,
+                finalprice: 10,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -286,18 +311,19 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 15.2,
+                finalprice: 15,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "failure"
                 }
             }
         ],
 
 
-        created: new Date()
+        created: new Date(),
+        closed:passedday      
 
     },{
 
@@ -314,27 +340,19 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"authorized"
+            status:"paid"
         },
 
         fulfillments: {
-            status: "partial"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
-        shipping: {
-            region: "Genève",
-            when: sellerDay,
-            geo: {
-                lng: 6.1692497,
-                lat: 46.1997473
-            },
-            postalCode: "1204",
-            location: "Genève-Ville",
-            floor: "1",
-            streetAdress: "rue de carouge",
-            note: "",
-            name: "famille delphine evalet 4"
+        shipping: { 
+            name: "famille olivier evalet 1", 
+            note: "123456", 
+            streetAdress: "route de chêne 34", floor: "2", postalCode: "1208", region: "Genève", 
+            when: lastDayOfMonth, geo: { lat: 46.1997473, lng: 6.1692497}
         },
 
         /* vendors */
@@ -344,9 +362,7 @@ exports.Orders=[
                 slug: "un-autre-shop",
                 name: "Un autre shop",
                 address: "TODO",
-                discount:{
-                    finaleAmount:0
-                }
+                fees:.14
             },
             {
                 /*shop status !=true */
@@ -354,9 +370,7 @@ exports.Orders=[
                 slug: "mon-shop",
                 name: "mon shop",
                 address: "TODO",
-                discount:{
-                    finaleAmount:0
-                }
+                fees:.30
             }
         ],
         /* items */
@@ -373,7 +387,7 @@ exports.Orders=[
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -383,12 +397,12 @@ exports.Orders=[
                 price: 3,
                 part: "100gr",
                 note: "",
-                finalprice: 3,
+                finalprice: 9,
                 category: "Fruits",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -398,18 +412,19 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 15.2,
+                finalprice: 15,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             }
         ],
 
 
-        created: new Date()
+        created: lastDayOfMonth,
+        closed:passedday      
 
     },{
 
@@ -426,17 +441,17 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"authorized"
+            status:"paid"
         },
 
         fulfillments: {
-            status: "partial"
+            status: "fulfilled"
         },
 
         /* shipping adresse*/
         shipping: {
             region: "Genève",
-            when: customerDay,
+            when: lastDayOfMonth,
             geo: {
                 lng: 6.1692497,
                 lat: 46.1997473
@@ -456,9 +471,7 @@ exports.Orders=[
                 slug: "un-autre-shop",
                 name: "Un autre shop",
                 address: "TODO",
-                discount:{
-                    finaleAmount:0
-                }
+                fees:.14
             },
             {
                 /*shop status !=true */
@@ -466,9 +479,7 @@ exports.Orders=[
                 slug: "mon-shop",
                 name: "mon shop",
                 address: "TODO",
-                discount:{
-                    finaleAmount:0
-                }
+                fees:.15
             }
         ],
         /* items */
@@ -485,7 +496,7 @@ exports.Orders=[
                 vendor:"mon-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -500,7 +511,7 @@ exports.Orders=[
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             },
             {
@@ -510,18 +521,19 @@ exports.Orders=[
                 price: 7.6,
                 part: "0.75L",
                 note: "",
-                finalprice: 15.2,
+                finalprice: 7.6,
                 category: "Poissons",
                 vendor:"un-autre-shop",
                 fulfillment: {
                     shipping: "grouped",
-                    status: "created"
+                    status: "fulfilled"
                 }
             }
         ],
 
 
-        created: new Date()
+        created: new Date(),
+        closed:passedday      
 
     }
 ];
@@ -536,17 +548,14 @@ exports.Shops=[{
     name: "Un autre shop",
     description:"cool ce shop",
     urlpath:"un-autre-shop",
-    catalog:c.Categories[0]._id, 
-    owner:u.Users[0]._id,  //evaleto@gluck.com
-    info:{
-        detailledOrder:true
-    },
-    discount:{
-        active:false
-    },
+    catalog:c.Categories[0]._id,
+    owner:u.Users[0]._id,
     available:{
       active:false,
       weekdays:[0,1,2,3,4,5,6]
+    },
+    account:{
+        fees:.2
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
@@ -556,13 +565,10 @@ exports.Shops=[{
     _id:ObjectId('515ec12e56a8d5961e000005'),
     status:true,
     name: "mon shop",
-    description:"cool ce shop", 
+    description:"cool ce shop",
     urlpath:"mon-shop",
     catalog:c.Categories[0]._id,
-    owner:u.Users[1]._id, //evaleto@gmail.com
-    discount:{
-        active:false
-    },
+    owner:u.Users[1]._id,
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
@@ -579,15 +585,9 @@ exports.Shops=[{
     urlpath:"super-shop",
     catalog:c.Categories[0]._id,
     owner:u.Users[0]._id,    
-    info:{
-        detailledOrder:true
-    },
     available:{
       active:false,
       weekdays:[0,1,2,3,4,5,6]
-    },
-    discount:{
-        active:false
     },
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
@@ -604,9 +604,6 @@ exports.Shops=[{
     photo:{ 
       bg:"http://image.truc.io/bg-01123.jp",
       fg:"http://image.truc.io/fg-01123.jp"      
-    },
-    discount:{
-        active:false
     },
     available:{
       active:false,
@@ -636,9 +633,6 @@ exports.Products=[{
         comment:false, 
         discount:true
      },
-     variants:[
-        {title:'Variation A'}
-     ],
 
      pricing: {
         stock:10, 
@@ -666,6 +660,9 @@ exports.Products=[{
         comment:false, 
         discount:false
      },
+     variants:[
+        {title:'Variation A'}
+     ],     
      pricing: {
         stock:10, 
         price:3.80,

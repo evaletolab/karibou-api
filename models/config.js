@@ -29,11 +29,13 @@ var Config = new Schema({
     },
 
     //
-    // display welcome message
+    // display checkout message
     checkout:{
       message:{en:String,fr:String,de:String},
       active:{type:Boolean,default:false}
     },
+
+    
 
 
     //

@@ -40,36 +40,82 @@ exports.favoriteProductsVsUsers=function(cb){
 
 
 exports.ordersByUsers=function (filter,cb) {
-  var Orders=this, Users=db.model('Users'), results={}, match={}, today=new Date();
+  var Orders=this, Users=db.model('Users'), results={}, match={'items.fulfillment.status':'fulfilled'}, today=new Date();
+
+  //
+  //$match:{
+  //  year:2015,
+  //  'items.fulfillment.status':'fulfilled',
+  //  'items.vendor':'herbaluna'
+  //}
 
   if(filter.year){
     match.year=parseInt(filter.year)||match.year;
   }
+  if(filter.shop){
+    match['items.vendor']=filter.shop;
+  }
 
   Orders.aggregate(
-     [
-       { $match: { 'payment.status': 'paid'  }},
-       {$project:{
-             month:{ $month:"$shipping.when"}, 
-             week: { $week: "$shipping.when"}, 
-             year: { $year: "$shipping.when" },
-             items:1,
-             shipping:1,
-             email:1,
-             customer:1
-       }},
-       {$sort:{'shipping.when':-1}},
-       {$match: match  },
-       {$group:
-           {
-             _id:"$email",
-             user:{$first:"$customer.name"},
-             last:{$first:"$shipping.when"},
-             count: { $sum: 1 }
-           }
-       },
-       {$sort:{count:-1}}
-     ]
+     // TODO better stats
+     // { $match: { 'payment.status': 'paid'  }},
+     // {$project:{
+     //          oid:1,
+     //          week: { $week: "$shipping.when"}, 
+     //          year: { $year: "$shipping.when" },
+     //          items:1,
+     //          shipping:1,
+     //          email:1,
+     //          customer:1}},
+     // {$sort:{'shipping.when':-1}},
+     // {$unwind: '$items' },
+     // {$match:match},
+     // {$group:
+     //     {
+     //       _id:"$email",
+     //       user:{$first:"$customer.name"},
+     //       last:{$first:"$shipping.when"},
+     //       first:{$last:"$shipping.when"},
+     //       orders: { $addToSet: "$oid" },
+     //       items:{$addToSet:{
+     //            oid:"$oid",
+     //            week:"$week",
+     //            year:"$year",
+     //            when:"$shipping.when",
+     //            sku:"$items.sku",
+     //            title:"$items.title",
+     //            finalprice:"$items.finalprice",
+     //            quantity:"$items.quantity",
+     //            vendor:"$items.vendor"
+     //         }}
+     //     }
+     // },
+     // {$sort:{'last':-1}}
+
+
+   [
+     { $match: { 'payment.status': 'paid'  }},
+     {$project:{
+           month:{ $month:"$shipping.when"}, 
+           week: { $week: "$shipping.when"}, 
+           year: { $year: "$shipping.when" },
+           items:1,
+           shipping:1,
+           email:1,
+           customer:1
+     }},
+     {$sort:{'shipping.when':-1}},
+     {$match: match  },
+     {$group:
+         {
+           _id:"$email",
+           user:{$first:"$customer.name"},
+           last:{$first:"$shipping.when"},
+           count: { $sum: 1 }
+         }
+     },
+     {$sort:{count:-1}}
+   ]
   ,function (err,stats) {
     if(err){
       return cb(err);
@@ -241,8 +287,246 @@ exports.getSellValueByYearAndWeek=function(query,cb){
 };
 
 //
+// new impl. to get CA by shop
+// {
+//   query:{
+//     month:10, << optional
+//     year:2016
+//   },
+//   header:{from,to },
+//   shops:{
+//     shop-slug:{amount,orders,fees,items,details:{name,slug}, discount}
+//   },
+//   products:[{sku,count,amount,title,customers:[customer]}]
+// }
+exports.getCAByVendor=function(filter,cb) {
+  var today=new Date(), match={'items.fulfillment.status':'fulfilled',year:today.getFullYear()};
+  //
+  // filter by month, year, thismonth,shop 
+  filter=filter||{};
+  if(filter.year){
+    match.year=parseInt(filter.year);
+  }
+  if(filter.month){
+    match.month=parseInt(filter.month);
+  }
+  if(filter.shop){    
+    match['items.vendor']=filter.shop;
+    if(Array.isArray(filter.shop)){
+      match['items.vendor']={'$in':filter.shop};
+    }
+  }
+
+
+  //
+  // only paid orders
+  this.aggregate([
+       { $match: {$or:[{'payment.status': 'paid'},{'payment.status': 'invoice'}]} },
+       {$project:{
+             month:{ $month:"$shipping.when"}, 
+             week: { $week: "$shipping.when"}, 
+             year: { $year: "$shipping.when" },
+             oid:1,
+             items:1,
+             email:1,
+             vendors:1
+       }},
+       { $unwind: '$vendors'}, 
+       { $unwind: '$items'}, 
+       { $match: match  },
+
+       //
+       // join items.vendor === vendors.slug
+       { $redact:{
+         $cond:[{$eq:["$items.vendor","$vendors.slug"]},"$$KEEP","$$PRUNE"]}
+       },
+       {$sort:{'week':-1}},
+
+       // compute CA,FEES,DISCOUT and PRODUCTS grouped by [vendor,oid]
+       // {$cond:[{$eq:["$items.vendor","$vendors.slug"]},TRUE,FALSE]}
+       {$group:{
+             _id:{oid:"$oid",vendor:"$items.vendor"},
+             products:{$addToSet:{
+              sku:"$items.sku",
+              title:"$items.title",
+              count:"$items.quantity",
+              amount:"$items.finalprice"
+             }},
+             month:{$first:"$month"}, year:{$first:"$year"}, 
+             items:{$sum:"$items.quantity"},
+             amount:{$sum:"$items.finalprice"},
+             name:{$first:"$vendors.name"},
+             fees:{$first:"$vendors.fees"},
+             discount:{$first:"$vendors.discount.finalAmount"}
+           }
+       },
+       //
+       // CA,FEES,DISCOUT and PRODUCTS grouped by [month,year,vendor] 
+       {$group:{
+         _id:{ month:"$month", year:"$year", vendor:"$_id.vendor"},
+            name:{$first:"$name"}, vendor:{$first:"$_id.vendor"},
+            orders:{$addToSet:"$_id.oid"},
+            items:{$sum:"$items"},
+            products:{$addToSet:"$products"},
+            amount:{$sum:"$amount"},
+            discount:{$sum:"$discount"},
+            fees:{$sum:{ $multiply: [ {$subtract:["$amount",{$ifNull:["$discount",0]}]}, "$fees" ]}},
+            contractFees:{$addToSet:"$fees"},
+         }
+       },
+       {$sort:{'_id.year':-1,'_id.month':-1}}
+  ]).allowDiskUse(true).exec(function(err,results){
+    if(err){
+      return cb(err);
+    }
+
+
+    if(!results||!results.length){
+      return cb(null,{});
+    }
+
+
+    //
+    // round result
+    results.forEach(function(result) {
+      result.amount=parseFloat(result.amount.toFixed(2));
+      result.discount=parseFloat(result.discount.toFixed(2));
+      result.fees=parseFloat(result.fees.toFixed(2));
+      result.products=_.flatten(result.products);
+    });    
+
+
+    //
+    // set output with the grouped format
+    if(filter.grouped){
+      var report={shops:{},products:[]}, ca=0, items=0, orders=[], amount=0, discount=0;
+      var from=new Date();from.setDate(1);from.setHours(1,0,0,0);from.setMonth(0);
+      if(filter.month){from.setMonth(filter.month-1);}
+      if(filter.year){from.setFullYear(filter.year);}      
+
+      var to=new Date(from);to.setDate(from.daysInMonth());to.setHours(23,0,0,0);    
+      if(!filter.month){to.setMonth(11)}
+      to.setDate(to.daysInMonth());
+
+      results.forEach(function(result) {
+        var i=0;
+        report.shops[result._id.vendor]=_.extend({},result);
+        delete report.shops[result._id.vendor]._id;
+        result.products.forEach(function(product) {
+          if(e=_.findWhere(report.products,{sku:product.sku})){
+            e.count+=product.count;
+            e.amount+=product.amount;
+            return;
+          }
+          report.products.push(product);
+        });
+        ca+=result.fees;
+        amount+=result.amount;
+        items+=result.items;
+        discount+=result.discount;
+        orders=_.union(result.orders,orders);        
+      });
+
+
+
+      report.from=from;
+      report.to=to;
+      report.ca=parseFloat(ca.toFixed(2));
+      report.discount=parseFloat(discount.toFixed(2));
+      report.amount=parseFloat(amount.toFixed(2));
+      report.items=items;
+      report.orders=orders;
+
+      return cb(null,report);
+
+
+    }
+
+    return cb(null,results);
+  });
+}
+
+//
 // follow CA for shops
 exports.getCAByYearMonthAndVendor=function (filter,cb) {
+  filter=filter||{};
+  filter.grouped=undefined;
+  this.getCAByVendor(filter,function(err, results) {
+      if(err){
+        return cb(err);
+      }
+
+      if(!results||!results.length){
+        return cb(null,{});
+      }
+
+      var group={}, series_shops={}, axisX_date={};
+
+      //
+      // group amount CA by vendor
+      results.forEach(function(result){
+        var stats={};
+
+        //
+        // build set of axisY
+        axisX_date[result._id.year+'.'+result._id.month]=Object.keys(axisX_date).length;
+        series_shops[result._id.vendor]=Object.keys(series_shops).length;
+
+        //
+        // init group vendor with [year][month]
+        if(!group[result._id.year]){
+          group[result._id.year]={};
+        }
+        if(!group[result._id.year][result._id.month]){
+          group[result._id.year][result._id.month]={};          
+        }
+        // {amount:0,fees:0,items:0,discount:0,contractFees:0}
+        group[result._id.year][result._id.month][result._id.vendor]=_.extend({},result);
+        delete group[result._id.year][result._id.month][result._id.vendor]._id;
+
+
+      });
+
+
+      //
+      // compute CA for month
+      Object.keys(group).forEach(function (year) {
+        var amount=0,fees=0,discount=0,items=0;
+        // for each year
+        Object.keys(group[year]).forEach(function (month) {
+          // for each month
+          amount=0,fees=0,discount=0,items=0;
+          Object.keys(group[year][month]).forEach(function (slug) {
+            amount=amount+group[year][month][slug].amount;
+            fees=fees+group[year][month][slug].fees;
+            discount=discount+group[year][month][slug].discount;
+            items+=group[year][month][slug].items;
+          });
+          group[year][month].amount=parseFloat(amount.toFixed(2));
+          group[year][month].fees=parseFloat(fees.toFixed(2));
+          group[year][month].discount=parseFloat(discount.toFixed(2));
+          group[year][month].items=items;
+
+        });
+      })      
+
+      // prepare axis
+      Object.keys(series_shops).forEach(function (shop,i) {
+        series_shops[shop]=i;
+      });
+
+      Object.keys(axisX_date).sortSeparatedAlphaNum().forEach(function (date,i) {
+        axisX_date[date]=i;
+      });
+
+      group.axis={
+        x:axisX_date,
+        series:series_shops
+      }      
+      return cb(undefined,group);
+  })
+};
+exports.getCAByYearMonthAndVendor_OFF=function (filter,cb) {
   var today=new Date(), match={'items.fulfillment.status':'fulfilled'};
   //
   // filter by month, year, thismonth,shop 
@@ -283,6 +567,7 @@ exports.getCAByYearMonthAndVendor=function (filter,cb) {
              items:{$addToSet:{
                 oid:"$oid",
                 sku:"$items.sku",
+                title:"$items.title",
                 finalprice:"$items.finalprice",
                 quantity:"$items.quantity",
                 vendor:"$items.vendor",

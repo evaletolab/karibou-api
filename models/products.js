@@ -38,9 +38,8 @@ var Product = new Schema({
    sku: { type: Number, required: true, unique:true, index: true },
    title: { type: String, required: true },
    slug: { type: String, required: false },
-   keywords:{ type: String, required: false },
-   
    details:{
+      keywords:{ type: String, required: false },
       description:{type:String, required:true},
       comment:{type:String, required:false},
       origin:{type:String, required:false},
@@ -109,7 +108,29 @@ var Product = new Schema({
 });
 
 
+Product.methods.print=function(product){
+  var self=product||this;
+  console.log("-- SKU  ", self.sku);
+  console.log("---      title          ",  self.title,self.slug);
+  console.log("---      price          ",  self.pricing.price,self.pricing.stock,self.pricing.part);
+  if(self.categories.name){
+    console.log("---      category       ",  self.categories.slug);
+  }else{
+    console.log("---      category       ",  self.categories);    
+  }
+  if(self.vendor.urlpath){
+    console.log("---      vendor         ",  self.vendor.urlpath);
+    console.log("---      vendor.discount",  self.vendor.discount);
+  }else{
+    console.log("---      vendor         ",  self.vendor);    
+  }
+  if(self.variants.length){
+    self.variants.forEach(function(variant) {
+      console.log("---      variant     ",  variant.title);    
+    })
+  }
 
+};
 
 //
 // API
@@ -588,7 +609,12 @@ Product.statics.findByCriteria = function(criteria, callback){
     var nextShippingDays=Date.fullWeekShippingDays(8);
     // specify a custom date
     if(criteria.when){
-      nextShippingDays=[new Date(criteria.when)];
+      // FIXME what if date is not valid?
+      if(['on',true,'true','next'].indexOf(criteria.when)>-1){
+        nextShippingDays=[nextShippingDays[0]];
+      }else{
+        nextShippingDays=[new Date(Date.parse(criteria.when))];
+      }
     }
 
     Shops.findAvailable(nextShippingDays).then(function(available) {
@@ -796,11 +822,11 @@ Product.index({
     "title": "text",
     "details.description":"text",
     "details.origin":"text", 
-    "keywords":"text" 
+    "details.keywords":"text" 
   }, 
   {"weights": { 
-    "keywords":2, 
     "title": 2, 
+    "details.keywords":2, 
     "details.origin":2 , 
     "details.description":1 
   },"default_language":"french"});

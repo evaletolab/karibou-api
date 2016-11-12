@@ -91,6 +91,7 @@ describe("api.users", function(){
         res.body.email.address.should.equal("evaleto@gluck.com");
         should.not.exist(res.body.hash)
         should.not.exist(res.body.salt)
+        // token = res.body.token;
         cookie = res.headers['set-cookie'];
         user=res.body;
         //res.headers.location.should.equal('/');
@@ -101,6 +102,7 @@ describe("api.users", function(){
   it('GET /v1/users/me should return 200',function(done){
     request(app)
       .get('/v1/users/me')
+      // .set('Authorization', 'Bearer ' + token)
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(200);
