@@ -398,6 +398,8 @@ exports.create=function(req,res){
             //TODO log activities
             if(err)console.log('---------------------------create',order.oid,err)
           })
+      order=order.toObject();
+      order.mail=mail;
       return res.json(order)
     })
     .fail(function(err){
