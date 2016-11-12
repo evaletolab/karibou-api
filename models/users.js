@@ -84,7 +84,7 @@ validate.postal = function (value) {
 
     addresses: [{
           name: { type: String, required : true, lowercase: true, trim: true },
-          note: { type: String, trim: true },
+          note: { type: String, trim: true, default:"" },
           floor: { type: String, trim: true, required : true },
           streetAdress: { type: String, required : true, lowercase: true, trim: true },
           region: { type: String, required : true, trim: true, default:"Genève", enum: EnumRegion },
@@ -181,6 +181,8 @@ UserSchema.statics.findOrCreate=function(u,callback){
 
         u.id=u['email.address'].hash()
         u["email.status"]=true;
+        u['shops']=[];
+        u['payments']=[];
       }
       var newuser=new Users(u);
 
@@ -539,6 +541,8 @@ UserSchema.statics.register = function(email, first, last, password, confirm, ex
         },
         email:{address:email,status:new Date()},
         provider:"local",
+        shops:[],
+        payments:[],
         password:password,
         created:new Date()
     });
@@ -854,7 +858,7 @@ UserSchema.statics.deletePayment=function(id, alias,callback){
     .fail(function(err) {
       //
       // error is tracked but card is always removed!
-      bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:alias});
+      bus.emit('system.message',"[karibou-danger] remove alias: "+err.message,{error:err,user:id, alias:JSON.stringify(p)});
       return;
     })
   });

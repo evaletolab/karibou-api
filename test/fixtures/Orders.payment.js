@@ -36,7 +36,8 @@ exports.Orders=[
             issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"voided"
+            status:"voided",
+            fees:{charge:0.0}
         },
 
 
@@ -88,7 +89,8 @@ exports.Orders=[
             number:'98xxxxxxx4123',
             expiry:'08/2015',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"pending"
+            status:"pending",
+            fees:{charge:0.0}
         },
 
 
@@ -139,7 +141,8 @@ exports.Orders=[
             issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"voided"
+            status:"voided",
+            fees:{charge:0.0}
         },
 
 
@@ -191,7 +194,8 @@ exports.Orders=[
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'').hash().crypt()),
             transaction:2000007,
-            status:"authorized"
+            status:"authorized",
+            fees:{charge:0.02}
         },
 
         fulfillments: {
@@ -297,7 +301,8 @@ exports.Orders=[
             issuer: "visa",
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'').hash().crypt()),
-            status:"authorized"
+            status:"authorized",
+            fees:{charge:0.029}
         },
 
         fulfillments: {
@@ -403,7 +408,8 @@ exports.Orders=[
             issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"authorized"
+            status:"authorized",
+            fees:{charge:0.0}
         },
 
         fulfillments: {
@@ -509,7 +515,8 @@ exports.Orders=[
             issuer: "invoice",
             number:'98xxxxxxx4123',
             alias:((u.Users[1].id+'invoice').hash().crypt()),
-            status:"pending"
+            status:"pending",
+            fees:{charge:0.0}
         },
 
         fulfillments: {
