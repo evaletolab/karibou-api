@@ -81,8 +81,14 @@ Categories.statics.create = function(cats, callback){
 	// create one Category
 	var cat=((typeof cats) ==="string")?({name:cats}):(cats);
 	cat.slug=cat.name.slug();
-  var c =new  Categories(cat);   
-  c.save(callback);  
+  Categories.findOne({slug:cat.slug}).select('_id').exec(function(err,duplicate) {
+    if(duplicate){
+      return callback(new Error("Error duplicate category "+cat.name));
+    }
+    var c =new  Categories(cat);   
+    c.save(callback);  
+
+  });
 
 }; 
 

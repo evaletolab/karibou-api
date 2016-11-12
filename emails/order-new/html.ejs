@@ -69,14 +69,17 @@ Vous trouverez ci-dessous le détail de votre commande<br/>
 * ------------------
 * Sous total  <%= subTotal %> CHF
 * Frais de livraison <%= shippingFees %> CHF
-* Frais de paiement <%= paymentFees %> CHF
+* Frais de paiement <%= paymentFees %> CHF<%if (extraDiscount>0) {%>
+* Bonus commerçants -<%= extraDiscount %> CHF<% } %>
 * ------------------
-* Montant total provisoire <%= totalWithFees %> CHF
+* Montant total provisoire <%= totalWithFees %> CHF<%if (totalDiscount>0) {%>
+* Rabais commerçants <%= totalDiscount %> CHF<% } %>
 *
 </pre>
 <h4>Récapitulatif</h4>
 Numéro de commande: <%= order.oid %><br/>
 Méthode de paiement: <%= order.payment.issuer %><br/>
+Rabais commerçants: <%= totalDiscount %><br/>
 Montant total provisoire: <%= totalWithFees %> CHF<br/>
 Date de livraison: <b>Le <%= shippingWhen %> </b><br/>
 Adresse de livraison: <br/>
@@ -85,7 +88,7 @@ Adresse de livraison: <br/>
 # <%- order.shipping.postalCode %>, <%- order.shipping.region %> <br/>
 
 <h4>Paiement et montant</h4>
-Vous recevrez une facture détaillée par e-mail avant la livraison.<br/>
+Vous recevrez une facture détaillée par e-mail au moment de la livraison.<br/>
 Le total de la commande peut être ajusté dans le cas où vous avez commandé des produits à poids variables dont le prix est connu le jour de la livraison. 
 Aussi, si un produit devait être en rupture de stock, il sera déduit de la facture finale.<br/>
 <br/>
@@ -96,7 +99,7 @@ Avec nos meilleurs messages,<br/>
  | ' / __ _ _ __ _| |__   ___  _   _ 
  |  < / _` | '__| | '_ \ / _ \| | | |
  | . \ (_| | |  | | |_) | (_) | |_| |
- |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|
+ |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|.ch
     
 </pre>
 ----<br/>

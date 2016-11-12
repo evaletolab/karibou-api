@@ -37,7 +37,7 @@ exports.Orders=[
             number:'98xxxxxxx4123',
             alias:'01234567890',
             status:"voided",
-            fees:{shipping:0}
+            fees:{shipping:0, charge:0.029}
         },
 
         /* shipping adresse*/
@@ -109,7 +109,8 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"pending"
+            status:"pending",
+            fees:{charge:0.02}
         },
 
         fulfillments: {
@@ -187,7 +188,8 @@ exports.Orders=[
             issuer: "mastercard",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"paid"
+            status:"paid",
+            fees:{charge:0.029}
         },
 
         fulfillments: {
@@ -280,7 +282,8 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"paid"
+            status:"paid",
+            fees:{charge:0.02}
         },
 
         fulfillments: {
@@ -372,7 +375,8 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"paid"
+            status:"paid",
+            fees:{charge:0.02}
         },
 
         fulfillments: {
@@ -478,7 +482,8 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"paid"
+            status:"paid",
+            fees:{charge:0.02}
         },
 
         fulfillments: {

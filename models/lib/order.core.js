@@ -203,11 +203,26 @@ exports.coreCreate = function(oid,items,customer,shipping,paymentData, vendors,c
   }
 
 
+
   //
   // ready to create one order
   var dborder =new Orders(order);
 
+  //
+  // fees
   dborder.payment.fees.shipping=dborder.getShippingPrice();
+  dborder.payment.fees.charge=config.shared.order.gateway.reduce(function(p,gateway,i) {
+    if(gateway.label===paymentData.issuer){
+      return gateway.fees;
+    }
+    return p;
+  });
+
+
+
+  //
+  // get discount offer by shops
+  dborder.computeDiscountAmountByShops();
 
   //
   // update rank for this valid order
@@ -230,7 +245,7 @@ exports.computeRankAndSave=function(cb){
   sd.setHours(1,0,0,0)
   ed=new Date(sd.getTime()+86400000-3601000);
 
-  this.model('Orders').find({"shipping.when":{"$gte": sd, "$lt": ed}}).exec(function(err,orders){
+  this.model('Orders').find({"shipping.when":{"$gte": sd, "$lt": ed}}).select('_id rank').exec(function(err,orders){
     var newRank=0;
     for (var i = orders.length - 1; i >= 0; i--) {
       newRank=Math.max(newRank,orders[i].rank);

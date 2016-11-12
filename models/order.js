@@ -85,12 +85,6 @@ var Orders = new Schema({
         shipping:{type:Number}
       },
 
-      /* discout is an amount offer by a shop */
-      discount:[{
-        amount:Number,
-        vendor:{type:String}
-      }],
-
       /* for security reason transaction data are encrypted */
       transaction:{type:String,select:false}
    },
@@ -153,7 +147,16 @@ var Orders = new Schema({
       lat:{type:Number, required: false},
       lng:{type:Number, required: false}
     },
-    collected:{type:Boolean,default:false}
+    collected:{type:Boolean,default:false},
+    //
+    // you can see values only when uid is order.owner, shop.owner, or admin 
+    // amount & threshold & finalAmount & are saved for security reason
+    discount:{
+      amount:{type:Number,min:0,default:0,select:true},
+      threshold:{type: Number,min:0,select:true},
+      finalAmount:{type: Number,min:0,default:0,select:true}
+    }
+
    }],
 
    shipping:{
@@ -187,6 +190,9 @@ Orders.statics.printInfo=utils.printInfo;
 Orders.statics.prepare=utils.prepare;
 Orders.methods.equalItem=utils.equalItem;
 Orders.methods.getShippingPrice=utils.getShippingPrice;
+Orders.methods.computeDiscountAmountByShops=utils.computeDiscountAmountByShops;
+Orders.methods.getTotalDiscount=utils.getTotalDiscount;
+Orders.methods.getExtraDiscount=utils.getExtraDiscount;
 Orders.methods.getTotalPrice=utils.getTotalPrice;
 Orders.methods.getSubTotal=utils.getSubTotal;
 Orders.methods.getDateString=utils.getDateString;
@@ -224,6 +230,7 @@ Orders.statics.convertOrdersToRepportForShop=format.convertOrdersToRepportForSho
 Orders.statics.getStatsByOrder=stats.getStatsByOrder;
 Orders.statics.favoriteProductsVsUsers=stats.favoriteProductsVsUsers;
 Orders.statics.getSellValueByYearAndWeek=stats.getSellValueByYearAndWeek;
+Orders.statics.getCAByVendor=stats.getCAByVendor;
 Orders.statics.getCAByYearMonthAndVendor=stats.getCAByYearMonthAndVendor;
 Orders.statics.ordersByPostalVsUsersByPostal=stats.ordersByPostalVsUsersByPostal;
 Orders.statics.ordersByUsers=stats.ordersByUsers;
@@ -352,8 +359,15 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
       address:address,
       fees:product.vendor.account.fees,
       geo:geo,
-      discount:product.vendor.discount
+      discount:{}
   };
+
+  //
+  // case of discount
+  if(product.vendor.discount.active){
+    vendor.discount.threshold=product.vendor.discount.threshold;
+    vendor.discount.amount=product.vendor.discount.amount;
+  }
 
   //
   // duplicate fees to simplify repport
