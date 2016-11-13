@@ -50,6 +50,8 @@ var Product = new Schema({
       natural:{type:Boolean, default:false},       // Synthetic Pesticide & Fertilizer Free
       local:{type:Boolean, default:false},         // Produit dans notre ferme
       bio:{type:Boolean, default:false},           // Certified Organic
+      biodynamics:{type:Boolean, default:false},   // Biodynamics 
+      bioconvertion:{type:Boolean, default:false}, // Bio convertion 
       vegetarian:{type: Boolean,default:false},
       biodegradable:{type:Boolean, default:false}, //  
    },  
