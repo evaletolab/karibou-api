@@ -1,17 +1,11 @@
 #!/bin/env node
 //
-// check links
-// https://github.com/madhums/node-express-mongoose-demo
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
 // mongo/express sample 
 // https://gist.github.com/1025038
 // dynamic helpers
 // http://stackoverflow.com/questions/6331776/accessing-express-js-req-or-session-from-jade-template
 // http://stackoverflow.com/questions/11580796/migrating-express-js-2-to-3-specifically-app-dynamichelpers-to-app-locals-use
 
-//
-// start newrelic logs here
-//require('newrelic');
 
 if(process.env.NODETIME_KEY){
   var nodetime=require('nodetime').profile({
