@@ -696,12 +696,12 @@ Product.statics.findByCriteria = function(criteria, callback){
     //
     // shops && available && available.find(shops._id)
     if(shops&&available){        
-      var okshops=[];
+      var okshops=[], compareIds=available.map((a)=> {return a.toString()});
       shops.forEach(function(shop) {
-        if(_.find(available,shop)){
+        if(compareIds.indexOf(shop.toString())>-1){
           okshops.push(shop);
         }
-      })
+      });
       query=query.where("vendor").in(okshops);
     }else 
     
