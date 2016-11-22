@@ -286,7 +286,7 @@ exports.github=function(req,res){
 
   //
   // github sig
-  function verify(key, body) {
+  function verify_hook(key, body) {
     var str=JSON.stringify(body);
     return 'sha1=' + require('crypto').createHmac('sha1', key).update(str).digest('hex')
   }
@@ -309,7 +309,7 @@ exports.github=function(req,res){
   var  sig   = req.headers['x-hub-signature']
       ,event = req.headers['x-github-event']
       ,id    = req.headers['x-github-delivery']  
-      ,verify= verify(config.admin.webhook.secret,req.body)
+      ,verify= verify_hook(config.admin.webhook.secret,req.body)
 
 
   if(!sig||!event||!id){
@@ -340,3 +340,4 @@ exports.github=function(req,res){
   // CI done
   return res.sendStatus(200)
 }
+

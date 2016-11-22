@@ -5,6 +5,11 @@ var data=require('./Categories.js');
 // 1product  ->shop[1](mon-shop, id:0005, status:false, owner:gmail)
 // 0product  ->shop[2](invalid-shop, id:0006, status:Date.now, owner:gluck)
 
+// data.Categories[0] -> alimentaire
+// data.Categories[1] -> fruits
+// data.Categories[2] -> legumes
+// data.Categories[3] -> poissons
+
 exports.Products=[{
     _id : new ObjectId(), 
      sku:1000001,
