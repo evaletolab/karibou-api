@@ -160,6 +160,43 @@ exports.findByOwner=function (req, res) {
 };
 
 
+exports.search=function(req,res){
+  var Products=db.model('Products');
+
+  //
+  // TODO - make a service, 
+  //    txt length>=3, typeof String 
+  //    typeof bio == boolean, 
+  //    when=undefined||1||next||date 
+  var bio=(req.query.bio)?true:false;
+  var search=req.query.q;
+
+
+
+  Products.find({
+    $text:{$search:search}, $or:[
+      {'details.bio':bio},
+      {'details.biodynamics':bio},
+      {'details.bioconvertion':bio}      
+    ],$and:[
+      {'attributes.available':true},
+      {'pricing.stock':{$gt:0}}      
+    ]
+  },{
+    score: {$meta: "textScore"}
+  })
+  .populate('vendor')
+  .populate('categories')
+  .sort({score:{$meta:"textScore"}}).exec(function(err,products){
+    if(err){
+      return res.status(400).send( err.message);      
+    }
+    return res.json(products);
+  });
+  
+
+}
+
 //
 // List products
 // /v1/products/category/:category
