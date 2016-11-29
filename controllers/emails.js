@@ -14,10 +14,6 @@ var check = require('../app/validator').check,
     _=require('underscore');
 
 
-function check(req){
-    if(req.body&&req.body.email) check(req.body.email).len(3, 40).isEmail();
-    
-}
 
 exports.create=function (req, res) {
  
