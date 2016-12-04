@@ -223,7 +223,7 @@ exports.createWallet=function (req,res) {
     var body=_.extend({},req.body);
     var content={
       wallet:wallet,
-      user:req.user,
+      user:req.user.toObject(),
       query:body,
       origin:req.header('Origin')||config.mail.origin,
       withHtml:true

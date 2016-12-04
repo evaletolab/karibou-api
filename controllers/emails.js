@@ -29,7 +29,7 @@ exports.create=function (req, res) {
       return res.status(400).send(err);
     }      
     
-    var content=req.user;
+    var content=req.user.toObject();
     content.validate=validate;
     content.origin=req.header('Origin')||config.mail.origin;
     console.log(content.origin+'/validate/'+validate.uid+'/'+validate.email)
