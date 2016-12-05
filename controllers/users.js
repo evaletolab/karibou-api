@@ -108,7 +108,7 @@ exports.recover=function(req,res){
 
       //
       // change the password
-      var content=user;
+      var content=user.toObject();
       content.password=user.password=password();
       content.origin=req.header('Origin')||config.mail.origin;
       user.save(function(err){
