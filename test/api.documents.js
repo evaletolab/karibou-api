@@ -129,7 +129,7 @@ describe("api.documents", function(){
         });
     });
 
-    it('GET /v1/documents with no owner should return 200',function(done){
+    it.skip('GET /v1/documents with no owner should return 200',function(done){
       request(app)
         .get('/v1/documents')
         .set('cookie', cookie)
