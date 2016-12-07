@@ -68,7 +68,7 @@ exports.validate=function (req, res) {
     }
     
 
-    return res.send("Ok");  
+    return res.json(user.toObject());  
   });
 };
 

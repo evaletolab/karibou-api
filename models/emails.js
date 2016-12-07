@@ -93,7 +93,8 @@ Emails.statics.create = function(user, callback){
 //
 // validate email 
 Emails.statics.validate=function(uid,email,callback){
-	var Emails=this.model('Emails');	
+	var Emails=this.model('Emails');
+  var Users=this.model('Users');
 	
 
 	//
@@ -129,13 +130,14 @@ Emails.statics.validate=function(uid,email,callback){
     };
     
     validate.owner.email.status=true;
-    
-    return validate.owner.save(function (err) {
+    Users.findOneAndUpdate({id:validate.owner.id}, {$set:{'email.status': true}}, {new: true}, 
+    function(err, owner){
       //
       // remove this validation process
       if (!err) validate.remove();
-      return callback(err, validate.owner);
+      return callback(err, owner);
     });
+
   });
 };
 
