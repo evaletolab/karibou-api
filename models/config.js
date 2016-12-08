@@ -28,6 +28,14 @@ var Config = new Schema({
       active:{type:Boolean,default:false}
     },
 
+
+    //
+    // display header content
+    header:{
+      message:{en:String,fr:String,de:String},
+      active:{type:Boolean,default:false}
+    },
+
     //
     // display checkout message
     checkout:{
