@@ -610,7 +610,7 @@ Product.statics.findByCriteria = function(criteria, callback){
     // specify full shipping week 
     var nextShippingDays=Date.fullWeekShippingDays(8);
     // specify a custom date
-    if(criteria.when){
+    if(criteria.when && nextShippingDays.length){
       // FIXME what if date is not valid?
       if(['on',true,'true','next'].indexOf(criteria.when)>-1){
         nextShippingDays=[nextShippingDays[0]];
@@ -696,12 +696,12 @@ Product.statics.findByCriteria = function(criteria, callback){
     //
     // shops && available && available.find(shops._id)
     if(shops&&available){        
-      var okshops=[];
+      var okshops=[], compareIds=available.map((a)=> {return a.toString()});
       shops.forEach(function(shop) {
-        if(_.find(available,shop)){
+        if(compareIds.indexOf(shop.toString())>-1){
           okshops.push(shop);
         }
-      })
+      });
       query=query.where("vendor").in(okshops);
     }else 
     

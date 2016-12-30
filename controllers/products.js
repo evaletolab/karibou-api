@@ -535,9 +535,6 @@ exports.update=function (req, res) {
         return res.status(401).send( "Your are not allowed to do that, arch!");    
       }
 
-      if(!product.vendor._id.equals(req.body.vendor)){
-        return res.status(400).send('Ooops, unknow product vendor '+req.body.vendor);          
-      }
     }
 
     //

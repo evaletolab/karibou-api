@@ -181,6 +181,8 @@ exports.createWallet=function (req,res) {
   var amount=parseFloat(req.body.amount);
   var charged=0;
   var stripeCharge={};
+  var user=req.user.toObject();
+  var body=_.extend({},req.body);
 
   //
   // 
@@ -188,8 +190,8 @@ exports.createWallet=function (req,res) {
 
   payment.for(req.body.payment.issuer).charge({
     amount: payment.fees(req.body.payment.issuer,amount+print)+(amount+print),
-    description: "#giftcard of "+req.body.amount+" for "+req.user.email.address
-  },alias,req.user).then(function(charge) {
+    description: "#giftcard of "+req.body.amount+" for "+user.email.address
+  },alias,user).then(function(charge) {
     //
     // payment fees makes amout bigger
     assert((charge.amount/100)>=(amount+print));
@@ -198,8 +200,8 @@ exports.createWallet=function (req,res) {
     //
     // create the giftcode
     var wallet={
-      id:req.user.id,
-      email:req.user.email.address,
+      id:user.id,
+      email:user.email.address,
       description:'Carte cadeau karibou.ch',
       giftcode:true    
     };
@@ -220,16 +222,15 @@ exports.createWallet=function (req,res) {
   }).then(function (wallet) {
     //
     // send mail
-    var body=_.extend({},req.body);
     var content={
       wallet:wallet,
-      user:req.user,
+      user:user,
       query:body,
       origin:req.header('Origin')||config.mail.origin,
       withHtml:true
     };
     bus.emit('sendmail',wallet.email,'Votre carte cadeau Karibou ',content,'wallet-new');
-    bus.emit('activity.create',req.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
+    bus.emit('activity.create',content.user,{type:'Wallets',key:'wid',id:wallet.wid},wallet.card);
     //
     // this makes test happy
     wallet._charged=charged;
@@ -265,10 +266,10 @@ exports.updateExpiry=function (req,res) {
 
   var wid=decodeURIComponent(req.params.wid);
   bank.wallet.updateExpiry(wid,req.body.expiry).then(function (wallet) {
-    bus.emit('activity.update',req.user,{type:'Wallets',key:'wid',id:wid},req.body);
+    bus.emit('activity.update',user,{type:'Wallets',key:'wid',id:wid},req.body);
     res.json(wallet);
   }).then(undefined, function (err) {
-    bus.emit('activity.error',req.user,{type:'Wallets',key:'wid',id:wid},{expiry:req.body.expiry,error:err});
+    bus.emit('activity.error',user,{type:'Wallets',key:'wid',id:wid},{expiry:req.body.expiry,error:err});
     return res.status(400).send(err.message||errorHelper(err))
   });
 

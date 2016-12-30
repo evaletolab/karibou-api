@@ -50,6 +50,7 @@ var Document = new Schema({
   published:{type:Boolean,default:false},
 
   skus:[Number],
+  skuByCategory:{type:Boolean,default:false},
   type: {type:String, required:true
          ,validate: {
           validator: EnumDocumentType,

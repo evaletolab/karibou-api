@@ -14,10 +14,6 @@ var check = require('../app/validator').check,
     _=require('underscore');
 
 
-function check(req){
-    if(req.body&&req.body.email) check(req.body.email).len(3, 40).isEmail();
-    
-}
 
 exports.create=function (req, res) {
  
@@ -33,7 +29,7 @@ exports.create=function (req, res) {
       return res.status(400).send(err);
     }      
     
-    var content=req.user;
+    var content=req.user.toObject();
     content.validate=validate;
     content.origin=req.header('Origin')||config.mail.origin;
     console.log(content.origin+'/validate/'+validate.uid+'/'+validate.email)
@@ -72,7 +68,7 @@ exports.validate=function (req, res) {
     }
     
 
-    return res.send("Ok");  
+    return res.json(user.toObject());  
   });
 };
 

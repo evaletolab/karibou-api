@@ -142,6 +142,7 @@ describe("api.validate", function(){
       .get('/v1/validate/'+uid+'/evaleto@gluck.com')
       .set('cookie', cookie)
       .end(function(err,res){
+        res.body.email.status.should.equal(true);
         res.should.have.status(200);        
         done()
       });

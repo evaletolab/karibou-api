@@ -219,7 +219,7 @@ exports.register_post= function(req, res,next) {
             //
             // send mail validation after user creation
             var origin=req.header('Origin')||config.mail.origin;
-            db.model('Emails').createAndSendMail(user,origin,function(err,validate){
+            db.model('Emails').createAndSendMail(user.toObject(),origin,function(err,validate){
               if(err){
                 bus.emit('system.message',"[karibou-register.mail] karibou error: ",
                   {message:err.message,stack:err.stack});

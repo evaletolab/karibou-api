@@ -56,8 +56,14 @@ var queryFilterByUser=function (q,req) {
 
 
 
+//
+// if user is admin your get all the documents!
 exports.findByOwner=function (req, res) {
-  Documents.findByCriteria({uid:req.user.id},function(err,docs){
+  var q={};
+  if(!req.user.isAdmin()){
+    q.uid=req.user.id;
+  }
+  Documents.findByCriteria(q,function(err,docs){
     if (err) {
       return res.status(400).send(err);
     }
@@ -95,7 +101,7 @@ exports.get=function (req, res) {
     // fetch products associated with this doc
     if(doc.skus){
       // return Documents.model('Products').findBySkus(doc.skus,function (err,products) {
-      return Documents.model('Products').findByCriteria({status:true,available:true,skus:doc.skus},function (err,products) {
+      return Documents.model('Products').findByCriteria({when:true,status:true,available:true,instock:true,skus:doc.skus},function (err,products) {
         var result=doc.toObject();
         result.products=products;
         return res.json(result);
