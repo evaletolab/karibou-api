@@ -171,6 +171,22 @@ describe("products.find:", function(){
     });  
 
   });
+
+  it("Find product when noshipping", function(done){
+    var today=new Date(), all=[];
+    config.shared.noshipping=[];
+    config.shared.noshipping.push({from:today.plusDays(-2),to:today.plusDays(9),reason:'1'});
+
+    var criteria={ status: true,when:'on' };
+    Products.findByCriteria(criteria,function(err,products){
+      should.not.exist(err);
+      should.exist(products);
+      products.length.should.equal(2)
+      config.shared.noshipping=[];
+      done();
+    });  
+
+  });
   
 
   it.skip("Product could have a related products", function(done){
