@@ -827,9 +827,9 @@ Product.index({
     "details.keywords":"text" 
   }, 
   {"weights": { 
-    "title": 2, 
+    "title": 3, 
     "details.keywords":2, 
-    "details.origin":2 , 
+    "details.origin":1 , 
     "details.description":1 
   },"default_language":"french"});
 

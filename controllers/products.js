@@ -191,7 +191,15 @@ exports.search=function(req,res){
     if(err){
       return res.status(400).send( err.message);      
     }
-    return res.json(products);
+    //
+    // TODO rewrite search function
+    var result=products.filter(function(product){
+      if(product._doc.score<0.8 || (product.vendor&&product.vendor.status==false)){
+        return false;
+      }
+      return true;
+    });
+    return res.json(result);
   });
   
 
