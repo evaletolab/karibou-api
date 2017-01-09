@@ -111,10 +111,6 @@ var Users=exports.Users=[{
         status: true,
         address: "delphine@gmail.com"
     },
-    name: {
-        familyName: "delphine",
-        givenName: "pluck"
-    },    
     displayName: "delphine pluck",
     likes: [],
     invoices: [],
