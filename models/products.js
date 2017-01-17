@@ -855,7 +855,7 @@ Product.index({
   }, 
   {"weights": { 
     "title": 3, 
-    "details.internal":3, 
+    "details.internal":4, 
     "details.keywords":1, 
     "details.origin":1 , 
     "details.description":1 
