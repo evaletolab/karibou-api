@@ -841,8 +841,8 @@ Product.index({
   }, 
   {"weights": { 
     "title": 3, 
-    "details.keywords":3, 
-    "details.origin":2 , 
+    "details.keywords":1, 
+    "details.origin":1 , 
     "details.description":1 
   },"default_language":"french"});
 

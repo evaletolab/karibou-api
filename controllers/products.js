@@ -183,7 +183,6 @@ exports.search=function(req,res){
     pricing:0,
     photo:0,
     faq:0,
-    title:0,
     variants:0,
     categories:0,
     vendor:0,
@@ -196,16 +195,26 @@ exports.search=function(req,res){
     //
     // TODO rewrite search function
     var result=products.filter(function(product){
+      console.log('search -------------',search,product.title,product._doc.score);
       return (product._doc.score>=0.8);
-    }).map(function(product){ return product.sku;});
+    })
+    var skus=result.map(function(product){ return product.sku;});
     Products.findByCriteria({
       status:true,
       available:true,
       when:true,
-      skus:result
+      skus:skus
     })
     .then(function(products){
-      res.json(products)
+      var scored=products.map(function(prod){
+        return prod.toObject();
+      }).map(function(prod){
+        var meta=_.where(result,{sku:prod.sku});
+        prod.score=meta[0]._doc.score;
+        return prod;
+      });
+      scored=_.sortBy(scored,function(p){return -p.score;});
+      res.json(scored);
     });
 
   });
