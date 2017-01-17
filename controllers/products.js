@@ -175,8 +175,7 @@ exports.search=function(req,res){
 
   Products.find({
     $text:{$search:search}, 
-    'attributes.available':true,
-    'pricing.stock':{$gt:0}      
+    'attributes.available':true      
   },{
     details:0,
     attributes:0,
@@ -193,9 +192,8 @@ exports.search=function(req,res){
       return res.status(400).send( err.message);      
     }
     //
-    // TODO rewrite search function
+    // TODO move search function as service
     var result=products.filter(function(product){
-      console.log('search -------------',search,product.title,product._doc.score);
       return (product._doc.score>=0.8);
     })
     var skus=result.map(function(product){ return product.sku;});
@@ -214,6 +212,9 @@ exports.search=function(req,res){
         return prod;
       });
       scored=_.sortBy(scored,function(p){return -p.score;});
+      scored.forEach(function(prod){
+        console.log('search -------------',search,prod.title,prod.score);
+      });
       res.json(scored);
     });
 
