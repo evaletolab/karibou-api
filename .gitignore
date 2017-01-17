@@ -1,5 +1,6 @@
 config/config-production.js
 node_modules
+node_modules.*
 tips
 backups
 karibou.sublime-workspace

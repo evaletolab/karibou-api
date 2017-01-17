@@ -95,6 +95,74 @@ describe("orders.update", function(){
     });
   });
 
+  it("update issue for item sku:1000001 doesn not change issue ", function(done){
+    var oid=2000007;
+    var item={      
+      sku:1000002,
+      finalprice:6.0,
+      note:"j'ai mis 2 pièces",
+      fulfillment:{issue:"issue_missing_product"}
+    }
+
+    db.model('Orders').updateItem(oid,[item], function(err,order){
+      should.not.exist(err)
+      should.not.exist(order.items[1].fulfillment.issue)
+      done();
+    });
+  });
+
+  it("update issue for item sku:1000001  ", function(done){
+    var oid=2000007;
+    var item={      
+      sku:1000002,
+      finalprice:6.0,
+      note:"j'ai mis 2 pièces",
+      fulfillment:{issue:"issue_missing_product"}
+    }
+
+    db.model('Orders').updateIssue(oid,[item], function(err,order){
+      should.not.exist(err)
+      order.items[1].fulfillment.issue.should.equal("issue_missing_product")
+      done();
+    });
+  });
+
+
+  it("remove issue for item sku:1000001 ", function(done){
+    var oid=2000007;
+    var item={      
+      sku:1000002,
+      finalprice:6.0,
+      note:"j'ai mis 2 pièces",
+      fulfillment:{issue:"issue_no_issue"}
+    }
+
+    db.model('Orders').updateIssue(oid,[item], function(err,order){
+      should.not.exist(err)
+      should.not.exist(order.items[1].fulfillment.issue)
+      done();
+    });
+  });
+
+  it("update issue after limit of times get an error  ", function(done){
+    config.shared.issue.ttl=2;
+    var oid=2100000;
+    var item={      
+      sku:1000002,
+      finalprice:6.0,
+      note:"j'ai mis 2 pièces",
+      fulfillment:{issue:"issue_missing_product"}
+    }
+
+    db.model('Orders').updateIssue(oid,[item], function(err,order){
+      console.log(err)
+      should.exist(err);
+      err.should.containEql('une erreur après nb jours')
+      config.shared.issue.ttl=7;
+      done();
+    });
+  });
+
   it("update items finalprice, note, fulfillment ", function(done){
     var oid=2000007;
     var items=[{      
@@ -170,7 +238,7 @@ describe("orders.update", function(){
 
   it("get notified on update items", function(done){
       console.log('!!! ----------- VALIDATE THE TEST HERE -------------- :) !!!')
-      events.length.should.equal(3)
+      events.length.should.equal(4)
       done();
 
   });
