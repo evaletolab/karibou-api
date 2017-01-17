@@ -20,7 +20,11 @@ var Users=exports.Users=[{
     ],
     created : new Date("2013-03-27T17:07:34.201Z"), 
     id : 12345, 
-    invoices : [], 
+    invoices : [],
+    name: {
+        familyName: "String",
+        givenName: "String"
+    },     
     likes : [], 
     displayName : "olvier e", 
     email : { 
@@ -46,6 +50,10 @@ var Users=exports.Users=[{
     created : new Date("2013-03-27T17:07:34.201Z"), 
     id : 12346, 
     invoices : [], 
+    name: {
+        familyName: "Olivier",
+        givenName: "String"
+    },     
     likes : [], 
     displayName : "olvier pluck", 
     email : { 
@@ -114,6 +122,10 @@ var Users=exports.Users=[{
     displayName: "delphine pluck",
     likes: [],
     invoices: [],
+    name: {
+        familyName: "Delphine",
+        givenName: "String"
+    },     
     id: 12347,
     created: "2012-03-27T17:07:34.201Z",
     status: true,
@@ -154,6 +166,10 @@ var Users=exports.Users=[{
     displayName: "delphine pluck",
     likes: [],
     invoices: [],
+    name: {
+        familyName: "Delphine",
+        givenName: "String"
+    },     
     id: 1279482741765243,
     created: "2012-03-27T17:07:34.201Z",
     status: true,
@@ -194,6 +210,10 @@ var Users=exports.Users=[{
     displayName: "delphine pluck",
     likes: [],
     invoices: [],
+    name: {
+        familyName: "Delphine",
+        givenName: "String"
+    },     
     id: 1279482741765246,
     created: "2012-03-27T17:07:34.201Z",
     status: true,
