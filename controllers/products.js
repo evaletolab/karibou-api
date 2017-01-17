@@ -174,32 +174,40 @@ exports.search=function(req,res){
 
 
   Products.find({
-    $text:{$search:search}, $or:[
-      {'details.bio':bio},
-      {'details.biodynamics':bio},
-      {'details.bioconvertion':bio}      
-    ],$and:[
-      {'attributes.available':true},
-      {'pricing.stock':{$gt:0}}      
-    ]
+    $text:{$search:search}, 
+    'attributes.available':true,
+    'pricing.stock':{$gt:0}      
   },{
+    details:0,
+    attributes:0,
+    pricing:0,
+    photo:0,
+    faq:0,
+    title:0,
+    variants:0,
+    categories:0,
+    vendor:0,
     score: {$meta: "textScore"}
   })
-  .populate('vendor')
-  .populate('categories')
-  .sort({score:{$meta:"textScore"}}).exec(function(err,products){
+  .exec(function(err,products){
     if(err){
       return res.status(400).send( err.message);      
     }
     //
     // TODO rewrite search function
     var result=products.filter(function(product){
-      if(product._doc.score<0.8 || (product.vendor&&product.vendor.status==false)){
-        return false;
-      }
-      return true;
+      return (product._doc.score>=0.8);
+    }).map(function(product){ return product.sku;});
+    Products.findByCriteria({
+      status:true,
+      available:true,
+      when:true,
+      skus:result
+    })
+    .then(function(products){
+      res.json(products)
     });
-    return res.json(result);
+
   });
   
 
@@ -531,19 +539,19 @@ exports.update=function (req, res) {
   //body clean (avoid mongo warn !) 
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
-  
+
+  //
+  // if not admin  
+  if(!req.user.isAdmin()){
+    delete req.body.attributes.home;
+  }
+
+
   Products.findOne({sku:req.params.sku}).populate('vendor').exec(function(err,product){
     if (!product){
       return res.status(400).send('Ooops, unknow product '+req.params.sku);    
     }
 
-    // if not admin  
-    if(!req.user.isAdmin()){
-      if(req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
-        return res.status(401).send( "Your are not allowed to do that, arch!");    
-      }
-
-    }
 
     //
     // slug this product
@@ -559,6 +567,8 @@ exports.update=function (req, res) {
 
     // do the update
     _.extend(product,req.body)
+
+    console.log('-----------------',product)
 
     product.save(function (err) {
       if (err){

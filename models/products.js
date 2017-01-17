@@ -182,8 +182,21 @@ Product.methods.removeCategories=function(cats,callback){
 
 
 
-Product.post('save',function (product) {
+Product.pre('save',function (next) {
+  var product=this, keywords=product.details.keywords||'';
   cache.reset();
+  db.model('Categories').findOne(product.categories,function(err,cat){
+    if(err||!cat){
+      return next();
+    }  
+    keywords=cat.name;
+    if(product.details.biodynamics||product.details.bio||product.details.bioconvertion){    
+      keywords+=" bio organic organique biodinamie naturel biodynamics";
+    }
+
+    product.details.keywords=keywords;
+    next();
+  });
 });
 
 Product.post('remove',function (product) {
@@ -828,8 +841,8 @@ Product.index({
   }, 
   {"weights": { 
     "title": 3, 
-    "details.keywords":2, 
-    "details.origin":1 , 
+    "details.keywords":3, 
+    "details.origin":2 , 
     "details.description":1 
   },"default_language":"french"});
 
