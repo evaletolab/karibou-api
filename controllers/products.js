@@ -568,7 +568,6 @@ exports.update=function (req, res) {
     // do the update
     _.extend(product,req.body)
 
-    console.log('-----------------',product)
 
     product.save(function (err) {
       if (err){
