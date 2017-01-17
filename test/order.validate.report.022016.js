@@ -86,7 +86,7 @@ describe("orders.validate.report.022016", function(){
   //
   //
   it("validate report content with the new API 2.0 for Year", function(done){
-    var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
+    var month=criteria.from.getMonth()+1, year=2016;
     Orders.getCAByVendor({year:year,grouped:true},function (err,report) {
 
 
