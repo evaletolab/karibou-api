@@ -19,19 +19,25 @@ exports.execute = function(db, script, callback){
     categories.find({}).toArray(function(err,cats){
         cats.forEach(function(cat){
           _cat[cat._id]=cat;
-          console.log('--------------- 0',cat._id)
         });
 
         //
         // run update here
         require('async').each(p, function(product, eachcb){
             //      
-          console.log('--------------- 1',product.categories)
             product.details.keywords=_cat[product.categories].name;
-            if(product.details.biodynamics||product.details.bio||product.details.bioconvertion){    
-                product.details.keywords+=" bio organic organique biodinamie naturel biodynamics";
-            }
             
+            product.details.internal="";
+            if(product.details.biodynamics||product.details.bio||product.details.bioconvertion){    
+                product.details.internal=" bio organique organic biodinamie naturel biodynamics";
+            }
+            if(product.details.vegetarian){    
+                product.details.internal+=" vegan végétarien vegetarian";
+            }
+
+            product.details.keywords=product.details.keywords+' '+product.details.internal;
+            
+
             console.log(product.sku,'keywords:',product.details.keywords )
             products.save(product,function(err){
                 eachcb(err);        

@@ -39,6 +39,7 @@ var Product = new Schema({
    title: { type: String, required: true },
    slug: { type: String, required: false },
    details:{
+      internal:{ type: String, required: false },
       keywords:{ type: String, required: false },
       description:{type:String, required:true},
       comment:{type:String, required:false},
@@ -190,11 +191,23 @@ Product.pre('save',function (next) {
       return next();
     }  
     keywords=cat.name;
+    product.details.internal="";
     if(product.details.biodynamics||product.details.bio||product.details.bioconvertion){    
-      keywords+=" bio organic organique biodinamie naturel biodynamics";
+      product.details.internal=" bio organique organic biodinamie naturel biodynamics";
+    }
+    if(product.details.vegetarian){    
+      product.details.internal+=" vegan végétarien vegetarian";
     }
 
-    product.details.keywords=keywords;
+    if(product.details.gluten){    
+        product.details.internal+=" gluten glutenfree sans-gluten";
+    }
+
+    if(product.details.lactose){    
+        product.details.internal+=" lactose sans-lactose";
+    }
+
+    product.details.keywords=keywords+' '+product.details.internal;
     next();
   });
 });
@@ -835,12 +848,14 @@ Product.statics.findByCriteria = function(criteria, callback){
 // }).sort({score:{$meta:"textScore"}})
 Product.index({ 
     "title": "text",
+    "details.internal":"text",
     "details.description":"text",
     "details.origin":"text", 
     "details.keywords":"text" 
   }, 
   {"weights": { 
     "title": 3, 
+    "details.internal":3, 
     "details.keywords":1, 
     "details.origin":1 , 
     "details.description":1 
