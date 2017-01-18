@@ -32,7 +32,15 @@ exports.execute = function(db, script, callback){
                 product.details.internal=" bio organique organic biodinamie naturel biodynamics";
             }
             if(product.details.vegetarian){    
-                product.details.internal+=" vegan végétarien vegetarian";
+                product.details.internal+=" végétarien vegetarian";
+            }
+
+            if(product.details.gluten){    
+                product.details.internal+=" gluten glutenfree sans-gluten";
+            }
+
+            if(product.details.lactose){    
+                product.details.internal+=" lactose sans-lactose";
             }
 
             product.details.keywords=product.details.keywords+' '+product.details.internal;
