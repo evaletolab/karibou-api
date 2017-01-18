@@ -196,7 +196,7 @@ Product.pre('save',function (next) {
       product.details.internal=" bio organique organic biodinamie naturel biodynamics";
     }
     if(product.details.vegetarian){    
-      product.details.internal+=" vegan végétarien vegetarian";
+      product.details.internal+=" végétarien vegetarian";
     }
 
     if(product.details.gluten){    
