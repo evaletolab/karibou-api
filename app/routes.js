@@ -226,8 +226,10 @@ module.exports = function(app, config, passport) {
   
   // only valid user with valid alias can create new order
   app.post('/v1/orders', auth.ensureUserValid, orders.ensureValidAlias, queued(orders.create));
+
   // only valid shop that bellongs to the order can update the order
   app.post('/v1/orders/:oid/items', orders.ensureShopOwnerOrAdmin, queued(orders.updateItem));
+  app.post('/v1/orders/:oid/issue', auth.ensureAdmin, orders.updateIssue);
 
   // only owner to the order can cancel order
   // shop can only cancel their items
