@@ -180,6 +180,9 @@ Product.methods.removeCategories=function(cats,callback){
 
 */
 
+Product.statics.resetCache=function(){
+  cache.reset();
+};
 
 
 Product.post('save',function (product) {
@@ -200,6 +203,8 @@ Product.post('remove',function (product) {
 
 Product.on('index', function(err,o) {
 });
+
+
 
 Product.methods.getPrice=function(){
   if(this.attributes.discount && this.pricing.discount)

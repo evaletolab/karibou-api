@@ -249,11 +249,19 @@ Shops.statics.update=function(id,s,callback){
     //
     // get catalog from object._id or _id
     s.owner&&delete(s.owner);
-    //
-    // normalize times
+
     if(s.available){
+      //
+      // normalize times
       s.available.from&&s.available.from.setHours(0,0,0,0);
       s.available.to&&s.available.to.setHours(0,0,0,0);
+
+      //
+      // in this case, propagate the clearing cache
+      if(JSON.stringify(s.available)!==JSON.stringify(shop.available)){
+        this.model('Products').resetCache();
+
+      }
     }
     _.extend(shop,s);
 
@@ -303,6 +311,8 @@ Shops.statics.findAvailable=function(rangeDates,callback) {
     
     //
     // filter by date 
+    // to<= dateEnd || from > deatBegin
+    // !(from <=dateBegin && to > dateEnd )
     q['$or']=[
       {'available.active':{'$ne':true}},
       {'available.to':{'$lte':rangeDates[rangeDates.length-1]}},
