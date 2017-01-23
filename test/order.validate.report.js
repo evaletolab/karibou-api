@@ -130,15 +130,15 @@ describe("orders.validate.report", function(){
   it("validate report content with the new API 2.0 for Year", function(done){
     var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
     Orders.getCAByVendor({year:year,grouped:true},function (err,report) {
+      should.not.exist(report.shops['mon-shop'].products);
+      should.not.exist(report.shops['un-autre-shop'].products);
+      
       report.shops['mon-shop'].items.should.equal(2);
       report.shops['mon-shop'].amount.should.equal(5);
       report.shops['mon-shop'].orders.length.should.equal(2);
       report.shops['mon-shop'].fees.should.equal(1.13);
       report.shops['mon-shop'].contractFees.sort()[0].should.equal(0.15);
       report.shops['mon-shop'].contractFees.sort()[1].should.equal(0.3);
-      report.shops['mon-shop'].products.length.should.equal(1);
-      report.shops['mon-shop'].products[0].count.should.equal(1);
-      report.shops['mon-shop'].products[0].amount.should.equal(2.5);
 
       report.shops['super-shop'].items.should.equal(3);
       report.shops['super-shop'].amount.should.equal(10);
@@ -151,7 +151,6 @@ describe("orders.validate.report", function(){
       report.shops['un-autre-shop'].orders.length.should.equal(4);
       report.shops['un-autre-shop'].fees.should.equal(7.78);
       report.shops['un-autre-shop'].contractFees[0].should.equal(0.14);
-      report.shops['un-autre-shop'].products.length.should.equal(7);
       report.amount.should.equal(70.6);
       report.ca.should.equal(10.51);
       report.items.should.equal(22);
