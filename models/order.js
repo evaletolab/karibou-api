@@ -5,6 +5,7 @@ var assert = require("assert");
 var _=require('underscore');
 
 var mongoose = require('mongoose')
+  , Promise = mongoose.Promise
   , bus = require('../app/bus')
   , format=require('./lib/order.format')
   , utils=require('./lib/order.utils')
@@ -584,6 +585,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   var db=this
     , Orders=this.model('Orders'), vendors=[], skus=[],products=[];
 
+  var promise = new Promise;
 
   //
   // check all parameters
@@ -611,7 +613,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   .then(function (ps) {
     products=ps;
     if(skus.length!==products.length){
-      return callback("Certains produits sélectionnés n'existent plus, vérifier votre panier");
+      return promise.reject(new Error("Certains produits sélectionnés n'existent plus, vérifier votre panier"));
     }
 
     //
@@ -631,13 +633,13 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       //
       // unknow issue?
       if(err){
-        return callback(err)
+        return promise.reject(err);
       }
 
       //
       // items issue? return the lists of issues
       if((errors&&errors.length)){
-        return callback(null,{errors:errors})
+        return promise.resolve(null,{errors:errors});
       }
 
       //
@@ -654,6 +656,9 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   //
   // finally update stocks
   .then(function (order) {
+    if(order.errors){
+      return callback(null,order);
+    }
     order.updateProductQuantityAndSave(callback);
   })
 
