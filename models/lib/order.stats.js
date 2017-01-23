@@ -346,7 +346,7 @@ exports.getCAByVendor=function(filter,cb) {
        // {$cond:[{$eq:["$items.vendor","$vendors.slug"]},TRUE,FALSE]}
        {$group:{
              _id:{oid:"$oid",vendor:"$items.vendor"},
-             products:{$addToSet:{
+             products:{$push:{
               sku:"$items.sku",
               title:"$items.title",
               count:"$items.quantity",
@@ -367,7 +367,7 @@ exports.getCAByVendor=function(filter,cb) {
             name:{$first:"$name"}, vendor:{$first:"$_id.vendor"},
             orders:{$addToSet:"$_id.oid"},
             items:{$sum:"$items"},
-            products:{$addToSet:"$products"},
+            products:{$push:"$products"},
             amount:{$sum:"$amount"},
             discount:{$sum:"$discount"},
             fees:{$sum:{ $multiply: [ {$subtract:["$amount",{$ifNull:["$discount",0]}]}, "$fees" ]}},
@@ -396,6 +396,7 @@ exports.getCAByVendor=function(filter,cb) {
     });    
 
 
+
     //
     // set output with the grouped format
     if(filter.grouped){
@@ -412,14 +413,17 @@ exports.getCAByVendor=function(filter,cb) {
         var i=0;
         report.shops[result._id.vendor]=_.extend({},result);
         delete report.shops[result._id.vendor]._id;
-        result.products.forEach(function(product) {
-          if(e=_.findWhere(report.products,{sku:product.sku})){
-            e.count+=product.count;
-            e.amount+=product.amount;
+        result.products.forEach(function(product,i) {
+          var elem=_.findWhere(report.products,{sku:product.sku})
+          if(elem){
+            elem.count+=product.count;
+            elem.amount+=product.amount;
             return;
           }
+          product.vendor=result.vendor;
           report.products.push(product);
         });
+        delete report.shops[result._id.vendor].products;
         ca+=result.fees;
         amount+=result.amount;
         items+=result.items;
