@@ -216,6 +216,7 @@ Orders.statics.findByCriteria=finds.findByCriteria;
 // import manage API
 Orders.statics.validateParams = core.validateParams;
 Orders.statics.updateItem = core.updateItem;
+Orders.statics.updateIssue = core.updateIssue;
 Orders.statics.updateLogistic =core.updateLogistic;
 Orders.statics.coreCreate =core.coreCreate;
 Orders.methods.computeRankAndSave=core.computeRankAndSave;

@@ -36,6 +36,9 @@ module.exports = {
   },
 
   issue:{
+    //
+    // limit of time to create an issue after order is closed
+    ttl:365,
     code:[
     "issue_no_issue",
     "issue_missing_client_id",
