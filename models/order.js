@@ -5,6 +5,7 @@ var assert = require("assert");
 var _=require('underscore');
 
 var mongoose = require('mongoose')
+  , Promise = mongoose.Promise
   , bus = require('../app/bus')
   , format=require('./lib/order.format')
   , utils=require('./lib/order.utils')
@@ -100,7 +101,7 @@ var Orders = new Schema({
       category:{type:String, required:true},
 
       // customer quantity
-      quantity:{type:Number, min:1, max:100, requiered:true},
+      quantity:{type:Number, min:1, max:200, requiered:true},
       // given price
       price:{type:Number, min:0, max:2000, requiered:true},
       part:{type: String, required: true},
@@ -252,6 +253,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg31="Une erreur c'est produite avec cet article (2)"
     , msg32="Une erreur c'est produite avec cet article (3)"
     , msg4="La quantité d'achat minimum est de 1 "
+    , msg41="La quantité d'achat maximum est de 200 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivée"
     , msg6="Ce produit n'est pas disponible car la boutique sera fermée ce jour là"
     , msg7="La quantité souhaitée n'est pas disponible "
@@ -400,6 +402,10 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   // check if item.quantity <1
   if(item.quantity<1){
     return cb(msg4,item)
+  }
+  // check if item.quantity >200
+  if(item.quantity>200){
+    return cb(msg41,item)
   }
 
   //
@@ -579,6 +585,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   var db=this
     , Orders=this.model('Orders'), vendors=[], skus=[],products=[];
 
+  var promise = new Promise;
 
   //
   // check all parameters
@@ -606,7 +613,7 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   .then(function (ps) {
     products=ps;
     if(skus.length!==products.length){
-      return callback("Certains produits sélectionnés n'existent plus, vérifier votre panier");
+      return promise.reject(new Error("Certains produits sélectionnés n'existent plus, vérifier votre panier"));
     }
 
     //
@@ -626,13 +633,13 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
       //
       // unknow issue?
       if(err){
-        return callback(err)
+        return promise.reject(err);
       }
 
       //
       // items issue? return the lists of issues
       if((errors&&errors.length)){
-        return callback(null,{errors:errors})
+        return promise.resolve(null,{errors:errors});
       }
 
       //
@@ -649,6 +656,9 @@ Orders.statics.create = function(items, customer, shipping, paymentData, callbac
   //
   // finally update stocks
   .then(function (order) {
+    if(order.errors){
+      return callback(null,order);
+    }
     order.updateProductQuantityAndSave(callback);
   })
 
