@@ -36,7 +36,7 @@ exports.Orders=[
             issuer: "tester",
             number:'98xxxxxxx4123',
             alias:'01234567890',
-            status:"voided"
+            status:"paid"
         },
 
 
