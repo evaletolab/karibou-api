@@ -144,6 +144,25 @@ describe("orders.validate.item", function(){
 
   });    
 
+  it("Error:item quantity in cart is to high ", function(done){
+    shipping.when=okDay
+
+    items=[]
+    items.push(Orders.prepare(data.Products[0], 201, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      //console.log(err)
+      should.exist(order.errors)
+      order.errors[0]['1000001'].should.containEql("quantité d'achat maximum est de")
+      done();          
+    });
+
+  });    
+
   it("Error:item final price is not correct ", function(done){
     shipping.when=okDay
 

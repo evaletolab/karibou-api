@@ -119,6 +119,13 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
     return promise.reject(new Error('shipping address is missing or imcomplet.'));
   }
 
+  //
+  // checking postalCode
+  if(config.shared.user.location.list.indexOf(shipping.postalCode+'')==-1){
+    return promise.reject(new Error('Votre code postal n\'est malheureusement pas disponible pour la livraison'));    
+  }
+
+
   return promise.resolve();
 }
 

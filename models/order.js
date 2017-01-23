@@ -100,7 +100,7 @@ var Orders = new Schema({
       category:{type:String, required:true},
 
       // customer quantity
-      quantity:{type:Number, min:1, max:100, requiered:true},
+      quantity:{type:Number, min:1, max:200, requiered:true},
       // given price
       price:{type:Number, min:0, max:2000, requiered:true},
       part:{type: String, required: true},
@@ -251,6 +251,7 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
     , msg31="Une erreur c'est produite avec cet article (2)"
     , msg32="Une erreur c'est produite avec cet article (3)"
     , msg4="La quantité d'achat minimum est de 1 "
+    , msg41="La quantité d'achat maximum est de 200 "
     , msg5="Ce produit n'est pas disponible car la boutique a été désactivée"
     , msg6="Ce produit n'est pas disponible car la boutique sera fermée ce jour là"
     , msg7="La quantité souhaitée n'est pas disponible "
@@ -399,6 +400,10 @@ Orders.statics.checkItem=function(shipping, item, product, cb){
   // check if item.quantity <1
   if(item.quantity<1){
     return cb(msg4,item)
+  }
+  // check if item.quantity >200
+  if(item.quantity>200){
+    return cb(msg41,item)
   }
 
   //
