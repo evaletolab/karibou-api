@@ -8,6 +8,7 @@
     "npm": "3.5.x"
   },
   "dependencies": {
+    "appdynamics": "^4.2.3",
     "async": "2.x",
     "body-parser": "^1.14.1",
     "compression": "^1.6.0",

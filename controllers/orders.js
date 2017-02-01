@@ -454,6 +454,36 @@ exports.updateItem=function(req,res){
   });
 }
 
+
+exports.updateIssue=function(req,res){
+
+  // check && validate input item
+  // ADMIN only
+  try{
+    validate.check(req.params.oid, "La commande n'est pas valide").isInt()
+    validate.orderIssue(req.body); 
+  }catch(err){
+    return res.status(400).send( err.message);
+  }
+
+  Orders.updateIssue(req.params.oid, req.body, function(err,order){
+    if(err){
+      return res.status(400).send( (err));
+    }
+
+    //
+    // admin only
+    if(req.user.isAdmin()){
+      return res.json(order)
+    }
+
+
+    var filtered=Orders.filterByShop([order],shop)
+    return res.json(filtered[0])
+  });
+}
+
+
 exports.updateShipping=function(req,res){
 
   // check && validate input 

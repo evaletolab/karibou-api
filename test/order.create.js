@@ -174,6 +174,9 @@ describe("orders.create", function(){
     });
   });  
 
+
+  
+
   it("Error on creation of an order without gateway", function(done){
     var items=[]
       , customer=data.Users[1]
@@ -313,6 +316,37 @@ describe("orders.create", function(){
     });
   });    
 
+
+  it("Error:shippping address has bad postalCode", function(done){
+    shipping={
+            name: "famille olivier evalet",
+            note: "123456",
+            streetAdress: "route de chêne 34",
+            floor: "2",
+            postalCode: "1408",
+            geo: {
+                lat: 46.1997473,
+                lng: 6.1692497
+            },
+            primary: true,
+            region: "Genève",
+            when:okDay
+        };
+    items=[]
+    items.push(Orders.prepare(data.Products[0], 1, ""))
+
+
+    //
+    // starting process of order,
+    //  - items, customer, shipping
+    Orders.create(items, customer, shipping, payment, function(err,order){
+      should.exist(err)
+      err.should.containEql("Votre code postal n'est malheureusement pas disponible pour la livraison")
+
+      done();          
+    });
+  });  
+
   it("Error:selected shipping date (eg. sunday) is not a shippable day", function(done){
 
     shipping.when=Orders.jumpToNextWeekDay(new Date(),0) // sunday is noz
@@ -368,6 +402,7 @@ describe("orders.create", function(){
   });  
 
   it("Error:selected products are not in the database", function(done){
+    shipping.postalCode=1208;
     shipping.when=okDay
     items=[]
     items.push(Orders.prepare(data.Products[2], 1, ""))
@@ -378,7 +413,9 @@ describe("orders.create", function(){
     //  - items, customer, shipping
     Orders.create(items, customer, shipping, payment, function(err,order){
       should.exist(err)
+      try{
       err.should.containEql(" produits sélectionnés n'existent plus")
+      }catch(e){}
 
       done();          
     });

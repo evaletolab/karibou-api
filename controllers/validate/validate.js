@@ -268,6 +268,14 @@ var order_items = exports.orderItems = function(items, update){
     check(items[i].finalprice,  "Le prix final n'est pas valide").isFloat()
   }
 }
+
+exports.orderIssue = function(items){
+  for (var i in items){
+    check(items[i].sku,'le format du produit est incompatible').isNumeric()
+    check(items[i].fulfillment.issue,'le format de l\'erreur est incompatible').isText().len(3, 100);
+  }
+}
+
 /**
  *
  */

@@ -84,11 +84,35 @@ describe("orders.validate.report.022016", function(){
 
 
   //
-  //
+  //  - Pain naturellement sans gluten, 42.00, 7, total:42.00 (1000313 7x vs 5x)
+  //  - Gâteau à l’orange, 28.00, 7, total:70.00
+  //  - Quiche salée, 30.00, 5, total:100.00
+  //  - Lasagne, 55.00, 5, total:155.00
+  //  - Muffin salé (naturellement sans gluten), 25.00, 5, total:180.00
+  //  - Pizza de farine mi-blanche aux légumes grillés, 48.00, 4, total:228.00
+  //  - Parmigiana d’aubergines, 44.00, 4, total:272.00
+  //  - Petit caprèse  au chocolat noir, 18.00, 3, total:290.00 (1000306 3x vs 5x)
+  //  - Tiramisu, 20.00, 2, total:310.00
+  //  - Pâtes d'épeautre BIO avec sauce noix, 36.00, 2, total:346.00
+  //  - Pizza Margherita de farine mi-blanche, 10.00, 1, total:356.00
+  //  - Pain d’épices aux trois poivres, 12.00, 1, total:368.00
+  //  - Pate à tartiner chocolat noir/noisette, 15.00, 1, total:383.00
+  //  - Pâtes de blé BIO avec sauce tomate, 13.00, 1, total:396.00
+  
   it("validate report content with the new API 2.0 for Year", function(done){
-    var month=criteria.from.getMonth()+1, year=criteria.from.getFullYear();
+    var month=criteria.from.getMonth()+1, year=2016;
     Orders.getCAByVendor({year:year,grouped:true},function (err,report) {
 
+
+      // check quantity of products 
+      var sku1000313=report.products.filter(function(p){
+        return p.sku===1000313;
+      });
+      sku1000313[0].count.should.equal(7);
+      sku1000313[0].amount.should.equal(42);
+      sku1000313[0].vendor.should.equal('purogusto');
+      sku1000313.length.should.equal(1);
+            
 
       report.shops['purogusto'].items.should.equal(48);
       report.shops['purogusto'].amount.should.equal(396);

@@ -119,6 +119,13 @@ exports.validateParams=function (items, customer, shipping, paymentData, callbac
     return promise.reject(new Error('shipping address is missing or imcomplet.'));
   }
 
+  //
+  // checking postalCode
+  if(config.shared.user.location.list.indexOf(shipping.postalCode+'')==-1){
+    return promise.reject(new Error('Votre code postal n\'est malheureusement pas disponible pour la livraison'));    
+  }
+
+
   return promise.resolve();
 }
 
@@ -265,6 +272,8 @@ exports.updateLogistic = function(query,options, callback){
   assert(options);
   var saveTasks=[], Q=require('q');
 
+
+
   //
   // this is the simple case, just update the logistic price
   if(!isNaN(parseFloat(options.amount))){
@@ -274,7 +283,17 @@ exports.updateLogistic = function(query,options, callback){
     return this.findOne(query,function(err,order){
       if(err){
         return callback(err)
-      } 
+      }
+      
+      if(order.closed){
+        return callback("Impossible de modifier une commande fermée: "+query.oid);
+      }
+      //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+      if(["authorized"].indexOf(order.payment.status)==-1){
+        return callback("Impossible de modifier une commande sans validation financière : "+order.payment.status);
+      }
+
+
       order.payment.fees.shipping=parseFloat(options.amount);
       order.save(function (err) {
         if(err){return callback(err)}
@@ -443,14 +462,6 @@ exports.updateItem = function(oid,items, callback){
             if(item.fulfillment.status){
               order.items[i].fulfillment.status=item.fulfillment.status;
             }
-            if(item.fulfillment.issue){
-              order.items[i].fulfillment.issue=item.fulfillment.issue;
-              //
-              // reset issue?
-              if(item.fulfillment.issue=='issue_no_issue'){
-                order.items[i].fulfillment.issue=undefined;
-              }
-            }
           }
 
           //
@@ -467,10 +478,6 @@ exports.updateItem = function(oid,items, callback){
         }
       }
     })
-
-    // console.log('-----------> items:',_.collect(items,function(i){return i.sku}))
-    // console.log('-----------> order.items:',_.collect(order.items,function(i){return i.sku}))
-    // console.log('-----------> fulfillment:',_.collect(order.items,function(i){return i.fulfillment.status}))
 
 
     if(itemIds.length!==items.length){
@@ -493,6 +500,57 @@ exports.updateItem = function(oid,items, callback){
       }
     })
 
+    order.save(callback);
+  });
+}
+
+//
+// issue is admin only and is independant on order state
+// one exception, you cannot modify an issue after one week
+exports.updateIssue = function(oid,items, callback){
+  assert(oid);
+  assert(items);
+  var today=new Date();
+
+  db.model('Orders').findOne({oid:oid},function(err,order){
+    if(err){
+      return callback(err)
+    }
+    if(!order){
+      return callback("Impossible de trouver la commande: "+oid);
+    }
+
+    var ttl=config.shared.issue.ttl||7;
+    if(order.closed && order.closed.plusDays(ttl)<today){
+      return callback("Impossible d'enregistrer une erreur après nb jours: "+ttl);
+    }
+
+    //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+    if(["authorized","paid","partially_refunded","refunded"].indexOf(order.payment.status)==-1){
+      return callback("Impossible de modifier une commande avec le status financier : "+order.payment.status);
+    }
+    
+
+    items.forEach(function(item){
+      assert(item.sku);
+      for(var i in order.items){
+        if(order.equalItem(order.items[i],item)){
+          // if(config.shared.issue.code.indexOf(item.fulfillment.issue)===-1){
+          //   return callback("Impossible de notifier une erreur après une semaine: "+oid);        
+          // }
+          if(item.fulfillment.issue){          
+            order.items[i].fulfillment.issue=item.fulfillment.issue;
+          }
+          if(item.fulfillment.issue==='issue_no_issue'){
+            order.items[i].fulfillment.issue=undefined;
+          }
+        }
+      }
+    });
+
+    //
+    // notify this order has been successfully modified
+    bus.emit('order.update.issue',null,order,items)
     order.save(callback);
   });
 }
