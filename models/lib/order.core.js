@@ -272,6 +272,8 @@ exports.updateLogistic = function(query,options, callback){
   assert(options);
   var saveTasks=[], Q=require('q');
 
+
+
   //
   // this is the simple case, just update the logistic price
   if(!isNaN(parseFloat(options.amount))){
@@ -281,7 +283,17 @@ exports.updateLogistic = function(query,options, callback){
     return this.findOne(query,function(err,order){
       if(err){
         return callback(err)
-      } 
+      }
+      
+      if(order.closed){
+        return callback("Impossible de modifier une commande fermée: "+query.oid);
+      }
+      //["pending","authorized","partially_paid","paid","partially_refunded","refunded","voided"]
+      if(["authorized"].indexOf(order.payment.status)==-1){
+        return callback("Impossible de modifier une commande sans validation financière : "+order.payment.status);
+      }
+
+
       order.payment.fees.shipping=parseFloat(options.amount);
       order.save(function (err) {
         if(err){return callback(err)}
