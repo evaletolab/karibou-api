@@ -5,6 +5,7 @@ to sell their products locally. There is alpha frontend available here http://ka
 
 [![David](https://img.shields.io/david/karibou-ch/karibou-api.svg?style=flat)](https://david-dm.org/evaletolab/karibou-api)
 [![Build Status](https://travis-ci.org/karibou-ch/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab/karibou-api)
+<a href="https://gitter.im/karibou-ch/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/Join Chat.svg" alt="Gitter chat" height="20"></a>
 
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
