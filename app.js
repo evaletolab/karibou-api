@@ -8,14 +8,14 @@
 
 
 if(process.env.NODETIME_KEY){
-  var nodetime=require('nodetime').profile({
-      accountKey:process.env.NODETIME_KEY, 
-      appName: process.env.NODETIME_APP
-  });
+  // var nodetime=require('nodetime').profile({
+  //     accountKey:process.env.NODETIME_KEY, 
+  //     appName: process.env.NODETIME_APP
+  // });
 }
 
 if (process.env.MEWRELIC_KEY){
-  var newrelic=require('newrelic')
+//  var newrelic=require('newrelic')
 }
 
 if(process.env.VCAP_SERVICES){
