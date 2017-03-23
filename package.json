@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "async": "2.x",
-    "body-parser": "^1.14.1",
+    "body-parser": "1.x",
     "compression": "^1.6.0",
     "connect-mongo": "1.x",
     "cookie-parser": "1.x",
@@ -56,8 +56,8 @@
     "mocha": "3.x",
     "pow-mongoose-fixtures": "x",
     "should": "6.x",
-    "should-http": "0.x",
-    "supertest": "2.x"
+    "should-http": "0.0.1",
+    "supertest": "3.x"
   },
   "scripts": {
     "start": "node app.js",
