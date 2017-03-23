@@ -3,8 +3,8 @@ Karibou.ch is an open-source project aim to help the creation of an
 online community marketplace. Our goal is to allow local food producers, artisans and artists 
 to sell their products locally. There is alpha frontend available here http://karibou.evaletolab.ch/
 
-[![David](https://img.shields.io/david/evaletolab/karibou-api.svg?style=flat)](https://david-dm.org/evaletolab/karibou-api)
-[![Build Status](https://travis-ci.org/evaletolab/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab/karibou-api)
+[![David](https://img.shields.io/david/karibou-ch/karibou-api.svg?style=flat)](https://david-dm.org/evaletolab/karibou-api)
+[![Build Status](https://travis-ci.org/karibou-ch/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab/karibou-api)
 
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
