@@ -170,11 +170,6 @@ describe("orders.date", function(){
 
     parseFloat((all[all.length-1].getTime()-all[0].getTime())/86400000).should.be.below(7)
 
-    all.forEach(function(n,i){
-      // deprecated use containEql(n.getDay())
-      n.getHours().should.not.be.above(config.shared.order.timelimitH)
-      config.shared.order.weekdays.should.containEql(n.getDay())
-    })
     
 
     done();          

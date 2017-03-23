@@ -265,6 +265,21 @@ module.exports = function (app) {
 
 
   //
+  // http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats
+  // will tell you whether Daylight Savings Time is in effect.
+  Date.prototype.stdTimezoneOffset = function() {
+      var jan = new Date(this.getFullYear(), 0, 1);
+      var jul = new Date(this.getFullYear(), 6, 1);
+      return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+  }
+
+  Date.prototype.dst = function() {
+    return (this.getTimezoneOffset() < this.stdTimezoneOffset())?1:0;
+  }
+  Object.defineProperty(Array.prototype, "stdTimezoneOffset", { enumerable: false });
+  Object.defineProperty(Array.prototype, "dst", { enumerable: false });
+
+  //
   // label alphanum sort for this case "2000.10"
   Array.prototype.sortSeparatedAlphaNum=function (separator) {
     separator=separator||'.';

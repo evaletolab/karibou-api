@@ -130,16 +130,16 @@ describe("Users", function(){
   
   it('should return true if the user has role', function (done) {
       db.model('Users').findOne({id:1279482741765243},function(err,profile){
-        profile.hasRole('admin').should.be.true;
-        profile.hasRole('mod').should.be.true;
+        profile.hasRole('admin').should.be.true();
+        profile.hasRole('mod').should.be.true();
         done();
       });
    });
    
    it('should return false if the user does not have role', function (done) {
      db.model('Users').findOne({id:1279482741765243},function(err,profile){
-       profile.hasRole('astronaut').should.be.false;
-       profile.hasRole('cowboy').should.be.false;
+       profile.hasRole('astronaut').should.be.false();
+       profile.hasRole('cowboy').should.be.false();
        done();
      });
    });  

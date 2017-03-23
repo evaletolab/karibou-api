@@ -110,7 +110,7 @@ describe("Shops", function(){
     };
     Shops.update({name:s.name},s,function(err,shop){
         //shop.user.id.should.equal(user.id);
-        err.should.be.a.string;
+        err.should.be.a.String();
         done();
     });
 
@@ -131,7 +131,7 @@ describe("Shops", function(){
     
     };
     Shops.update({name:s.name},s,function(err,shop){
-        shop.details.bio.should.be.true;
+        shop.details.bio.should.be.true();
         shop.details.should.not.have.property('avoid');
         done();
     });
@@ -150,7 +150,7 @@ describe("Shops", function(){
     };
     Shops.update({},s,function(err,shop){
         //shop.user.id.should.equal(user.id);
-        err.should.be.a.String;
+        err.should.be.a.String();
         done();
     });
 
