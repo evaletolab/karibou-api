@@ -22,6 +22,22 @@ if(process.env.VCAP_SERVICES){
     //var vcap = JSON.parse(process.env.VCAP_SERVICES);
 }
 
+if(process.env.APPDYNAMICS){
+  require("appdynamics").profile({
+  controllerHostName: 'paid134.saas.appdynamics.com',
+  controllerPort: 443, 
+  
+  // If SSL, be sure to enable the next line
+  controllerSslEnabled: true,
+  accountName: 'Karibouch',
+  accountAccessKey: 'pll8l7k7suuf',
+  applicationName: 'karibou.ch',
+  tierName: 'front',
+  nodeName: 'process' // The controller will automatically append the node name with a unique number
+  });  
+}
+
+
 //
 // load env
 var express = require('express')
