@@ -147,7 +147,7 @@ describe("api.products", function(){
           // console.log(res.text)
           res.should.have.status(200);
           res.body.sku.should.equal(1000000);
-          res.body.categories.should.be.an.array;
+          res.body.categories.should.be.an.Object();
           res.body.vendor.should.be.an.instanceOf(Object)
           //res.body.manufacturer.location.should.equal("Genève");
           done();        
@@ -174,7 +174,7 @@ describe("api.products", function(){
         .end(function(err,res){
           res.should.have.status(200);
           res.body.sku.should.equal(1000001);
-          res.body.categories.should.be.an.array;
+          res.body.categories.should.be.an.Object();
           res.body.vendor.should.be.an.instanceOf(Object)
           //res.body.manufacturer.location.should.equal("Genève");
           done();        
@@ -201,7 +201,7 @@ describe("api.products", function(){
         .end(function(err,res){
           res.should.have.status(200);
           res.body.sku.should.equal(1000002);
-          res.body.categories.should.be.an.array;
+          res.body.categories.should.be.an.Object();
           res.body.vendor.should.be.an.instanceOf(Object)
           //res.body.categories.length.should.equal(2);
           done();        
@@ -282,7 +282,7 @@ describe("api.products", function(){
         .end(function(err,res){
           res.should.have.status(200);
           res.body.sku.should.equal(1000002);
-          res.body.categories.should.be.an.array;
+          res.body.categories.should.be.an.String();
           res.body.vendor.should.be.an.instanceOf(Object)
           //res.body.categories.length.should.equal(2);
           done();        

@@ -35,7 +35,6 @@
     "mongoose-error-helper": "0.x",
     "mongoose-validate": "x",
     "morgan": "1.x",
-    "newrelic": "1.x",
     "node-postfinance": "0.x",
     "nodemailer": "1.x",
     "passport": "0.x",
@@ -55,8 +54,8 @@
   "devDependencies": {
     "mocha": "3.x",
     "pow-mongoose-fixtures": "x",
-    "should": "6.x",
-    "should-http": "0.0.1",
+    "should": "11.x",
+    "should-http": "0.x",
     "supertest": "3.x"
   },
   "scripts": {
