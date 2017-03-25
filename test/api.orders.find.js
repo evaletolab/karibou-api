@@ -86,7 +86,6 @@ describe("api.orders.find", function(){
       .get('/v1/orders?when=current')
       .set('cookie', cookie)      
       .expect(200,function(err,res){
-
         should.not.exist(err)
         res.body.length.should.equal(3)
         for(var o in res.body){          

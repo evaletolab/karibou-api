@@ -236,11 +236,29 @@ exports.list = function(req,res){
     criteria.oid=parseInt(req.params.oid)
   }
 
+
+  //
+  // constraint your shops, 
+  if (!req.user.isAdmin() && req.user.shops.length){
+    criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+  }
+
+  
+
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
       return res.status(400).send(err);
     }
 
+    // FIXME constraint for shipping
+    if (req.user.hasRole('logistic') ){
+    }
+
+    //
+    // filter content
+    if(criteria.shop){
+      return res.json(Orders.filterByShop(orders,criteria.shop))
+    }
     return res.json(orders)
   });
 };
@@ -264,7 +282,11 @@ exports.listByShop = function(req,res){
   parseCriteria(criteria,req)
 
   // restrict to a shopname
-  criteria.shop=[req.params.shopname]
+  criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
+  if(req.params.shopname){
+    criteria.shop=req.params.shopname;
+  }
+
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
@@ -293,7 +315,6 @@ exports.listByShopOwner = function(req,res){
 
   // restrict shops to a user
   criteria.shop=req.user.shops.map(function(i){ return i.urlpath})
-
   // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
@@ -425,10 +446,7 @@ exports.updateItem=function(req,res){
   //
   // verify owner
   // no admin should not get all order details
-  var shop=_.collect(req.user.shops,function (shop) {
-    return shop.urlpath;
-  });
-
+  var shop=req.user.shops.map(function(i){ return i.urlpath});
   //
   // security
   if(!req.user.isAdmin()){
@@ -462,9 +480,13 @@ exports.updateIssue=function(req,res){
   try{
     validate.check(req.params.oid, "La commande n'est pas valide").isInt()
     validate.orderIssue(req.body); 
+    if(!req.user.isAdmin()){
+      throw new Error("Admin only!");
+    }
   }catch(err){
     return res.status(400).send( err.message);
   }
+
 
   Orders.updateIssue(req.params.oid, req.body, function(err,order){
     if(err){
@@ -473,13 +495,7 @@ exports.updateIssue=function(req,res){
 
     //
     // admin only
-    if(req.user.isAdmin()){
-      return res.json(order)
-    }
-
-
-    var filtered=Orders.filterByShop([order],shop)
-    return res.json(filtered[0])
+    return res.json(order)
   });
 }
 
