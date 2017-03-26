@@ -31,10 +31,14 @@ var passport_Authenticate=function(req, res, next){
       console.log("ERROR","Votre compte est désactivé")    
       return res.status(401).send("Votre compte est désactivé");
     }
-    
-    req.logIn(user, function(err) {
 
-      if (err) { return res.status(403).send(err); }
+    
+    // Manually establish the session...
+    req.login(user,{}, function(err) {
+
+      if (err) { 
+        return res.status(403).send(err); 
+      }
       return res.json(req.user);
     });
 
@@ -146,9 +150,10 @@ exports.login_post=function(req, res, next) {
   
   //
   // setup a simple timer to prevent scripted multiple post 
-  setTimeout(function() {
-    passport_Authenticate(req, res, next)
-  }, config.shared.system.post.limitMS);
+  // FIXME TIMEOUT BLOCK THE SERVER !
+  // setTimeout(function() {
+  // }, config.shared.system.post.limitMS);
+  passport_Authenticate(req, res, next)
 
 };
 
