@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "async": "2.x",
-    "body-parser": "^1.14.1",
+    "body-parser": "1.x",
     "compression": "^1.6.0",
     "connect-mongo": "1.x",
     "cookie-parser": "1.x",
