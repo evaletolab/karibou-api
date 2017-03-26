@@ -42,7 +42,7 @@
     "passport-local": "1.x",
     "passport-twitter": "1.x",
     "password-generator": "2.x",
-    "q": "1.4.x",
+    "q": "1.5.x",
     "queue-async": "1.x",
     "remarkable": "1.x",
     "serve-favicon": "2.x",
