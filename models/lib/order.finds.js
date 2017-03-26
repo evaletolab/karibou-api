@@ -45,12 +45,13 @@ exports.findByCriteria = function(criteria, callback){
   //
   // filter by shop or shops
   if(criteria.shop){
-    if(Array.isArray(criteria.shop)){
-      q["vendors.slug"]={"$in":criteria.shop};
-    }else{
-      q["$or"]=[{"items.vendor":criteria.shop},{"vendors.slug":criteria.shop}]
+    var inshop=criteria.shop
+    if(!Array.isArray(criteria.shop)){
+      inshop=[criteria.shop];
     }
+    q["vendors.slug"]={"$in":inshop};
   }
+
 
 
   //

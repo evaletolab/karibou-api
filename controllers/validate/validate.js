@@ -180,6 +180,7 @@ exports.product = function(req){
       req.body.details.local && check(req.body.details.local,"Erreur system p4").isBoolean();
       req.body.details.cold && check(req.body.details.cold,"Erreur system p5").isBoolean();
       req.body.details.gluten && check(req.body.details.gluten,"Erreur system p6").isBoolean();
+      req.body.details.grta && check(req.body.details.grta,"Erreur system p7").isBoolean();
     }else{
       throw new Error("Vous devez définir une description de 3 à 1'300 caractères");
     }
