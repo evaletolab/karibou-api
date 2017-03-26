@@ -25,9 +25,12 @@ module.exports = function(app, config, passport) {
   // It's not efficient, but this should avoid race condition on product and orders
   var queue=require('../app/queue')(1,true);
   var queued=function(f){
-    return function(req,res){
-      queue.defer(f,req,res)
-    }
+    return f;
+    //
+    // FIXME this function is broken! Infinit waiting for callback in queue !
+    // return function(req,res){
+    //   queue.defer(f,req,res)
+    // }
   }
 
 
