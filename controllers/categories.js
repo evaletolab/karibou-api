@@ -24,13 +24,13 @@ exports.list=function (req, res) {
     req.query.name&&check(req.query.name, "Le nom du filtre est invalide").len(2, 32).isText();
     req.query.type&&check(req.query.type, "Le type de catégorie est invalide").len(1, 32).isText();
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message||err);
   }  
 
   Categories.findByCriteria(req.query).then(function(cats) {
     return res.json(cats);
   }).then(undefined,function(err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
   });
 
 };
@@ -39,12 +39,12 @@ exports.get=function (req, res) {
   try{
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message||err);
   }  
 
   Categories.findBySlug(req.params.category,function(err,cat){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
 
     if(!cat){
@@ -61,18 +61,18 @@ exports.update=function (req, res) {
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
     checkParams(req);
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message||err);
   }  
 
   Categories.findBySlug(req.params.category,function(err,cat){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     _.extend(cat,req.body);
     cat.slug=cat.slugName();
     cat.save(function(err){
       if(err){
-        return res.status(400).send(err);
+        return res.status(400).send(err.message||err);
       }
       return res.json(cat);
     });    
@@ -85,13 +85,13 @@ exports.remove=function (req, res) {
   try{
     check(req.params.category, "Invalid characters for category name").len(2, 64).isSlug();    
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message||err);
   } 
 
   Categories.removeBySlug(req.params.category).then(function() {
     res.sendStatus(200);
   },function(err){
-    res.status(400).send(err)
+    res.status(400).send(err.message||err)
   });
 
 };
@@ -102,12 +102,12 @@ exports.create=function (req, res) {
   try{
     checkParams(req);
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message||err);
   }  
 
   Categories.create(req.body,function(err,category){
     if (err){
-      return res.status(400).send(err);    
+      return res.status(400).send(err.message||err);    
     }
     return res.json(category);    
   });

@@ -247,7 +247,7 @@ exports.list = function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
 
     // FIXME constraint for shipping
@@ -290,7 +290,7 @@ exports.listByShop = function(req,res){
 
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(Orders.filterByShop(orders,criteria.shop))
   });
@@ -318,7 +318,7 @@ exports.listByShopOwner = function(req,res){
   // console.log("find orders",criteria)
   Orders.findByCriteria(criteria, function(err,orders){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(Orders.filterByShop(orders,criteria.shop))
   });
@@ -334,7 +334,7 @@ exports.get = function(req,res){
 
   Orders.findOne({oid:req.params.oid}).exec(function(err,order){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(order)
   })
@@ -354,7 +354,7 @@ exports.verifyItems = function(req,res){
 
   db.model('Orders').checkItems(items,function(err,products, vendors, errors){
     if(err){
-      return res.status(400).send( err);
+      return res.status(400).send(err.message||err);
     }
     return res.json({errors:errors})
   });
@@ -457,7 +457,7 @@ exports.updateItem=function(req,res){
 
   Orders.updateItem(req.params.oid, req.body, function(err,order){
     if(err){
-      return res.status(400).send( (err));
+      return res.status(400).send(err.message||err);
     }
 
     //
@@ -490,7 +490,7 @@ exports.updateIssue=function(req,res){
 
   Orders.updateIssue(req.params.oid, req.body, function(err,order){
     if(err){
-      return res.status(400).send( (err));
+      return res.status(400).send(err.message||err);
     }
 
     //
@@ -517,7 +517,7 @@ exports.updateShipping=function(req,res){
 
   Orders.updateLogistic({oid:req.params.oid}, req.body, function(err,orders){
     if(err){
-      return res.status(400).send( (err));
+      return res.status(400).send(err.message||err);
     }
     return res.json(orders)
   });
@@ -539,7 +539,7 @@ exports.updateCollect=function(req,res){
 
   Orders.updateLogistic({'vendors.slug':req.params.shopname}, req.body, function(err,orders){
     if(err){
-      return res.status(400).send( (err));
+      return res.status(400).send(err.message||err);
     }
     return res.json(orders)
   });

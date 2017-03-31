@@ -26,7 +26,7 @@ exports.create=function (req, res) {
 
   db.model('Emails').create(req.user, function(err,validate){
     if(err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message);
     }      
     
     var content=req.user.toObject();
@@ -64,7 +64,7 @@ exports.validate=function (req, res) {
   Emails.validate(req.params.uid,req.params.email,function (err,user){
 
     if (err){
-      return res.status(400).send(err);    
+      return res.status(400).send(err.message||err);    
     }
     
 
@@ -77,7 +77,7 @@ exports.validate=function (req, res) {
 exports.list=function (req, res) {
   Emails.find({})/*.where("status",true)*/.exec(function (err,emails){
     if (err){
-      return res.status(400).send(errorHelper(err));    
+      return res.status(400).send(errorHelper(err.message||err));    
     }
     
 

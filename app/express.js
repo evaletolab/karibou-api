@@ -84,7 +84,6 @@ var tokenSession=function (req, res, next) {
 }; */
 
 
-  app.set('showStackError', true)
 
 
   if (config.express.proxy) {
@@ -95,6 +94,7 @@ var tokenSession=function (req, res, next) {
   app.set('views', config.root+config.express.views)
   app.set('view engine', config.express['view engine'])
   app.set('port', port);
+
 
   app.use(function (req, res, next) {
     res.locals.pkg = pkg
@@ -133,7 +133,8 @@ var tokenSession=function (req, res, next) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(methodOverride())
 
-  app.use(errorHandler({ dumpExceptions: true, showStack: true }));  
+  //app.set('showStackError', true)
+  //app.use(errorHandler({ dumpExceptions: true, showStack: true }));  
 
 
   //
@@ -213,12 +214,17 @@ var tokenSession=function (req, res, next) {
   }
 
 
+  
   // assume "not found" in the error msgs
   // is a 404. this is somewhat silly, but
   // valid, you can do whatever you like, set
   // properties, use instanceof etc.
   app.use(function(err, req, res, next){
-
+    var email=req.user?req.user.email:'Anonymous';
+    var msg=JSON.stringify(
+        {error:((err.stack)?err.stack:err),user:email, url:req.originalUrl, params:req.params,body:req.body},
+        null,2
+    );
     //
     // no error
     if(!err){
@@ -227,27 +233,20 @@ var tokenSession=function (req, res, next) {
 
     //send emails if you want
     if(process.env.NODE_ENV==='production'){
-      var email=req.user?req.user.email:'Anonymous';
-      var msg=JSON.stringify(
-          {error:((err.stack)?err.stack:err),user:email, url:req.originalUrl, params:req.params,body:req.body},
-          null,2
-      );
       bus.emit("sendmail", "evaleto@gmail.com","[karibou] : "+err.toString(), 
           {content:msg}, "simple",function(err,status){
             console.log(err,status)
       });
     }
-
+    console.error("ERROR -------",email,msg)
 
     if (typeof err==='string'){
       return res.status(400).send(err); 
     }
 
-    console.error(err)
-    console.error(err.stack)
-
     // error page
-    res.render('500', { error: err.stack })
+    res.render('500', { error: msg, email:email })
+    
   })
 
 

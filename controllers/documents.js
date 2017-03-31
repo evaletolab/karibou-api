@@ -65,7 +65,7 @@ exports.findByOwner=function (req, res) {
   }
   Documents.findByCriteria(q,function(err,docs){
     if (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(docs)    
   });
@@ -79,7 +79,7 @@ exports.findByCategory=function (req, res) {
   q=queryFilterByUser(q,req);
   Documents.findByCriteria(q,function(err,docs){
     if (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(docs)    
   });
@@ -117,7 +117,7 @@ exports.findBySkus=function (req, res) {
   q=queryFilterByUser(q,req);
   Documents.findByCriteria(q,function(err,docs){
     if (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(docs)    
   });
@@ -131,7 +131,7 @@ exports.create=function (req, res) {
   try{  
     validate.document(req.body,lang);
   }catch(err){
-    return res.status(400).send( err.message);
+    return res.status(400).send(err.message);
   }  
   
   //

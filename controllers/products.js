@@ -146,7 +146,7 @@ exports.love=function (req, res) {
 
   Products.findBySkus(req.user.likes,function(err,products){
     if (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(products)    
   })
@@ -158,7 +158,6 @@ exports.findByOwner=function (req, res) {
     
     return res.json([]);
 };
-
 
 //
 // List products
@@ -173,7 +172,7 @@ exports.findByOwner=function (req, res) {
 // get a mix of those lists
 // popular, home, love, discount, maxcat
 
-exports.list=function (req, res) {
+exports.list=function (req, res,next) {
   //
   // check inputs
   var now =Date.now(), Q=require('q');
@@ -316,16 +315,12 @@ exports.list=function (req, res) {
       result=result.concat(items);
     }
     result=uniq_sku(result);
-    // result=_.sortBy(result,function(prod) {
-    //     return prod.categories.weight;
-    //     // return [prod.category.weight, prod.category.name].join("_");      
-    // })
-    // console.log('--------------- time 1',Date.now()-now);
 
     res.json(result);
   }).then(undefined,function(error) {
     res.status(400).send(error);
-  })
+  });
+
 
 };
 
