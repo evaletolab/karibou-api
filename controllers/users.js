@@ -100,7 +100,7 @@ exports.recover=function(req,res){
     function(err,user){
 
       if (err){
-        return res.status(400).send(err);
+        return res.status(400).send(err.message||err);
       }
       if(!user){
         return res.status(400).send("Utilisateur inconnu");
@@ -123,7 +123,7 @@ exports.recover=function(req,res){
                      content,
                      "password", function(err, status){
           if(err){
-            return res.status(400).send(err);
+            return res.status(400).send(err.message||err);
           }
 
           return res.json("Un nouveau mot de passe à été envoyé à votre adresse mail.");
@@ -151,7 +151,7 @@ exports.password=function(req,res){
   Users.findOne({'email.address': req.body.email, id:req.params.id}).select('+hash +salt')
     .exec(function(err,user){
       if (err){
-        return res.status(400).send(err);
+        return res.status(400).send(err.message||err);
       }
       //
       // check user
@@ -163,7 +163,7 @@ exports.password=function(req,res){
       // check password
       user.verifyPassword(req.body.current, function(err, passwordCorrect) {
         if (err) {
-          return res.status(400).send(err);
+          return res.status(400).send(err.message||err);
         }
         if (!passwordCorrect) {
           return res.status(400).send(stderr+" (2)");
@@ -173,7 +173,7 @@ exports.password=function(req,res){
         // change the password
         user.password=req.body.new;
         user.save(function(err){
-          if(err)return res.status(400).send(err);
+          if(err)return res.status(400).send(err.message||err);
           return res.json({});
         });
       });

@@ -147,18 +147,15 @@ var host = (process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP
 
 var count=0;
 app.listen(app.get('port'),host).on('connection', function(socket) {
-  // console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
-  socket.on('end',function(){
-    // console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
-  })
 
 })
 
 
-
 //
-// manage unmanaged exception
+// unmanaged exception
 process.on('uncaughtException', function(err) {
+
+  console.log("-------- uncaughtException",err.stack);
 
   if(process.env.NODE_ENV==='production'){
     var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
@@ -170,7 +167,6 @@ process.on('uncaughtException', function(err) {
     });
 
   }
-  console.log("uncaughtException",err.stack);
 });
 
 

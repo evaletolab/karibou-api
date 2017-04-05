@@ -228,7 +228,7 @@ exports.register_post= function(req, res,next) {
               if(err){
                 bus.emit('system.message',"[karibou-register.mail] karibou error: ",
                   {message:err.message,stack:err.stack});
-                return res.status(400).send(err)
+                return res.status(400).send(err.message||err)
               }
 
               //
