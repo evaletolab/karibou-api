@@ -146,7 +146,7 @@ exports.love=function (req, res) {
 
   Products.findBySkus(req.user.likes,function(err,products){
     if (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     return res.json(products)    
   })
@@ -159,6 +159,68 @@ exports.findByOwner=function (req, res) {
     return res.json([]);
 };
 
+exports.search=function(req,res){
+  var Products=db.model('Products');
+
+  //
+  // TODO - make a service, 
+  //    txt length>=3, typeof String 
+  //    typeof bio == boolean, 
+  //    when=undefined||1||next||date 
+  var bio=(req.query.bio)?true:false;
+  var search=req.query.q;
+
+
+
+  Products.find({
+    $text:{$search:search}, 
+    'attributes.available':true      
+  },{
+    details:0,
+    attributes:0,
+    pricing:0,
+    photo:0,
+    faq:0,
+    variants:0,
+    categories:0,
+    vendor:0,
+    score: {$meta: "textScore"}
+  })
+  .exec(function(err,products){
+    if(err){
+      return res.status(400).send( err.message||err);      
+    }
+    //
+    // TODO move search function as service
+    var result=products.filter(function(product){
+      return (product._doc.score>=0.8);
+    })
+    var skus=result.map(function(product){ return product.sku;});
+    Products.findByCriteria({
+      status:true,
+      available:true,
+      when:true,
+      skus:skus
+    })
+    .then(function(products){
+      var scored=products.map(function(prod){
+        return prod.toObject();
+      }).map(function(prod){
+        var meta=_.where(result,{sku:prod.sku});
+        prod.score=meta[0]._doc.score;
+        return prod;
+      });
+      scored=_.sortBy(scored,function(p){return -p.score;});
+      scored.forEach(function(prod){
+        console.log('search -------------',search,prod.title,prod.score);
+      });
+      res.json(scored);
+    });
+
+  });
+  
+
+}
 
 //
 // List products
@@ -173,7 +235,7 @@ exports.findByOwner=function (req, res) {
 // get a mix of those lists
 // popular, home, love, discount, maxcat
 
-exports.list=function (req, res) {
+exports.list=function (req, res,next) {
   //
   // check inputs
   var now =Date.now(), Q=require('q');
@@ -316,16 +378,12 @@ exports.list=function (req, res) {
       result=result.concat(items);
     }
     result=uniq_sku(result);
-    // result=_.sortBy(result,function(prod) {
-    //     return prod.categories.weight;
-    //     // return [prod.category.weight, prod.category.name].join("_");      
-    // })
-    // console.log('--------------- time 1',Date.now()-now);
 
     res.json(result);
   }).then(undefined,function(error) {
     res.status(400).send(error);
-  })
+  });
+
 
 };
 
@@ -486,19 +544,19 @@ exports.update=function (req, res) {
   //body clean (avoid mongo warn !) 
   req.body.$promise && delete(req.body.$promise);
   req.body.$resolved && delete(req.body.$resolved);
-  
+
+  //
+  // if not admin  
+  if(!req.user.isAdmin()){
+    delete req.body.attributes.home;
+  }
+
+
   Products.findOne({sku:req.params.sku}).populate('vendor').exec(function(err,product){
     if (!product){
       return res.status(400).send('Ooops, unknow product '+req.params.sku);    
     }
 
-    // if not admin  
-    if(!req.user.isAdmin()){
-      if(req.body.attributes.home!==undefined && req.body.attributes.home!=product.attributes.home){
-        return res.status(401).send( "Your are not allowed to do that, arch!");    
-      }
-
-    }
 
     //
     // slug this product
@@ -514,6 +572,7 @@ exports.update=function (req, res) {
 
     // do the update
     _.extend(product,req.body)
+
 
     product.save(function (err) {
       if (err){

@@ -22,6 +22,22 @@ if(process.env.VCAP_SERVICES){
     //var vcap = JSON.parse(process.env.VCAP_SERVICES);
 }
 
+if(process.env.APPDYNAMICS){
+  require("appdynamics").profile({
+  controllerHostName: 'paid134.saas.appdynamics.com',
+  controllerPort: 443, 
+  
+  // If SSL, be sure to enable the next line
+  controllerSslEnabled: true,
+  accountName: 'Karibouch',
+  accountAccessKey: 'pll8l7k7suuf',
+  applicationName: 'karibou.ch',
+  tierName: 'front',
+  nodeName: 'process' // The controller will automatically append the node name with a unique number
+  });  
+}
+
+
 //
 // load env
 var express = require('express')
@@ -147,18 +163,15 @@ var host = (process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP
 
 var count=0;
 app.listen(app.get('port'),host).on('connection', function(socket) {
-  // console.log("---- new connection was made by a client: ",socket.remoteAddress,"c:", ++count);
-  socket.on('end',function(){
-    // console.log("---- close connection made by a client: ",socket.remoteAddress,"c:", --count);
-  })
 
 })
 
 
-
 //
-// manage unmanaged exception
+// unmanaged exception
 process.on('uncaughtException', function(err) {
+
+  console.log("-------- uncaughtException",err.stack);
 
   if(process.env.NODE_ENV==='production'){
     var msg=(err.stack)?err.stack:JSON.stringify(err,null,2);
@@ -170,7 +183,6 @@ process.on('uncaughtException', function(err) {
     });
 
   }
-  console.log("uncaughtException",err.stack);
 });
 
 
