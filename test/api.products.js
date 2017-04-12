@@ -235,7 +235,7 @@ describe("api.products", function(){
 
 
 
-    it('POST update /v1/products/1000002 home field should return 401 for not admin ',function(done){
+    it('POST update /v1/products/1000002 home field should not be modified ',function(done){
       // shop must be managed
       //p.manufacturer={_id:maker._id};
       var p=_.clone(data.Products[0]);
@@ -255,7 +255,7 @@ describe("api.products", function(){
         .set('cookie', gluck)
         .send(p)
         .end(function(err,res){
-          res.should.have.status(401);
+          should.not.exist(res.body.attributes.home);
           done();        
         });
     });    

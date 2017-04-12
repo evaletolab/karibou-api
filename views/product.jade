@@ -76,12 +76,12 @@ html(itemscope itemtype="http://schema.org/Product")
           li(  class="label label-success") Terroir et Local
         if product.details.gluten
           li(  class="label label-success") Sans gluten
-        if product.details.bio
+        if (product.details.bio||product.details.biodynamics||product.details.bioconvertion)
           li(  class="label label-success") BIO
         if product.details.grta
           li(  class="label label-success") GRTA
         if product.details.natural
-          li(  class="label label-success" title="Naturel") Sans chimie de synthèse
+          li(  class="label label-success" title="Naturel") 100% naturel
 
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
         span prix, 

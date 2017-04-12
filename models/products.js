@@ -38,8 +38,9 @@ var Product = new Schema({
    sku: { type: Number, required: true, unique:true, index: true },
    title: { type: String, required: true },
    slug: { type: String, required: false },
-   
    details:{
+      internal:{ type: String, required: false },
+      keywords:{ type: String, required: false },
       description:{type:String, required:true},
       comment:{type:String, required:false},
       origin:{type:String, required:false},
@@ -183,8 +184,37 @@ Product.methods.removeCategories=function(cats,callback){
 
 
 
-Product.post('save',function (product) {
+Product.pre('save',function (next) {
+  var product=this, keywords=product.details.keywords||'';
   cache.reset();
+  db.model('Categories').findOne(product.categories,function(err,cat){
+    if(err||!cat){
+      return next();
+    }  
+    keywords=cat.name;
+    product.details.internal="";
+    if(product.details.biodynamics||product.details.bio||product.details.bioconvertion){    
+      product.details.internal=" bio organique organic biodinamie naturel biodynamics";
+    }
+    if(product.details.vegetarian){    
+      product.details.internal+=" végétarien vegetarian";
+    }
+
+    if(product.details.gluten){    
+        product.details.internal+=" gluten glutenfree sans-gluten";
+    }
+
+    if(product.details.lactose){    
+        product.details.internal+=" lactose sans-lactose";
+    }
+
+    if(product.details.grta){
+        product.details.internal+=" grta";
+    }
+
+    product.details.keywords=keywords+' '+product.details.internal;
+    next();
+  });
 });
 
 Product.post('remove',function (product) {
@@ -814,6 +844,27 @@ Product.statics.findByCriteria = function(criteria, callback){
 //   });
 // };
 
+//
+// generate text index
+// db.products.find({
+//   $text:{$search:"confiture"}
+// },{
+//   score: {$meta: "textScore"}
+// }).sort({score:{$meta:"textScore"}})
+Product.index({ 
+    "title": "text",
+    "details.internal":"text",
+    "details.description":"text",
+    "details.origin":"text", 
+    "details.keywords":"text" 
+  }, 
+  {"weights": { 
+    "title": 3, 
+    "details.internal":4, 
+    "details.keywords":1, 
+    "details.origin":1 , 
+    "details.description":1 
+  },"default_language":"french"});
 
 Product.set('autoIndex', config.mongo.ensureIndex);
 exports.Products = mongoose.model('Products', Product);

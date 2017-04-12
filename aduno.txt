@@ -1,0 +1,20 @@
+aduno
+six payment service
+concardis 
+swisscard
+https://www.bs-card-service.ch/fr/home/
+
+psp avec postfinance contract d'aquiring 
+
+RAF (PMS PMS-ID, FDS  USER-ID)
+
+
+#contract visa & mc
+https://www.six-payment-services.com/fr/home.html
+- région romande voir avec Madame Christin 079 596 34 66
+
+
+# activation PSP avec postcard
+PSP activation Voir avec Izabela Lamoureux izabela.lamoureux@postfinance.ch:
+- mail a merchanthelp@postfinance.ch
+
