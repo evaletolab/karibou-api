@@ -13,7 +13,7 @@ html
     link(rel="icon", type="image/png", href="/img/k-small.png" )
     meta(property="og:type", content="website")
     if category && category.cover
-      meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
+      meta( property="og:url", content="https://karibou.ch/products/category/#{category.slug}" )
       meta( property="og:image", content="#{category.cover}-/resize/600x/" )
       meta( property="og:image:width", content="600")
     else
