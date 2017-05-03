@@ -106,6 +106,12 @@ var Shops = new Schema({
       updated:{type:Date, default: Date.now}
     },
     owner: {type: Schema.Types.ObjectId, ref : 'Users',required: true},
+    scoring:{
+      weight:{type:Number,default:0},
+      orders:{type:Number},
+      issues:{type:Number,default:0},
+      score:{type:Number,default:0}
+    },
     created:{type:Date, default: Date.now}
 });
 
