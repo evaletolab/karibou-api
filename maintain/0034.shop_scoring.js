@@ -31,7 +31,6 @@ exports.execute = function(db, script, callback){
 	console.log(script,"Initial values for shop.scoring ");
   var logs="", count=0;
   var shops=db.collection('shops');
-  return callback("not implemented")
   shops.update({}, { $set: { "scoring": {
     weight:10,
     orders:0,
