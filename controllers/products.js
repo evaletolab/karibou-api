@@ -460,10 +460,16 @@ exports.allSEO=function (req, res) {
     //
     // get the list of cats
     db.model('Categories').find({},function (err,cats) {
+      var currentCat;
+      if(query.category){
+        currentCat=_.find(cats, (c)=>  c.slug===query.category);
+      }
+      
       //
       // setup the model 
       var model={ 
         categories:cats,
+        category:currentCat,
         products: products, 
         user: req.user, 
         _:_,

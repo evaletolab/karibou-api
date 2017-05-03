@@ -43,13 +43,10 @@ module.exports = {
     "issue_no_issue",
     "issue_missing_client_id",
     "issue_missing_product",
-    "issue_missing_validation",
-    "issue_missing_customer_support",
     "issue_wrong_packing",
     "issue_wrong_product",
     "issue_wrong_client_id",
-    "issue_wrong_product_quality",
-    "issue_late_delivry"
+    "issue_wrong_product_quality"
     ]
   },
   //
@@ -148,10 +145,11 @@ module.exports = {
     /* for testing 50 hours is the time limit between order and delivery*/
     /* timelimit = monday 18:00 + timelimit = dayDest 9:00*/
 
-    // -> une commande le lundi à 9:00 .... mercredi 10:00 == 49h
-    // -> une commande le lundi à 18:00 .... mercredi 10:00 == 40h
-    // -> une commande le lundi à 20:00 .... mercredi 10:00 == 38h* minimum pour deux matinées
-    timelimit:35,
+    // -> une commande le dimanche à 9:00 .... mardi 10:00 == 49h
+    // -> une commande le dimanche à 18:00 .... mardi 10:00 == 40h
+    // -> une commande le dimanche à 23:00 .... mardi 10:00 == 35h* minimum pour deux matinées
+    // -> une commande le lundi à 14:00 .... mardi 10:00 == 20h* minimum 
+    timelimit:20,
 
     //
     // stripe uncaptured charges expire in 7 days

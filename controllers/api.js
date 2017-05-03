@@ -228,12 +228,6 @@ exports.sitemap=function(req,res){
   var sitemap;
 
   // if sitemap is cached
-  if (sitemap && sitemap.isCacheValid()){
-    return sitemap.toXML( function (xml) {
-        res.header('Content-Type', 'application/xml');
-        res.send( xml );
-    });    
-  }
 
   // else
   require('mongoose').model('Products').findByCriteria({'query.status':true,'available':true},function(err,products){
@@ -256,10 +250,12 @@ exports.sitemap=function(req,res){
       urls: urls
     });
 
-    sitemap.toXML( function (xml) {
-        res.header('Content-Type', 'application/xml');
-        res.send( xml );
-    });    
+    res.header('Content-Type', 'application/xml');
+    res.send( sitemap.toString() );
+    // sitemap.toXML( function (xml) {
+    //     res.header('Content-Type', 'application/xml');
+    //     res.send( xml );
+    // });    
 
   })
 }

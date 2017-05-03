@@ -44,8 +44,11 @@ html
 
 
       div(class="jumbotron")
-        h2 Des produits frais, bio, votre maraîcher, boulanger, fromager, boucher... livrés à votre porte!
-        img(src="/img/hello-home.jpg", class="img-responsive img")
+        h2 Le premier marché participatif de Suisse
+        if category && category.cover
+          img(src="#{category.cover}", class="img-responsive img")
+        else
+          img(src="/img/hello-home.jpg", class="img-responsive img")
 
 
 
