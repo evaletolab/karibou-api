@@ -541,9 +541,6 @@ exports.updateIssue = function(oid,items, callback){
           if(item.fulfillment.issue){          
             order.items[i].fulfillment.issue=item.fulfillment.issue;
           }
-          if(item.fulfillment.issue==='issue_no_issue'){
-            order.items[i].fulfillment.issue=undefined;
-          }
         }
       }
     });
