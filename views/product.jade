@@ -107,16 +107,13 @@ html(itemscope itemtype="http://schema.org/Product")
       h2(itemscope,itemtype="https://schema.org/Organization") Contact
         a(itemprop="url", href="/shop/#{product.vendor.urlpath}"): =product.vendor.name
 
-      div(itemscope itemtype="https://schema.org/LocalBusiness")
+      div
         h3(itemprop="name"): =product.vendor.name
-        p(itemprop="description"): =product.vendor.description
-        p(itemprop="telephone"): =product.vendor.address.phone        
-        ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
-            li(class="list-group-item", itemprop="name"): =product.vendor.address.name
-            li(class="list-group-item", itemprop="streetAddress"): =product.vendor.address.streetAdress
-            li(class="list-group-item", itemprop="addressRegion"): =product.vendor.address.region
-            li(class="list-group-item", itemprop="postalCode"): =product.vendor.address.postalCode
-        span(itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates")
-          meta(itemprop="latitude", content="#{product.vendor.address.geo.lat}")
-          meta(itemprop="longitude", content="#{product.vendor.address.geo.lng}")
-
+        p: =product.vendor.description
+        p: =product.vendor.address.phone        
+        ul(class="list-group")
+            li(class="list-group-item"): =product.vendor.address.name
+            li(class="list-group-item"): =product.vendor.address.streetAdress
+            li(class="list-group-item"): =product.vendor.address.region
+            li(class="list-group-item"): =product.vendor.address.postalCode
+        
