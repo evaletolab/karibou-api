@@ -30,6 +30,7 @@ html
     link(href="/css/style.css", rel="stylesheet")
 
   body(itemscope,itemtype="https://schema.org/Organization")
+    meta(itemprop="url", href="https://karibou.ch/shop/#{shop.urlpath}")
     div(class="container")
       div(class="header clearfix")
         nav(class="navbar navbar-default")
@@ -67,8 +68,7 @@ html
         h3(itemprop="name"): =shop.name
         p(itemprop="description"): =shop.description
         p(itemprop="telephone"): =shop.address.phone        
-        meta(itemprop="image",href="#{prependUrlImage(shop.photo.fg)}")
-        meta(itemprop="url", href="https://karibou.ch/shop/#{shop.urlpath}")
+        meta(itemprop="image",src="#{prependUrlImage(shop.photo.fg)}")
         ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
             li(class="list-group-item", itemprop="name"): =shop.address.name
             li(class="list-group-item", itemprop="streetAddress"): =shop.address.streetAdress
