@@ -164,7 +164,7 @@ module.exports = {
         pk:'e1da8e0e16519c97364f'
     },
     fb: {
-        appId: '111565172259433'
+        appId: '178042049293834'
       , appSecret: '85f7e0a0cc804886180b887c1f04a3c1'
     }
   , twit: {

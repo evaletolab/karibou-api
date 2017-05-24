@@ -139,7 +139,8 @@ describe("orders.update", function(){
 
     db.model('Orders').updateIssue(oid,[item], function(err,order){
       should.not.exist(err)
-      should.not.exist(order.items[1].fulfillment.issue)
+      // should.not.exist(order.items[1].fulfillment.issue)
+      order.items[1].fulfillment.issue.should.equal(item.fulfillment.issue)
       done();
     });
   });
