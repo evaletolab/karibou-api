@@ -3,14 +3,14 @@ Karibou.ch is an open-source project aim to help the creation of an
 online community marketplace. Our goal is to allow local food producers, artisans and artists 
 to sell their products locally. There is alpha frontend available here http://karibou.evaletolab.ch/
 
-[![David](https://img.shields.io/david/karibou-ch/karibou-api.svg?style=flat)](https://david-dm.org/evaletolab/karibou-api)
-[![Build Status](https://travis-ci.org/karibou-ch/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab/karibou-api)
+[![David](https://img.shields.io/david/karibou-ch/karibou-api.svg?style=flat)](https://david-dm.org/evaletolab-ch/karibou-api)
+[![Build Status](https://travis-ci.org/karibou-ch/karibou-api.svg?branch=master)](https://travis-ci.org/evaletolab-ch/karibou-api)
 <a href="https://gitter.im/karibou-ch/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/Join Chat.svg" alt="Gitter chat" height="20"></a>
 
 ## Getting started
 This is a backend part of the futur [karibou.*] application.
 
-    $ git clone https://github.com/evaletolab/karibou-api.git
+    $ git clone https://github.com/evaletolab-ch/karibou-api.git
     $ cd karibou-api
     $ npm install
     $ optional edit config-devel|test.js
@@ -60,7 +60,7 @@ All requests that change state (`POST`, `PUT`, `DELETE`) require authentication.
  * **YOU CAN NOT USE THE SOFTWARE TO BUILD A ONLINE GROCERY STORE WITHOUT THE KARIBOU PERMISSION.**
 -->
 
-* Copyright (c) 2015 Karibou (http://karibou.ch/)
+* Copyright (c) 2015 Karibou.ch (http://karibou.ch/)
 * Copyright (c) 2012 Olivier Evalet (http://evaletolab.ch/)
 
 Karibou is distributed under a dual license: an open source license, and a commercial license. The open source license under which Karibou API is distributed is the AGPL V3 to protect the long term interests of the community – you are free to use it with no restrictions but if you change the server code, then those code changes must be contributed back. **it means,**
