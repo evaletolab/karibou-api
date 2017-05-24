@@ -157,6 +157,7 @@ exports.getSEO=function (req, res) {
     //
     // setup the model 
     var model={ 
+      config:config,
       shop: shop, 
       user: req.user, 
       _:_,
@@ -199,6 +200,7 @@ exports.allSEO=function (req, res) {
       //
       // setup the model 
       var model={ 
+        config:config,
         categories:cats,
         shops: shops, 
         user: req.user, 

@@ -32,6 +32,7 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( name="twitter:label1", content="Price")
 
     // Open Graph data
+    meta( property="fb:app_id", content="#{config.auth.fb.appId}" )    
     meta( property="og:title", content="#{product.title}" )
     meta( property="og:type", content="article" )
     meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
@@ -92,13 +93,9 @@ html(itemscope itemtype="http://schema.org/Product")
 
         h2:  =product.categories.name
         div: |Région de Genève
-        h2 Boutique
-        div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
-          a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
-            span(itemprop="name"): =product.vendor.name 
+      h2 Boutique
 
-      h2 En vente sur le marché
-      ul(class="list-group")
+      ul(class="list-group hide")
       - each place in product.vendor.marketplace
         li(class="list-group-item"): =place
 
@@ -107,9 +104,19 @@ html(itemscope itemtype="http://schema.org/Product")
         li(  class="label label-success" title="#{weekdays[day]}")  #{weekdays[day]}
 
 
-      h2 Contact
-      ul(itemscope itemtype="http://schema.org/PostalAddress",class="list-group")
-         li(class="list-group-item", itemprop="name"): =product.vendor.address.name
-         li(class="list-group-item", itemprop="streetAddress"): =product.vendor.address.streetAdress
-         li(class="list-group-item", itemprop="addressRegion"): =product.vendor.address.region.replace('GE','Genève')
-         li(class="list-group-item", itemprop="postalCode"): =product.vendor.address.postalCode
+      h2(itemscope,itemtype="https://schema.org/Organization") Contact
+        a(itemprop="url", href="/shop/#{product.vendor.urlpath}"): =product.vendor.name
+
+      div(itemscope itemtype="https://schema.org/LocalBusiness")
+        h3(itemprop="name"): =product.vendor.name
+        p(itemprop="description"): =product.vendor.description
+        p(itemprop="telephone"): =product.vendor.address.phone        
+        ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
+            li(class="list-group-item", itemprop="name"): =product.vendor.address.name
+            li(class="list-group-item", itemprop="streetAddress"): =product.vendor.address.streetAdress
+            li(class="list-group-item", itemprop="addressRegion"): =product.vendor.address.region
+            li(class="list-group-item", itemprop="postalCode"): =product.vendor.address.postalCode
+        span(itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates")
+          meta(itemprop="latitude", content="#{product.vendor.address.geo.lat}")
+          meta(itemprop="longitude", content="#{product.vendor.address.geo.lng}")
+
