@@ -71,6 +71,12 @@ var Config = new Schema({
         p:{en:String,de:String,fr:String},
         image:String
       },
+      howto:{
+        h:{en:String,de:String,fr:String},
+        t:{en:String,de:String,fr:String},
+        p:{en:String,de:String,fr:String},
+        image:String
+      },
       about:{
         h:{en:String,de:String,fr:String},
         t:{en:String,de:String,fr:String},
