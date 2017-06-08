@@ -21,7 +21,7 @@ scenarios:
         url: "/login"
         json:
           email: "evaleto@gmail.com"
-          password: "ploiuz"
+          password: "testing"
           provider: "local"          
         cookie:
           saved: "artillery-cookies"

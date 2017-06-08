@@ -108,7 +108,8 @@ exports.love=function (req, res) {
     likes:req.user.likes,
     minhit:parseInt(req.query.minhit)||1,
     maxcat:parseInt(req.query.maxcat)||4,
-    available:(req.query.available&&req.query.available=='true')
+    available:(req.query.available&&req.query.available=='true'),
+    nocache:req.query.available
   }
   //
   // limit past time
@@ -264,7 +265,12 @@ exports.list=function (req, res,next) {
   // if popular products are requested  
   // options: email, maxcat,likes,available
   if(query.popular && req.user){
-    promise=Products.findPopular({email:req.user.email.address,status:true, available:query.available,maxcat:query.maxcat,when:query.when});
+    promise=Products.findPopular({
+      email:req.user.email.address,
+      status:true, 
+      available:query.available,
+      nocache:query.nocache,
+      maxcat:query.maxcat,when:query.when});
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- popular',products.length, Date.now()-now)
@@ -287,7 +293,14 @@ exports.list=function (req, res,next) {
   //
   // in home
   if(query.home&&query.maxcat){
-    promise=Products.findByCriteria({status:true,instock:true,available:true,home:true,when:query.when});
+    promise=Products.findByCriteria({
+      status:true,
+      instock:true,
+      available:true,
+      home:true,
+      when:query.when,
+      nocache:query.nocache
+    });
     promises.push(promise);
     promise.then(function(products) {
       // console.log('---------- home',products.length, Date.now()-now)

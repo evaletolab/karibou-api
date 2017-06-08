@@ -3,12 +3,8 @@ config:
   http:
     timeout: 1
   phases:
-    -
-      duration: 10
-      arrivalRate: 50
-      name: "Warm-up"
-    - duration: 30
-      arrivalRate: 50
+    - duration: 40
+      arrivalRate: 100
       name: "Running"
 
   defaults:
@@ -17,14 +13,6 @@ config:
 
 scenarios:
   - flow:
-#    - post:
-#        url: "/login"
-#        json:
-#          email: "evaleto@gmail.com"
-#          password: "ploiuz"
-#          provider: "local"          
-#        cookie:
-#          saved: "artillery-cookies"
     - get:
         url: "/v1/config?lang=fr"
         cookie:
@@ -38,7 +26,7 @@ scenarios:
         cookie:
           saved: "artillery-cookies"
     - get:
-        url: "/v1/products?available=true&discount=true&home=true&maxcat=8&popular=true&status=true&when=true"
+        url: "/v1/products?available=true&discount=true&home=true&maxcat=8&popular=true&status=true&when=true&nocache=true"
         cookie:
           saved: "artillery-cookies"
     - get:

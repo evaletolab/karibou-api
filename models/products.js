@@ -397,7 +397,7 @@ Product.statics.findPopular = function(criteria, callback){
   if(callback){promise.addBack(callback);}
 
   var result=cache.get(cacheKey);
-  if(result){
+  if(result && !criteria.nocache){
     return promise.resolve(null,result);
   }
 
@@ -615,7 +615,7 @@ Product.statics.findByCriteria = function(criteria, callback){
       
 
   var result=cache.get(cacheKey);
-  if(result){
+  if(result&& !criteria.nocache){
     return promise.resolve(null,result);
   }
 
