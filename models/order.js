@@ -124,10 +124,13 @@ var Orders = new Schema({
         issue:{type:String, enum: EnumOrderIssue},
         status:{type: String, required: true, enum: EnumOrderStatus, default:'created'},
         note:{type: String, required: false},
-        shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'}
+        shipping:{type:String,enum:EnumShippingMode, required:true, default:'grouped'},
+        //
+        // date/time for the first activity is saved
+        timestamp:{type:Date,required:false}
       },
 
-      vendor:{type:String, required:true}
+      vendor:{type:String, required:true},
 
       //
       // only displayed for owner and admin
@@ -149,6 +152,10 @@ var Orders = new Schema({
       lng:{type:Number, required: false}
     },
     collected:{type:Boolean,default:false},
+
+    //
+    // date/time for the first activity is saved
+    collected_timestamp:{type:Date,required:false},
     //
     // you can see values only when uid is order.owner, shop.owner, or admin 
     // amount & threshold & finalAmount & are saved for security reason

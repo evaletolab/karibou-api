@@ -375,6 +375,9 @@ exports.updateLogistic = function(query,options, callback){
           for (var i = order.vendors.length - 1; i >= 0; i--) {
             if(order.vendors[i].slug===query['vendors.slug']){
               order.vendors[i].collected=statusShopper;
+              if(!order.vendors[i].collected_timestamp){
+                order.vendors[i].collected_timestamp=new Date();
+              }              
               break;
             }
           };
@@ -473,6 +476,13 @@ exports.updateItem = function(oid,items, callback){
             rollback.push({sku:item.sku,qty:item.quantity})
             //order.items[i].finalprice=item.finalprice=0.0;
           }
+
+          //
+          // initial date for fulfillment is saved
+          if(!item.fulfillment.timestamp){
+            item.fulfillment.timestamp=new Date();
+          }
+
           itemIds.push(order.items[i].sku);
           break;
         }
