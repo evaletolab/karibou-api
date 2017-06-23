@@ -103,7 +103,7 @@ module.exports = {
     "issue_wrong_packing",
     "issue_wrong_client_id",
     "issue_wrong_product_quality",
-    "issue_late_delivry"
+    "issue_no_issue"
     ]
   },
   

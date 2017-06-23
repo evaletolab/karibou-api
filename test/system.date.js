@@ -159,7 +159,8 @@ describe("system.date", function(){
 
     all.forEach(function(n,i){
       // deprecated use containEql(n.getDay())
-      n.getHours().should.not.be.above(config.shared.order.timelimitH);
+      // dst() take care of Daylight Savings Time
+      n.getHours().should.not.be.above(config.shared.order.timelimitH+n.dst());
       config.shared.order.weekdays.should.containEql(n.getDay());
     })
     
@@ -172,9 +173,7 @@ describe("system.date", function(){
     config.shared.order.timelimitH=1;
     var today=new Date(), all=Date.fullWeekShippingDays();
 
-    console.log('--------',all.map(function(d) {
-      return d.getDay();
-    }))
+    // console.log('--------',all.map( d=> d.getDay()));
 
     //
     // should have more date than the weekdays available

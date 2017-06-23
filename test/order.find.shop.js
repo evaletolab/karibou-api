@@ -108,7 +108,7 @@ describe("orders.find.shop", function(){
     });
   });
 
-  it("when filterByShop, only those items are exported ", function(done){
+  it("filter content by shop with ONE shop, only those items are exported ", function(done){
     var criteria={
       shop:"super-shop",  /*super-shop*/
       nextShippingDay:true,
@@ -130,6 +130,30 @@ describe("orders.find.shop", function(){
       done();
     });
   });
+
+  it("filter content by shop with TWO shop, only those items are exported ", function(done){
+    var criteria={
+      shop:["super-shop"],  /*super-shop*/
+      nextShippingDay:true,
+      closed:null
+
+    }
+    db.model('Orders').findByCriteria(criteria, function(err,order){
+      should.not.exist(err);
+
+      order.length.should.equal(1);
+      order=db.model('Orders').filterByShop(order,criteria.shop)
+
+      order[0].vendors.length.should.equal(1);
+      order[0].vendors[0].slug.should.equal(criteria.shop[0])
+
+      for(var i in order[0].items){
+        order[0].items[i].vendor.should.equal(criteria.shop[0])
+      }
+      done();
+    });
+  });
+
   it.skip("find open orders (1) for next shipping day filter by shop name and with status paid+partial", function(done){
     var criteria={
       shop:"super-shop",  /*super-shop*/

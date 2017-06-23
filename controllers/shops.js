@@ -157,6 +157,7 @@ exports.getSEO=function (req, res) {
     //
     // setup the model 
     var model={ 
+      config:config,
       shop: shop, 
       user: req.user, 
       _:_,
@@ -199,6 +200,7 @@ exports.allSEO=function (req, res) {
       //
       // setup the model 
       var model={ 
+        config:config,
         categories:cats,
         shops: shops, 
         user: req.user, 
@@ -329,7 +331,7 @@ exports.status=function(req,res){
 
   db.model('Shops').findOne({urlpath:req.params.shopname},function(err,shop){
     if (err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
     if(!shop){
       return res.status(400).send("Cannot find the shop");
@@ -374,7 +376,7 @@ exports.update=function(req,res){
 
   Shops.findOne({urlpath:req.params.shopname}).select('+account.fees +account.tva.number +account.tva.fees').exec(function(err,shop){
     if (err){
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
     }
 
     if (!shop){
@@ -427,7 +429,7 @@ exports.list=function (req, res) {
   Shops.findByCriteria(criteria).then(function(shops) {
     return res.json(shops);
   }).then(undefined,function(err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message||err);
   });
 
 

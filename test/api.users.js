@@ -45,7 +45,7 @@ describe("api.users", function(){
       .send({ email: "evaleto@gluck.com", password:'123456789', provider:'local' })
       .end(function(err,res){      
         res.should.have.status(400);
-        res.body.should.be.a.string;        
+        res.text.should.be.a.String();        
         done();        
       });
   });
@@ -66,7 +66,8 @@ describe("api.users", function(){
       .send({ email:'oo@oo.com',provider:'local', password:'ppppp' })
       .end(function(err,res){
         res.should.have.status(400);
-        res.body.should.be.a.string;        
+        res.text.should.containEql('le mot de passe est incorrect')
+        res.text.should.be.a.String();        
         done();        
       });
   });

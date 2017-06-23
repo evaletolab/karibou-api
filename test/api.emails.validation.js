@@ -78,7 +78,7 @@ describe("api.validate", function(){
       .set('cookie', cookie)
       .end(function(err,res){
         res.should.have.status(200);
-        res.body.should.be.an.array;
+        res.body.should.be.an.Array();
         res.body.length.should.equal(0);
         done()
       });
@@ -120,7 +120,7 @@ describe("api.validate", function(){
       .end(function(err,res){
         res.should.have.status(200);
 
-        res.body.should.be.an.array;
+        res.body.should.be.an.Array();
         res.body.should.have.length(1);
         done()
       });
@@ -184,7 +184,7 @@ describe("api.validate", function(){
       .end(function(err,res){
         res.should.have.status(200);
 
-        res.body.should.be.an.array;
+        res.body.should.be.an.Array();
         res.body.should.have.length(0);
         done()
       });

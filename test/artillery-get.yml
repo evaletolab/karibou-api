@@ -1,0 +1,39 @@
+config:
+  target: 'http://localhost:4000'
+  http:
+    timeout: 1
+  phases:
+    - duration: 40
+      arrivalRate: 100
+      name: "Running"
+
+  defaults:
+    headers:
+      x-my-service-auth: '987401838271002188298567'
+
+scenarios:
+  - flow:
+    - get:
+        url: "/v1/config?lang=fr"
+        cookie:
+          saved: "artillery-cookies"
+    - get:
+        url: "/v1/users/me"
+        cookie:
+          saved: "artillery-cookies"
+    - get:
+        url: "/v1/category?stats=true"
+        cookie:
+          saved: "artillery-cookies"
+    - get:
+        url: "/v1/products?available=true&discount=true&home=true&maxcat=8&popular=true&status=true&when=true&nocache=true"
+        cookie:
+          saved: "artillery-cookies"
+    - get:
+        url: "/v1/shops"
+        cookie:
+          saved: "artillery-cookies"
+
+
+
+

@@ -138,9 +138,9 @@ describe("shops.find.available", function(){
 
 
 
-  // only 2 shop available on monday
-  it("Find available Shops for monday", function(done){
-    var range=Date.dayToDates([1]);
+  // only 2 shop available on monday/tuesday (depending if today is sunday!)
+  it("Find available Shops for monday/tuesday", function(done){    
+    var range=Date.dayToDates([now.getDay()?1:2]);
     Shops.findAvailable(range,function(err,shops){
         var str=shops.map(function(s) {
           return s.urlpath;

@@ -1,7 +1,6 @@
 doctype html
-html(itemscope, itemtype="http://schema.org/LocalBusiness")
+html
   head
-    // http://schema.org/LocalBusiness
     title: =shop.name
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
@@ -10,11 +9,6 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
     // Place this data between the <head> tags of your website 
     meta( name="description", content="#{shop.description}")
 
-    // Schema.org markup for Google+ 
-    meta( itemprop="name", content="#{shop.name}")
-    meta( itemprop="description", content="#{shop.description}")
-    meta( itemprop="image", content="#{prependUrlImage(shop.photo.fg)}")
-    meta( itemprop="url", content="https://karibou.ch/shop/#{shop.urlpath}" )
 
     // Twitter Card data 
     meta( name="twitter:card", content="article")
@@ -24,7 +18,9 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
     //meta( name="twitter:creator", content="@author_handle")
     meta( name="twitter:image", content="#{prependUrlImage(shop.photo.fg)}")
 
+
     // Open Graph data
+    meta( property="fb:app_id", content="#{config.auth.fb.appId}" )    
     meta( property="og:title", content="#{shop.name}" )
     meta( property="og:url", content="https://karibou.ch/shop/#{shop.urlpath}" )
     meta( property="og:image", content="#{prependUrlImage(shop.photo.fg)}" )
@@ -33,7 +29,8 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
     link(href="/css/style.css", rel="stylesheet")
 
-  body
+  body(itemscope,itemtype="https://schema.org/Organization")
+    link(itemprop="url", href="https://karibou.ch/shop/#{shop.urlpath}",class="hide")
     div(class="container")
       div(class="header clearfix")
         nav(class="navbar navbar-default")
@@ -54,22 +51,49 @@ html(itemscope, itemtype="http://schema.org/LocalBusiness")
       div: =shop.description
       div 
         img(src='#{prependUrlImage(shop.photo.fg)}', class="img-responsive")
+        hr
+        img(itemprop="logo", src="#{prependUrlImage(shop.photo.logo||shop.photo.owner)}")
       h1 Boutique
-      div(itemprop='owns')
-        div(itemprop="name"): =shop.address.name 
-        div(itemprop="url")<a href="/shop/#{shop.urlpath}">#{shop.name}</a>
+      div
+        div: =shop.address.name 
 
       h2 En vente sur le marché
-      ul(class="list-group")
+      ul(class="list-group hide")
       - each place in shop.marketplace
           li(class="list-group-item"): =place
 
 
       h2 Contact
-      ul(class="list-group", itemscope, itemtype="http://schema.org/Organization")
-          li(class="list-group-item",itemprop="telephone"): =shop.address.phone
-      ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
-          li(class="list-group-item", itemprop="name"): =shop.address.name
-          li(class="list-group-item", itemprop="streetAddress"): =shop.address.streetAdress
-          li(class="list-group-item", itemprop="addressRegion"): =shop.address.region
-          li(class="list-group-item", itemprop="postalCode"): =shop.address.postalCode
+      div(itemscope itemtype="https://schema.org/LocalBusiness")
+        h3(itemprop="name"): =shop.name
+        p(itemprop="description"): =shop.description
+        p(itemprop="telephone"): =shop.address.phone        
+        img(itemprop="image",src="#{prependUrlImage(shop.photo.fg)}",class="hide")
+        ul(class="list-group",itemscope, itemtype="http://schema.org/PostalAddress")
+            li(class="list-group-item", itemprop="name"): =shop.address.name
+            li(class="list-group-item", itemprop="streetAddress"): =shop.address.streetAdress
+            li(class="list-group-item", itemprop="addressRegion"): =shop.address.region
+            li(class="list-group-item", itemprop="postalCode"): =shop.address.postalCode
+        span(itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates")
+          meta(itemprop="latitude", content="#{shop.address.geo.lat}")
+          meta(itemprop="longitude", content="#{shop.address.geo.lng}")
+
+
+
+//- span(itemscope,itemtype="https://schema.org/Organization")
+//-   link(itemprop="url", href="https://karibou.ch/shop/#{shop.urlpath}")
+//-   meta(itemprop="logo", href="#{prependUrlImage(shop.photo.logo||shop.photo.owner)}")
+//-   span(itemscope itemtype="https://schema.org/LocalBusiness")
+//-     span(itemprop="name"): =shop.name
+//-     span(itemscope itemtype="https://schema.org/PostalAddress")
+//-       meta(itemprop="streetAddress", content="#{shop.address.streetAdress}")
+//-       meta(itemprop="postalCode", content="#{shop.address.postalCode}")
+//-       meta(itemprop="addressRegion", content="#{shop.address.region}")
+//-       meta(itemprop="addressCountry", content="#{shop.address.region}")
+//-     span(itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates")
+//-       meta(itemprop="latitude", content="#{shop.address.geo.lat}")
+//-       meta(itemprop="longitude", content="#{shop.address.geo.lng}")
+    
+//-     span(itemprop="description"): =shop.description
+//-     span(itemprop="telephone"): =shop.address.phone
+

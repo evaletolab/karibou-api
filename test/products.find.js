@@ -34,7 +34,7 @@ describe("products.find:", function(){
   it("Find products by SKU", function(done){
     Products.findBySkus([1000001,1000002],function(err,products){
       products.length.should.equal(2)  
-      products[0].sku.should.equal(1000001)
+      products.map(e=>e.sku).should.containEql(1000001);
       products[0].vendor.should.be.instanceOf(Object).and.have.property('name')
       done();
     });
@@ -44,7 +44,7 @@ describe("products.find:", function(){
   it("Find products by criteria SKU", function(done){
     Products.findByCriteria({skus:[1000001,1000002]},function(err,products){
       products.length.should.equal(2)  
-      products[0].sku.should.equal(1000001)
+      products.map(e=>e.sku).should.containEql(1000001);
       products[0].vendor.should.be.instanceOf(Object).and.have.property('name')
       done();
     });
@@ -53,7 +53,7 @@ describe("products.find:", function(){
   it("Find products by SKU", function(done){
     Products.findBySkus([1000001,1000002],function(err,products){
       products.length.should.equal(2)      
-      products[0].sku.should.equal(1000001)
+      products.map(e=>e.sku).should.containEql(1000001);
       done();
     });
   });

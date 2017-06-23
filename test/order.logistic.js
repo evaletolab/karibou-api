@@ -136,9 +136,9 @@ describe("orders.logistic", function(){
     Orders.updateLogistic({'vendors.slug':'un-autre-shop-2'}, {status:true, when:when},function (err, orders) {
       should.not.exist(err)
       should.exist(orders)
-      orders[0].vendors[0].collected.should.be.true
-      orders[0].vendors[1].collected.should.be.false
-      //orders[0].shipping.shipped.should.be.true
+      orders[0].vendors[0].collected.should.be.true()
+      orders[0].vendors[1].collected.should.be.false()
+      //orders[0].shipping.shipped.should.be.true()
       done()
     })
   });

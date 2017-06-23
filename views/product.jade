@@ -32,6 +32,7 @@ html(itemscope itemtype="http://schema.org/Product")
     meta( name="twitter:label1", content="Price")
 
     // Open Graph data
+    meta( property="fb:app_id", content="#{config.auth.fb.appId}" )    
     meta( property="og:title", content="#{product.title}" )
     meta( property="og:type", content="article" )
     meta( property="og:url", content="https://karibou.ch/products/#{product.sku}" )
@@ -76,10 +77,12 @@ html(itemscope itemtype="http://schema.org/Product")
           li(  class="label label-success") Terroir et Local
         if product.details.gluten
           li(  class="label label-success") Sans gluten
-        if product.details.bio
+        if (product.details.bio||product.details.biodynamics||product.details.bioconvertion)
           li(  class="label label-success") BIO
+        if product.details.grta
+          li(  class="label label-success") GRTA
         if product.details.natural
-          li(  class="label label-success" title="Naturel") Sans chimie de synthèse
+          li(  class="label label-success" title="Naturel") 100% naturel
 
       div(itemprop="offers", itemscope, itemtype="http://schema.org/Offer")
         span prix, 
@@ -90,13 +93,9 @@ html(itemscope itemtype="http://schema.org/Product")
 
         h2:  =product.categories.name
         div: |Région de Genève
-        h2 Boutique
-        div(itemprop='seller' itemscope itemtype='http://schema.org/Organization')
-          a( itemprop="url" href="/shop/#{product.vendor.urlpath}")
-            span(itemprop="name"): =product.vendor.name 
+      h2 Boutique
 
-      h2 En vente sur le marché
-      ul(class="list-group")
+      ul(class="list-group hide")
       - each place in product.vendor.marketplace
         li(class="list-group-item"): =place
 
@@ -105,9 +104,16 @@ html(itemscope itemtype="http://schema.org/Product")
         li(  class="label label-success" title="#{weekdays[day]}")  #{weekdays[day]}
 
 
-      h2 Contact
-      ul(itemscope itemtype="http://schema.org/PostalAddress",class="list-group")
-         li(class="list-group-item", itemprop="name"): =product.vendor.address.name
-         li(class="list-group-item", itemprop="streetAddress"): =product.vendor.address.streetAdress
-         li(class="list-group-item", itemprop="addressRegion"): =product.vendor.address.region.replace('GE','Genève')
-         li(class="list-group-item", itemprop="postalCode"): =product.vendor.address.postalCode
+      h2(itemscope,itemtype="https://schema.org/Organization") Contact
+        a(itemprop="url", href="/shop/#{product.vendor.urlpath}"): =product.vendor.name
+
+      div
+        h3(itemprop="name"): =product.vendor.name
+        p: =product.vendor.description
+        p: =product.vendor.address.phone        
+        ul(class="list-group")
+            li(class="list-group-item"): =product.vendor.address.name
+            li(class="list-group-item"): =product.vendor.address.streetAdress
+            li(class="list-group-item"): =product.vendor.address.region
+            li(class="list-group-item"): =product.vendor.address.postalCode
+        
