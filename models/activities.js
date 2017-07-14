@@ -62,6 +62,10 @@ Activity.statics.findByCrireria = function(criteria, callback){
   if(criteria.type){
     query['what.type']=criteria.type;
   }
+  
+  if(criteria.year){
+    from.setFullYear(criteria.year|0)
+  }
 
   if(criteria.month){
     from.setDate(1)
