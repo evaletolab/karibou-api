@@ -83,7 +83,7 @@ exports.create=function (req, res) {
 exports.remove=function (req, res) {
 
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
   }catch(err){
     return res.status(400).send( err.message);
   }
@@ -108,7 +108,7 @@ exports.get=function (req, res) {
   //
   // check shop owner
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
   }catch(err){
     return res.status(400).send( err.message);
   }
@@ -270,7 +270,7 @@ exports.email=function(req,res){
 
 exports.askStatus=function(req,res){
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
     if(req.user.email.status!==true)throw new Error("Vous devez avoir une adresse email valide");
     if(!req.user)throw new Error("Vous devez avoir une session ouverte");
     //check(req.user.email.address, "Vous devez avoir une adresse email valide").len(3, 44).isEmail();
@@ -322,7 +322,7 @@ exports.askStatus=function(req,res){
 exports.status=function(req,res){
 
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").isSlug().len(3, 34);
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").isSlug().len(3, 64);
     if(req.body.status===undefined)throw new Error("Invalid request");;
   }catch(err){
     return res.status(400).send( err.message);
@@ -347,7 +347,7 @@ exports.update=function(req,res){
   //
   // check && validate input field
   try{
-    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 34).isSlug();
+    validate.check(req.params.shopname, "Le format du nom de la boutique n'est pas valide").len(3, 64).isSlug();
     validate.shop(req.body);
   }catch(err){
     return res.status(400).send( err.message);
