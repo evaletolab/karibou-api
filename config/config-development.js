@@ -157,28 +157,28 @@ module.exports = {
 
 	auth:{
     mailchimp:{
-        key:"a9ade807b26ef746022d094620244d9a-us9"
+        key:"-us9"
     },
     uploadcare:{
-        pub:'b51a13e6bd44bf76e263',
-        pk:'e1da8e0e16519c97364f'
+        pub:'',
+        pk:''
     },
     fb: {
         appId: '111565172259433'
-      , appSecret: '85f7e0a0cc804886180b887c1f04a3c1'
+      , appSecret: ''
     }
   , twit: {
         consumerKey: 'PzDBUUZoU5hVtigzAz73w'
-      , consumerSecret: 'AvLzgxbZoJHMvV9RSCmvHGDL1ona0Zm9pOsw4FNGno'
+      , consumerSecret: ''
 		  , cb: "http://localhost:4000/auth/twitter/callback"
     }
   , github: {
-        appId: '11932f2b6d05d2a5fa18'
-      , appSecret: '2603d1bc663b74d6732500c1e9ad05b0f4013593'
+        appId: ''
+      , appSecret: ''
     }
   , google: {
-        clientId: '224794776836-cp3a2v0elt955h9uqhgmskplhg85ljjm.apps.googleusercontent.com'
-      , clientSecret: 'rxGFo1mBG_H3DX2ifDFawiMZ'
+        clientId: '224794776836-.apps.googleusercontent.com'
+      , clientSecret: ''
       , cb: 'http://localhost:4000/auth/google/callback'
     }
   , persona:{
